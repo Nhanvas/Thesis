@@ -1,0 +1,39 @@
+# Default configuration.
+# Modify for your task.
+
+# Data
+data:
+  train_dir: "/path/to/train/"
+  val_dir: "/path/to/val/"
+  test_dir: "/path/to/test/"
+  batch_size: 16
+  num_workers: 4
+
+# Model
+model:
+  name: "unet"
+  n_channels: 3
+  n_classes: 1
+
+# Training
+training:
+  max_epochs: 100
+  lr: 0.0001
+  optimizer: "adamw"
+  scheduler: "cosine"
+  checkpoint_dir: "./checkpoints/"
+  log_dir: "./logs/"
+
+# Loss
+loss:
+  type: "bce"
+
+# Metrics
+metrics:
+  task: "binary"
+  num_classes: 2
+
+# Transform
+transform:
+  target_size: [224, 224]
+  do_augmentation: true

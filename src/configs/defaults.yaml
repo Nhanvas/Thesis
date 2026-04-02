@@ -1,39 +1,34 @@
-# Default configuration.
-# Modify for your task.
-
-# Data
 data:
-  train_dir: "/path/to/train/"
-  val_dir: "/path/to/val/"
-  test_dir: "/path/to/test/"
-  batch_size: 16
+  processed_dir: "../data/processed/"
+  splits_dir: "../data/splits/"
+  batch_size: 32
   num_workers: 4
+  n_channels: 18
+  window_samples: 1024
 
-# Model
+graph:
+  metric: "wpli_aec"
+  alpha: 0.5
+  top_k_percent: 30
+
 model:
-  name: "unet"
-  n_channels: 3
-  n_classes: 1
+  name: "gae"
+  encoder_layers: 2
+  hidden_dim: 64
+  latent_dim: 16
 
-# Training
 training:
   max_epochs: 100
-  lr: 0.0001
-  optimizer: "adamw"
+  lr: 0.001
+  optimizer: "adam"
   scheduler: "cosine"
-  checkpoint_dir: "./checkpoints/"
-  log_dir: "./logs/"
+  checkpoint_dir: "../results/checkpoints/"
+  log_dir: "../results/logs/"
+  seed: 42
 
-# Loss
-loss:
-  type: "bce"
+anomaly:
+  threshold_percentile: 95
 
-# Metrics
-metrics:
-  task: "binary"
-  num_classes: 2
-
-# Transform
-transform:
-  target_size: [224, 224]
-  do_augmentation: true
+evaluation:
+  metrics: ["sensitivity", "specificity", "auroc", "fdr_per_hour"]
+  results_log: "../results/results_log.csv"

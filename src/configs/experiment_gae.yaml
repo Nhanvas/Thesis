@@ -1,0 +1,14 @@
+# E5 — Proposed model (override defaults)
+model:
+  name: "gae"
+  encoder_layers: 2
+  hidden_dim: 64
+  latent_dim: 16
+
+graph:
+  metric: "wpli_aec"
+  alpha: 0.5
+  top_k_percent: 30
+
+training:
+  seed: 42

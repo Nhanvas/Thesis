@@ -217,7 +217,7 @@ def process_subject(subject_id, raw_dir, processed_dir,
 # ── 6. Run all subjects ───────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    RAW_DIR = "D:/CHB-MIT"          # Change to the actual path
+    RAW_DIR = "F:/Study/Thesis/Dataset/CHB-MIT"          # Change to the actual path
     PROCESSED_DIR = "../data/processed"
 
     SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]

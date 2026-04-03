@@ -15,4 +15,5 @@ __pycache__/
 .env
 
 # Editors
-.vscode/
+.vscode/venv/
+venv/

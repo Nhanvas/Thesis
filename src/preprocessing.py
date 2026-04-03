@@ -64,12 +64,29 @@ def parse_summary(summary_path):
 def load_edf(edf_path):
     """
     Load EDF, pick 18 common channels.
-    Returns: raw MNE object or None if channels missing.
+    Handles duplicate channel names (e.g. T8-P8 appears twice in CHB-MIT).
     """
     raw = mne.io.read_raw_edf(edf_path, preload=True, verbose=False)
 
-    # Normalize channel names
+    # Normalize channel names to uppercase
     raw.rename_channels({ch: ch.upper().strip() for ch in raw.ch_names})
+
+    # Handle duplicates: MNE renames T8-P8 → T8-P8-0, T8-P8-1
+    # Keep first occurrence, rename back to original
+    rename_map = {}
+    seen = {}
+    for ch in raw.ch_names:
+        # Check if this is a MNE-generated duplicate (ends with -0, -1, etc.)
+        base = ch.rsplit('-', 1)
+        if len(base) == 2 and base[1].isdigit():
+            original = base[0]
+            if original not in seen:
+                seen[original] = ch
+                rename_map[ch] = original  # rename T8-P8-0 → T8-P8
+            # T8-P8-1 and beyond: leave as is, will be dropped
+
+    if rename_map:
+        raw.rename_channels(rename_map)
 
     available = set(raw.ch_names)
     missing = set(COMMON_CHANNELS) - available

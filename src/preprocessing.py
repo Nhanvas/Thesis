@@ -141,7 +141,7 @@ def process_subject(subject_id, raw_dir, processed_dir,
     processed_dir = Path(processed_dir)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
-    summary_path = raw_dir / subject_id / f"{subject_id}-summary.txt"
+    summary_path = raw_dir / "CHB info" / "summary" / f"{subject_id}-summary.txt"
     seizure_map = parse_summary(summary_path)
 
     interictal_windows, interictal_adjs = [], []

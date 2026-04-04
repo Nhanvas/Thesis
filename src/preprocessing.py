@@ -1,4 +1,3 @@
-import os
 import re
 import numpy as np
 import mne
@@ -22,6 +21,9 @@ COMMON_CHANNELS = [
     "FZ-CZ",  "CZ-PZ"
 ]
 
+N_CH  = 18
+N_SMP = 1024   # samples per window
+
 
 # ── 1. Parse summary file ─────────────────────────────────────────────────────
 
@@ -32,8 +34,7 @@ def parse_summary(summary_path):
     """
     seizures = {}
     current_file = None
-    n_seizures = 0
-    seizure_count = 0
+    onset = None
 
     with open(summary_path, "r") as f:
         for line in f:
@@ -42,49 +43,43 @@ def parse_summary(summary_path):
             if line.startswith("File Name:"):
                 current_file = line.split(":")[1].strip()
                 seizures[current_file] = []
-                seizure_count = 0
-
-            elif line.startswith("Number of Seizures in File:"):
-                n_seizures = int(line.split(":")[1].strip())
 
             elif "Seizure" in line and "Start Time:" in line:
-                onset = int(re.search(r"(\d+)\s*seconds", line).group(1))
-                seizure_count += 1
+                match = re.search(r"(\d+)\s*seconds", line)
+                if match:
+                    onset = int(match.group(1))
 
             elif "Seizure" in line and "End Time:" in line:
-                offset = int(re.search(r"(\d+)\s*seconds", line).group(1))
-                if current_file is not None:
+                match = re.search(r"(\d+)\s*seconds", line)
+                if match and onset is not None and current_file is not None:
+                    offset = int(match.group(1))
                     seizures[current_file].append((onset, offset))
+                    onset = None
 
     return seizures
 
 
-# ── 2. Load single EDF file ───────────────────────────────────────────────────
+# ── 2. Open EDF — NO full load into RAM ──────────────────────────────────────
 
-def load_edf(edf_path):
+def open_edf(edf_path):
     """
-    Load EDF, pick 18 common channels.
-    Handles duplicate channel names (e.g. T8-P8 appears twice in CHB-MIT).
+    Open EDF and pick 18 channels WITHOUT loading data into RAM.
+    Data is read per-window via raw.get_data(start, stop).
     """
-    raw = mne.io.read_raw_edf(edf_path, preload=True, verbose=False)
+    raw = mne.io.read_raw_edf(edf_path, preload=False, verbose=False)
 
-    # Normalize channel names to uppercase
     raw.rename_channels({ch: ch.upper().strip() for ch in raw.ch_names})
 
-    # Handle duplicates: MNE renames T8-P8 → T8-P8-0, T8-P8-1
-    # Keep first occurrence, rename back to original
+    # Handle CHB-MIT duplicate T8-P8
     rename_map = {}
     seen = {}
     for ch in raw.ch_names:
-        # Check if this is a MNE-generated duplicate (ends with -0, -1, etc.)
         base = ch.rsplit('-', 1)
         if len(base) == 2 and base[1].isdigit():
             original = base[0]
             if original not in seen:
                 seen[original] = ch
-                rename_map[ch] = original  # rename T8-P8-0 → T8-P8
-            # T8-P8-1 and beyond: leave as is, will be dropped
-
+                rename_map[ch] = original
     if rename_map:
         raw.rename_channels(rename_map)
 
@@ -96,33 +91,21 @@ def load_edf(edf_path):
 
     raw.pick_channels(COMMON_CHANNELS)
     raw.reorder_channels(COMMON_CHANNELS)
-
-    # Bandpass 0.5–40 Hz
-    raw.filter(0.5, 40.0, fir_design="firwin")
-
     return raw
 
 
-# ── 3. Build per-file label arrays ───────────────────────────────────────────
+# ── 3. Label and buffer mask ──────────────────────────────────────────────────
 
 def build_labels(n_seconds, seizure_list):
-    """
-    Binary label array at 1s resolution.
-    1 = ictal, 0 = interictal.
-    """
     labels = np.zeros(n_seconds, dtype=np.int8)
     for onset, offset in seizure_list:
-        onset = max(0, onset)
+        onset  = max(0, onset)
         offset = min(n_seconds, offset)
         labels[onset:offset] = 1
     return labels
 
 
 def build_buffer_mask(n_seconds, seizure_list):
-    """
-    True where window is within 4h after a seizure end.
-    These windows are excluded from interictal training set.
-    """
     mask = np.zeros(n_seconds, dtype=bool)
     for _, offset in seizure_list:
         buffer_end = min(n_seconds, offset + BUFFER_S)
@@ -133,109 +116,188 @@ def build_buffer_mask(n_seconds, seizure_list):
 # ── 4. Artifact rejection ─────────────────────────────────────────────────────
 
 def is_artifact(window):
-    """
-    window: [18, 1024] in Volts.
-    Reject if any channel exceeds ±500 µV.
-    """
     return np.abs(window).max() > ARTIFACT_THRESHOLD_UV
 
 
-# ── 5. Process one subject ────────────────────────────────────────────────────
+# ── 5. Count windows (pass 1) ─────────────────────────────────────────────────
+
+def count_windows(subject_id, raw_dir, seizure_map):
+    """
+    First pass: count how many interictal and ictal windows will be saved.
+    Required to pre-allocate memmap arrays on disk before writing.
+    Does NOT store any signal data.
+    """
+    raw_dir   = Path(raw_dir)
+    n_inter   = 0
+    n_ictal   = 0
+    n_rejected = 0
+
+    edf_files = sorted((raw_dir / subject_id).glob("*.edf"))
+
+    for edf_path in edf_files:
+        fname        = edf_path.name
+        seizure_list = seizure_map.get(fname, [])
+
+        raw = open_edf(edf_path)
+        if raw is None:
+            continue
+
+        n_samples = int(raw.n_times)
+        n_seconds = n_samples // FS
+        n_windows = n_samples // WIN_SAMPLES
+
+        labels      = build_labels(n_seconds, seizure_list)
+        buffer_mask = build_buffer_mask(n_seconds, seizure_list)
+
+        for i in range(n_windows):
+            start   = i * WIN_SAMPLES
+            end     = start + WIN_SAMPLES
+            start_s = i * WIN_S
+            end_s   = start_s + WIN_S
+
+            window = raw.get_data(start=start, stop=end)
+
+            if is_artifact(window):
+                n_rejected += 1
+                continue
+
+            window_label    = labels[start_s:end_s].max()
+            window_buffered = buffer_mask[start_s:end_s].any()
+
+            if window_label == 1:
+                n_ictal += 1
+            elif not window_buffered:
+                n_inter += 1
+
+        del raw
+
+    return n_inter, n_ictal, n_rejected
+
+
+# ── 6. Process one subject (two-pass, memmap write) ───────────────────────────
 
 def process_subject(subject_id, raw_dir, processed_dir,
                     alpha=0.5, top_k_percent=30):
     """
     Full preprocessing pipeline for one CHB-MIT subject.
 
+    Two-pass strategy to avoid large RAM spike:
+      Pass 1 — count_windows(): count N and M without storing data
+      Allocate memmap files on disk sized exactly [N,18,1024] and [N,18,18]
+      Pass 2 — write each window directly into the memmap file
+
+    Peak RAM at any point = one 4s window = 18 x 1024 x 8 bytes = ~0.15 MB.
+    No large intermediate list is held in memory.
+
     Outputs (saved to processed_dir):
-      {subject_id}_interictal_windows.npy  [N, 18, 1024]
-      {subject_id}_interictal_adjs.npy     [N, 18, 18]
-      {subject_id}_ictal_windows.npy       [M, 18, 1024]
-      {subject_id}_ictal_adjs.npy          [M, 18, 18]
-      {subject_id}_metadata.npy            dict saved as .npy
+      {subject_id}_interictal_windows.npy  [N, 18, 1024]  float32
+      {subject_id}_interictal_adjs.npy     [N, 18, 18]    float32
+      {subject_id}_ictal_windows.npy       [M, 18, 1024]  float32
+      {subject_id}_ictal_adjs.npy          [M, 18, 18]    float32
+      {subject_id}_metadata.npy            dict
     """
-    raw_dir = Path(raw_dir)
+    raw_dir       = Path(raw_dir)
     processed_dir = Path(processed_dir)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
-    summary_path = raw_dir / "CHB info" / "summary" / f"{subject_id}-summary.txt"
+    summary_path = (raw_dir / "CHB info" / "summary" /
+                    f"{subject_id}-summary.txt")
     seizure_map = parse_summary(summary_path)
 
-    interictal_windows, interictal_adjs = [], []
-    ictal_windows, ictal_adjs = [], []
-    n_artifact_rejected = 0
+    # ── Pass 1: count windows ─────────────────────────────────────────────────
+    print(f"  [pass 1] counting windows...")
+    n_inter, n_ictal, n_rejected = count_windows(subject_id, raw_dir, seizure_map)
+    print(f"  [pass 1] interictal={n_inter} | ictal={n_ictal} | rejected={n_rejected}")
 
+    prefix = processed_dir / subject_id
+
+    # ── Allocate memmap files on disk ─────────────────────────────────────────
+    # np.lib.format.open_memmap creates a proper .npy file with header
+    mm_iw = np.lib.format.open_memmap(
+        f"{prefix}_interictal_windows.npy", mode='w+',
+        dtype=np.float32, shape=(n_inter, N_CH, N_SMP))
+    mm_ia = np.lib.format.open_memmap(
+        f"{prefix}_interictal_adjs.npy", mode='w+',
+        dtype=np.float32, shape=(n_inter, N_CH, N_CH))
+    mm_cw = np.lib.format.open_memmap(
+        f"{prefix}_ictal_windows.npy", mode='w+',
+        dtype=np.float32, shape=(max(n_ictal, 1), N_CH, N_SMP))
+    mm_ca = np.lib.format.open_memmap(
+        f"{prefix}_ictal_adjs.npy", mode='w+',
+        dtype=np.float32, shape=(max(n_ictal, 1), N_CH, N_CH))
+
+    # ── Pass 2: write windows directly to disk ────────────────────────────────
+    print(f"  [pass 2] writing windows to disk...")
+    idx_inter = 0
+    idx_ictal = 0
     edf_files = sorted((raw_dir / subject_id).glob("*.edf"))
 
     for edf_path in edf_files:
-        fname = edf_path.name
+        fname        = edf_path.name
         seizure_list = seizure_map.get(fname, [])
 
-        raw = load_edf(edf_path)
+        raw = open_edf(edf_path)
         if raw is None:
             continue
 
-        data = raw.get_data()           # [18, n_samples] in Volts
-        n_samples = data.shape[1]
+        n_samples = int(raw.n_times)
         n_seconds = n_samples // FS
-
-        labels = build_labels(n_seconds, seizure_list)
-        buffer_mask = build_buffer_mask(n_seconds, seizure_list)
-
         n_windows = n_samples // WIN_SAMPLES
 
+        labels      = build_labels(n_seconds, seizure_list)
+        buffer_mask = build_buffer_mask(n_seconds, seizure_list)
+
         for i in range(n_windows):
-            start = i * WIN_SAMPLES
-            end = start + WIN_SAMPLES
+            start   = i * WIN_SAMPLES
+            end     = start + WIN_SAMPLES
             start_s = i * WIN_S
-            end_s = start_s + WIN_S
+            end_s   = start_s + WIN_S
 
-            window = data[:, start:end]  # [18, 1024]
+            window = raw.get_data(start=start, stop=end)  # [18, 1024] float64
 
-            # Artifact rejection
             if is_artifact(window):
-                n_artifact_rejected += 1
                 continue
 
-            window_label = labels[start_s:end_s].max()
+            window_label    = labels[start_s:end_s].max()
             window_buffered = buffer_mask[start_s:end_s].any()
 
-            # Build graph
-            A = build_adjacency(window, alpha=alpha, top_k_percent=top_k_percent)
+            A = build_adjacency(window, alpha=alpha,
+                                top_k_percent=top_k_percent)
 
-            if window_label == 1:
-                ictal_windows.append(window)
-                ictal_adjs.append(A)
-            elif not window_buffered:
-                interictal_windows.append(window)
-                interictal_adjs.append(A)
+            if window_label == 1 and idx_ictal < n_ictal:
+                mm_cw[idx_ictal] = window.astype(np.float32)
+                mm_ca[idx_ictal] = A.astype(np.float32)
+                idx_ictal += 1
+            elif not window_buffered and idx_inter < n_inter:
+                mm_iw[idx_inter] = window.astype(np.float32)
+                mm_ia[idx_inter] = A.astype(np.float32)
+                idx_inter += 1
 
-    # Save
-    prefix = processed_dir / subject_id
-    np.save(f"{prefix}_interictal_windows.npy", np.array(interictal_windows, dtype=np.float32))
-    np.save(f"{prefix}_interictal_adjs.npy",   np.array(interictal_adjs,   dtype=np.float32))
-    np.save(f"{prefix}_ictal_windows.npy",      np.array(ictal_windows,     dtype=np.float32))
-    np.save(f"{prefix}_ictal_adjs.npy",         np.array(ictal_adjs,        dtype=np.float32))
+        del raw
 
+    # Flush memmap to disk
+    del mm_iw, mm_ia, mm_cw, mm_ca
+
+    # ── Save metadata ─────────────────────────────────────────────────────────
     metadata = {
         "subject_id":          subject_id,
-        "n_interictal":        len(interictal_windows),
-        "n_ictal":             len(ictal_windows),
-        "n_artifact_rejected": n_artifact_rejected,
-        "imbalance_ratio":     len(interictal_windows) / max(len(ictal_windows), 1),
+        "n_interictal":        n_inter,
+        "n_ictal":             n_ictal,
+        "n_artifact_rejected": n_rejected,
+        "imbalance_ratio":     n_inter / max(n_ictal, 1),
     }
     np.save(f"{prefix}_metadata.npy", metadata)
 
-    print(f"[{subject_id}] interictal={len(interictal_windows)} | "
-          f"ictal={len(ictal_windows)} | rejected={n_artifact_rejected}")
+    print(f"[{subject_id}] interictal={n_inter} | "
+          f"ictal={n_ictal} | rejected={n_rejected}")
     return metadata
 
 
-# ── 6. Run all subjects ───────────────────────────────────────────────────────
+# ── 7. Run all subjects ───────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    RAW_DIR = "F:/Study/Thesis/Dataset/CHB-MIT"          # Change to the actual path
-    PROCESSED_DIR = "../data/processed"
+    RAW_DIR       = "F:/Study/Thesis/Dataset/CHB-MIT"
+    PROCESSED_DIR = "F:/Study/Thesis/Code/data/processed"
 
     SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]
 

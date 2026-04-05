@@ -1,1 +1,3 @@
-from .dataset import EEGWindowDataset, collate_eeg_graphs
+from .dataset import EEGGraphDataset
+
+__all__ = ["EEGGraphDataset"]

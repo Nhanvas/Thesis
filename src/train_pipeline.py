@@ -1,179 +1,172 @@
-import os
+"""
+train_pipeline.py
+=================
+Train GAE on interictal adjacency matrices of training subjects.
+Evaluate on held-out LTSO test subjects.
+
+Usage (smoke test):
+    cd src
+    python train_pipeline.py
+"""
+
+import sys
 import torch
 import numpy as np
 from pathlib import Path
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, ConcatDataset
 
-from configs import ConfigReader
-from shared.models import (
-    LossHandler,
-    OptimizerHandler,
-    Trainer,
-    ExperimentLogger
-)
-from shared.services.data import EEGWindowDataset, collate_eeg_graphs
-from shared.services.models_hub.gae import GAEModel
+sys.path.insert(0, str(Path(__file__).parent))
+
+from configs.config import ConfigReader
+from shared.models.logger import ExperimentLogger
+from shared.models.loss_function import LossHandler
+from shared.models.optimization import OptimizerHandler
+from shared.models.trainer import Trainer
+from shared.models.metrics import MetricHandler
+from shared.services.data.dataset import EEGGraphDataset
+from shared.services.models_hub.gae.model import GAEModel
 from evaluate import run_evaluation
 
 
-def set_seed(seed=42):
+def set_seed(seed: int = 42):
     torch.manual_seed(seed)
     np.random.seed(seed)
     torch.backends.cudnn.deterministic = True
 
 
-def run(config_path="./configs/defaults.yaml",
-        experiment_path=None,
-        experiment_id="E5_proposed_gae",
-        fold_id="fold_1",
-        train_subjects=None,
-        test_subjects=None):
+def run(config_path: str = "./configs/defaults.yaml",
+        experiment_path: str = None,
+        experiment_id: str = "E5_proposed_gae",
+        fold_id: str = "fold_1",
+        train_subjects: list = None,
+        test_subjects: list = None) -> dict:
     """
     Train GAE on interictal windows of train_subjects.
     Evaluate on test_subjects (held-out LTSO fold).
-
-    Args:
-        train_subjects: list of subject IDs for training
-        test_subjects:  list of 2 subject IDs held out
     """
-    # ── Config ────────────────────────────────────────────────────────────────
     config = ConfigReader.merge(config_path, experiment_path)
     set_seed(config.training.seed)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     logger = ExperimentLogger(log_dir=config.training.log_dir)
-    logger.log_config(config_path)
-    logger.log_message(f"Starting {experiment_id} | {fold_id}")
+    logger.log_message(f"Start: {experiment_id} | {fold_id} | device={device}")
 
-    # ── Build dataset from train_subjects ─────────────────────────────────────
     processed_dir = Path(config.data.processed_dir)
 
-    all_windows, all_adjs = [], []
+    # ── Build dataset from training subjects ──────────────────────────────────
+    datasets = []
     for subj in train_subjects:
-        w = np.load(processed_dir / f"{subj}_interictal_windows.npy")
-        a = np.load(processed_dir / f"{subj}_interictal_adjs.npy")
-        all_windows.append(w)
-        all_adjs.append(a)
+        adjs_path = processed_dir / f"{subj}_interictal_adjs.npy"
+        if not adjs_path.exists():
+            raise FileNotFoundError(
+                f"Missing: {adjs_path}\n"
+                f"Run build_graphs.py first.")
+        datasets.append(EEGGraphDataset(str(adjs_path)))
 
-    all_windows = np.concatenate(all_windows, axis=0)
-    all_adjs    = np.concatenate(all_adjs,    axis=0)
+    full_dataset = ConcatDataset(datasets)
+    n_total = len(full_dataset)
+    n_val   = max(1, int(0.2 * n_total))
+    n_train = n_total - n_val
 
-    # Save merged temp files for dataset
-    tmp_w = processed_dir / "_tmp_train_windows.npy"
-    tmp_a = processed_dir / "_tmp_train_adjs.npy"
-    np.save(tmp_w, all_windows)
-    np.save(tmp_a, all_adjs)
+    logger.log_message(
+        f"Dataset: {n_total} windows | train={n_train} | val={n_val}")
 
-    full_dataset = EEGWindowDataset(tmp_w, tmp_a)
-
-    # 80/20 train/val split (interictal only — no labels)
-    n_val   = int(0.2 * len(full_dataset))
-    n_train = len(full_dataset) - n_val
-    train_dataset, val_dataset = random_split(
+    train_ds, val_ds = random_split(
         full_dataset, [n_train, n_val],
-        generator=torch.Generator().manual_seed(config.training.seed)
-    )
+        generator=torch.Generator().manual_seed(config.training.seed))
 
+    # num_workers=0 required on Windows with mmap'd files
     train_loader = DataLoader(
-        train_dataset,
+        train_ds,
         batch_size=config.data.batch_size,
         shuffle=True,
-        num_workers=config.data.num_workers,
-        collate_fn=collate_eeg_graphs,
-        pin_memory=torch.cuda.is_available()
-    )
+        num_workers=0,
+        pin_memory=False)
+
     val_loader = DataLoader(
-        val_dataset,
+        val_ds,
         batch_size=config.data.batch_size,
         shuffle=False,
-        num_workers=config.data.num_workers,
-        collate_fn=collate_eeg_graphs,
-        pin_memory=torch.cuda.is_available()
-    )
+        num_workers=0,
+        pin_memory=False)
 
     # ── Model ─────────────────────────────────────────────────────────────────
     model = GAEModel(
         in_channels=config.data.n_channels,
         hidden_dim=config.model.hidden_dim,
-        latent_dim=config.model.latent_dim
-    )
+        latent_dim=config.model.latent_dim)
     model.summary()
     logger.log_model_info(model)
 
-    # ── Handlers ──────────────────────────────────────────────────────────────
-    loss_handler = LossHandler(loss_type="graph_bce")
-
-    from shared.models.optimization import OptimizerHandler
+    # ── Train ─────────────────────────────────────────────────────────────────
     optimizer_handler = OptimizerHandler(
         optimizer_type=config.training.optimizer,
         lr=config.training.lr,
         scheduler_type=config.training.scheduler,
-        T_max=config.training.max_epochs
-    )
+        T_max=config.training.max_epochs)
 
-    # ── Train ─────────────────────────────────────────────────────────────────
-    checkpoint_dir = Path(config.training.checkpoint_dir) / experiment_id / fold_id
+    checkpoint_dir = (Path(config.training.checkpoint_dir)
+                      / experiment_id / fold_id)
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
     trainer = Trainer(
         max_epochs=config.training.max_epochs,
         checkpoint_dir=str(checkpoint_dir),
-        experiment_dir=logger.get_experiment_dir()
-    )
-    lightning_model = trainer.train(
+        patience=10)
+
+    train_result = trainer.train(
         model=model,
         train_loader=train_loader,
         val_loader=val_loader,
-        loss_handler=loss_handler,
-        optimizer_handler=optimizer_handler
-    )
+        loss_handler=None,       # trainer uses nn.BCELoss directly
+        optimizer_handler=optimizer_handler,
+        device=device)
 
-    # Save weights
+    # Save final weights
     weights_path = checkpoint_dir / "model_weights.pt"
-    model.save(str(weights_path))
+    torch.save(model.state_dict(), str(weights_path))
     logger.log_message(f"Weights saved: {weights_path}")
+
+    # ── Calibrate threshold from val scores ───────────────────────────────────
+    metric_handler = MetricHandler(
+        threshold_percentile=config.anomaly.threshold_percentile)
+    threshold = metric_handler.calibrate_threshold(
+        np.array(train_result["val_scores"]))
+    logger.log_message(f"Threshold (95th pct): {threshold:.4f}")
 
     # ── Evaluate on held-out test fold ────────────────────────────────────────
     hyperparams = {
-        "encoder_layers": config.model.encoder_layers,
-        "hidden_dim":     config.model.hidden_dim,
-        "latent_dim":     config.model.latent_dim,
-        "lr":             config.training.lr,
-        "alpha":          config.graph.alpha,
-        "top_k_percent":  config.graph.top_k_percent,
-        "seed":           config.training.seed
+        "hidden_dim":  config.model.hidden_dim,
+        "latent_dim":  config.model.latent_dim,
+        "lr":          config.training.lr,
+        "alpha":       config.graph.alpha,
+        "top_k":       config.graph.top_k_percent,
+        "seed":        config.training.seed,
+        "threshold":   round(threshold, 4),
     }
 
     metrics = run_evaluation(
         model=model,
         subject_ids=test_subjects,
-        splits_dir=config.data.splits_dir,
-        processed_dir=config.data.processed_dir,
+        processed_dir=str(processed_dir),
+        threshold=threshold,
         experiment_id=experiment_id,
         fold_id=fold_id,
         hyperparams=hyperparams,
         results_log_path=config.evaluation.results_log,
-        notes=f"train_subjects={train_subjects}"
-    )
+        device=device,
+        notes=f"train={train_subjects}")
 
     logger.log_results(metrics)
-    logger.log_message(f"Completed {experiment_id} | {fold_id}")
-
-    # Cleanup tmp files
-    tmp_w.unlink(missing_ok=True)
-    tmp_a.unlink(missing_ok=True)
-
+    logger.log_message(f"Done: {experiment_id} | {fold_id}")
     return metrics
 
 
 if __name__ == "__main__":
-    # Smoke test: fold_1 — chb01 + chb02 held out
-    TRAIN_SUBJECTS = [f"chb{i:02d}" for i in range(3, 24)]
-    TEST_SUBJECTS  = ["chb01", "chb02"]
-
+    # Smoke test: train on chb01, evaluate on chb09
     run(
         config_path="./configs/defaults.yaml",
-        experiment_id="E5_proposed_gae",
-        fold_id="fold_1_held_out_chb01_chb02",
-        train_subjects=TRAIN_SUBJECTS,
-        test_subjects=TEST_SUBJECTS
-    )
+        experiment_id="E5_smoke_test",
+        fold_id="smoke_chb01_train_chb09_test",
+        train_subjects=["chb01"],
+        test_subjects=["chb09"])

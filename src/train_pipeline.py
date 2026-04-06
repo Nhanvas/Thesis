@@ -49,11 +49,12 @@ def run(config_path: str = "./configs/defaults.yaml",
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     logger = ExperimentLogger(log_dir=config.training.log_dir)
-    logger.log_message(f"Start: {experiment_id} | {fold_id} | device={device}")
+    logger.log_message(
+        f"Start: {experiment_id} | {fold_id} | device={device}")
 
     processed_dir = Path(config.data.processed_dir)
 
-    # ── Build dataset from training subjects ──────────────────────────────────
+    # ── Build dataset từ training subjects ───────────────────────────────────
     datasets = []
     for subj in train_subjects:
         adjs_path = processed_dir / f"{subj}_interictal_adjs.npy"
@@ -75,20 +76,12 @@ def run(config_path: str = "./configs/defaults.yaml",
         full_dataset, [n_train, n_val],
         generator=torch.Generator().manual_seed(config.training.seed))
 
-    # num_workers=0 required on Windows with mmap'd files
     train_loader = DataLoader(
-        train_ds,
-        batch_size=config.data.batch_size,
-        shuffle=True,
-        num_workers=0,
-        pin_memory=False)
-
+        train_ds, batch_size=config.data.batch_size,
+        shuffle=True, num_workers=0, pin_memory=False)
     val_loader = DataLoader(
-        val_ds,
-        batch_size=config.data.batch_size,
-        shuffle=False,
-        num_workers=0,
-        pin_memory=False)
+        val_ds, batch_size=config.data.batch_size,
+        shuffle=False, num_workers=0, pin_memory=False)
 
     # ── Model ─────────────────────────────────────────────────────────────────
     model = GAEModel(
@@ -99,6 +92,8 @@ def run(config_path: str = "./configs/defaults.yaml",
     logger.log_model_info(model)
 
     # ── Train ─────────────────────────────────────────────────────────────────
+    loss_handler = LossHandler(loss_type="graph_bce")
+
     optimizer_handler = OptimizerHandler(
         optimizer_type=config.training.optimizer,
         lr=config.training.lr,
@@ -118,7 +113,7 @@ def run(config_path: str = "./configs/defaults.yaml",
         model=model,
         train_loader=train_loader,
         val_loader=val_loader,
-        loss_handler=None,       # trainer uses nn.BCELoss directly
+        loss_handler=loss_handler,
         optimizer_handler=optimizer_handler,
         device=device)
 
@@ -127,22 +122,22 @@ def run(config_path: str = "./configs/defaults.yaml",
     torch.save(model.state_dict(), str(weights_path))
     logger.log_message(f"Weights saved: {weights_path}")
 
-    # ── Calibrate threshold from val scores ───────────────────────────────────
+    # ── Calibrate threshold từ val scores ────────────────────────────────────
     metric_handler = MetricHandler(
         threshold_percentile=config.anomaly.threshold_percentile)
     threshold = metric_handler.calibrate_threshold(
         np.array(train_result["val_scores"]))
     logger.log_message(f"Threshold (95th pct): {threshold:.4f}")
 
-    # ── Evaluate on held-out test fold ────────────────────────────────────────
+    # ── Evaluate ──────────────────────────────────────────────────────────────
     hyperparams = {
-        "hidden_dim":  config.model.hidden_dim,
-        "latent_dim":  config.model.latent_dim,
-        "lr":          config.training.lr,
-        "alpha":       config.graph.alpha,
-        "top_k":       config.graph.top_k_percent,
-        "seed":        config.training.seed,
-        "threshold":   round(threshold, 4),
+        "hidden_dim": config.model.hidden_dim,
+        "latent_dim": config.model.latent_dim,
+        "lr":         config.training.lr,
+        "alpha":      config.graph.alpha,
+        "top_k":      config.graph.top_k_percent,
+        "seed":       config.training.seed,
+        "threshold":  round(threshold, 4),
     }
 
     metrics = run_evaluation(
@@ -163,10 +158,12 @@ def run(config_path: str = "./configs/defaults.yaml",
 
 
 if __name__ == "__main__":
-    # Smoke test: train on chb01, evaluate on chb09
+    # Within-subject smoke test: train + test trên chb01
+    # Mục đích: verify model học được signal thật (AUROC > 0.5)
+    # trước khi chạy cross-subject LTSO
     run(
         config_path="./configs/defaults.yaml",
-        experiment_id="E5_smoke_test",
-        fold_id="smoke_chb01_train_chb09_test",
+        experiment_id="E5_within_subject_smoke",
+        fold_id="smoke_chb01",
         train_subjects=["chb01"],
-        test_subjects=["chb09"])
+        test_subjects=["chb01"])

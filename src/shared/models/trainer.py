@@ -24,7 +24,7 @@ class Trainer:
         """
         batch: tuple (A_batch, X_batch)
             A_batch: [B, 18, 18]  weighted adjacency
-            X_batch: [B, 18, 5]   band power features
+            X_batch: [B, 18, 23]  node features = concat(A_row_norm, band_powers_norm)
         """
         A_batch, X_batch = batch
         total_loss = 0.0

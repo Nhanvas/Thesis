@@ -1,0 +1,3659 @@
+===== AUDIT: Fri, Apr 10, 2026 11:29:20 AM =====
+
+
+=== FOLDER STRUCTURE ===
+.
+./.git
+./.gitignore
+./.vscode
+./.vscode/settings.json
+./audit_output.txt
+./data
+./data/processed
+./data/raw
+./data/splits
+./data/splits/.gitkeep
+./data/splits/fold_01_test.json
+./data/splits/fold_01_train.json
+./data/splits/fold_02_test.json
+./data/splits/fold_02_train.json
+./data/splits/fold_03_test.json
+./data/splits/fold_03_train.json
+./data/splits/fold_04_test.json
+./data/splits/fold_04_train.json
+./data/splits/fold_05_test.json
+./data/splits/fold_05_train.json
+./data/splits/fold_06_test.json
+./data/splits/fold_06_train.json
+./data/splits/fold_07_test.json
+./data/splits/fold_07_train.json
+./data/splits/fold_08_test.json
+./data/splits/fold_08_train.json
+./data/splits/fold_09_test.json
+./data/splits/fold_09_train.json
+./data/splits/fold_10_test.json
+./data/splits/fold_10_train.json
+./data/splits/fold_11_test.json
+./data/splits/fold_11_train.json
+./data/splits/splits_summary.json
+./Dockerfile
+./entry.sh
+./logs
+./logs/.gitkeep
+./logs/build_graphs_full.log
+./logs/preprocess_full.log
+./logs/preprocess_run3.log
+./Makefile
+./README.md
+./results
+./results/checkpoints
+./results/checkpoints/.gitkeep
+./results/checkpoints/E5_smoke_test
+./results/checkpoints/E5_smoke_test/smoke_chb01_train_chb09_test
+./results/checkpoints/E5_smoke_test/smoke_chb01_train_chb09_test/best_model.pt
+./results/checkpoints/E5_smoke_test/smoke_chb01_train_chb09_test/model_weights.pt
+./results/checkpoints/E5_within_subject_smoke
+./results/checkpoints/E5_within_subject_smoke/smoke_chb01
+./results/checkpoints/E5_within_subject_smoke/smoke_chb01/best_model.pt
+./results/checkpoints/E5_within_subject_smoke/smoke_chb01/model_weights.pt
+./results/figures
+./results/figures/fig1_preprocessing_summary.png
+./results/figures/fig2_raw_vs_filtered.png
+./results/figures/fig3_adjacency_heatmap.png
+./results/logs
+./results/logs/2026-04-05_21-12-00
+./results/logs/2026-04-05_21-12-00/log.txt
+./results/logs/2026-04-05_21-12-00/model_info.json
+./results/logs/2026-04-05_21-12-00/results.json
+./results/logs/2026-04-06_02-42-33
+./results/logs/2026-04-06_02-42-33/log.txt
+./results/logs/2026-04-06_11-55-28
+./results/logs/2026-04-06_11-55-28/log.txt
+./results/logs/2026-04-06_11-55-28/model_info.json
+./results/logs/2026-04-06_14-34-17
+./results/logs/2026-04-06_14-34-17/log.txt
+./results/logs/2026-04-06_14-34-17/model_info.json
+./results/logs/2026-04-06_15-20-41
+./results/logs/2026-04-06_15-20-41/log.txt
+./results/logs/2026-04-06_15-20-41/model_info.json
+./results/logs/2026-04-06_15-20-41/results.json
+./results/results_log.csv
+./src
+./src/__pycache__
+./src/__pycache__/build_graphs.cpython-311.pyc
+./src/__pycache__/evaluate.cpython-311.pyc
+./src/__pycache__/graph_construction.cpython-311.pyc
+./src/__pycache__/preprocessing.cpython-311.pyc
+./src/__pycache__/visualize_progress.cpython-311.pyc
+./src/build_graphs.py
+./src/configs
+./src/configs/__init__.py
+./src/configs/__pycache__
+./src/configs/__pycache__/__init__.cpython-311.pyc
+./src/configs/__pycache__/config.cpython-311.pyc
+./src/configs/config.py
+./src/configs/defaults.yaml
+./src/configs/experiment.yaml
+./src/configs/experiment_gae.yaml
+./src/create_splits.py
+./src/evaluate.py
+./src/feature_extraction.py
+./src/graph_construction.py
+./src/inference_pipeline.py
+./src/preprocessing.py
+./src/requirements.txt
+./src/shared
+./src/shared/models
+./src/shared/models/__init__.py
+./src/shared/models/__pycache__
+./src/shared/models/__pycache__/__init__.cpython-311.pyc
+./src/shared/models/__pycache__/logger.cpython-311.pyc
+./src/shared/models/__pycache__/loss_function.cpython-311.pyc
+./src/shared/models/__pycache__/metrics.cpython-311.pyc
+./src/shared/models/__pycache__/optimization.cpython-311.pyc
+./src/shared/models/__pycache__/trainer.cpython-311.pyc
+./src/shared/models/logger.py
+./src/shared/models/loss_function.py
+./src/shared/models/metrics.py
+./src/shared/models/optimization.py
+./src/shared/models/trainer.py
+./src/shared/models/visualization.py
+./src/shared/services
+./src/shared/services/data
+./src/shared/services/data/__init__.py
+./src/shared/services/data/__pycache__
+./src/shared/services/data/__pycache__/__init__.cpython-311.pyc
+./src/shared/services/data/__pycache__/dataset.cpython-311.pyc
+./src/shared/services/data/dataset.py
+./src/shared/services/data/transforms.py
+./src/shared/services/models_hub
+./src/shared/services/models_hub/__init__.py
+./src/shared/services/models_hub/__pycache__
+./src/shared/services/models_hub/__pycache__/__init__.cpython-311.pyc
+./src/shared/services/models_hub/__pycache__/base.cpython-311.pyc
+./src/shared/services/models_hub/__pycache__/utils.cpython-311.pyc
+./src/shared/services/models_hub/base.py
+./src/shared/services/models_hub/baselines
+./src/shared/services/models_hub/baselines/__init__.py
+./src/shared/services/models_hub/baselines/lstm_ae.py
+./src/shared/services/models_hub/baselines/svm_baseline.py
+./src/shared/services/models_hub/gae
+./src/shared/services/models_hub/gae/__init__.py
+./src/shared/services/models_hub/gae/__pycache__
+./src/shared/services/models_hub/gae/__pycache__/__init__.cpython-311.pyc
+./src/shared/services/models_hub/gae/__pycache__/model.cpython-311.pyc
+./src/shared/services/models_hub/gae/model.py
+./src/shared/services/models_hub/unet
+./src/shared/services/models_hub/unet/__init__.py
+./src/shared/services/models_hub/unet/__pycache__
+./src/shared/services/models_hub/unet/__pycache__/__init__.cpython-311.pyc
+./src/shared/services/models_hub/unet/__pycache__/model.cpython-311.pyc
+./src/shared/services/models_hub/unet/model.py
+./src/shared/services/models_hub/utils.py
+./src/test_pipeline.py
+./src/train_pipeline.py
+./src/visualize_progress.py
+./venv
+
+
+=== PYTHON VERSION ===
+Python 3.11.9
+
+
+=== INSTALLED PACKAGES (key) ===
+
+
+=== SOURCE FILES CONTENT ===
+
+
+--- FILE: ./src/build_graphs.py ---
+"""
+build_graphs.py
+===============
+Compute adjacency matrices from preprocessed EEG windows.
+Run once after preprocessing.py completes.
+"""
+
+import sys
+import numpy as np
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from graph_construction import build_adjacency
+
+
+def build_subject_graphs(subject_id: str,
+                         processed_dir: Path,
+                         alpha: float = 0.5,
+                         top_k_percent: float = 30) -> None:
+    inter_in  = processed_dir / f"{subject_id}_interictal.npy"
+    ictal_in  = processed_dir / f"{subject_id}_ictal.npy"
+    inter_out = processed_dir / f"{subject_id}_interictal_adjs.npy"
+    ictal_out = processed_dir / f"{subject_id}_ictal_adjs.npy"
+
+    if not inter_in.exists():
+        raise FileNotFoundError(f"Missing: {inter_in}\nRun preprocessing.py first.")
+
+    # Interictal
+    windows = np.load(str(inter_in), mmap_mode="r")
+    N = windows.shape[0]
+    print(f"  [{subject_id}] interictal adjs: {N} windows...")
+    mm = np.lib.format.open_memmap(str(inter_out), mode="w+", dtype=np.float32, shape=(N, 18, 18))
+    for i in range(N):
+        mm[i] = build_adjacency(windows[i].astype(np.float64), alpha=alpha, top_k_percent=top_k_percent)
+        if (i + 1) % 2000 == 0:
+            print(f"    {i+1}/{N}", end="\r")
+    del mm
+    print(f"  [{subject_id}] interictal adjs saved.")
+
+    # Ictal
+    if not ictal_in.exists():
+        print(f"  [{subject_id}] no ictal file — skipping")
+        return
+    windows = np.load(str(ictal_in), mmap_mode="r")
+    M = windows.shape[0]
+    print(f"  [{subject_id}] ictal adjs: {M} windows...")
+    mm = np.lib.format.open_memmap(str(ictal_out), mode="w+", dtype=np.float32, shape=(M, 18, 18))
+    for i in range(M):
+        mm[i] = build_adjacency(windows[i].astype(np.float64), alpha=alpha, top_k_percent=top_k_percent)
+    del mm
+    print(f"  [{subject_id}] ictal adjs saved.")
+
+
+if __name__ == "__main__":
+    PROCESSED_DIR = Path("F:/Study/Thesis/Code/data/processed")
+    SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]
+    for subj in SUBJECTS:
+        if not (PROCESSED_DIR / f"{subj}_interictal.npy").exists():
+            print(f"[SKIP] {subj} — not preprocessed yet")
+            continue
+        print(f"\nProcessing {subj}...")
+        try:
+            build_subject_graphs(subj, PROCESSED_DIR)
+        except Exception as e:
+            print(f"  [ERROR] {subj}: {e}")
+    print("\n=== GRAPH CONSTRUCTION COMPLETE ===")
+
+--- FILE: ./src/configs/__init__.py ---
+from .config import ConfigReader, ConfigException
+
+__all__ = [
+    "ConfigReader",
+    "ConfigException"
+]
+
+--- FILE: ./src/configs/config.py ---
+# config.py
+import os
+import yaml
+
+
+class ConfigException(Exception):
+    def __init__(self, message="Config error"):
+        self.message = message
+        super().__init__(self.message)
+
+
+class ConfigReader:
+    def __init__(self, sections: dict):
+        for section, content in sections.items():
+            if isinstance(content, dict):
+                setattr(self, section, ConfigReader(content))
+            else:
+                setattr(self, section, content)
+
+    @classmethod
+    def load(cls, config_path: str):
+        if not config_path.endswith((".yml", ".yaml")):
+            raise ConfigException("Only support yaml or yml file.")
+        
+        with open(config_path, 'r') as f:
+            return cls(yaml.safe_load(f))
+    
+    @classmethod
+    def merge(cls, default_path: str, experiment_path: str = None):
+        with open(default_path, 'r') as f:
+            default = yaml.safe_load(f)
+        
+        if experiment_path and os.path.exists(experiment_path):
+            with open(experiment_path, 'r') as f:
+                experiment = yaml.safe_load(f)
+            default = cls._deep_merge(default, experiment)
+        
+        return cls(default)
+    
+    @staticmethod
+    def _deep_merge(default: dict, override: dict) -> dict:
+        result = default.copy()
+        for key, value in override.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = ConfigReader._deep_merge(result[key], value)
+            else:
+                result[key] = value
+        return result
+
+--- FILE: ./src/create_splits.py ---
+"""
+create_splits.py
+================
+Generate LTSO (Leave-Two-Subjects-Out) fold indices for 23 CHB-MIT subjects.
+
+11 folds:
+  Fold 01: test = [chb01, chb02]
+  Fold 02: test = [chb03, chb04]
+  ...
+  Fold 10: test = [chb19, chb20]
+  Fold 11: test = [chb21, chb22, chb23]   ← 3 subjects (23 is odd)
+
+Output: data/splits/fold_XX_test.json  (list of subject IDs held out)
+        data/splits/fold_XX_train.json (list of subject IDs used for training)
+        data/splits/splits_summary.json (overview of all folds)
+"""
+
+import json
+from pathlib import Path
+
+SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]  # chb01..chb23
+SPLITS_DIR = Path("../data/splits")
+SPLITS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Build 11 folds
+folds = []
+for i in range(10):
+    test = [SUBJECTS[2*i], SUBJECTS[2*i + 1]]
+    folds.append(test)
+folds.append([SUBJECTS[20], SUBJECTS[21], SUBJECTS[22]])  # fold 11
+
+# Write per-fold files + summary
+summary = {}
+for fold_idx, test_subjects in enumerate(folds, start=1):
+    fold_id = f"fold_{fold_idx:02d}"
+    train_subjects = [s for s in SUBJECTS if s not in test_subjects]
+
+    test_path  = SPLITS_DIR / f"{fold_id}_test.json"
+    train_path = SPLITS_DIR / f"{fold_id}_train.json"
+
+    test_path.write_text(json.dumps(test_subjects, indent=2))
+    train_path.write_text(json.dumps(train_subjects, indent=2))
+
+    summary[fold_id] = {
+        "test":  test_subjects,
+        "train": train_subjects,
+        "n_test":  len(test_subjects),
+        "n_train": len(train_subjects),
+    }
+    print(f"[{fold_id}] test={test_subjects} | train={len(train_subjects)} subjects")
+
+(SPLITS_DIR / "splits_summary.json").write_text(json.dumps(summary, indent=2))
+print(f"\nSaved {len(folds)} folds to {SPLITS_DIR.resolve()}")
+
+
+--- FILE: ./src/evaluate.py ---
+"""
+evaluate.py
+===========
+Evaluation for one LTSO fold. Now uses node features.
+"""
+
+import json
+import numpy as np
+import pandas as pd
+import torch
+from pathlib import Path
+from datetime import datetime
+from torch_geometric.utils import dense_to_sparse
+
+from shared.models.metrics import MetricHandler
+
+
+def run_evaluation(model, subject_ids: list,
+                   processed_dir: str,
+                   threshold: float,
+                   experiment_id: str,
+                   fold_id: str,
+                   hyperparams: dict,
+                   results_log_path: str,
+                   notes: str = "",
+                   device: str = "cpu") -> dict:
+    model.eval()
+    model.to(device)
+
+    metric_handler = MetricHandler()
+    metric_handler.threshold = threshold
+
+    processed_dir = Path(processed_dir)
+    all_scores, all_labels = [], []
+    total_interictal_s = 0.0
+
+    for subj in subject_ids:
+        # Interictal
+        inter_adj = processed_dir / f"{subj}_interictal_adjs.npy"
+        inter_feat = processed_dir / f"{subj}_interictal_features.npy"
+        if not inter_adj.exists() or not inter_feat.exists():
+            raise FileNotFoundError(f"Missing data for {subj}")
+
+        adjs_inter = np.load(str(inter_adj), mmap_mode="r")
+        feats_inter = np.load(str(inter_feat), mmap_mode="r")
+        scores_inter = _score_windows(model, adjs_inter, feats_inter, device)
+        all_scores.extend(scores_inter)
+        all_labels.extend([0] * len(scores_inter))
+        total_interictal_s += len(scores_inter) * 4.0
+
+        # Ictal
+        ictal_adj = processed_dir / f"{subj}_ictal_adjs.npy"
+        ictal_feat = processed_dir / f"{subj}_ictal_features.npy"
+        if ictal_adj.exists() and ictal_feat.exists():
+            adjs_ictal = np.load(str(ictal_adj), mmap_mode="r")
+            feats_ictal = np.load(str(ictal_feat), mmap_mode="r")
+            scores_ictal = _score_windows(model, adjs_ictal, feats_ictal, device)
+            all_scores.extend(scores_ictal)
+            all_labels.extend([1] * len(scores_ictal))
+        else:
+            print(f"  [WARN] {subj}: no ictal data")
+
+    all_scores = np.array(all_scores, dtype=np.float32)
+    all_labels = np.array(all_labels, dtype=np.int32)
+    total_hours = total_interictal_s / 3600.0
+
+    metrics = metric_handler.compute_all(all_scores, all_labels, total_hours)
+    metrics["n_ictal_windows"] = int((all_labels == 1).sum())
+    metrics["n_interictal_windows"] = int((all_labels == 0).sum())
+    metrics["total_interictal_hours"] = round(total_hours, 2)
+
+    _append_results(results_log_path, experiment_id, fold_id,
+                    metrics, hyperparams, notes)
+
+    print(f"[{experiment_id} | {fold_id}]  "
+          f"AUROC={metrics['auroc']:.4f} | "
+          f"Sensitivity={metrics['sensitivity']:.4f} | "
+          f"FDR/h={metrics['fdr_per_hour']:.2f}")
+    return metrics
+
+
+def _score_windows(model, adjs: np.ndarray, features: np.ndarray, device: str) -> list:
+    scores = []
+    with torch.no_grad():
+        for A_np, X_np in zip(adjs, features):
+            A = torch.tensor(A_np.astype(np.float32)).to(device)
+            X = torch.tensor(X_np.astype(np.float32)).to(device)
+            edge_index, edge_weight = dense_to_sparse(A)
+            _, A_hat = model(X, edge_index, edge_weight)
+            scores.append(model.anomaly_score(A, A_hat))
+    return scores
+
+
+def _append_results(results_log_path: str, experiment_id: str,
+                    fold_id: str, metrics: dict,
+                    hyperparams: dict, notes: str) -> None:
+    row = {
+        "experiment_id": experiment_id,
+        "timestamp": datetime.now().isoformat(),
+        "fold_id": fold_id,
+        "sensitivity": metrics["sensitivity"],
+        "specificity": metrics["specificity"],
+        "auroc": metrics["auroc"],
+        "fdr_per_hour": metrics["fdr_per_hour"],
+        "hyperparams_json": json.dumps(hyperparams),
+        "notes": notes,
+    }
+    path = Path(results_log_path)
+    df = pd.DataFrame([row])
+    if path.exists():
+        df.to_csv(path, mode="a", header=False, index=False)
+    else:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(path, mode="w", header=True, index=False)
+
+--- FILE: ./src/feature_extraction.py ---
+"""
+feature_extraction.py
+=====================
+Compute 5 spectral band powers per channel for each 4s window.
+Output shape: [N_windows, 18, 5]
+Bands: Delta (0.5–4), Theta (4–8), Alpha (8–13), Beta (13–30), Gamma (30–60)
+"""
+
+import numpy as np
+from scipy.signal import welch
+from pathlib import Path
+
+FS = 256
+BANDS = {
+    'delta': (0.5, 4),
+    'theta': (4, 8),
+    'alpha': (8, 13),
+    'beta':  (13, 30),
+    'gamma': (30, 60),
+}
+
+def compute_band_powers(window: np.ndarray, fs: int = FS) -> np.ndarray:
+    """
+    window: [18, 1024] (already filtered 0.5–60 Hz)
+    returns: [18, 5] average power in each band
+    """
+    n_channels = window.shape[0]
+    features = np.zeros((n_channels, len(BANDS)), dtype=np.float32)
+
+    # Welch PSD with 2-second segments, 50% overlap
+    freqs, psd = welch(window, fs=fs, nperseg=fs*2, noverlap=fs, axis=1)
+
+    for i, (band, (low, high)) in enumerate(BANDS.items()):
+        idx = np.where((freqs >= low) & (freqs <= high))[0]
+        features[:, i] = np.mean(psd[:, idx], axis=1)
+
+    return features
+
+
+def process_subject(subject_id: str, processed_dir: Path):
+    inter_path = processed_dir / f"{subject_id}_interictal.npy"
+    ictal_path = processed_dir / f"{subject_id}_ictal.npy"
+
+    if not inter_path.exists():
+        print(f"Missing {inter_path} – skipping {subject_id}")
+        return
+
+    for label, path in [('interictal', inter_path), ('ictal', ictal_path)]:
+        if not path.exists():
+            continue
+
+        windows = np.load(path, mmap_mode='r')
+        n_windows = windows.shape[0]
+        out_path = processed_dir / f"{subject_id}_{label}_features.npy"
+
+        print(f"  [{subject_id}] {label} features: {n_windows} windows...")
+        mm = np.lib.format.open_memmap(
+            str(out_path), mode='w+', dtype=np.float32,
+            shape=(n_windows, 18, 5))
+
+        for i in range(n_windows):
+            mm[i] = compute_band_powers(windows[i].astype(np.float64))
+            if (i + 1) % 2000 == 0:
+                print(f"    {i+1}/{n_windows}", end='\r')
+        del mm
+        print(f"  Saved {out_path}")
+
+
+if __name__ == "__main__":
+    PROCESSED_DIR = Path("F:/Study/Thesis/Code/data/processed")
+    SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]
+
+    for subj in SUBJECTS:
+        print(f"\nProcessing {subj}...")
+        process_subject(subj, PROCESSED_DIR)
+
+    print("\n=== FEATURE EXTRACTION COMPLETE ===")
+
+--- FILE: ./src/graph_construction.py ---
+"""
+graph_construction.py
+=====================
+Graph construction pipeline for one 4s EEG window.
+**Updated: CAR applied before connectivity computation.**
+
+Equations implemented (thesis §2.2):
+  Eq (2): wPLI_xy = |mean(imag(C_xy))| / mean(|imag(C_xy)|)
+  Eq (3): AEC_xy  = corr(|hilbert(x)|, |hilbert(y)|)
+  Eq (4): A = alpha * A_wPLI + (1 - alpha) * A_AEC
+"""
+
+import numpy as np
+from scipy.signal import hilbert
+
+
+def apply_car(eeg_window: np.ndarray) -> np.ndarray:
+    """
+    Common Average Reference: subtract mean across channels at each time point.
+    Suppresses common-mode noise and volume conduction zero-lag.
+    """
+    return eeg_window - np.mean(eeg_window, axis=0, keepdims=True)
+
+
+# ── Eq (2): wPLI ──────────────────────────────────────────────────────────────
+def compute_wpli(eeg_window: np.ndarray, fs: int = 256) -> np.ndarray:
+    """
+    Weighted Phase Lag Index for one window.
+    Uses rfft (positive frequencies only).
+    """
+    n_channels = eeg_window.shape[0]
+    wpli = np.zeros((n_channels, n_channels), dtype=np.float64)
+
+    fft_data = np.fft.rfft(eeg_window, axis=1)   # [18, 513]
+
+    for i in range(n_channels):
+        for j in range(i + 1, n_channels):
+            cross = fft_data[i] * np.conj(fft_data[j])
+            imag_cross = np.imag(cross)
+            numerator = np.abs(np.mean(imag_cross))
+            denominator = np.mean(np.abs(imag_cross)) + 1e-8
+            val = numerator / denominator
+            wpli[i, j] = val
+            wpli[j, i] = val
+
+    return wpli
+
+
+# ── Eq (3): AEC ───────────────────────────────────────────────────────────────
+def compute_aec(eeg_window: np.ndarray) -> np.ndarray:
+    """
+    Amplitude Envelope Correlation for one window.
+    """
+    envelopes = np.abs(hilbert(eeg_window, axis=1))   # [18, 1024]
+    aec = np.corrcoef(envelopes)                      # [18, 18]
+    np.fill_diagonal(aec, 0.0)
+    aec = np.abs(aec)
+    return aec
+
+
+# ── Eq (4): Combined adjacency ────────────────────────────────────────────────
+def combine_adjacency(wpli: np.ndarray, aec: np.ndarray,
+                      alpha: float = 0.5) -> np.ndarray:
+    """A = alpha * A_wPLI + (1 - alpha) * A_AEC"""
+    return alpha * wpli + (1 - alpha) * aec
+
+
+# ── Top-k% threshold ──────────────────────────────────────────────────────────
+def apply_top_k_threshold(A: np.ndarray, top_k_percent: float = 30) -> np.ndarray:
+    """Retain only the top-k% strongest edges (upper triangle)."""
+    n = A.shape[0]
+    n_upper = n * (n - 1) // 2
+    n_keep = max(1, int(n_upper * top_k_percent / 100))
+
+    triu_idx = np.triu_indices(n, k=1)
+    values = A[triu_idx]
+
+    threshold = np.partition(values, -n_keep)[-n_keep]
+
+    A_thresh = np.where(A >= threshold, A, 0.0)
+    np.fill_diagonal(A_thresh, 0.0)
+    return A_thresh
+
+
+# ── Full pipeline for one window ──────────────────────────────────────────────
+def build_adjacency(eeg_window: np.ndarray,
+                    alpha: float = 0.5,
+                    top_k_percent: float = 30,
+                    fs: int = 256) -> np.ndarray:
+    """
+    Full graph construction for one 4s EEG window.
+    **Now includes CAR before wPLI/AEC.**
+    """
+    eeg_window = eeg_window.astype(np.float64)
+    eeg_window = apply_car(eeg_window)          # <-- NEW: CAR
+
+    wpli = compute_wpli(eeg_window, fs=fs)
+    aec  = compute_aec(eeg_window)
+    A    = combine_adjacency(wpli, aec, alpha=alpha)
+    A    = apply_top_k_threshold(A, top_k_percent=top_k_percent)
+    return A.astype(np.float32)
+
+--- FILE: ./src/inference_pipeline.py ---
+# Inference pipeline.
+# Modify for your task.
+
+import torch
+
+from configs import ConfigReader
+from shared.services.data import Transformer
+from shared.services.models_hub import UNet
+
+
+def load_model(config, device):
+    model = UNet(
+        n_channels=config.model.n_channels,
+        n_classes=config.model.n_classes
+    )
+    model.load(config.training.checkpoint_dir + "model_weights.pt")
+    model.to(device)
+    model.eval()
+    return model
+
+
+def predict(model, data, transform, device):
+    x = transform(data)
+    x = x.unsqueeze(0).to(device)
+    
+    with torch.no_grad():
+        output = model(x)
+    
+    return output
+
+
+def run(config_path="./configs/defaults.yml", experiment_path=None):
+    # Load config
+    config = ConfigReader.merge(config_path, experiment_path)
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Transform
+    transform = Transformer(
+        target_size=tuple(config.transform.target_size),
+        do_augmentation=False
+    )
+    
+    # Load model
+    model = load_model(config, device)
+    
+    # Load your data here
+    # data = Image.open("image.jpg")      # Image
+    # data = load_audio("audio.wav")      # Audio
+    # data = load_text("text.txt")        # Text
+    # data = np.load("data.npy")          # Numpy
+    data = None  # Modify this
+    
+    # Predict
+    output = predict(model, data, transform, device)
+    
+    # Process output (modify for your task)
+    # Classification: pred = output.argmax(dim=1)
+    # Segmentation: pred = torch.sigmoid(output) > 0.5
+    print(output)
+
+
+if __name__ == "__main__":
+    run(config_path="./configs/defaults.yml")
+
+--- FILE: ./src/preprocessing.py ---
+"""
+preprocessing.py
+================
+CHB-MIT EEG preprocessing pipeline.
+
+Design decisions (thesis §2.1):
+  - Bandpass: 0.5–40 Hz, 4th-order Butterworth, zero-phase (sosfiltfilt)
+    with 3s padding per side to avoid edge artifacts
+  - Artifact rejection: ±500 µV threshold applied to INTERICTAL windows only
+    Ictal windows are NOT artifact-rejected — seizure EEG has high amplitude
+    by nature (838–1622 µV observed in CHB-MIT). Rejecting ictal windows
+    would cause systematic underestimation of sensitivity.
+  - Window: 4s non-overlapping (1024 samples at 256 Hz)
+  - Interictal training set: excludes 4h post-seizure buffer per file
+  - Adjacency matrices: computed separately in graph_construction.py
+"""
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning,
+                        message=".*Channel names are not unique.*")
+                        
+import json
+import re
+import numpy as np
+import mne
+from pathlib import Path
+from scipy.signal import butter, sosfiltfilt
+
+mne.set_log_level("WARNING")
+
+# ── Constants ─────────────────────────────────────────────────────────────────
+
+FS          = 256
+WIN_S       = 4
+WIN_SAMPLES = FS * WIN_S        # 1024
+BUFFER_S    = 4 * 3600          # 4h post-seizure exclusion
+ART_THRESH  = 500e-6            # 500 µV in Volts — interictal only
+FILTER_PAD  = 3 * FS            # 768 samples padding each side
+
+N_CH  = 18
+N_SMP = WIN_SAMPLES
+
+COMMON_CHANNELS = [
+    "FP1-F7", "F7-T7", "T7-P7", "P7-O1",
+    "FP1-F3", "F3-C3", "C3-P3", "P3-O1",
+    "FP2-F4", "F4-C4", "C4-P4", "P4-O2",
+    "FP2-F8", "F8-T8", "T8-P8", "P8-O2",
+    "FZ-CZ",  "CZ-PZ",
+]
+
+# Build filter once at module load
+_SOS = butter(4, [0.5, 60.0], btype="bandpass", fs=FS, output="sos")
+
+
+# ── 1. Parse summary file ─────────────────────────────────────────────────────
+
+def parse_summary(summary_path: Path) -> dict:
+    """
+    Parse chbXX-summary.txt.
+    Returns dict: filename → list of (onset_s, offset_s).
+
+    Parser is index-agnostic on Start/End lines to handle CHB-MIT typo:
+        'Seizure 2 Start Time: ...'
+        'Seizure 1 End Time: ...'   ← wrong index, present in chb09_08
+    """
+    seizures: dict = {}
+    current_file: str | None = None
+    pending_onset: int | None = None
+
+    with open(summary_path, "r") as f:
+        for line in f:
+            line = line.strip()
+
+            if line.startswith("File Name:"):
+                if pending_onset is not None:
+                    print(f"  [WARN] dangling onset {pending_onset}s "
+                          f"in {current_file} — no End Time found")
+                    pending_onset = None
+                current_file = line.split(":", 1)[1].strip()
+                seizures[current_file] = []
+
+            elif "Start Time:" in line and current_file is not None:
+                m = re.search(r"(\d+)\s*seconds", line)
+                if m:
+                    pending_onset = int(m.group(1))
+
+            elif "End Time:" in line and current_file is not None:
+                m = re.search(r"(\d+)\s*seconds", line)
+                if m and pending_onset is not None:
+                    offset = int(m.group(1))
+                    if offset > pending_onset:
+                        seizures[current_file].append((pending_onset, offset))
+                    else:
+                        print(f"  [WARN] invalid interval "
+                              f"({pending_onset}–{offset}) in {current_file}")
+                    pending_onset = None
+
+    return seizures
+
+
+# ── 2. Open EDF — no full RAM load ───────────────────────────────────────────
+
+def open_edf(edf_path: Path):
+    """
+    Open EDF, normalise channel names, pick 18 common channels.
+    Returns None if any common channel is missing (file skipped silently).
+    """
+    raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+
+    raw.rename_channels({ch: ch.upper().strip() for ch in raw.ch_names})
+
+    # CHB-MIT duplicate T8-P8: MNE appends "-0"/"-1".
+    # Strip numeric suffix to recover original name for the first occurrence.
+    rename_map: dict = {}
+    seen: set = set()
+    for ch in raw.ch_names:
+        m = re.match(r"^(.*)-(\d+)$", ch)
+        if m:
+            base = m.group(1)
+            if base not in seen:
+                rename_map[ch] = base
+                seen.add(base)
+    if rename_map:
+        raw.rename_channels(rename_map)
+
+    missing = set(COMMON_CHANNELS) - set(raw.ch_names)
+    if missing:
+        return None
+
+    raw.pick(COMMON_CHANNELS)
+    raw.reorder_channels(COMMON_CHANNELS)
+    return raw
+
+
+# ── 3. Filter one window with context padding ─────────────────────────────────
+
+def filter_window(raw, start: int, end: int) -> np.ndarray:
+    """
+    Read [start-pad, end+pad), apply sosfiltfilt, return centre [start, end).
+    Zero-phase — no group delay introduced.
+    Returns [N_CH, WIN_SAMPLES] float64.
+    """
+    n_total   = int(raw.n_times)
+    pad_start = max(0, start - FILTER_PAD)
+    pad_end   = min(n_total, end + FILTER_PAD)
+
+    segment  = raw.get_data(start=pad_start, stop=pad_end)  # [18, L]
+    filtered = sosfiltfilt(_SOS, segment, axis=1)
+
+    offset = start - pad_start
+    return filtered[:, offset : offset + WIN_SAMPLES]
+
+
+# ── 4. Label and buffer arrays ────────────────────────────────────────────────
+
+def build_labels(n_seconds: int, seizure_list: list) -> np.ndarray:
+    labels = np.zeros(n_seconds, dtype=np.int8)
+    for onset, offset in seizure_list:
+        labels[max(0, onset) : min(n_seconds, offset)] = 1
+    return labels
+
+
+def build_buffer_mask(n_seconds: int, seizure_list: list) -> np.ndarray:
+    mask = np.zeros(n_seconds, dtype=bool)
+    for _, offset in seizure_list:
+        mask[offset : min(n_seconds, offset + BUFFER_S)] = True
+    return mask
+
+
+# ── 5. Artifact check (interictal only) ──────────────────────────────────────
+
+def is_artifact(window: np.ndarray) -> bool:
+    """True if any sample exceeds ±500 µV. Applied to interictal only."""
+    return bool(np.abs(window).max() > ART_THRESH)
+
+
+# ── 6. Count windows — Pass 1 ─────────────────────────────────────────────────
+
+def count_windows(subject_id: str, raw_dir: Path,
+                  seizure_map: dict) -> tuple[int, int, int]:
+    """
+    Count valid windows without storing data.
+    Artifact rejection applied to interictal only — NOT to ictal.
+    """
+    n_inter    = 0
+    n_ictal    = 0
+    n_rejected = 0  # interictal artifact rejections only
+
+    for edf_path in sorted((raw_dir / subject_id).glob("*.edf")):
+        seizure_list = seizure_map.get(edf_path.name, [])
+        raw = open_edf(edf_path)
+        if raw is None:
+            continue
+
+        n_samples = int(raw.n_times)
+        n_seconds = n_samples // FS
+        n_windows = n_samples // WIN_SAMPLES
+
+        labels      = build_labels(n_seconds, seizure_list)
+        buffer_mask = build_buffer_mask(n_seconds, seizure_list)
+
+        for i in range(n_windows):
+            start_s = i * WIN_S
+            end_s   = start_s + WIN_S
+
+            win_label    = int(labels[start_s:end_s].max())
+            win_buffered = bool(buffer_mask[start_s:end_s].any())
+
+            if win_label == 1:
+                # Ictal: count all — no artifact rejection
+                n_ictal += 1
+
+            elif not win_buffered:
+                # Interictal: artifact rejection applies
+                start = i * WIN_SAMPLES
+                end   = start + WIN_SAMPLES
+                window = filter_window(raw, start, end)
+                if is_artifact(window):
+                    n_rejected += 1
+                else:
+                    n_inter += 1
+
+        del raw
+
+    return n_inter, n_ictal, n_rejected
+
+
+# ── 7. Process one subject — two-pass memmap write ────────────────────────────
+
+def process_subject(subject_id: str, raw_dir: Path,
+                    processed_dir: Path) -> dict:
+    """
+    Two-pass strategy:
+      Pass 1 — count valid windows (no data stored in RAM)
+      Allocate memmap on disk
+      Pass 2 — filter + write directly to memmap
+
+    Peak RAM ≈ one window = 18 × 1024 × 8 B ≈ 0.15 MB
+
+    Outputs:
+      {subject_id}_interictal.npy   [N, 18, 1024]  float32
+      {subject_id}_ictal.npy        [M, 18, 1024]  float32
+      {subject_id}_stats.json
+    """
+    processed_dir.mkdir(parents=True, exist_ok=True)
+
+    summary_path = (raw_dir / "CHB info" / "summary" /
+                    f"{subject_id}-summary.txt")
+    seizure_map = parse_summary(summary_path)
+
+    # ── Pass 1 ────────────────────────────────────────────────────────────────
+    print(f"  [pass 1] counting windows...")
+    n_inter, n_ictal, n_rejected = count_windows(
+        subject_id, raw_dir, seizure_map)
+    print(f"  [pass 1] interictal={n_inter} | ictal={n_ictal} "
+          f"| rejected={n_rejected}")
+
+    if n_inter == 0:
+        raise RuntimeError(
+            f"{subject_id}: zero interictal windows — check data path")
+
+    # ── Allocate memmap ───────────────────────────────────────────────────────
+    prefix = processed_dir / subject_id
+
+    mm_inter = np.lib.format.open_memmap(
+        f"{prefix}_interictal.npy", mode="w+",
+        dtype=np.float32, shape=(n_inter, N_CH, N_SMP))
+    mm_ictal = np.lib.format.open_memmap(
+        f"{prefix}_ictal.npy", mode="w+",
+        dtype=np.float32, shape=(max(n_ictal, 1), N_CH, N_SMP))
+
+    # ── Pass 2 ────────────────────────────────────────────────────────────────
+    print(f"  [pass 2] writing windows to disk...")
+    idx_inter = 0
+    idx_ictal = 0
+
+    for edf_path in sorted((raw_dir / subject_id).glob("*.edf")):
+        seizure_list = seizure_map.get(edf_path.name, [])
+        raw = open_edf(edf_path)
+        if raw is None:
+            continue
+
+        n_samples = int(raw.n_times)
+        n_seconds = n_samples // FS
+        n_windows = n_samples // WIN_SAMPLES
+
+        labels      = build_labels(n_seconds, seizure_list)
+        buffer_mask = build_buffer_mask(n_seconds, seizure_list)
+
+        for i in range(n_windows):
+            start   = i * WIN_SAMPLES
+            end     = start + WIN_SAMPLES
+            start_s = i * WIN_S
+            end_s   = start_s + WIN_S
+
+            win_label    = int(labels[start_s:end_s].max())
+            win_buffered = bool(buffer_mask[start_s:end_s].any())
+
+            if win_label == 1:
+                # Ictal: filter and save — no artifact rejection
+                if idx_ictal < n_ictal:
+                    window = filter_window(raw, start, end)
+                    mm_ictal[idx_ictal] = window.astype(np.float32)
+                    idx_ictal += 1
+
+            elif not win_buffered:
+                # Interictal: filter, artifact check, then save
+                window = filter_window(raw, start, end)
+                if not is_artifact(window) and idx_inter < n_inter:
+                    mm_inter[idx_inter] = window.astype(np.float32)
+                    idx_inter += 1
+
+        del raw
+
+    del mm_inter, mm_ictal
+
+    # ── Stats ─────────────────────────────────────────────────────────────────
+    stats = {
+        "subject_id":   subject_id,
+        "n_interictal": n_inter,
+        "n_ictal":      n_ictal,
+        "n_rejected":   n_rejected,
+        "ratio":        round(n_inter / max(n_ictal, 1), 1),
+    }
+    with open(f"{prefix}_stats.json", "w") as fout:
+        json.dump(stats, fout, indent=2)
+
+    print(f"[{subject_id}] interictal={n_inter} | ictal={n_ictal} "
+          f"| rejected={n_rejected} | ratio={stats['ratio']}:1")
+    return stats
+
+
+# ── 8. Run all subjects ───────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    RAW_DIR       = Path("F:/Study/Thesis/Dataset/CHB-MIT")
+    PROCESSED_DIR = Path("F:/Study/Thesis/Code/data/processed")
+
+    SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]
+
+    all_stats = []
+    for subj in SUBJECTS:
+        print(f"\nProcessing {subj}...")
+        try:
+            stats = process_subject(subj, RAW_DIR, PROCESSED_DIR)
+            all_stats.append(stats)
+        except Exception as e:
+            print(f"  [ERROR] {subj}: {e}")
+
+    print("\n=== PREPROCESSING COMPLETE ===")
+    for s in all_stats:
+        print(f"{s['subject_id']}: {s['n_interictal']} interictal | "
+              f"{s['n_ictal']} ictal | ratio {s['ratio']}:1")
+
+--- FILE: ./src/shared/models/__init__.py ---
+from .loss_function import LossHandler
+from .metrics import MetricHandler
+from .optimization import OptimizerHandler
+from .trainer import Trainer
+from .logger import ExperimentLogger
+
+__all__ = [
+    "LossHandler",
+    "MetricHandler",
+    "OptimizerHandler",
+    "Trainer",
+    "ExperimentLogger",
+]
+
+
+--- FILE: ./src/shared/models/logger.py ---
+# logger.py
+# Experiment logging utilities.
+
+import os
+import json
+import yaml
+import shutil
+from datetime import datetime
+from pathlib import Path
+
+
+class ExperimentLogger:
+    """
+    Log experiment config, results, and model info.
+    """
+    def __init__(self, log_dir="./logs/", experiment_name=None):
+        if experiment_name is None:
+            experiment_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
+        self.experiment_dir = Path(log_dir) / experiment_name
+        self.experiment_dir.mkdir(parents=True, exist_ok=True)
+    
+    def get_experiment_dir(self):
+        """Return experiment directory path (for Lightning logger)."""
+        return str(self.experiment_dir)
+    
+    def log_config(self, config_path):
+        """Copy config file to experiment folder."""
+        shutil.copy(config_path, self.experiment_dir / "config.yml")
+    
+    def log_config_dict(self, config_dict):
+        """Save config dict to experiment folder."""
+        with open(self.experiment_dir / "config.yml", 'w') as f:
+            yaml.dump(config_dict, f, default_flow_style=False)
+    
+    def log_model_info(self, model):
+        """Save model info."""
+        info = {
+            "architecture": model.__class__.__name__,
+            "total_parameters": sum(p.numel() for p in model.parameters()),
+            "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)
+        }
+        with open(self.experiment_dir / "model_info.json", 'w') as f:
+            json.dump(info, f, indent=2)
+    
+    def log_results(self, results: dict):
+        """Save final results."""
+        with open(self.experiment_dir / "results.json", 'w') as f:
+            json.dump(results, f, indent=2)
+    
+    def log_message(self, message: str):
+        """Append message to log file."""
+        with open(self.experiment_dir / "log.txt", 'a') as f:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            f.write(f"[{timestamp}] {message}\n")
+
+--- FILE: ./src/shared/models/loss_function.py ---
+"""
+loss_function.py
+================
+Graph reconstruction loss cho GAE — Eq (8).
+
+Vấn đề với plain BCELoss trên sparse graph:
+  Sau top-k% thresholding, adjacency có ~70% zeros.
+  Plain BCELoss → model học predict ~0.5 mọi entry
+  → loss stuck near log(2) = 0.693, không học được gì.
+
+Fix (Kipf & Welling 2016 GAE paper):
+  pos_weight = n_negative / n_positive
+  → penalise missed edges nhiều hơn
+  → model buộc phải học phân biệt edge vs non-edge
+"""
+
+import torch
+import torch.nn as nn
+
+
+class GraphBCELoss:
+    """
+    Weighted BCE loss cho sparse graph reconstruction.
+    pos_weight tự động tính từ adjacency matrix của mỗi graph.
+    """
+
+    def __call__(self, A_hat: torch.Tensor,
+                 A: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            A_hat: reconstructed adjacency [18, 18], values in (0,1)
+            A:     target adjacency [18, 18]
+        """
+        n_pos      = (A > 0).sum().float()
+        n_neg      = A.numel() - n_pos
+        pos_weight = n_neg / (n_pos + 1e-8)
+
+        weight  = torch.where(A > 0,
+                              pos_weight * torch.ones_like(A),
+                              torch.ones_like(A))
+        loss_fn = nn.BCELoss(weight=weight)
+        return loss_fn(A_hat, A)
+
+
+class LossHandler:
+    """
+    Loss handler — entry point cho train_pipeline.
+    """
+
+    def __init__(self, loss_type: str = "graph_bce"):
+        self.loss_type = loss_type
+        if loss_type == "graph_bce":
+            self.loss_fn = GraphBCELoss()
+        elif loss_type == "mse":
+            self.loss_fn = nn.MSELoss()
+        else:
+            raise ValueError(f"Unknown loss type: {loss_type}")
+
+    def __call__(self, A_hat: torch.Tensor,
+                 A: torch.Tensor) -> torch.Tensor:
+        return self.loss_fn(A_hat, A)
+
+--- FILE: ./src/shared/models/metrics.py ---
+"""
+metrics.py
+==========
+Evaluation metrics cho unsupervised seizure detection.
+
+Accuracy bị loại bỏ có chủ ý:
+  0.18% seizure prevalence → 99.82% accuracy bằng cách predict all-normal.
+  Đây là misleading metric — examiner sẽ flag ngay.
+
+Primary metrics: sensitivity, specificity, AUROC, FDR/h.
+"""
+
+import numpy as np
+import torch
+from torchmetrics.functional import auroc as torchmetrics_auroc
+
+
+class MetricHandler:
+    """
+    Compute evaluation metrics for one LTSO fold.
+    Threshold calibrated externally (from val interictal scores).
+    """
+
+    def __init__(self, threshold_percentile: int = 95):
+        self.threshold_percentile = threshold_percentile
+        self.threshold: float | None = None
+
+    def calibrate_threshold(self, interictal_scores: np.ndarray) -> float:
+        """
+        Set detection threshold at Nth percentile of interictal
+        reconstruction errors. No ictal labels involved — no leakage.
+        """
+        self.threshold = float(
+            np.percentile(interictal_scores, self.threshold_percentile))
+        return self.threshold
+
+    def get_auroc(self, scores: np.ndarray,
+                  labels: np.ndarray) -> float:
+        scores_t = torch.tensor(scores, dtype=torch.float32)
+        labels_t = torch.tensor(labels, dtype=torch.long)
+        return float(torchmetrics_auroc(
+            scores_t, labels_t, task="binary"))
+
+    def get_sensitivity_specificity(
+            self, scores: np.ndarray,
+            labels: np.ndarray) -> tuple[float, float]:
+        assert self.threshold is not None, \
+            "Call calibrate_threshold() before compute_all()"
+
+        preds = (scores >= self.threshold).astype(int)
+        tp = int(((preds == 1) & (labels == 1)).sum())
+        fn = int(((preds == 0) & (labels == 1)).sum())
+        tn = int(((preds == 0) & (labels == 0)).sum())
+        fp = int(((preds == 1) & (labels == 0)).sum())
+
+        sensitivity = tp / (tp + fn + 1e-8)
+        specificity = tn / (tn + fp + 1e-8)
+        return float(sensitivity), float(specificity)
+
+    def get_fdr_per_hour(self, scores: np.ndarray,
+                         labels: np.ndarray,
+                         total_hours: float) -> float:
+        assert self.threshold is not None
+        interictal_mask = labels == 0
+        fp = int((scores[interictal_mask] >= self.threshold).sum())
+        return fp / max(total_hours, 1e-8)
+
+    def compute_all(self, scores: np.ndarray,
+                    labels: np.ndarray,
+                    total_hours: float) -> dict:
+        """
+        Requires calibrate_threshold() to have been called first.
+        """
+        auroc_val                = self.get_auroc(scores, labels)
+        sensitivity, specificity = self.get_sensitivity_specificity(
+            scores, labels)
+        fdr = self.get_fdr_per_hour(scores, labels, total_hours)
+
+        return {
+            "sensitivity": round(sensitivity, 4),
+            "specificity": round(specificity, 4),
+            "auroc":       round(auroc_val,   4),
+            "fdr_per_hour": round(fdr,        2),
+        }
+
+--- FILE: ./src/shared/models/optimization.py ---
+"""
+optimization.py
+===============
+Optimizer and learning rate scheduler.
+"""
+
+import torch
+import torch.optim as optim
+
+
+class OptimizerHandler:
+    """
+    Builds optimizer and scheduler from config strings.
+
+    Supported optimizers: adam, adamw, sgd
+    Supported schedulers: cosine, plateau, None
+    """
+
+    def __init__(self, optimizer_type: str = "adam",
+                 lr: float = 1e-3,
+                 weight_decay: float = 0.0,
+                 scheduler_type: str = None,
+                 **scheduler_kwargs):
+        self.optimizer_type  = optimizer_type
+        self.lr              = lr
+        self.weight_decay    = weight_decay
+        self.scheduler_type  = scheduler_type
+        self.scheduler_kwargs = scheduler_kwargs
+
+    def get_optimizer(self, model_parameters) -> optim.Optimizer:
+        if self.optimizer_type == "adam":
+            return optim.Adam(
+                model_parameters, lr=self.lr,
+                weight_decay=self.weight_decay)
+        elif self.optimizer_type == "adamw":
+            return optim.AdamW(
+                model_parameters, lr=self.lr,
+                weight_decay=self.weight_decay)
+        elif self.optimizer_type == "sgd":
+            return optim.SGD(
+                model_parameters, lr=self.lr,
+                momentum=0.9,
+                weight_decay=self.weight_decay)
+        else:
+            raise ValueError(
+                f"Unknown optimizer: {self.optimizer_type}. "
+                f"Use 'adam', 'adamw', or 'sgd'.")
+
+    def get_scheduler(self, optimizer: optim.Optimizer):
+        if self.scheduler_type is None:
+            return None
+        elif self.scheduler_type == "cosine":
+            T_max = self.scheduler_kwargs.get("T_max", 100)
+            return optim.lr_scheduler.CosineAnnealingLR(
+                optimizer, T_max=T_max)
+        elif self.scheduler_type == "plateau":
+            patience = self.scheduler_kwargs.get("patience", 5)
+            return optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer, mode="min", patience=patience)
+        else:
+            raise ValueError(
+                f"Unknown scheduler: {self.scheduler_type}. "
+                f"Use 'cosine', 'plateau', or None.")
+
+--- FILE: ./src/shared/models/trainer.py ---
+"""
+trainer.py
+==========
+Plain PyTorch training loop for GAE with node features.
+"""
+
+import torch
+import numpy as np
+from pathlib import Path
+from torch_geometric.utils import dense_to_sparse
+
+
+class Trainer:
+    def __init__(self, max_epochs: int = 100,
+                 checkpoint_dir: str = "./checkpoints/",
+                 patience: int = 10,
+                 **kwargs):
+        self.max_epochs = max_epochs
+        self.checkpoint_dir = Path(checkpoint_dir)
+        self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.patience = patience
+
+    def _compute_batch_loss(self, model, batch, loss_handler, device):
+        """
+        batch: tuple (A_batch, X_batch) where
+               A_batch: [B, 18, 18]
+               X_batch: [B, 18, 5]
+        """
+        A_batch, X_batch = batch
+        total_loss = 0.0
+        B = A_batch.shape[0]
+        for i in range(B):
+            A = A_batch[i].to(device)
+            X = X_batch[i].to(device)
+            A_binary = (A > 0).float()
+            edge_index, edge_weight = dense_to_sparse(A)
+            _, A_hat = model(X, edge_index, edge_weight)
+            total_loss = total_loss + loss_handler(A_hat, A_binary)
+        return total_loss / B
+
+    def train(self, model, train_loader, val_loader,
+              loss_handler, optimizer_handler,
+              device: str = "cpu") -> dict:
+        model.to(device)
+        optimizer = optimizer_handler.get_optimizer(model.parameters())
+        scheduler = optimizer_handler.get_scheduler(optimizer)
+
+        best_val_loss = float("inf")
+        best_ckpt_path = self.checkpoint_dir / "best_model.pt"
+        no_improve = 0
+
+        for epoch in range(self.max_epochs):
+            # ── Train ─────────────────────────────────────────────────────────
+            model.train()
+            train_losses = []
+            for batch in train_loader:
+                optimizer.zero_grad()
+                loss = self._compute_batch_loss(model, batch, loss_handler, device)
+                loss.backward()
+                optimizer.step()
+                train_losses.append(loss.item())
+
+            # ── Validate ──────────────────────────────────────────────────────
+            model.eval()
+            val_losses = []
+            with torch.no_grad():
+                for batch in val_loader:
+                    loss = self._compute_batch_loss(model, batch, loss_handler, device)
+                    val_losses.append(loss.item())
+
+            train_loss = float(np.mean(train_losses))
+            val_loss = float(np.mean(val_losses))
+
+            if (epoch + 1) % 10 == 0 or epoch == 0:
+                print(f"  Epoch {epoch+1:3d}/{self.max_epochs} | "
+                      f"train_loss={train_loss:.4f} | val_loss={val_loss:.4f}")
+
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                torch.save(model.state_dict(), str(best_ckpt_path))
+                no_improve = 0
+            else:
+                no_improve += 1
+
+            if scheduler is not None:
+                if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                    scheduler.step(val_loss)
+                else:
+                    scheduler.step()
+
+            if self.patience > 0 and no_improve >= self.patience:
+                print(f"  Early stopping at epoch {epoch+1}")
+                break
+
+        model.load_state_dict(torch.load(str(best_ckpt_path), map_location=device))
+        print(f"  Best val_loss={best_val_loss:.4f} loaded.")
+
+        # Collect validation scores for threshold calibration
+        model.eval()
+        val_scores = []
+        with torch.no_grad():
+            for batch in val_loader:
+                A_batch, X_batch = batch
+                for i in range(A_batch.shape[0]):
+                    A = A_batch[i].to(device)
+                    X = X_batch[i].to(device)
+                    edge_index, edge_weight = dense_to_sparse(A)
+                    _, A_hat = model(X, edge_index, edge_weight)
+                    val_scores.append(model.anomaly_score(A, A_hat))
+
+        return {"val_scores": val_scores, "best_val_loss": best_val_loss}
+
+--- FILE: ./src/shared/models/visualization.py ---
+# visualization.py
+# Plotting utilities.
+# Modify for your task.
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+
+def plot_training_curves(log_dir="./logs/experiment/version_0/", save_dir="./"):
+    """
+    Plot training curves from CSVLogger.
+    """
+    # Read logs
+    log_path = Path(log_dir) / "metrics.csv"
+    if not log_path.exists():
+        print(f"Log file not found: {log_path}")
+        return
+    
+    logs = pd.read_csv(log_path)
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Loss curve
+    if "train_loss" in logs.columns and "val_loss" in logs.columns:
+        plt.figure()
+        logs[["train_loss", "val_loss"]].dropna().plot()
+        plt.title("Loss Curve")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend(["Train", "Validation"])
+        plt.savefig(save_dir / "loss_curve.png")
+        plt.close()
+        print(f"Saved: {save_dir / 'loss_curve.png'}")
+    
+    # Accuracy curve
+    if "train_acc" in logs.columns and "val_acc" in logs.columns:
+        plt.figure()
+        logs[["train_acc", "val_acc"]].dropna().plot()
+        plt.title("Accuracy Curve")
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy")
+        plt.legend(["Train", "Validation"])
+        plt.savefig(save_dir / "acc_curve.png")
+        plt.close()
+        print(f"Saved: {save_dir / 'acc_curve.png'}")
+
+
+def plot_metric(log_dir="./logs/experiment/version_0/", metric_name="loss", save_dir="./"):
+    """
+    Plot specific metric.
+    metric_name: "loss", "acc", "f1", "dice", etc.
+    """
+    log_path = Path(log_dir) / "metrics.csv"
+    if not log_path.exists():
+        print(f"Log file not found: {log_path}")
+        return
+    
+    logs = pd.read_csv(log_path)
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    
+    train_col = f"train_{metric_name}"
+    val_col = f"val_{metric_name}"
+    
+    if train_col in logs.columns and val_col in logs.columns:
+        plt.figure()
+        logs[[train_col, val_col]].dropna().plot()
+        plt.title(f"{metric_name.upper()} Curve")
+        plt.xlabel("Epoch")
+        plt.ylabel(metric_name.capitalize())
+        plt.legend(["Train", "Validation"])
+        plt.savefig(save_dir / f"{metric_name}_curve.png")
+        plt.close()
+        print(f"Saved: {save_dir / f'{metric_name}_curve.png'}")
+    else:
+        print(f"Metric not found: {train_col}, {val_col}")
+
+--- FILE: ./src/shared/services/data/__init__.py ---
+from .dataset import EEGGraphDataset
+
+__all__ = ["EEGGraphDataset"]
+
+
+--- FILE: ./src/shared/services/data/dataset.py ---
+"""
+dataset.py
+==========
+Dataset for GAE training. Now returns both adjacency matrix and node features.
+"""
+
+import numpy as np
+import torch
+from torch.utils.data import Dataset
+
+
+class EEGGraphDataset(Dataset):
+    """
+    Load precomputed adjacency matrices and node features.
+
+    Args:
+        adjs_path: path to chbXX_interictal_adjs.npy     [N, 18, 18]
+        features_path: path to chbXX_interictal_features.npy [N, 18, 5]
+
+    Returns:
+        A: torch.FloatTensor [18, 18]
+        X: torch.FloatTensor [18, 5]
+    """
+
+    def __init__(self, adjs_path: str, features_path: str):
+        self.adjs = np.load(adjs_path, mmap_mode="r")
+        self.features = np.load(features_path, mmap_mode="r")
+        assert len(self.adjs) == len(self.features), \
+            f"Mismatch: {adjs_path} vs {features_path}"
+
+    def __len__(self) -> int:
+        return len(self.adjs)
+
+    def __getitem__(self, idx):
+        A = torch.tensor(self.adjs[idx].astype(np.float32))
+        X = torch.tensor(self.features[idx].astype(np.float32))
+        return A, X
+
+--- FILE: ./src/shared/services/data/transforms.py ---
+from typing import Tuple
+from abc import ABC, abstractmethod
+
+
+class BaseTransformer(ABC):
+    """
+    Base transformer class.
+    Modify for your task.
+    """
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def __call__(self, *args, **kwargs):
+        pass
+
+
+class Transformer(BaseTransformer):
+    """
+    General transformer.
+    Modify for your task.
+    """
+    def __init__(self, target_size: Tuple[int, int] = (224, 224), do_augmentation=False):
+        self.target_size = target_size
+        self.do_augmentation = do_augmentation
+
+    def _augment(self, x):
+        # Add augmentation here
+        # Examples: flip, rotate, crop, etc.
+        return x
+
+    def _preprocess(self, x):
+        # Add preprocessing here
+        # Examples: resize, normalize, etc.
+        return x
+
+    def __call__(self, x):
+        if self.do_augmentation:
+            x = self._augment(x)
+        
+        x = self._preprocess(x)
+        
+        return x
+
+
+# Segmentation example:
+# class SegmentationTransformer(BaseTransformer):
+#     def __init__(self, target_size=(224, 224), do_augmentation=False):
+#         self.target_size = target_size
+#         self.do_augmentation = do_augmentation
+#
+#     def _augment(self, image, mask):
+#         # flip, rotate, etc.
+#         return image, mask
+#
+#     def _preprocess(self, image, mask):
+#         # resize, normalize, etc.
+#         return image, mask
+#
+#     def __call__(self, image, mask):
+#         if self.do_augmentation:
+#             image, mask = self._augment(image, mask)
+#         image, mask = self._preprocess(image, mask)
+#         return {"image": image, "mask": mask}
+
+--- FILE: ./src/shared/services/models_hub/__init__.py ---
+from .base import ModelManager
+from . import utils
+from .unet import UNet
+
+__all__ = [
+    "ModelManager",
+    "utils",
+    "UNet"
+]
+
+--- FILE: ./src/shared/services/models_hub/base.py ---
+# base.py
+import torch
+from abc import ABC, abstractmethod
+
+
+class ModelManager(ABC):
+    """
+    Base class for all models.
+    Inherit this with nn.Module.
+    """
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def forward(self, x):
+        pass
+    
+    def save(self, path):
+        torch.save(self.state_dict(), path)
+    
+    def load(self, path):
+        self.load_state_dict(torch.load(path))
+    
+    def count_parameters(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+    
+    def freeze(self):
+        for param in self.parameters():
+            param.requires_grad = False
+    
+    def unfreeze(self):
+        for param in self.parameters():
+            param.requires_grad = True
+    
+    def summary(self):
+        print(self)
+        total = sum(p.numel() for p in self.parameters())
+        trainable = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        frozen = total - trainable
+        print(f"Total parameters: {total:,}")
+        print(f"Trainable: {trainable:,}")
+        print(f"Frozen: {frozen:,}")
+
+--- FILE: ./src/shared/services/models_hub/baselines/__init__.py ---
+
+
+--- FILE: ./src/shared/services/models_hub/baselines/lstm_ae.py ---
+
+
+--- FILE: ./src/shared/services/models_hub/baselines/svm_baseline.py ---
+
+
+--- FILE: ./src/shared/services/models_hub/gae/__init__.py ---
+from .model import GAEModel
+
+--- FILE: ./src/shared/services/models_hub/gae/model.py ---
+import torch
+import torch.nn as nn
+from torch_geometric.nn import GCNConv
+from shared.services.models_hub.base import ModelManager
+
+
+class GAEEncoder(nn.Module):
+    """
+    2-layer GCNConv encoder.
+    Eq (6) in thesis: H^(l+1) = σ(D̃^{-1/2} Ã D̃^{-1/2} H^(l) W^(l))
+    """
+    def __init__(self, in_channels, hidden_dim, latent_dim):
+        super().__init__()
+        self.conv1 = GCNConv(in_channels, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, latent_dim)
+        self.relu = nn.ReLU()
+
+    def forward(self, x, edge_index, edge_weight=None):
+        z = self.relu(self.conv1(x, edge_index, edge_weight))
+        z = self.conv2(z, edge_index, edge_weight)
+        return z  # [N_nodes, latent_dim]
+
+
+class GAEModel(nn.Module, ModelManager):
+    """
+    Graph Autoencoder for unsupervised seizure detection.
+
+    Encoder: 2-layer GCNConv
+    Decoder: inner product  Â_ij = σ(z_i^T z_j)  — Eq (7)
+    Loss:    BCE(A, Â)                             — Eq (8)
+    Score:   ||A - Â||_F                           — Eq (9)
+    """
+    def __init__(self, in_channels, hidden_dim=64, latent_dim=16):
+        super().__init__()
+        self.encoder = GAEEncoder(in_channels, hidden_dim, latent_dim)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x, edge_index, edge_weight=None):
+        z = self.encoder(x, edge_index, edge_weight)
+        A_hat = self.decode(z)
+        return z, A_hat
+
+    def decode(self, z):
+        """
+        Inner product decoder.
+        Â = σ(Z Z^T)  →  [N_nodes, N_nodes]
+        """
+        return self.sigmoid(torch.mm(z, z.t()))
+
+    def anomaly_score(self, A, A_hat):
+        """
+        Frobenius norm reconstruction error — Eq (9).
+        s(G) = ||A_binary - Â||_F
+        Consistent with training target (binary adjacency).
+        """
+        A_binary = (A > 0).float()
+        return torch.norm(A_binary - A_hat, p='fro').item()
+
+    def summary(self):
+        print(self)
+        total = sum(p.numel() for p in self.parameters())
+        trainable = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        print(f"Total parameters: {total:,} | Trainable: {trainable:,}")
+
+--- FILE: ./src/shared/services/models_hub/unet/__init__.py ---
+from .model import UNet
+
+--- FILE: ./src/shared/services/models_hub/unet/model.py ---
+# Example: UNet for segmentation.
+# Copy this folder, rename, and modify for your model.
+#
+# Learn more about UNet:
+# - Paper: https://arxiv.org/abs/1505.04597
+# - Tutorial: https://www.youtube.com/watch?v=IHq1t7NxS8k
+#
+# Pretrained alternatives:
+# - segmentation_models_pytorch: https://github.com/qubvel/segmentation_models_pytorch
+#   pip install segmentation-models-pytorch
+#   import segmentation_models_pytorch as smp
+#   model = smp.Unet('resnet34', encoder_weights='imagenet', classes=1)
+#
+# - torchvision (DeepLabV3, FCN):
+#   from torchvision.models.segmentation import deeplabv3_resnet50
+#   model = deeplabv3_resnet50(pretrained=True)
+
+import torch
+import torch.nn as nn
+from ..base import ModelManager
+from .. import utils
+
+
+class UNet(nn.Module, ModelManager):
+    """
+    UNet for segmentation.
+    Modify for your task.
+    """
+    def __init__(self, n_channels=3, n_classes=1, bilinear=False):
+        super().__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = utils.DoubleConv(n_channels, 64)
+        self.down1 = utils.Down(64, 128)
+        self.down2 = utils.Down(128, 256)
+        self.down3 = utils.Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = utils.Down(512, 1024 // factor)
+        self.up1 = utils.Up(1024, 512 // factor, bilinear)
+        self.up2 = utils.Up(512, 256 // factor, bilinear)
+        self.up3 = utils.Up(256, 128 // factor, bilinear)
+        self.up4 = utils.Up(128, 64, bilinear)
+        self.outc = utils.OutConv(64, n_classes)
+
+    def forward(self, x):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
+        logits = self.outc(x)
+        return logits
+
+    def use_checkpointing(self):
+        self.inc = torch.utils.checkpoint(self.inc)
+        self.down1 = torch.utils.checkpoint(self.down1)
+        self.down2 = torch.utils.checkpoint(self.down2)
+        self.down3 = torch.utils.checkpoint(self.down3)
+        self.down4 = torch.utils.checkpoint(self.down4)
+        self.up1 = torch.utils.checkpoint(self.up1)
+        self.up2 = torch.utils.checkpoint(self.up2)
+        self.up3 = torch.utils.checkpoint(self.up3)
+        self.up4 = torch.utils.checkpoint(self.up4)
+        self.outc = torch.utils.checkpoint(self.outc)
+
+--- FILE: ./src/shared/services/models_hub/utils.py ---
+# utils.py
+# Shared layers for models.
+# Add your reusable layers here.
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class DoubleConv(nn.Module):
+    """(Conv => BN => ReLU) * 2"""
+    def __init__(self, in_channels, out_channels, mid_channels=None):
+        super().__init__()
+        if not mid_channels:
+            mid_channels = out_channels
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_channels, mid_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(mid_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(mid_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.double_conv(x)
+
+
+class Down(nn.Module):
+    """Downscaling: MaxPool => DoubleConv"""
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.maxpool_conv = nn.Sequential(
+            nn.MaxPool2d(2),
+            DoubleConv(in_channels, out_channels)
+        )
+
+    def forward(self, x):
+        return self.maxpool_conv(x)
+
+
+class Up(nn.Module):
+    """Upscaling => DoubleConv"""
+    def __init__(self, in_channels, out_channels, bilinear=True):
+        super().__init__()
+        if bilinear:
+            self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+            self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
+        else:
+            self.up = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=2, stride=2)
+            self.conv = DoubleConv(in_channels, out_channels)
+
+    def forward(self, x1, x2):
+        x1 = self.up(x1)
+        diffY = x2.size()[2] - x1.size()[2]
+        diffX = x2.size()[3] - x1.size()[3]
+        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2])
+        x = torch.cat([x2, x1], dim=1)
+        return self.conv(x)
+
+
+class OutConv(nn.Module):
+    """1x1 Conv for output"""
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+
+    def forward(self, x):
+        return self.conv(x)
+
+--- FILE: ./src/test_pipeline.py ---
+# Testing pipeline.
+# Modify for your task.
+
+import torch
+from torch.utils.data import DataLoader
+
+from configs import ConfigReader
+from shared.models import LossHandler, MetricHandler, OptimizerHandler, Trainer, LightningModel
+from shared.services.data import BaseDataset, Transformer
+from shared.services.models_hub import UNet
+
+
+def run(config_path="./configs/defaults.yml", experiment_path=None):
+    # Load config
+    config = ConfigReader.merge(config_path, experiment_path)
+    
+    # Transform
+    transform = Transformer(
+        target_size=tuple(config.transform.target_size),
+        do_augmentation=False
+    )
+    
+    # Dataset
+    test_dataset = BaseDataset(data_dir=config.data.test_dir, transform=transform)
+    
+    # DataLoader
+    test_loader = DataLoader(
+        dataset=test_dataset,
+        batch_size=config.data.batch_size,
+        shuffle=False,
+        num_workers=config.data.num_workers,
+        pin_memory=torch.cuda.is_available()
+    )
+    
+    # Model
+    model = UNet(
+        n_channels=config.model.n_channels,
+        n_classes=config.model.n_classes
+    )
+    
+    # Handlers
+    loss_handler = LossHandler(loss_type=config.loss.type)
+    metric_handler = MetricHandler(
+        task=config.metrics.task,
+        num_classes=config.metrics.num_classes
+    )
+    optimizer_handler = OptimizerHandler(
+        optimizer_type=config.training.optimizer,
+        lr=config.training.lr
+    )
+    
+    # Load checkpoint
+    checkpoint_path = config.training.checkpoint_dir + "last.ckpt"
+    lightning_model = LightningModel.load_from_checkpoint(
+        checkpoint_path,
+        model=model,
+        loss_handler=loss_handler,
+        metric_handler=metric_handler,
+        optimizer_handler=optimizer_handler
+    )
+    
+    # Test
+    trainer = Trainer()
+    trainer.test(lightning_model, test_loader)
+
+
+if __name__ == "__main__":
+    run(config_path="./configs/defaults.yml")
+
+--- FILE: ./src/train_pipeline.py ---
+"""
+train_pipeline.py
+=================
+Train GAE on interictal data with node features.
+"""
+
+import sys
+import torch
+import numpy as np
+from pathlib import Path
+from torch.utils.data import DataLoader, random_split, ConcatDataset
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from configs.config import ConfigReader
+from shared.models.logger import ExperimentLogger
+from shared.models.loss_function import LossHandler
+from shared.models.optimization import OptimizerHandler
+from shared.models.trainer import Trainer
+from shared.models.metrics import MetricHandler
+from shared.services.data.dataset import EEGGraphDataset
+from shared.services.models_hub.gae.model import GAEModel
+from evaluate import run_evaluation
+
+
+def set_seed(seed: int = 42):
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+
+
+def run(config_path: str = "./configs/defaults.yaml",
+        experiment_path: str = None,
+        experiment_id: str = "E5_proposed_gae",
+        fold_id: str = "fold_1",
+        train_subjects: list = None,
+        test_subjects: list = None) -> dict:
+    config = ConfigReader.merge(config_path, experiment_path)
+    set_seed(config.training.seed)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    logger = ExperimentLogger(log_dir=config.training.log_dir)
+    logger.log_message(f"Start: {experiment_id} | {fold_id} | device={device}")
+
+    processed_dir = Path(config.data.processed_dir)
+
+    # Build dataset from training subjects
+    datasets = []
+    for subj in train_subjects:
+        adjs_path = processed_dir / f"{subj}_interictal_adjs.npy"
+        feats_path = processed_dir / f"{subj}_interictal_features.npy"
+        if not adjs_path.exists() or not feats_path.exists():
+            raise FileNotFoundError(f"Missing {adjs_path} or {feats_path}")
+        datasets.append(EEGGraphDataset(str(adjs_path), str(feats_path)))
+
+    full_dataset = ConcatDataset(datasets)
+    n_total = len(full_dataset)
+    n_val = max(1, int(0.2 * n_total))
+    n_train = n_total - n_val
+
+    logger.log_message(f"Dataset: {n_total} windows | train={n_train} | val={n_val}")
+
+    train_ds, val_ds = random_split(
+        full_dataset, [n_train, n_val],
+        generator=torch.Generator().manual_seed(config.training.seed))
+
+    train_loader = DataLoader(train_ds, batch_size=config.data.batch_size,
+                              shuffle=True, num_workers=0, pin_memory=False)
+    val_loader = DataLoader(val_ds, batch_size=config.data.batch_size,
+                            shuffle=False, num_workers=0, pin_memory=False)
+
+    # Model
+    model = GAEModel(in_channels=5,   # 5 band powers
+                     hidden_dim=config.model.hidden_dim,
+                     latent_dim=config.model.latent_dim)
+    model.summary()
+    logger.log_model_info(model)
+
+    # Loss and optimizer
+    loss_handler = LossHandler(loss_type="graph_bce")
+    optimizer_handler = OptimizerHandler(
+        optimizer_type=config.training.optimizer,
+        lr=config.training.lr,
+        scheduler_type=config.training.scheduler,
+        T_max=config.training.max_epochs)
+
+    checkpoint_dir = Path(config.training.checkpoint_dir) / experiment_id / fold_id
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+    trainer = Trainer(max_epochs=config.training.max_epochs,
+                      checkpoint_dir=str(checkpoint_dir),
+                      patience=10)
+
+    train_result = trainer.train(model=model,
+                                 train_loader=train_loader,
+                                 val_loader=val_loader,
+                                 loss_handler=loss_handler,
+                                 optimizer_handler=optimizer_handler,
+                                 device=device)
+
+    # Save final weights
+    weights_path = checkpoint_dir / "model_weights.pt"
+    torch.save(model.state_dict(), str(weights_path))
+    logger.log_message(f"Weights saved: {weights_path}")
+
+    # Calibrate threshold from val scores
+    metric_handler = MetricHandler(threshold_percentile=config.anomaly.threshold_percentile)
+    threshold = metric_handler.calibrate_threshold(np.array(train_result["val_scores"]))
+    logger.log_message(f"Threshold (95th pct): {threshold:.4f}")
+
+    # Evaluate on test subjects
+    hyperparams = {
+        "hidden_dim": config.model.hidden_dim,
+        "latent_dim": config.model.latent_dim,
+        "lr": config.training.lr,
+        "alpha": config.graph.alpha,
+        "top_k": config.graph.top_k_percent,
+        "seed": config.training.seed,
+        "threshold": round(threshold, 4),
+    }
+
+    metrics = run_evaluation(
+        model=model,
+        subject_ids=test_subjects,
+        processed_dir=str(processed_dir),
+        threshold=threshold,
+        experiment_id=experiment_id,
+        fold_id=fold_id,
+        hyperparams=hyperparams,
+        results_log_path=config.evaluation.results_log,
+        device=device,
+        notes=f"train={train_subjects}")
+
+    logger.log_results(metrics)
+    logger.log_message(f"Done: {experiment_id} | {fold_id}")
+    return metrics
+
+
+if __name__ == "__main__":
+    # Smoke test: train on chb01, test on chb01
+    run(experiment_id="E5_within_subject_smoke",
+        fold_id="smoke_chb01",
+        train_subjects=["chb01"],
+        test_subjects=["chb01"])
+
+--- FILE: ./src/visualize_progress.py ---
+"""
+visualize_progress.py
+=====================
+Create 3 figures for supervisor report.
+
+Output (saved in results/figures/):
+  fig1_preprocessing_summary.png  — ictal/interictal windows per subject
+  fig2_raw_vs_filtered.png        — EEG signal before/after filter
+  fig3_adjacency_heatmap.png      — interictal vs ictal functional connectivity
+"""
+
+import sys
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+PROCESSED_DIR = Path("F:/Study/Thesis/Code/data/processed")
+RAW_DIR       = Path("F:/Study/Thesis/Dataset/CHB-MIT")
+FIG_DIR       = Path("F:/Study/Thesis/Code/results/figures")
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# ── Figure 1: Preprocessing summary ──────────────────────────────────────────
+
+def plot_preprocessing_summary():
+    import json
+
+    subjects, n_inter, n_ictal, n_rejected = [], [], [], []
+
+    for i in range(1, 24):
+        subj = f"chb{i:02d}"
+        stats_path = PROCESSED_DIR / f"{subj}_stats.json"
+        if not stats_path.exists():
+            continue
+        with open(stats_path) as f:
+            s = json.load(f)
+        subjects.append(subj)
+        n_inter.append(s["n_interictal"])
+        n_ictal.append(s["n_ictal"])
+        n_rejected.append(s["n_rejected"])
+
+    x = np.arange(len(subjects))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8))
+
+    # Top: interictal vs ictal windows
+    bar_w = 0.35
+    b1 = ax1.bar(x - bar_w/2, n_inter, bar_w,
+                 label="Interictal", color="#2196F3", alpha=0.85)
+    b2 = ax1.bar(x + bar_w/2, n_ictal, bar_w,
+                 label="Ictal", color="#F44336", alpha=0.85)
+
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(subjects, rotation=45, ha="right", fontsize=9)
+    ax1.set_ylabel("Number of 4s windows")
+    ax1.set_title("CHB-MIT Preprocessing Summary — Windows per Subject",
+                  fontweight="bold")
+    ax1.legend()
+    ax1.set_yscale("log")
+    ax1.grid(axis="y", alpha=0.3)
+
+    # Bottom: artifact rejected
+    ax2.bar(x, n_rejected, color="#FF9800", alpha=0.85,
+            label="Artifact rejected (interictal)")
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(subjects, rotation=45, ha="right", fontsize=9)
+    ax2.set_ylabel("Windows rejected")
+    ax2.set_title("Artifact Rejection per Subject (±500 µV threshold)",
+                  fontweight="bold")
+    ax2.legend()
+    ax2.grid(axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    out = FIG_DIR / "fig1_preprocessing_summary.png"
+    plt.savefig(str(out), dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"Saved: {out}")
+
+
+# ── Figure 2: Raw vs filtered EEG ────────────────────────────────────────────
+
+def plot_raw_vs_filtered():
+    import mne
+    import warnings
+    import re
+    from scipy.signal import butter, sosfiltfilt
+
+    warnings.filterwarnings("ignore")
+    mne.set_log_level("ERROR")
+
+    FS = 256
+    SOS = butter(4, [0.5, 40.0], btype="bandpass", fs=FS, output="sos")
+
+    # chb01_18.edf: seizure at 1720-1810s
+    # Window at ~1700s = pre-ictal, high amplitude, DC drift visible
+    edf_path = RAW_DIR / "chb01" / "chb01_18.edf"
+    raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+    raw.rename_channels({ch: ch.upper().strip() for ch in raw.ch_names})
+
+    rename_map, seen = {}, set()
+    for ch in raw.ch_names:
+        m = re.match(r"^(.*)-(\d+)$", ch)
+        if m:
+            base = m.group(1)
+            if base not in seen:
+                rename_map[ch] = base
+                seen.add(base)
+    if rename_map:
+        raw.rename_channels(rename_map)
+
+    raw.pick(["FP1-F7", "F7-T7", "T7-P7", "FZ-CZ"])
+
+    # Scan windows to find one with high peak-to-peak (noisy but < 500µV)
+    best_start = 0
+    best_ptp   = 0
+    for trial_start in range(0, min(int(raw.n_times) - 1024, 1800*256), 1024):
+        seg = raw.get_data(start=trial_start,
+                           stop=trial_start + 1024) * 1e6
+        ptp = float(np.ptp(seg))
+        if 150 < ptp < 800 and ptp > best_ptp:
+            best_ptp   = ptp
+            best_start = trial_start
+
+    segment  = raw.get_data(start=best_start,
+                             stop=best_start + 1024) * 1e6
+    filtered = sosfiltfilt(SOS, segment, axis=1)
+    time     = np.arange(1024) / FS
+
+    channels = ["FP1-F7", "F7-T7", "T7-P7", "FZ-CZ"]
+    fig, axes = plt.subplots(4, 2, figsize=(14, 9), sharex=True)
+
+    for idx, ch in enumerate(channels):
+        raw_sig  = segment[idx]
+        filt_sig = filtered[idx]
+
+        # Raw
+        axes[idx, 0].plot(time, raw_sig, color="#555", linewidth=0.8)
+        axes[idx, 0].set_ylabel(ch, fontsize=9)
+        lim = max(abs(raw_sig).max() * 1.2, 100)
+        axes[idx, 0].set_ylim(-lim, lim)
+        axes[idx, 0].axhline(500,  color="red", linestyle="--",
+                             linewidth=0.7, alpha=0.6, label="±500µV")
+        axes[idx, 0].axhline(-500, color="red", linestyle="--",
+                             linewidth=0.7, alpha=0.6)
+        axes[idx, 0].grid(alpha=0.2)
+
+        # Filtered
+        axes[idx, 1].plot(time, filt_sig, color="#1976D2", linewidth=0.8)
+        axes[idx, 1].set_ylim(-lim, lim)
+        axes[idx, 1].grid(alpha=0.2)
+
+        # Annotate DC removal on first channel if visible
+        dc_raw  = float(np.mean(raw_sig))
+        dc_filt = float(np.mean(filt_sig))
+        if abs(dc_raw) > 20:
+            axes[idx, 0].axhline(dc_raw, color="orange", linestyle=":",
+                                 linewidth=1.0, alpha=0.8)
+            axes[idx, 1].axhline(dc_filt, color="orange", linestyle=":",
+                                 linewidth=1.0, alpha=0.8)
+
+    axes[0, 0].set_title("Raw EEG (µV) — DC drift + broadband noise",
+                         fontweight="bold")
+    axes[0, 1].set_title("After bandpass filter 0.5–40 Hz — DC removed",
+                         fontweight="bold")
+    for ax in axes[-1]:
+        ax.set_xlabel("Time (s)")
+
+    window_time = best_start // FS
+    plt.suptitle(
+        f"EEG Preprocessing: Raw vs Filtered\n"
+        f"chb01_18.edf — window at t={window_time}s "
+        f"(near seizure onset at 1720s)",
+        fontweight="bold")
+    plt.tight_layout()
+    out = FIG_DIR / "fig2_raw_vs_filtered.png"
+    plt.savefig(str(out), dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"Saved: {out}  [window at t={window_time}s, peak-to-peak={best_ptp:.0f}µV]")
+
+
+# ── Figure 3: Adjacency heatmap — interictal vs ictal ────────────────────────
+
+def plot_adjacency_heatmap():
+    from graph_construction import build_adjacency
+
+    CHANNELS = [
+        "FP1-F7", "F7-T7", "T7-P7", "P7-O1",
+        "FP1-F3", "F3-C3", "C3-P3", "P3-O1",
+        "FP2-F4", "F4-C4", "C4-P4", "P4-O2",
+        "FP2-F8", "F8-T8", "T8-P8", "P8-O2",
+        "FZ-CZ",  "CZ-PZ"
+    ]
+
+    # Load 1 interictal and 1 ictal window from chb01
+    inter_windows = np.load(
+        str(PROCESSED_DIR / "chb01_interictal.npy"), mmap_mode="r")
+    ictal_windows = np.load(
+        str(PROCESSED_DIR / "chb01_ictal.npy"), mmap_mode="r")
+
+    # Use middle of dataset for representative window
+    inter_win = inter_windows[len(inter_windows)//2].astype(np.float64)
+    ictal_win = ictal_windows[len(ictal_windows)//2].astype(np.float64)
+
+    A_inter = build_adjacency(inter_win, alpha=0.5, top_k_percent=30)
+    A_ictal = build_adjacency(ictal_win, alpha=0.5, top_k_percent=30)
+
+    # Also compute mean adjacency across multiple windows
+    n_sample = min(50, len(inter_windows))
+    A_inter_mean = np.mean([
+        build_adjacency(inter_windows[i].astype(np.float64))
+        for i in range(n_sample)], axis=0)
+
+    n_sample_i = min(50, len(ictal_windows))
+    A_ictal_mean = np.mean([
+        build_adjacency(ictal_windows[i].astype(np.float64))
+        for i in range(n_sample_i)], axis=0)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+    vmax = max(A_inter.max(), A_ictal.max(),
+               A_inter_mean.max(), A_ictal_mean.max())
+
+    for ax, A, title in zip(
+        axes.flat,
+        [A_inter, A_ictal, A_inter_mean, A_ictal_mean],
+        ["Interictal (single window)",
+         "Ictal (single window)",
+         f"Interictal (mean of {min(50,len(inter_windows))} windows)",
+         f"Ictal (mean of {min(50,len(ictal_windows))} windows)"]
+    ):
+        im = ax.imshow(A, cmap="hot", vmin=0, vmax=vmax,
+                       aspect="auto")
+        ax.set_title(title, fontweight="bold", fontsize=10)
+        ax.set_xticks(range(18))
+        ax.set_yticks(range(18))
+        ax.set_xticklabels(CHANNELS, rotation=90, fontsize=6)
+        ax.set_yticklabels(CHANNELS, fontsize=6)
+        plt.colorbar(im, ax=ax, shrink=0.8)
+
+    plt.suptitle(
+        "EEG Functional Connectivity (wPLI+AEC, top-30%)\nchb01 — Interictal vs Ictal",
+        fontweight="bold", fontsize=12)
+    plt.tight_layout()
+    out = FIG_DIR / "fig3_adjacency_heatmap.png"
+    plt.savefig(str(out), dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"Saved: {out}")
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    print("Generating figures for supervisor report...")
+    print("\n[1/3] Preprocessing summary...")
+    plot_preprocessing_summary()
+
+    print("\n[2/3] Raw vs filtered EEG...")
+    plot_raw_vs_filtered()
+
+    print("\n[3/3] Adjacency heatmaps...")
+    plot_adjacency_heatmap()
+
+    print(f"\nAll figures saved to: {FIG_DIR}")
+
+=== PROCESSED DATA STATUS ===
+total 46G
+-rw-r--r-- 1 Dell Latitude 3590 197121 8.1M Apr  5 23:10 chb01_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 2.1G Apr  5 23:10 chb01_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  5 23:17 chb01_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.2M Apr  5 23:26 chb02_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.9G Apr  5 23:26 chb02_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  5 23:33 chb02_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 7.5M Apr  5 23:42 chb03_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.8G Apr  5 23:42 chb03_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  5 23:49 chb03_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 7.0M Apr  6 01:02 chb04_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 7.7G Apr  6 01:02 chb04_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  118 Apr  6 02:18 chb04_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  11M Apr  6 02:41 chb05_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.9G Apr  6 02:41 chb05_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  6 02:45 chb05_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.2M Apr  6 02:58 chb06_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.7G Apr  6 02:58 chb06_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  6 03:09 chb06_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.9M Apr  6 03:27 chb07_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.4G Apr  6 03:27 chb07_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 03:42 chb07_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  17M Apr  6 03:45 chb08_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 894M Apr  6 03:45 chb08_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 03:47 chb08_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.2M Apr  6 04:04 chb09_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.4G Apr  6 04:04 chb09_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 04:20 chb09_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 8.3M Apr  6 04:28 chb10_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 2.5G Apr  6 04:28 chb10_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  6 04:36 chb10_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  15M Apr  6 04:39 chb11_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.7G Apr  6 04:39 chb11_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  6 04:42 chb11_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  20M Apr  6 04:44 chb12_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 895M Apr  6 04:44 chb12_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 04:46 chb12_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  11M Apr  6 04:49 chb13_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.4G Apr  6 04:49 chb13_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  116 Apr  6 04:52 chb13_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.5M Apr  6 04:55 chb14_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.4G Apr  6 04:55 chb14_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 04:57 chb14_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  37M Apr  6 05:01 chb15_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.9G Apr  6 05:01 chb15_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 05:04 chb15_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 2.0M Apr  6 05:06 chb16_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 691M Apr  6 05:06 chb16_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 05:07 chb16_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.3M Apr  6 05:09 chb17_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.2G Apr  6 05:09 chb17_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 05:12 chb17_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.9M Apr  6 05:15 chb18_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.9G Apr  6 05:15 chb18_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 05:19 chb18_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 4.4M Apr  6 05:22 chb19_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.8G Apr  6 05:22 chb19_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 05:25 chb19_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.7M Apr  6 05:28 chb20_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.5G Apr  6 05:28 chb20_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  114 Apr  6 05:30 chb20_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.8M Apr  6 05:34 chb21_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.7G Apr  6 05:34 chb21_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 05:37 chb21_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 3.9M Apr  6 05:40 chb22_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.5G Apr  6 05:40 chb22_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 05:43 chb22_stats.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 7.7M Apr  6 05:49 chb23_ictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121 1.2G Apr  6 05:49 chb23_interictal.npy
+-rw-r--r-- 1 Dell Latitude 3590 197121  115 Apr  6 05:53 chb23_stats.json
+
+
+=== SPLITS STATUS ===
+total 30K
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_01_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_01_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_02_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_02_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_03_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_03_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_04_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_04_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_05_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_05_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_06_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_06_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_07_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_07_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_08_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_08_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_09_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_09_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   27 Apr  6 11:38 fold_10_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  255 Apr  6 11:38 fold_10_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121   39 Apr  6 11:38 fold_11_test.json
+-rw-r--r-- 1 Dell Latitude 3590 197121  243 Apr  6 11:38 fold_11_train.json
+-rw-r--r-- 1 Dell Latitude 3590 197121 5.1K Apr  6 11:38 splits_summary.json
+
+
+=== RESULTS LOG (first 30 lines) ===
+experiment_id,timestamp,fold_id,sensitivity,specificity,auroc,fdr_per_hour,hyperparams_json,notes
+E5_smoke_test,2026-04-05T22:50:34.149906,smoke_chb01_train_chb09_test,0.0,0.8501,0.3774,134.9,"{""hidden_dim"": 64, ""latent_dim"": 16, ""lr"": 0.001, ""alpha"": 0.5, ""top_k"": 30, ""seed"": 42, ""threshold"": 8.0089}",train=['chb01']
+E5_within_subject_smoke,2026-04-06T17:47:29.950927,smoke_chb01,0.0261,0.9536,0.4872,41.73,"{""hidden_dim"": 64, ""latent_dim"": 16, ""lr"": 0.001, ""alpha"": 0.5, ""top_k"": 30, ""seed"": 42, ""threshold"": 9.9172}",train=['chb01']
+
+
+=== LOG FILES ===
+./logs/build_graphs_full.log
+./logs/preprocess_full.log
+./logs/preprocess_run3.log
+
+--- LOG: ./logs/build_graphs_full.log (last 50 lines) ---
+
+Processing chb16...
+  [chb16] interictal adjs: 9826 windows...
+    2000/9826    4000/9826    6000/9826    8000/9826  [chb16] interictal adjs saved.
+  [chb16] ictal adjs: 28 windows...
+  [chb16] ictal adjs saved.
+
+Processing chb17...
+  [chb17] interictal adjs: 16175 windows...
+    2000/16175    4000/16175    6000/16175    8000/16175    10000/16175    12000/16175    14000/16175    16000/16175  [chb17] interictal adjs saved.
+  [chb17] ictal adjs: 74 windows...
+  [chb17] ictal adjs saved.
+
+Processing chb18...
+  [chb18] interictal adjs: 26379 windows...
+    2000/26379    4000/26379    6000/26379    8000/26379    10000/26379    12000/26379    14000/26379    16000/26379    18000/26379    20000/26379    22000/26379    24000/26379    26000/26379  [chb18] interictal adjs saved.
+  [chb18] ictal adjs: 83 windows...
+  [chb18] ictal adjs saved.
+
+Processing chb19...
+  [chb19] interictal adjs: 25245 windows...
+    2000/25245    4000/25245    6000/25245    8000/25245    10000/25245    12000/25245    14000/25245    16000/25245    18000/25245    20000/25245    22000/25245    24000/25245  [chb19] interictal adjs saved.
+  [chb19] ictal adjs: 62 windows...
+  [chb19] ictal adjs saved.
+
+Processing chb20...
+  [chb20] interictal adjs: 20869 windows...
+    2000/20869    4000/20869    6000/20869    8000/20869    10000/20869    12000/20869    14000/20869    16000/20869    18000/20869    20000/20869  [chb20] interictal adjs saved.
+  [chb20] ictal adjs: 81 windows...
+  [chb20] ictal adjs saved.
+
+Processing chb21...
+  [chb21] interictal adjs: 23754 windows...
+    2000/23754    4000/23754    6000/23754    8000/23754    10000/23754    12000/23754    14000/23754    16000/23754    18000/23754    20000/23754    22000/23754  [chb21] interictal adjs saved.
+  [chb21] ictal adjs: 53 windows...
+  [chb21] ictal adjs saved.
+
+Processing chb22...
+  [chb22] interictal adjs: 20421 windows...
+    2000/20421    4000/20421    6000/20421    8000/20421    10000/20421    12000/20421    14000/20421    16000/20421    18000/20421    20000/20421  [chb22] interictal adjs saved.
+  [chb22] ictal adjs: 55 windows...
+  [chb22] ictal adjs saved.
+
+Processing chb23...
+  [chb23] interictal adjs: 16604 windows...
+    2000/16604    4000/16604    6000/16604    8000/16604    10000/16604    12000/16604    14000/16604    16000/16604  [chb23] interictal adjs saved.
+  [chb23] ictal adjs: 109 windows...
+  [chb23] ictal adjs saved.
+
+=== GRAPH CONSTRUCTION COMPLETE ===
+
+--- LOG: ./logs/preprocess_full.log (last 50 lines) ---
+[chb19] interictal=25245 | ictal=62 | rejected=659 | ratio=407.2:1
+
+Processing chb20...
+  [pass 1] counting windows...
+  [pass 1] interictal=20869 | ictal=81 | rejected=838
+  [pass 2] writing windows to disk...
+[chb20] interictal=20869 | ictal=81 | rejected=838 | ratio=257.6:1
+
+Processing chb21...
+  [pass 1] counting windows...
+  [pass 1] interictal=23754 | ictal=53 | rejected=3561
+  [pass 2] writing windows to disk...
+[chb21] interictal=23754 | ictal=53 | rejected=3561 | ratio=448.2:1
+
+Processing chb22...
+  [pass 1] counting windows...
+  [pass 1] interictal=20421 | ictal=55 | rejected=6721
+  [pass 2] writing windows to disk...
+[chb22] interictal=20421 | ictal=55 | rejected=6721 | ratio=371.3:1
+
+Processing chb23...
+  [pass 1] counting windows...
+  [pass 1] interictal=16604 | ictal=109 | rejected=952
+  [pass 2] writing windows to disk...
+[chb23] interictal=16604 | ictal=109 | rejected=952 | ratio=152.3:1
+
+=== PREPROCESSING COMPLETE ===
+chb01: 29719 interictal | 115 ictal | ratio 258.4:1
+chb02: 26885 interictal | 45 ictal | ratio 597.4:1
+chb03: 25509 interictal | 106 ictal | ratio 240.7:1
+chb04: 111800 interictal | 99 ictal | ratio 1129.3:1
+chb05: 27010 interictal | 143 ictal | ratio 188.9:1
+chb06: 24536 interictal | 45 ictal | ratio 545.2:1
+chb07: 48110 interictal | 83 ictal | ratio 579.6:1
+chb08: 12708 interictal | 234 ictal | ratio 54.3:1
+chb09: 48142 interictal | 73 ictal | ratio 659.5:1
+chb10: 35621 interictal | 117 ictal | ratio 304.5:1
+chb11: 23756 interictal | 204 ictal | ratio 116.5:1
+chb12: 12724 interictal | 271 ictal | ratio 47.0:1
+chb13: 20191 interictal | 144 ictal | ratio 140.2:1
+chb14: 19872 interictal | 49 ictal | ratio 405.6:1
+chb15: 26740 interictal | 515 ictal | ratio 51.9:1
+chb16: 9826 interictal | 28 ictal | ratio 350.9:1
+chb17: 16175 interictal | 74 ictal | ratio 218.6:1
+chb18: 26379 interictal | 83 ictal | ratio 317.8:1
+chb19: 25245 interictal | 62 ictal | ratio 407.2:1
+chb20: 20869 interictal | 81 ictal | ratio 257.6:1
+chb21: 23754 interictal | 53 ictal | ratio 448.2:1
+chb22: 20421 interictal | 55 ictal | ratio 371.3:1
+chb23: 16604 interictal | 109 ictal | ratio 152.3:1
+
+--- LOG: ./logs/preprocess_run3.log (last 50 lines) ---
+[chb19] interictal=24684 | ictal=11 | rejected=1443
+
+Processing chb20...
+  [pass 1] counting windows...
+  [pass 1] interictal=20095 | ictal=68 | rejected=1642
+  [pass 2] writing windows to disk...
+[chb20] interictal=20095 | ictal=68 | rejected=1642
+
+Processing chb21...
+  [pass 1] counting windows...
+  [pass 1] interictal=22315 | ictal=23 | rejected=5461
+  [pass 2] writing windows to disk...
+[chb21] interictal=22315 | ictal=23 | rejected=5461
+
+Processing chb22...
+  [pass 1] counting windows...
+  [pass 1] interictal=18909 | ictal=8 | rejected=8589
+  [pass 2] writing windows to disk...
+[chb22] interictal=18909 | ictal=8 | rejected=8589
+
+Processing chb23...
+  [pass 1] counting windows...
+  [pass 1] interictal=15605 | ictal=26 | rejected=3035
+  [pass 2] writing windows to disk...
+[chb23] interictal=15605 | ictal=26 | rejected=3035
+
+=== PREPROCESSING COMPLETE ===
+chb01: 28234 interictal | 54 ictal | ratio 522.9:1
+chb02: 25475 interictal | 10 ictal | ratio 2547.5:1
+chb03: 23784 interictal | 12 ictal | ratio 1982.0:1
+chb04: 103024 interictal | 54 ictal | ratio 1907.9:1
+chb05: 24847 interictal | 13 ictal | ratio 1911.3:1
+chb06: 22132 interictal | 31 ictal | ratio 713.9:1
+chb07: 42581 interictal | 5 ictal | ratio 8516.2:1
+chb08: 11747 interictal | 40 ictal | ratio 293.7:1
+chb09: 42091 interictal | 1 ictal | ratio 42091.0:1
+chb10: 33089 interictal | 19 ictal | ratio 1741.5:1
+chb11: 21943 interictal | 33 ictal | ratio 664.9:1
+chb12: 12276 interictal | 258 ictal | ratio 47.6:1
+chb13: 16510 interictal | 106 ictal | ratio 155.8:1
+chb14: 19575 interictal | 45 ictal | ratio 435.0:1
+chb15: 26500 interictal | 506 ictal | ratio 52.4:1
+chb16: 8921 interictal | 16 ictal | ratio 557.6:1
+chb17: 15357 interictal | 38 ictal | ratio 404.1:1
+chb18: 25598 interictal | 41 ictal | ratio 624.3:1
+chb19: 24684 interictal | 11 ictal | ratio 2244.0:1
+chb20: 20095 interictal | 68 ictal | ratio 295.5:1
+chb21: 22315 interictal | 23 ictal | ratio 970.2:1
+chb22: 18909 interictal | 8 ictal | ratio 2363.6:1
+chb23: 15605 interictal | 26 ictal | ratio 600.2:1
+
+
+=== CONFIG/JSON FILES ===
+
+--- FILE: ./.git/cursor/crepe/ad35fd198abfc7efe02939f4795ca6461c314059/metadata.json ---
+{"version":4,"git_revision":19}
+--- FILE: ./.vscode/settings.json ---
+{
+    "git.ignoreLimitWarning": true
+}
+--- FILE: ./data/processed/chb01_stats.json ---
+{
+  "subject_id": "chb01",
+  "n_interictal": 29719,
+  "n_ictal": 115,
+  "n_rejected": 3573,
+  "ratio": 258.4
+}
+--- FILE: ./data/processed/chb02_stats.json ---
+{
+  "subject_id": "chb02",
+  "n_interictal": 26885,
+  "n_ictal": 45,
+  "n_rejected": 4432,
+  "ratio": 597.4
+}
+--- FILE: ./data/processed/chb03_stats.json ---
+{
+  "subject_id": "chb03",
+  "n_interictal": 25509,
+  "n_ictal": 106,
+  "n_rejected": 4886,
+  "ratio": 240.7
+}
+--- FILE: ./data/processed/chb04_stats.json ---
+{
+  "subject_id": "chb04",
+  "n_interictal": 111800,
+  "n_ictal": 99,
+  "n_rejected": 23045,
+  "ratio": 1129.3
+}
+--- FILE: ./data/processed/chb05_stats.json ---
+{
+  "subject_id": "chb05",
+  "n_interictal": 27010,
+  "n_ictal": 143,
+  "n_rejected": 5745,
+  "ratio": 188.9
+}
+--- FILE: ./data/processed/chb06_stats.json ---
+{
+  "subject_id": "chb06",
+  "n_interictal": 24536,
+  "n_ictal": 45,
+  "n_rejected": 22987,
+  "ratio": 545.2
+}
+--- FILE: ./data/processed/chb07_stats.json ---
+{
+  "subject_id": "chb07",
+  "n_interictal": 48110,
+  "n_ictal": 83,
+  "n_rejected": 9575,
+  "ratio": 579.6
+}
+--- FILE: ./data/processed/chb08_stats.json ---
+{
+  "subject_id": "chb08",
+  "n_interictal": 12708,
+  "n_ictal": 234,
+  "n_rejected": 4049,
+  "ratio": 54.3
+}
+--- FILE: ./data/processed/chb09_stats.json ---
+{
+  "subject_id": "chb09",
+  "n_interictal": 48142,
+  "n_ictal": 73,
+  "n_rejected": 9431,
+  "ratio": 659.5
+}
+--- FILE: ./data/processed/chb10_stats.json ---
+{
+  "subject_id": "chb10",
+  "n_interictal": 35621,
+  "n_ictal": 117,
+  "n_rejected": 3883,
+  "ratio": 304.5
+}
+--- FILE: ./data/processed/chb11_stats.json ---
+{
+  "subject_id": "chb11",
+  "n_interictal": 23756,
+  "n_ictal": 204,
+  "n_rejected": 2553,
+  "ratio": 116.5
+}
+--- FILE: ./data/processed/chb12_stats.json ---
+{
+  "subject_id": "chb12",
+  "n_interictal": 12724,
+  "n_ictal": 271,
+  "n_rejected": 474,
+  "ratio": 47.0
+}
+--- FILE: ./data/processed/chb13_stats.json ---
+{
+  "subject_id": "chb13",
+  "n_interictal": 20191,
+  "n_ictal": 144,
+  "n_rejected": 5033,
+  "ratio": 140.2
+}
+--- FILE: ./data/processed/chb14_stats.json ---
+{
+  "subject_id": "chb14",
+  "n_interictal": 19872,
+  "n_ictal": 49,
+  "n_rejected": 779,
+  "ratio": 405.6
+}
+--- FILE: ./data/processed/chb15_stats.json ---
+{
+  "subject_id": "chb15",
+  "n_interictal": 26740,
+  "n_ictal": 515,
+  "n_rejected": 634,
+  "ratio": 51.9
+}
+--- FILE: ./data/processed/chb16_stats.json ---
+{
+  "subject_id": "chb16",
+  "n_interictal": 9826,
+  "n_ictal": 28,
+  "n_rejected": 3704,
+  "ratio": 350.9
+}
+--- FILE: ./data/processed/chb17_stats.json ---
+{
+  "subject_id": "chb17",
+  "n_interictal": 16175,
+  "n_ictal": 74,
+  "n_rejected": 2135,
+  "ratio": 218.6
+}
+--- FILE: ./data/processed/chb18_stats.json ---
+{
+  "subject_id": "chb18",
+  "n_interictal": 26379,
+  "n_ictal": 83,
+  "n_rejected": 3289,
+  "ratio": 317.8
+}
+--- FILE: ./data/processed/chb19_stats.json ---
+{
+  "subject_id": "chb19",
+  "n_interictal": 25245,
+  "n_ictal": 62,
+  "n_rejected": 659,
+  "ratio": 407.2
+}
+--- FILE: ./data/processed/chb20_stats.json ---
+{
+  "subject_id": "chb20",
+  "n_interictal": 20869,
+  "n_ictal": 81,
+  "n_rejected": 838,
+  "ratio": 257.6
+}
+--- FILE: ./data/processed/chb21_stats.json ---
+{
+  "subject_id": "chb21",
+  "n_interictal": 23754,
+  "n_ictal": 53,
+  "n_rejected": 3561,
+  "ratio": 448.2
+}
+--- FILE: ./data/processed/chb22_stats.json ---
+{
+  "subject_id": "chb22",
+  "n_interictal": 20421,
+  "n_ictal": 55,
+  "n_rejected": 6721,
+  "ratio": 371.3
+}
+--- FILE: ./data/processed/chb23_stats.json ---
+{
+  "subject_id": "chb23",
+  "n_interictal": 16604,
+  "n_ictal": 109,
+  "n_rejected": 952,
+  "ratio": 152.3
+}
+--- FILE: ./data/splits/fold_01_test.json ---
+[
+  "chb01",
+  "chb02"
+]
+--- FILE: ./data/splits/fold_01_train.json ---
+[
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_02_test.json ---
+[
+  "chb03",
+  "chb04"
+]
+--- FILE: ./data/splits/fold_02_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_03_test.json ---
+[
+  "chb05",
+  "chb06"
+]
+--- FILE: ./data/splits/fold_03_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_04_test.json ---
+[
+  "chb07",
+  "chb08"
+]
+--- FILE: ./data/splits/fold_04_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_05_test.json ---
+[
+  "chb09",
+  "chb10"
+]
+--- FILE: ./data/splits/fold_05_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_06_test.json ---
+[
+  "chb11",
+  "chb12"
+]
+--- FILE: ./data/splits/fold_06_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_07_test.json ---
+[
+  "chb13",
+  "chb14"
+]
+--- FILE: ./data/splits/fold_07_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_08_test.json ---
+[
+  "chb15",
+  "chb16"
+]
+--- FILE: ./data/splits/fold_08_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_09_test.json ---
+[
+  "chb17",
+  "chb18"
+]
+--- FILE: ./data/splits/fold_09_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_10_test.json ---
+[
+  "chb19",
+  "chb20"
+]
+--- FILE: ./data/splits/fold_10_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_11_test.json ---
+[
+  "chb21",
+  "chb22",
+  "chb23"
+]
+--- FILE: ./data/splits/fold_11_train.json ---
+[
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20"
+]
+--- FILE: ./data/splits/splits_summary.json ---
+{
+  "fold_01": {
+    "test": [
+      "chb01",
+      "chb02"
+    ],
+    "train": [
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_02": {
+    "test": [
+      "chb03",
+      "chb04"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_03": {
+    "test": [
+      "chb05",
+      "chb06"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_04": {
+    "test": [
+      "chb07",
+      "chb08"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_05": {
+    "test": [
+      "chb09",
+      "chb10"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_06": {
+    "test": [
+      "chb11",
+      "chb12"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_07": {
+    "test": [
+      "chb13",
+      "chb14"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_08": {
+    "test": [
+      "chb15",
+      "chb16"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_09": {
+    "test": [
+      "chb17",
+      "chb18"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb19",
+      "chb20",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_10": {
+    "test": [
+      "chb19",
+      "chb20"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "n_test": 2,
+    "n_train": 21
+  },
+  "fold_11": {
+    "test": [
+      "chb21",
+      "chb22",
+      "chb23"
+    ],
+    "train": [
+      "chb01",
+      "chb02",
+      "chb03",
+      "chb04",
+      "chb05",
+      "chb06",
+      "chb07",
+      "chb08",
+      "chb09",
+      "chb10",
+      "chb11",
+      "chb12",
+      "chb13",
+      "chb14",
+      "chb15",
+      "chb16",
+      "chb17",
+      "chb18",
+      "chb19",
+      "chb20"
+    ],
+    "n_test": 3,
+    "n_train": 20
+  }
+}
+--- FILE: ./results/logs/2026-04-05_21-12-00/model_info.json ---
+{
+  "architecture": "GAEModel",
+  "total_parameters": 2256,
+  "trainable_parameters": 2256
+}
+--- FILE: ./results/logs/2026-04-05_21-12-00/results.json ---
+{
+  "sensitivity": 0.0,
+  "specificity": 0.8501,
+  "auroc": 0.3774,
+  "fdr_per_hour": 134.9,
+  "n_ictal_windows": 73,
+  "n_interictal_windows": 48142,
+  "total_interictal_hours": 53.49
+}
+--- FILE: ./results/logs/2026-04-06_11-55-28/model_info.json ---
+{
+  "architecture": "GAEModel",
+  "total_parameters": 2256,
+  "trainable_parameters": 2256
+}
+--- FILE: ./results/logs/2026-04-06_14-34-17/model_info.json ---
+{
+  "architecture": "GAEModel",
+  "total_parameters": 2256,
+  "trainable_parameters": 2256
+}
+--- FILE: ./results/logs/2026-04-06_15-20-41/model_info.json ---
+{
+  "architecture": "GAEModel",
+  "total_parameters": 2256,
+  "trainable_parameters": 2256
+}
+--- FILE: ./results/logs/2026-04-06_15-20-41/results.json ---
+{
+  "sensitivity": 0.0261,
+  "specificity": 0.9536,
+  "auroc": 0.4872,
+  "fdr_per_hour": 41.73,
+  "n_ictal_windows": 115,
+  "n_interictal_windows": 29719,
+  "total_interictal_hours": 33.02
+}
+
+=== YAML FILES ===
+
+--- FILE: ./src/configs/defaults.yaml ---
+data:
+  processed_dir: "../data/processed/"
+  splits_dir: "../data/splits/"
+  batch_size: 32
+  num_workers: 0
+  n_channels: 18
+  window_samples: 1024
+
+graph:
+  metric: "wpli_aec"
+  alpha: 0.5
+  top_k_percent: 30
+
+model:
+  name: "gae"
+  encoder_layers: 2
+  hidden_dim: 64
+  latent_dim: 16
+
+training:
+  max_epochs: 100
+  lr: 0.001
+  optimizer: "adam"
+  scheduler: "cosine"
+  checkpoint_dir: "../results/checkpoints/"
+  log_dir: "../results/logs/"
+  seed: 42
+
+anomaly:
+  threshold_percentile: 95
+
+evaluation:
+  metrics: ["sensitivity", "specificity", "auroc", "fdr_per_hour"]
+  results_log: "../results/results_log.csv"
+--- FILE: ./src/configs/experiment.yaml ---
+# Override defaults for specific experiment.
+# Modify for your task.
+
+data:
+  batch_size: 8
+
+training:
+  max_epochs: 200
+  lr: 0.00005
+
+transform:
+  target_size: [512, 512]
+--- FILE: ./src/configs/experiment_gae.yaml ---
+# E5 — Proposed model (override defaults)
+model:
+  name: "gae"
+  encoder_layers: 2
+  hidden_dim: 64
+  latent_dim: 16
+
+graph:
+  metric: "wpli_aec"
+  alpha: 0.5
+  top_k_percent: 30
+
+training:
+  seed: 42
+
+===== AUDIT COMPLETE =====

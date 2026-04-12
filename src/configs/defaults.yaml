@@ -1,15 +1,15 @@
 data:
-  processed_dir: "../data/processed/"
-  splits_dir: "../data/splits/"
+  processed_dir: "F:/Study/Thesis/Code/data/processed/"
+  splits_dir: "F:/Study/Thesis/Code/data/splits/"
   batch_size: 32
-  num_workers: 4
+  num_workers: 0
   n_channels: 18
   window_samples: 1024
 
 graph:
-  metric: "wpli_aec"
-  alpha: 0.5
-  top_k_percent: 30
+  metric: "wpli"
+  alpha: 1.0
+  top_k_percent: 0
 
 model:
   name: "gae"
@@ -18,12 +18,13 @@ model:
   latent_dim: 16
 
 training:
+  loss_type: "graph_mse"
   max_epochs: 100
   lr: 0.001
   optimizer: "adam"
   scheduler: "cosine"
-  checkpoint_dir: "../results/checkpoints/"
-  log_dir: "../results/logs/"
+  checkpoint_dir: "F:/Study/Thesis/Code/results/checkpoints/"
+  log_dir: "F:/Study/Thesis/Code/results/logs/"
   seed: 42
 
 anomaly:
@@ -31,4 +32,4 @@ anomaly:
 
 evaluation:
   metrics: ["sensitivity", "specificity", "auroc", "fdr_per_hour"]
-  results_log: "../results/results_log.csv"
+  results_log: "F:/Study/Thesis/Code/results/results_log.csv"

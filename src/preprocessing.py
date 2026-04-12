@@ -48,7 +48,7 @@ COMMON_CHANNELS = [
 ]
 
 # Build filter once at module load
-_SOS = butter(4, [0.5, 40.0], btype="bandpass", fs=FS, output="sos")
+_SOS = butter(4, [0.5, 60.0], btype="bandpass", fs=FS, output="sos")
 
 
 # ── 1. Parse summary file ─────────────────────────────────────────────────────

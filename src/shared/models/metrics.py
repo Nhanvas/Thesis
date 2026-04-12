@@ -1,13 +1,17 @@
 """
 metrics.py
 ==========
-Evaluation metrics cho unsupervised seizure detection.
+Evaluation metrics for unsupervised seizure detection.
 
-Accuracy bị loại bỏ có chủ ý:
-  0.18% seizure prevalence → 99.82% accuracy bằng cách predict all-normal.
-  Đây là misleading metric — examiner sẽ flag ngay.
+Accuracy is intentionally excluded:
+  0.18% seizure prevalence => 99.82% accuracy by predicting all-normal.
+  This is a misleading metric that examiners will flag immediately.
 
 Primary metrics: sensitivity, specificity, AUROC, FDR/h.
+
+FDR/h uses EVENT-LEVEL counting (30s merge window), not window-level.
+Rationale: consecutive positive windows within 30s represent one clinical
+false alarm event, not multiple independent detections.
 """
 
 import numpy as np
@@ -59,11 +63,44 @@ class MetricHandler:
 
     def get_fdr_per_hour(self, scores: np.ndarray,
                          labels: np.ndarray,
-                         total_hours: float) -> float:
+                         total_hours: float,
+                         merge_window_s: int = 30,
+                         window_s: int = 4) -> float:
+        """
+        False Detection Rate per hour — EVENT-LEVEL (not window-level).
+
+        Consecutive false-positive windows within 30s are merged into
+        one false detection event. This matches clinical alarm counting:
+        a burst of false alarms lasting 20s is one event, not 5 events.
+
+        merge_window_s: gap in seconds before a new event is counted.
+        window_s:       size of each EEG window (4s non-overlapping).
+        """
         assert self.threshold is not None
+
         interictal_mask = labels == 0
-        fp = int((scores[interictal_mask] >= self.threshold).sum())
-        return fp / max(total_hours, 1e-8)
+        fp_flags = (scores[interictal_mask] >= self.threshold).astype(int)
+
+        merge_gap_windows = merge_window_s // window_s  # 7 windows = 28s
+
+        events = 0
+        in_event = False
+        gap_count = 0
+
+        for flag in fp_flags:
+            if flag == 1:
+                if not in_event:
+                    events += 1
+                    in_event = True
+                gap_count = 0
+            else:
+                if in_event:
+                    gap_count += 1
+                    if gap_count >= merge_gap_windows:
+                        in_event = False
+                        gap_count = 0
+
+        return float(events) / max(total_hours, 1e-8)
 
     def compute_all(self, scores: np.ndarray,
                     labels: np.ndarray,

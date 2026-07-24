@@ -1,0 +1,5 @@
+{
+  "architecture": "GAEModel",
+  "total_parameters": 2576,
+  "trainable_parameters": 2576
+}

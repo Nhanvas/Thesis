@@ -1,0 +1,2 @@
+n_subjects,n_used_sign_test,n_positive,n_negative,sign_test_p_two_sided,median_signed_deviation,median_signed_deviation_ci_lo,median_signed_deviation_ci_hi,n_subjects_bh_significant_q05,preregistered_verdict,seed,n_null,n_boot
+8,8,2,6,0.2890625,-0.011355797928416067,-0.027152509897179822,0.022492628749700316,0,A3 (indeterminate): sign test not significant,0,1000,10000

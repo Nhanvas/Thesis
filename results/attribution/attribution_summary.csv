@@ -1,0 +1,9 @@
+subject,n_seizures,real_consistency,null_consistency,p_seizure_specific,convergent_validity,lateralization_index,dominant_hemisphere,lateralization_agreement,dominant_channels
+chb03,7,0.455,0.202,0.001,0.386,0.026,Bilateral,0.57,"FP2-F4, FP1-F3, T7-P7, P7-O1, P4-O2"
+chb06,10,0.34,0.241,0.014,0.539,-0.104,Right,0.9,"T8-P8, T7-P7, F8-T8, P8-O2, FP1-F7"
+chb13,12,0.304,0.183,0.001,0.506,0.081,Bilateral,0.67,"FP1-F7, F7-T7, FP2-F8, F3-C3, FP2-F4"
+chb14,8,0.331,0.258,0.0889,0.448,0.219,Left,0.88,"FP1-F7, F7-T7, P7-O1, FP2-F4, T8-P8"
+chb15,20,0.276,0.192,0.002,0.469,0.21,Left,0.85,"T7-P7, P3-O1, P7-O1, F7-T7, C3-P3"
+chb16,10,0.209,0.178,0.0789,0.23,-0.046,Bilateral,0.6,"T7-P7, CZ-PZ, FP2-F4, C4-P4, P4-O2"
+chb17,3,0.323,0.239,0.1948,0.587,0.094,Bilateral,0.67,"T7-P7, FZ-CZ, C4-P4, CZ-PZ, P4-O2"
+chb18,6,0.38,0.23,0.017,0.409,-0.159,Right,0.83,"P8-O2, FP2-F4, FP1-F3, P7-O1, T8-P8"

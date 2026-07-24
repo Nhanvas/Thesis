@@ -1,0 +1,8 @@
+config,sensitivity,tp,n_seizures,fp_per_day,delta_sens_vs_full
+full(3-view),0.7105,54,76,39.25,0.0
+drop_recon,0.6316,48,76,35.63,-0.0789
+drop_temporal,0.6316,48,76,34.59,-0.0789
+drop_gamma,0.6579,50,76,37.96,-0.0526
+recon_only,0.5789,44,76,28.55,-0.1316
+temporal_only,0.3158,24,76,49.34,-0.3947
+gamma_only,0.5658,43,76,33.12,-0.1447

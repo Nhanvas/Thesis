@@ -1,0 +1,9 @@
+{
+  "sensitivity": 0.0261,
+  "specificity": 0.9536,
+  "auroc": 0.4872,
+  "fdr_per_hour": 41.73,
+  "n_ictal_windows": 115,
+  "n_interictal_windows": 29719,
+  "total_interictal_hours": 33.02
+}

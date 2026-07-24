@@ -1,0 +1,33 @@
+{
+  "script": "attribution_v3.py / pre-registration v3.1 / Stage 1 (Test A)",
+  "preregistration": "ATTRIBUTION_PREREGISTRATION_v3_1.md (Test A only)",
+  "run_utc": "2026-07-19T02:55:05+00:00",
+  "seed": 0,
+  "rng": "np.random.default_rng",
+  "n_null": 1000,
+  "n_boot": 10000,
+  "win_sec": 4,
+  "subjects": [
+    "chb03",
+    "chb06",
+    "chb13",
+    "chb14",
+    "chb15",
+    "chb16",
+    "chb17",
+    "chb18"
+  ],
+  "pernode_root": "F:\\Study\\Thesis\\Code\\data\\pernode",
+  "summary_dir": "F:\\Study\\Thesis\\Dataset\\CHB-MIT\\CHB info\\summary",
+  "statistic": "Gini of |z| over 18 bipolar derivations; per subject = median over seizures",
+  "null": "length-matched contiguous interictal pseudo-seizure draw",
+  "mad_epsilon": 1e-09,
+  "weight_invariant": true,
+  "caveats": [
+    "Interictal contiguity is contiguity in the concatenated interictal window index space; a drawn block may straddle an EDF boundary.",
+    "Attribution lives in bipolar-derivation space; adjacent derivations share a physical electrode and are inherently correlated, which caps attainable concentration (pre-registration \u00a71.4).",
+    "No clinical localization claim is made under any outcome (A5)."
+  ],
+  "python": "3.11.9",
+  "numpy": "2.4.4"
+}

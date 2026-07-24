@@ -59,7 +59,8 @@ class GAEModel(nn.Module):
 
     def anomaly_score(self, A, A_hat):
         """Frobenius norm — Eq (9). s(G) = ||A - Â||_F"""
-        return torch.norm(A - A_hat, p='fro').item()
+        diff = A - A_hat
+        return float((diff * diff).mean())
 
     def summary(self):
         print(self)

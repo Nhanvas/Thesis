@@ -1,0 +1,11 @@
+operating_point,bucket,n,tp,sensitivity
+balanced,<10s,3,2,0.667
+balanced,10-20s,15,4,0.267
+balanced,20-60s,27,22,0.815
+balanced,>=60s,31,29,0.935
+balanced,ALL,76,57,0.75
+high_sens,<10s,3,2,0.667
+high_sens,10-20s,15,9,0.6
+high_sens,20-60s,27,23,0.852
+high_sens,>=60s,31,29,0.935
+high_sens,ALL,76,63,0.829

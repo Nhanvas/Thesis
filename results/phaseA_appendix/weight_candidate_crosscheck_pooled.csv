@@ -1,0 +1,5 @@
+weight,operating_point,sens_mean,sens_sd,fp_per_day_mean,fp_per_day_sd
+locked,balanced,0.676,0.0233,39.24,0.09
+locked,high_sens,0.6974,0.029,48.39,0.13
+cand_1,balanced,0.6974,0.0315,39.75,0.15
+cand_1,high_sens,0.7237,0.0272,49.78,0.2

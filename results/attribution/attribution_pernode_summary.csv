@@ -1,0 +1,9 @@
+subject,n_seizures,seg_ok,consistency,cons_null,p_consistency,p_seizure_specific,topk_mass,p_occlusion,convergent_vs_eigcent,lateralization_index,dominant_channels
+chb03,7,True,0.401,0.174,0.001,0.001,0.353,0.0918,0.301,0.231,"P7-O1, T7-P7, FZ-CZ, P4-O2, F3-C3"
+chb06,10,True,0.18,0.174,0.3287,0.4096,0.275,0.6068,0.304,-0.062,"P4-O2, F3-C3, T8-P8, F7-T7, C3-P3"
+chb13,12,True,0.428,0.174,0.001,0.001,0.372,0.002,0.457,0.244,"FP1-F7, F3-C3, F7-T7, FP2-F8, FZ-CZ"
+chb14,8,True,0.318,0.176,0.001,0.005,0.352,0.002,0.322,0.059,"FP2-F8, FP1-F7, F7-T7, F8-T8, P7-O1"
+chb15,20,True,0.316,0.174,0.001,0.001,0.354,0.002,0.415,0.238,"P3-O1, T7-P7, FP1-F7, P7-O1, C3-P3"
+chb16,10,True,0.341,0.174,0.001,0.001,0.412,0.4691,0.18,-0.009,"P4-O2, P8-O2, F3-C3, FZ-CZ, P3-O1"
+chb17,3,True,0.25,0.171,0.1928,0.2637,0.328,0.022,0.508,-0.143,"T7-P7, P4-O2, CZ-PZ, C4-P4, T8-P8"
+chb18,6,True,0.402,0.174,0.001,0.003,0.389,0.002,0.333,-0.124,"P8-O2, P4-O2, CZ-PZ, C3-P3, F8-T8"

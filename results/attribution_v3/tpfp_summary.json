@@ -1,0 +1,82 @@
+{
+  "D1_per_subject_auroc": {
+    "chb03": 0.481,
+    "chb13": 0.7152,
+    "chb14": 0.4922,
+    "chb15": 0.4566,
+    "chb16": 0.5,
+    "chb17": 0.7,
+    "chb18": 0.3647
+  },
+  "D1_auroc_mean": 0.5299604026874779,
+  "D1_auprc_mean": 0.14141031468106183,
+  "D1_auroc_ci": [
+    0.44378063210102603,
+    0.6200571528893358
+  ],
+  "D1_auprc_ci": [
+    0.0837741540440412,
+    0.20327038269845704
+  ],
+  "D1_pass": false,
+  "D2_auroc_nuisance(score+duration)": 0.8577445292351611,
+  "D2_auroc_full(+concentration)": 0.8683497839081821,
+  "D2_auroc_concentration_alone": 0.5299604026874779,
+  "D2_incremental_auroc": 0.01060525467302098,
+  "D2_incremental_auroc_ci": [
+    -0.01576690295568528,
+    0.017233394995132052
+  ],
+  "D2_pass": false,
+  "D2_permutation_p": 0.35564435564435565,
+  "duration_TP_median_iqr": [
+    84.0,
+    64.0,
+    84.0
+  ],
+  "duration_FP_median_iqr": [
+    4.0,
+    4.0,
+    4.0
+  ],
+  "D4_group_gini_median": {
+    "TP": [
+      43,
+      0.3766476332452673
+    ],
+    "near_miss_FP": [
+      9,
+      0.39179336583118407
+    ],
+    "remote_FP": [
+      452,
+      0.38210925012136276
+    ]
+  },
+  "D4_auroc_TP_vs_nearmiss": 0.36259920634920634,
+  "D4_auroc_TP_vs_remote": 0.5310990862677198,
+  "D3_status": "NOT COMPUTED - D2 failed: concentration is redundant with anomaly score + duration. Per \u00a74 D2: STOP, make no operational claim, do not build a triage narrative.",
+  "_provenance": {
+    "script": "attribution_tpfp.py / pre-registration v3.1 / Stage 2 (Test D)",
+    "run_utc": "2026-07-19T03:21:07+00:00",
+    "weight": [
+      0.4,
+      0.35,
+      0.25
+    ],
+    "operating_point": "mag60/pen1.0",
+    "seed": 0,
+    "n_boot": 2000,
+    "n_perm": 1000,
+    "comp_dir": "F:\\Study\\Thesis\\Code\\data\\processed\\components",
+    "pernode_root": "F:\\Study\\Thesis\\Code\\data\\pernode",
+    "lock_guard": true,
+    "pooled_TP": 57,
+    "pooled_FP": 461,
+    "pooled_sensitivity": 0.75,
+    "pooled_fp_per_day": 39.76661435058166,
+    "event_unit": "locked eval path: detect_changepoints -> cps_to_events (buffer don't-care) -> merge 90s -> split 300s; see module docstring for the \u00a74 specification conflict and its resolution",
+    "python": "3.11.9",
+    "numpy": "2.4.4"
+  }
+}

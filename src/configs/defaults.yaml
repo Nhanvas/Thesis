@@ -7,9 +7,9 @@ data:
   window_samples: 1024
 
 graph:
-  metric: "wpli"
-  alpha: 1.0
-  top_k_percent: 0
+  metric: "wpli_aec_combined"
+  alpha: 0.5
+  threshold: 0.05
 
 model:
   name: "gae"
@@ -19,7 +19,7 @@ model:
 
 training:
   loss_type: "graph_mse"
-  max_epochs: 100
+  max_epochs: 200
   lr: 0.001
   optimizer: "adam"
   scheduler: "cosine"

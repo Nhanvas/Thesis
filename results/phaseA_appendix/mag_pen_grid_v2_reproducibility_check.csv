@@ -1,0 +1,4 @@
+mag_pct,pen_mult,label,this_run_sensitivity,this_run_tp,previously_locked_sensitivity,previously_locked_tp,drift,status
+60.0,1.0,balanced,0.7105,54,0.75,57,0.0395,MISMATCH (still drifting)
+50.0,1.0,high-sens (Decision #16),0.75,57,0.8158,62,0.0658,MISMATCH (still drifting)
+70.0,0.3,high-sens (superseded pre-#16),0.7895,60,0.816,62,0.0265,MISMATCH (still drifting)

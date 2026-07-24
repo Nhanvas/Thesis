@@ -1,0 +1,5 @@
+[2026-04-06 15:20:41] Start: E5_within_subject_smoke | smoke_chb01 | device=cpu
+[2026-04-06 15:20:41] Dataset: 29719 windows | train=23776 | val=5943
+[2026-04-06 17:45:42] Weights saved: ..\results\checkpoints\E5_within_subject_smoke\smoke_chb01\model_weights.pt
+[2026-04-06 17:45:42] Threshold (95th pct): 9.9172
+[2026-04-06 17:47:30] Done: E5_within_subject_smoke | smoke_chb01

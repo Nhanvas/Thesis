@@ -1,53 +1,72 @@
 """
 create_splits.py
 ================
-Generate LTSO (Leave-Two-Subjects-Out) fold indices for 23 CHB-MIT subjects.
+Generate a single fixed 15-train / 8-test subject split for E_main.
 
-11 folds:
-  Fold 01: test = [chb01, chb02]
-  Fold 02: test = [chb03, chb04]
-  ...
-  Fold 10: test = [chb19, chb20]
-  Fold 11: test = [chb21, chb22, chb23]   ← 3 subjects (23 is odd)
+Rules (proposed_solution_updated.md §I):
+  - 23 subjects total: chb01 through chb23
+  - 15 randomly selected for training (interictal windows only)
+  - 8 held out for testing (never touched during training or threshold calibration)
+  - Seed = 42, fixed permanently
+  - Split is written once to split_main.json and NEVER regenerated
 
-Output: data/splits/fold_XX_test.json  (list of subject IDs held out)
-        data/splits/fold_XX_train.json (list of subject IDs used for training)
-        data/splits/splits_summary.json (overview of all folds)
+Output: data/splits/split_main.json
+
+IMPORTANT: Run this script exactly ONCE before E_main.
+Do not re-run after the experiment has started.
 """
 
 import json
+import random
 from pathlib import Path
 
-SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]  # chb01..chb23
+SUBJECTS   = [f"chb{i:02d}" for i in range(1, 24)]   # chb01..chb23
+SEED       = 42
+N_TEST     = 8
 SPLITS_DIR = Path("../data/splits")
-SPLITS_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT     = SPLITS_DIR / "split_main.json"
 
-# Build 11 folds
-folds = []
-for i in range(10):
-    test = [SUBJECTS[2*i], SUBJECTS[2*i + 1]]
-    folds.append(test)
-folds.append([SUBJECTS[20], SUBJECTS[21], SUBJECTS[22]])  # fold 11
 
-# Write per-fold files + summary
-summary = {}
-for fold_idx, test_subjects in enumerate(folds, start=1):
-    fold_id = f"fold_{fold_idx:02d}"
-    train_subjects = [s for s in SUBJECTS if s not in test_subjects]
+def main():
+    # Guard: do not overwrite existing split
+    if OUTPUT.exists():
+        existing = json.loads(OUTPUT.read_text())
+        print(f"[INFO] {OUTPUT} already exists. Not overwriting.")
+        print(f"  Train ({existing['n_train']}): {existing['train']}")
+        print(f"  Test  ({existing['n_test']}):  {existing['test']}")
+        print("Delete the file manually if you need to regenerate.")
+        return
 
-    test_path  = SPLITS_DIR / f"{fold_id}_test.json"
-    train_path = SPLITS_DIR / f"{fold_id}_train.json"
+    SPLITS_DIR.mkdir(parents=True, exist_ok=True)
 
-    test_path.write_text(json.dumps(test_subjects, indent=2))
-    train_path.write_text(json.dumps(train_subjects, indent=2))
+    rng = random.Random(SEED)
+    subjects_shuffled = SUBJECTS.copy()
+    rng.shuffle(subjects_shuffled)
 
-    summary[fold_id] = {
-        "test":  test_subjects,
-        "train": train_subjects,
-        "n_test":  len(test_subjects),
+    test_subjects  = sorted(subjects_shuffled[:N_TEST])
+    train_subjects = sorted(subjects_shuffled[N_TEST:])
+
+    assert len(train_subjects) == 15, f"Expected 15 train, got {len(train_subjects)}"
+    assert len(test_subjects)  == 8,  f"Expected 8 test, got {len(test_subjects)}"
+    assert set(train_subjects) | set(test_subjects) == set(SUBJECTS)
+    assert set(train_subjects) & set(test_subjects) == set()
+
+    split = {
+        "seed":    SEED,
+        "train":   train_subjects,
+        "test":    test_subjects,
         "n_train": len(train_subjects),
+        "n_test":  len(test_subjects),
     }
-    print(f"[{fold_id}] test={test_subjects} | train={len(train_subjects)} subjects")
 
-(SPLITS_DIR / "splits_summary.json").write_text(json.dumps(summary, indent=2))
-print(f"\nSaved {len(folds)} folds to {SPLITS_DIR.resolve()}")
+    OUTPUT.write_text(json.dumps(split, indent=2))
+
+    print(f"Split saved: {OUTPUT.resolve()}")
+    print(f"Train ({len(train_subjects)}): {train_subjects}")
+    print(f"Test  ({len(test_subjects)}):  {test_subjects}")
+    print()
+    print("IMPORTANT: This split is now fixed. Do not re-run this script.")
+
+
+if __name__ == "__main__":
+    main()

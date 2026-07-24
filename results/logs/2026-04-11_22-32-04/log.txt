@@ -1,0 +1,2 @@
+[2026-04-11 22:32:04] Start: E5_proposed_gae_seed42 | fold_01 | device=cpu
+[2026-04-11 22:32:05] Dataset: 595992 windows | train=476794 | val=119198

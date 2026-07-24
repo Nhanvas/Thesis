@@ -1,0 +1,9 @@
+subject,pen,mag,approx_fp,authoritative_fp,approx_tp,authoritative_tp,fp_count_match,n_inter_h,pct_fp_near_boundary,null_pct_near_boundary,boundary_enrichment,median_n_underlying_cps,median_cp_magnitude,median_dist_to_seizure_edge_s,pct_fp_with_buffer_contamination,n_sessions
+chb03,1.0,60,60,60,7,7,True,37.88,0.05,0.0344,1.45,1.0,1.213,37601.0,0.0,1
+chb06,1.0,60,58,58,2,2,True,66.68,0.0,0.0093,0.0,1.0,0.7306,16156.0,0.0,1
+chb13,1.0,60,52,52,10,10,True,32.84,0.0192,0.0344,0.56,1.0,1.24875,28834.0,0.0,1
+chb14,1.0,60,87,87,8,8,True,25.95,0.0,0.0344,0.0,1.0,0.6835,5370.0,0.0,1
+chb15,1.0,60,50,50,20,17,True,39.44,0.02,0.0344,0.58,1.0,1.2132,5135.0,0.0,1
+chb16,1.0,60,31,31,6,6,True,18.97,0.0323,0.0344,0.94,1.0,1.5628,28906.0,0.0,1
+chb17,1.0,60,31,31,3,2,True,20.92,0.129,0.0344,3.75,1.0,1.3791,2078.0,0.0,3
+chb18,1.0,60,72,72,5,5,True,35.54,0.0,0.0348,0.0,1.0,1.01345,74787.0,0.0,1

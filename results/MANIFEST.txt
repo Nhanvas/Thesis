@@ -1,0 +1,32 @@
+# consolidated results manifest (copies; originals untouched)
+locked/locked_phaseA_event_results.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\locked_phaseA_event_results.csv
+locked/eval_window_level.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\eval_window_level.csv
+locked/eval_stat_tests.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\eval_stat_tests.csv
+locked/auroc_verification.csv  <=  F:\Study\Thesis\Code\results\phaseB\auroc_verification.csv
+attribution/attribution_pernode_summary.csv  <=  F:\Study\Thesis\Code\results\phaseB\attribution_pernode_summary.csv
+attribution/attribution_pernode_profile.csv  <=  F:\Study\Thesis\Code\results\phaseB\attribution_pernode_profile.csv
+attribution/attribution_pernode_figure.png  <=  F:\Study\Thesis\Code\results\phaseB\attribution_pernode_figure.png
+attribution/attribution_summary.csv  <=  F:\Study\Thesis\Code\attribution_out\attribution_summary.csv
+attribution/attribution_profile.csv  <=  F:\Study\Thesis\Code\attribution_out\attribution_profile.csv
+attribution/attribution_figure.png  <=  F:\Study\Thesis\Code\attribution_out\attribution_figure.png
+ablation/event_ablation_pooled.csv  <=  F:\Study\Thesis\Code\results\phaseB\event_ablation_pooled.csv
+ablation/event_ablation_persubject.csv  <=  F:\Study\Thesis\Code\results\phaseB\event_ablation_persubject.csv
+ablation/window_event_gap.csv  <=  F:\Study\Thesis\Code\results\phaseB\window_event_gap.csv
+phaseA_appendix/mag_pen_grid_v2_pooled.csv  (already in place)
+phaseA_appendix/mag_pen_grid_v2_persubject.csv  (already in place)
+phaseA_appendix/mag_pen_grid_v2_reproducibility_check.csv  (already in place)
+phaseA_appendix/duration_bucket_summary.csv  (already in place)
+phaseA_appendix/duration_hit_persubject.csv  (already in place)
+phaseA_appendix/szcore_event_level_new_decision19_mag60.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\szcore_event_level_new_decision19_mag60.csv
+phaseA_appendix/szcore_event_level_new_decision19_mag50.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\szcore_event_level_new_decision19_mag50.csv
+phaseA_appendix/weight_candidate_crosscheck_pooled.csv  (already in place)
+phaseA_appendix/weight_candidate_crosscheck_persubject.csv  (already in place)
+phaseA_appendix/weight_seed_robustness_summary.csv  (already in place)
+phaseA_appendix/weight_seed_robustness_raw.csv  (already in place)
+history_topology/topo_standalone_auroc.csv  <=  F:\Study\Thesis\Code\topo_standalone_auroc.csv
+history_superseded/szcore_event_level_mag60.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\szcore_event_level_mag60.csv
+history_superseded/szcore_event_level_mag70.csv  <=  F:\Study\Thesis\Code\results\cpd\evaluation\szcore_event_level_mag70.csv
+history_superseded/mag_pen_grid_pooled.csv  (already in place)
+history_superseded/mag_pen_grid_persubject.csv  (already in place)
+history_topology/topo_features/  <=  F:\Study\Thesis\Code\topo_features  (16 files)
+attribution/attribution_out/  <=  F:\Study\Thesis\Code\attribution_out  (3 files)

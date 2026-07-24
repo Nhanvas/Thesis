@@ -1,0 +1,321 @@
+"""
+verify_chb14_gamma.py — Verify gamma AEC impact on chb14 detection
+3 scenarios: full ensemble / no gamma / reversed gamma
+Usage: python src/verify_chb14_gamma.py
+"""
+
+import numpy as np
+import torch
+import torch.nn as nn
+import re
+import pandas as pd
+import ruptures as rpt
+from pathlib import Path
+from sklearn.metrics import roc_auc_score
+from torch_geometric.nn import GCNConv
+from torch_geometric.data import Data, Batch as PyGBatch
+from torch_geometric.utils import dense_to_sparse
+
+# ── Config ─────────────────────────────────────────────────────────────────
+DATA_DIR    = Path("data/processed")
+MODEL_PATH  = Path("data/models/best_model_joint_lambda01.pt")
+TEMP_DIR    = Path("data/processed/temporal_zscores")
+SUMMARY_DIR = Path(r"F:\Study\Thesis\Dataset\CHB-MIT\CHB info\summary")
+SCORES_DIR  = Path("results/cpd/scores")
+RESULTS_DIR = Path("results/cpd")
+SCORES_DIR.mkdir(parents=True, exist_ok=True)
+
+WIN_SEC = 4; FS = 256; BUFFER_H = 4; ADJS_SUFFIX = "_topk20"
+N_CH = 18; N_BANDS = 5; INPUT_DIM = 23; HIDDEN_DIM = 64; LATENT_DIM = 16; LAMBDA = 0.1
+TOLERANCE_S = 30; MERGE_GAP_S = 32
+
+W_R, W_T, W_G = 0.35, 0.30, 0.35
+PEN_MULTIPLIERS = [0.3, 0.5, 1.0, 2.0]
+SUBJ = "chb14"
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Device: {device}")
+
+# ── Model (same as v13) ─────────────────────────────────────────────────────
+class GAEEncoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(INPUT_DIM, HIDDEN_DIM)
+        self.conv2 = GCNConv(HIDDEN_DIM, LATENT_DIM)
+        self.relu  = nn.ReLU()
+    def forward(self, x, ei, ea=None):
+        return self.conv2(self.relu(self.conv1(x, ei, ea)), ei, ea)
+
+class XDecoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(LATENT_DIM, 32), nn.ReLU(), nn.Linear(32, N_BANDS))
+    def forward(self, z): return self.net(z)
+
+class GAEModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder   = GAEEncoder()
+        self.x_decoder = XDecoder()
+
+def score_adj_files(model, adj_path, feat_path, batch_size=256):
+    adjs  = np.load(adj_path,  mmap_mode='r')
+    feats = np.load(feat_path, mmap_mode='r')
+    scores = []
+    model.eval()
+    with torch.no_grad():
+        for s in range(0, len(adjs), batch_size):
+            e  = min(s + batch_size, len(adjs))
+            B  = e - s
+            A  = torch.tensor(adjs[s:e].astype(np.float32),  device=device)
+            Xt = torch.tensor(feats[s:e].astype(np.float32), device=device)
+            An = A / (A.amax(dim=(1,2), keepdim=True) + 1e-8)
+            Xn = (Xt - Xt.amin(dim=1, keepdim=True)) / \
+                 (Xt.amax(dim=1,keepdim=True) - Xt.amin(dim=1,keepdim=True) + 1e-8)
+            dl = [Data(x=torch.cat([An[b], Xn[b]], dim=1),
+                       edge_index=dense_to_sparse(A[b])[0],
+                       edge_attr=dense_to_sparse(A[b])[1]) for b in range(B)]
+            pg = PyGBatch.from_data_list(dl).to(device)
+            z  = model.encoder(pg.x, pg.edge_index, pg.edge_attr)
+            zpg= z.view(B, N_CH, LATENT_DIM)
+            Ah = torch.clamp(torch.bmm(zpg, zpg.transpose(1,2)), 0., 1.)
+            Xh = model.x_decoder(z).view(B, N_CH, N_BANDS)
+            sc = ((A-Ah)**2).mean(dim=(1,2)) + LAMBDA*((Xn-Xh)**2).mean(dim=(1,2))
+            scores.extend(sc.cpu().numpy().tolist())
+    return np.array(scores, dtype=np.float32)
+
+def robust_z_normalize(si, sc):
+    all_s = np.concatenate([si, sc])
+    med = np.median(all_s); mad = np.median(np.abs(all_s - med)) + 1e-9
+    return (si - med) / mad, (sc - med) / mad
+
+# ── Summary parsing ─────────────────────────────────────────────────────────
+def parse_time_hms(t):
+    p = t.strip().split(":"); return int(p[0])*3600 + int(p[1])*60 + int(p[2])
+
+def parse_summary_edf_list(summary_path):
+    text = Path(summary_path).read_text()
+    pat  = re.compile(
+        r'File Name:\s*(\S+\.edf)\s+File Start Time:\s*(\S+)\s+'
+        r'File End Time:\s*(\S+)\s+Number of Seizures in File:\s*(\d+)(.*?)(?=File Name:|$)',
+        re.DOTALL)
+    edfs = []
+    for m in pat.finditer(text):
+        fname, t0, t1, nsz, rest = m.groups()
+        dur = parse_time_hms(t1) - parse_time_hms(t0)
+        if dur <= 0: dur += 86400
+        szs = []
+        if int(nsz) > 0:
+            ons = [int(x) for x in re.findall(r'Seizure.*?Start Time.*?:\s*(\d+)', rest, re.I)]
+            ofs = [int(x) for x in re.findall(r'Seizure.*?End Time.*?:\s*(\d+)',   rest, re.I)]
+            szs = list(zip(ons, ofs))
+        edfs.append({'fname': fname, 'duration_s': dur, 'seizures': szs})
+    edfs.sort(key=lambda x: x['fname']); return edfs
+
+# ── Timeline (same as v13) ──────────────────────────────────────────────────
+def build_timeline(subj, inter_scores, ictal_scores):
+    np.random.seed(42)
+    edfs = parse_summary_edf_list(SUMMARY_DIR / f"{subj}-summary.txt")
+    scores_out, is_ictal_out = [], []
+    inter_ptr = ictal_ptr = 0; total_inter_s = 0.0
+    bootstrap_pool = np.random.choice(inter_scores, size=250000, replace=True)
+    boot_ptr = 0
+
+    for edf in edfs:
+        dur = edf['duration_s']; n_win = dur // WIN_SEC
+        labels = np.zeros(dur, dtype=np.int8); buf = np.zeros(dur, dtype=bool)
+        for (on, off) in edf['seizures']:
+            on = min(on, dur); off = min(off, dur)
+            labels[on:off] = 1; buf[off:min(dur, off+BUFFER_H*3600)] = True
+        tl = n_win * WIN_SEC
+        wl = labels[:tl].reshape(n_win, WIN_SEC).max(axis=1)
+        wb = buf[:tl].reshape(n_win, WIN_SEC).any(axis=1)
+
+        for w in range(n_win):
+            lbl = int(wl[w]); bfr = bool(wb[w])
+            if lbl == 1:
+                if ictal_ptr < len(ictal_scores):
+                    scores_out.append(float(ictal_scores[ictal_ptr])); ictal_ptr += 1
+                else: scores_out.append(0.0)
+                is_ictal_out.append(True)
+            elif bfr:
+                scores_out.append(float(bootstrap_pool[boot_ptr]))
+                boot_ptr = (boot_ptr + 1) % len(bootstrap_pool)
+                is_ictal_out.append(False); total_inter_s += WIN_SEC
+            else:
+                if inter_ptr < len(inter_scores):
+                    scores_out.append(float(inter_scores[inter_ptr])); inter_ptr += 1
+                else:
+                    scores_out.append(float(bootstrap_pool[boot_ptr]))
+                    boot_ptr = (boot_ptr + 1) % len(bootstrap_pool)
+                is_ictal_out.append(False); total_inter_s += WIN_SEC
+
+    if inter_ptr < len(inter_scores):
+        diff = len(inter_scores) - inter_ptr
+        scores_out = np.concatenate([scores_out, inter_scores[inter_ptr:]])
+        is_ictal_out.extend([False]*diff); total_inter_s += diff*WIN_SEC
+
+    scores_out = np.array(scores_out, dtype=np.float32)
+    is_ictal   = np.array(is_ictal_out, dtype=bool)
+    sz_ranges, in_s, ss_idx = [], False, 0
+    for i, ic in enumerate(is_ictal):
+        if ic and not in_s: ss_idx = i; in_s = True
+        elif not ic and in_s: sz_ranges.append((ss_idx, i)); in_s = False
+    if in_s: sz_ranges.append((ss_idx, len(is_ictal)))
+    return scores_out, is_ictal, sz_ranges, total_inter_s / 3600.0
+
+# ── PELT and evaluation (same as v13) ──────────────────────────────────────
+def run_pelt_all(signal, pen_multipliers):
+    n = len(signal)
+    if n < 10: return {pm: ([], 0.0) for pm in pen_multipliers}
+    med = np.median(signal); mad = np.median(np.abs(signal-med)) + 1e-9
+    s2  = (1.4826*mad)**2
+    if s2 < 1e-10: s2 = 1.0
+    algo = rpt.Pelt(model="l2", min_size=3, jump=5).fit(signal.reshape(-1,1))
+    return {pm: ([c for c in algo.predict(pen=pm*s2*np.log(n)) if c < n],
+                 pm*s2*np.log(n)) for pm in pen_multipliers}
+
+def evaluate_cpd(cps, sz_ranges, n_inter_h):
+    tol = TOLERANCE_S // WIN_SEC; gap = MERGE_GAP_S // WIN_SEC
+    if not cps: return 0, len(sz_ranges), 0.0, float('nan')
+    groups = []; curr = [cps[0]]
+    for c in cps[1:]:
+        if c - curr[-1] <= gap: curr.append(c)
+        else: groups.append(curr); curr = [c]
+    groups.append(curr)
+    if not sz_ranges:
+        return 0, 0, len(groups)/max(n_inter_h,1e-6), float('nan')
+    matched = set(); tp, fn, lats = 0, 0, []
+    for (ss, se) in sz_ranges:
+        hits = [(gi, c) for gi, g in enumerate(groups)
+                for c in g if abs(c-ss) <= tol]
+        if hits:
+            tp += 1; bgi, bc = min(hits, key=lambda x: abs(x[1]-ss))
+            matched.add(bgi); lats.append((bc-ss)*WIN_SEC)
+        else: fn += 1
+    fp = len([gi for gi in range(len(groups)) if gi not in matched])
+    return tp, fn, fp/max(n_inter_h,1e-6), \
+           float(np.mean(lats)) if lats else float('nan')
+
+# ── Run one scenario ────────────────────────────────────────────────────────
+def run_scenario(name, ens_i, ens_c):
+    print(f"\n  {'─'*52}")
+    print(f"  Scenario: {name}")
+    y     = np.concatenate([np.zeros(len(ens_i)), np.ones(len(ens_c))])
+    auroc = roc_auc_score(y, np.concatenate([ens_i, ens_c]))
+    print(f"  AUROC = {auroc:.4f}")
+    timeline, is_ictal, sz_ranges, n_inter_h = build_timeline(SUBJ, ens_i, ens_c)
+    smoothed = pd.Series(timeline).rolling(window=15, min_periods=1,
+                                           center=True).mean().values
+    pelt_res = run_pelt_all(smoothed, PEN_MULTIPLIERS)
+    print(f"  {len(sz_ranges)} seizures | {n_inter_h:.2f}h interictal")
+    print(f"  {'pen':>5} {'TP':>3} {'FN':>3} {'det%':>6} {'FCP/h':>7} {'lat_s':>7}")
+    print(f"  {'─'*38}")
+    rows = []
+    for pm in PEN_MULTIPLIERS:
+        cps, _ = pelt_res[pm]
+        tp, fn, fcp_h, lat = evaluate_cpd(cps, sz_ranges, n_inter_h)
+        dr  = tp / max(tp+fn, 1)
+        ls  = f"{lat:.1f}" if not np.isnan(lat) else "—"
+        print(f"  {pm:>5.1f} {tp:>3} {fn:>3} {dr:>5.1%} {fcp_h:>7.1f} {ls:>7}")
+        rows.append({'scenario': name, 'pen': pm, 'auroc': round(auroc, 4),
+                     'tp': tp, 'fn': fn, 'dr': round(dr, 4),
+                     'fcp_h': round(fcp_h, 2),
+                     'lat_s': round(lat, 1) if not np.isnan(lat) else None})
+    return rows
+
+# ── Main ────────────────────────────────────────────────────────────────────
+def main():
+    np.random.seed(42)
+    print("=" * 60)
+    print(f"GAMMA IMPACT VERIFICATION — {SUBJ}")
+    print("=" * 60)
+
+    # Step 1: reconstruction scores (cached per-subject, separate from ensemble)
+    ri_path = SCORES_DIR / f"{SUBJ}_recon_raw_i.npy"
+    rc_path = SCORES_DIR / f"{SUBJ}_recon_raw_c.npy"
+    if ri_path.exists() and rc_path.exists():
+        raw_r_i = np.load(str(ri_path))
+        raw_r_c = np.load(str(rc_path))
+        print(f"\nLoaded cached recon scores: {len(raw_r_i)} inter | {len(raw_r_c)} ictal")
+    else:
+        print("\nScoring GAE reconstruction (cached after this run)...")
+        model = GAEModel().to(device)
+        model.load_state_dict(torch.load(str(MODEL_PATH), map_location=device))
+        raw_r_i = score_adj_files(model,
+            str(DATA_DIR / f"{SUBJ}_interictal_adjs{ADJS_SUFFIX}.npy"),
+            str(DATA_DIR / f"{SUBJ}_interictal_features.npy"))
+        raw_r_c = score_adj_files(model,
+            str(DATA_DIR / f"{SUBJ}_ictal_adjs{ADJS_SUFFIX}.npy"),
+            str(DATA_DIR / f"{SUBJ}_ictal_features.npy"))
+        np.save(str(ri_path), raw_r_i)
+        np.save(str(rc_path), raw_r_c)
+        print(f"  Saved. {len(raw_r_i)} inter | {len(raw_r_c)} ictal")
+
+    # Step 2: temporal and gamma scores
+    raw_t_i = np.load(str(TEMP_DIR / f"temporal_{SUBJ}_zinter.npy"))
+    raw_t_c = np.load(str(TEMP_DIR / f"temporal_{SUBJ}_zictal.npy"))
+    raw_g_i = np.load(str(DATA_DIR / f"gamma_aec_{SUBJ}_inter.npy"))
+    raw_g_c = np.load(str(DATA_DIR / f"gamma_aec_{SUBJ}_ictal.npy"))
+
+    print(f"\nComponent lengths (before alignment):")
+    print(f"  Reconstruction : {len(raw_r_i)} inter | {len(raw_r_c)} ictal")
+    print(f"  Temporal LSTM  : {len(raw_t_i)} inter | {len(raw_t_c)} ictal")
+    print(f"  Gamma AEC      : {len(raw_g_i)} inter | {len(raw_g_c)} ictal")
+
+    # Step 3: z-normalize each component independently
+    z_r_i, z_r_c = robust_z_normalize(raw_r_i, raw_r_c)
+    z_t_i, z_t_c = robust_z_normalize(raw_t_i, raw_t_c)
+    z_g_i, z_g_c = robust_z_normalize(raw_g_i, raw_g_c)
+
+    # Align lengths
+    ni = min(len(z_r_i), len(z_t_i), len(z_g_i))
+    nc = min(len(z_r_c), len(z_t_c), len(z_g_c))
+    print(f"\nAligned: {ni} inter | {nc} ictal")
+
+    # Step 4: direction check per component
+    print(f"\nComponent separation (median_ictal - median_inter):")
+    for name, zi, zc in [("Reconstruction", z_r_i[:ni], z_r_c[:nc]),
+                          ("Temporal LSTM",  z_t_i[:ni], z_t_c[:nc]),
+                          ("Gamma AEC",      z_g_i[:ni], z_g_c[:nc])]:
+        sep = np.median(zc) - np.median(zi)
+        d   = "↑ CORRECT" if sep > 0 else "↓ INVERTED"
+        print(f"  {name:18s}: sep = {sep:+.3f}  {d}")
+
+    # Step 5: build 3 scenarios
+    ens_A_i = W_R*z_r_i[:ni] + W_T*z_t_i[:ni] + W_G*z_g_i[:ni]   # full
+    ens_A_c = W_R*z_r_c[:nc] + W_T*z_t_c[:nc] + W_G*z_g_c[:nc]
+
+    ens_B_i = 0.50*z_r_i[:ni] + 0.50*z_t_i[:ni]                   # no gamma
+    ens_B_c = 0.50*z_r_c[:nc] + 0.50*z_t_c[:nc]
+
+    ens_C_i = W_R*z_r_i[:ni] + W_T*z_t_i[:ni] - W_G*z_g_i[:ni]   # reversed gamma
+    ens_C_c = W_R*z_r_c[:nc] + W_T*z_t_c[:nc] - W_G*z_g_c[:nc]
+
+    # Step 6: run CPD for each
+    all_rows = []
+    all_rows += run_scenario("A: full  (0.35r+0.30t+0.35g)", ens_A_i, ens_A_c)
+    all_rows += run_scenario("B: -gamma(0.50r+0.50t       )", ens_B_i, ens_B_c)
+    all_rows += run_scenario("C: rev-g (0.35r+0.30t-0.35g)", ens_C_i, ens_C_c)
+
+    # Step 7: summary comparison
+    df = pd.DataFrame(all_rows)
+    out = RESULTS_DIR / "chb14_gamma_scenarios.csv"
+    df.to_csv(str(out), index=False)
+
+    print(f"\n{'='*60}")
+    print("SUMMARY — pen_mult=0.3 and pen_mult=0.5")
+    print(f"{'Scenario':<35} {'AUROC':>6} {'DR':>6} {'FCP/h':>7} {'Lat(s)':>7}")
+    print("─" * 60)
+    for pm in [0.3, 0.5]:
+        print(f"  pen={pm}:")
+        for _, row in df[df.pen == pm].iterrows():
+            lat = f"{row.lat_s:.1f}" if pd.notna(row.lat_s) else "—"
+            print(f"    {row.scenario:<33} {row.auroc:.4f} "
+                  f"{row.dr:>5.1%} {row.fcp_h:>7.1f} {lat:>7}")
+
+    print(f"\nFull CSV → {out}")
+
+if __name__ == "__main__":
+    main()

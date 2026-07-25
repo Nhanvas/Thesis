@@ -22,3 +22,10 @@ data/processed/temporal_zscores/
 data/*.gz
 data/*.zip
 results/loss_curves.npz
+
+# superseded binaries (A-only checkpoints, old ens cache, rejected topology)
+archive/scaffolding/checkpoints/
+results/best_model.pt
+results/history_superseded/oldweight_ens_scores/
+results/history_topology/
+topo_features/

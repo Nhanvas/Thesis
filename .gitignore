@@ -14,3 +14,11 @@ thesis_model_probe.py
 b4_cleanup.py
 b5_reorg.py
 audit_inventory.*
+
+# --- data: chỉ commit artifact nhỏ authoritative; graph 34GB nằm ngoài git ---
+data/processed/*.npy
+data/processed/*.json
+data/processed/temporal_zscores/
+data/*.gz
+data/*.zip
+results/loss_curves.npz

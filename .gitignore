@@ -1,3 +1,16 @@
-The AT command has been deprecated. Please use schtasks.exe instead.
-
-The request is not supported.
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+*.egg-info/
+*.zip
+*.tar.gz
+# throwaway session tools (không thuộc bản ghi thesis)
+thesis_prov_scan.py
+thesis_prov_verify.py
+thesis_file_purpose.py
+thesis_model_probe.py
+b4_cleanup.py
+b5_reorg.py
+audit_inventory.*

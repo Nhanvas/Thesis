@@ -1,5 +1,7 @@
 # PROVENANCE MAP — Unsupervised Seizure Localization (GAE + CPD)
 
+*Code lives in `src/` (flat); run scripts as `python src/<name>.py` from the repo root. Governance docs in `docs/`.*
+
 **Purpose.** One page that lets a second researcher (or a reviewer, or you in a year)
 trace every locked number back to the exact file that produced it, and tells them
 which artifacts are authoritative vs. superseded. Companion to `RESULTS_OF_RECORD.md`
@@ -105,10 +107,21 @@ LOCAL (CPU, Cursor repo)
 - Pre-`_v2` grid (`mag_pen_grid_{pooled,persubject}.csv`) — seeding bug.
 - `cpd_pipeline_v2..v13`, `cpd_results_v*`, `cpd_tolerance_sweep`, `window_metrics` — old lineage.
 - Topology (`topo_*`, `history_topology/*`) — rejected A.5 extension.
+- **FP persistence post-filter (CUSUM) — Decision #24 (ROR §15): TESTED and REJECTED.** The pipeline has NO post-filter. `results/phaseB/fp_filter_*` are the rejection record — never cite them or wire the filter in.
 - **Baselines:** Yildiz unsupervised CHB-MIT AUROC = 0.68 (not 0.76). Transformer 0.765/40.6 is TUH,
   NOT a CHB-MIT baseline.
 
 ---
+
+## 4b. Model provenance (verified)
+
+The authoritative model is the JOINT model **`data/models/best_model_joint_lambda01.pt`** — verified by
+checkpoint forensics: its state-dict contains `x_decoder` layers (16→32→5), matching the notebook's
+joint architecture `score = MSE(A) + 0.1·MSE(X)`. The 10 A-only checkpoints under
+`archive/scaffolding/` (no `x_decoder`) are SUPERSEDED experiments and did NOT produce the thesis
+model. The joint-training notebook was not retained; the architecture is documented (here + the
+notebook) and the model artifact + `data/processed/components/` reproduce the locked numbers bit-exact,
+so the training-script gap does not affect any reported result.
 
 ## 5. Gaps (upstream code not yet in repo)
 
@@ -126,7 +139,7 @@ For full reproducibility + the Methods chapter, these generating steps are still
 ## 6. Reproduction
 
 **Locked numbers from components (CPU, no GPU, no cache):**
-`python thesis_repro_lock.py` — builds ensemble from `data/processed/components/` via
+`python src/thesis_repro_lock.py` — builds ensemble from `data/processed/components/` via
 `ensemble_recipe` (weight 0.40/0.35/0.25), scores mag60/pen1.0 and mag50/pen0.5 with the same
 functions the lock used, seeds `np.random.seed(0)` per subject. Verified bit-exact 2026-07-25.
 

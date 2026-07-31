@@ -29,3 +29,8 @@ results/best_model.pt
 results/history_superseded/oldweight_ens_scores/
 results/history_topology/
 topo_features/
+
+b7_final_tidy.py
+results_scan.py
+dump_src.py
+fp_filter_step1_diagnose.py

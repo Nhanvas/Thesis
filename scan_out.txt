@@ -1,0 +1,576 @@
+RESULTS_SCAN v1 (read-only)
+cwd = F:\Study\Thesis\Code
+
+==========================================================================
+results/ SUBDIR SUMMARY (file counts by ext)
+==========================================================================
+  results  ::  .csv:4, .npz:1, .pt:1, .txt:1
+  results\attribution  ::  .csv:4, .png:2
+  results\attribution\attribution_out  ::  .csv:2, .png:1
+  results\attribution_v3  ::  .csv:5, .json:2, .png:2
+  results\attribution_v3\headmaps  ::  .png:16
+  results\cpd  ::  .csv:13
+  results\cpd\evaluation  ::  .csv:7
+  results\cpd\evaluation\figures  ::  .png:5
+  results\cpd\evaluation\multiseed  ::  .csv:3
+  results\cpd\evaluation\multiseed\figures  ::  .pdf:2, .png:2
+  results\cpd\evaluation\oversegmentation  ::  .csv:3
+  results\cpd\evaluation\oversegmentation\figures  ::  .pdf:2, .png:2
+  results\cpd\evaluation\sweep  ::  .csv:3
+  results\cpd\evaluation\sweep\figures  ::  .pdf:1, .png:1
+  results\cpd\figures  ::  .png:4
+  results\eval  ::  .csv:3
+  results\figures  ::  .pdf:2, .png:6
+  results\history_superseded  ::  .csv:6, .png:1
+  results\history_superseded\2026-07-25\ablation  ::  .csv:3
+  results\history_superseded\2026-07-25\cpd\evaluation  ::  .csv:9
+  results\history_superseded\2026-07-25\cpd\evaluation\lock_mag60  ::  .csv:1
+  results\history_superseded\2026-07-25\cpd\evaluation\lock_mag70  ::  .csv:1
+  results\history_superseded\2026-07-25\cpd\evaluation\szcore  ::  .csv:3
+  results\history_superseded\2026-07-25\cpd\evaluation\szcore_mag60  ::  .csv:2
+  results\history_superseded\2026-07-25\locked  ::  .csv:5
+  results\history_superseded\2026-07-25\phaseA_appendix  ::  .csv:1
+  results\history_superseded\2026-07-25\phaseB  ::  .csv:3
+  results\history_superseded\attribution_out  ::  .csv:2, .png:1
+  results\history_superseded\oldweight_ens_scores  ::  .npy:16
+  results\history_topology  ::  .csv:1
+  results\history_topology\topo_features  ::  .npy:16
+  results\locked  ::  .csv:1
+  results\logs\2026-04-05_21-12-00  ::  .json:2, .txt:1
+  results\logs\2026-04-06_02-42-33  ::  .txt:1
+  results\logs\2026-04-06_11-55-28  ::  .json:1, .txt:1
+  results\logs\2026-04-06_14-34-17  ::  .json:1, .txt:1
+  results\logs\2026-04-06_15-20-41  ::  .json:2, .txt:1
+  results\logs\2026-04-10_13-02-37  ::  .json:1, .txt:1
+  results\logs\2026-04-10_13-07-33  ::  .json:2, .txt:1
+  results\logs\2026-04-10_16-12-57  ::  .json:1, .txt:1
+  results\logs\2026-04-10_17-36-20  ::  .json:2, .txt:1
+  results\logs\2026-04-10_21-17-35  ::  .json:2, .txt:1
+  results\logs\2026-04-11_11-24-45  ::  .json:2, .txt:1
+  results\logs\2026-04-11_14-06-25  ::  .txt:1
+  results\logs\2026-04-11_14-09-46  ::  .json:1, .txt:1
+  results\logs\2026-04-11_17-52-22  ::  .json:1, .txt:1
+  results\logs\2026-04-11_19-29-44  ::  .json:2, .txt:1
+  results\logs\2026-04-11_22-32-04  ::  .json:1, .txt:1
+  results\logs\2026-04-12_10-58-34  ::  .json:1, .txt:1
+  results\logs\2026-04-13_08-59-38  ::  .json:2, .txt:1
+  results\logs\2026-04-18_22-02-31  ::  .json:1, .txt:1
+  results\phaseA_appendix  ::  .csv:11
+  results\phaseB  ::  .csv:8
+  results\phaseB\cross_view_consensus  ::  .csv:2
+  results\phaseB\figures  ::  .pdf:2, .png:2
+  results\phaseB\fp_diagnosis  ::  .csv:2
+  results\phaseB\fp_diagnosis\figures  ::  .pdf:3, .png:3
+  results\phaseB_newweight  ::  .csv:2
+
+==========================================================================
+results/ CSVs  [bytes | lines | path] (+header; +1 row if key)
+==========================================================================
+
+   5548B |  145L | results\attribution\attribution_out\attribution_profile.csv
+   subject,ch_index,channel,region,hemisphere,mean_abs_z,sd_abs_z
+   chb03,0,FP1-F7,L-temp,L,0.1643,0.0998
+
+    893B |    9L | results\attribution\attribution_out\attribution_summary.csv
+   subject,n_seizures,real_consistency,null_consistency,p_seizure_specific,convergent_validity,lateralization_index,dominant_hemisphere,lateralization_agreement,dominant_channels
+   chb03,7,0.455,0.202,0.001,0.386,0.026,Bilateral,0.57,"FP2-F4, FP1-F3, T7-P7, P7-O1, P4-O2"
+
+   5552B |  145L | results\attribution\attribution_pernode_profile.csv
+   subject,ch_index,channel,region,hemisphere,mean_abs_z,sd_abs_z
+   chb03,0,FP1-F7,L-temp,L,1.0311,0.4124
+
+    966B |    9L | results\attribution\attribution_pernode_summary.csv
+   subject,n_seizures,seg_ok,consistency,cons_null,p_consistency,p_seizure_specific,topk_mass,p_occlusion,convergent_vs_eigcent,lateralization_index,dominant_channels
+   chb03,7,True,0.401,0.174,0.001,0.001,0.353,0.0918,0.301,0.231,"P7-O1, T7-P7, FZ-CZ, P4-O2, F3-C3"
+
+   5548B |  145L | results\attribution\attribution_profile.csv
+   subject,ch_index,channel,region,hemisphere,mean_abs_z,sd_abs_z
+   chb03,0,FP1-F7,L-temp,L,0.1643,0.0998
+
+    893B |    9L | results\attribution\attribution_summary.csv
+   subject,n_seizures,real_consistency,null_consistency,p_seizure_specific,convergent_validity,lateralization_index,dominant_hemisphere,lateralization_agreement,dominant_channels
+   chb03,7,0.455,0.202,0.001,0.386,0.026,Bilateral,0.57,"FP2-F4, FP1-F3, T7-P7, P7-O1, P4-O2"
+
+    373B |    2L | results\attribution_v3\attribution_v3_cohort.csv
+   n_subjects,n_used_sign_test,n_positive,n_negative,sign_test_p_two_sided,median_signed_deviation,median_signed_deviation_ci_lo,median_signed_deviation_ci_hi,n_subjects_bh_significant_q05,prer
+   8,8,2,6,0.2890625,-0.011355797928416067,-0.027152509897179822,0.022492628749700316,0,A3 (indeterminate): sign test not significant,0,1000,10000
+
+  10769B |   77L | results\attribution_v3\attribution_v3_perseizure.csv
+   subject,seizure_idx,n_windows,gini,gini_null_median,signed_deviation,entropy_norm,top5_mass,top5_channels
+   chb03,1,14,0.3897353336630873,0.3676536719000003,0.022081661763087013,0.9115236929649128,0.5294273101842121,P7-O1|F3-C3|FZ-CZ|T7-P7|P4-O2
+
+   2152B |    9L | results\attribution_v3\attribution_v3_summary.csv
+   subject,n_seizures,n_interictal_windows,median_seizure_len_win,gini_obs,gini_null_median,gini_null_p2_5,gini_null_p97_5,signed_deviation,p_raw,q_bh,entropy_norm,top5_mass,top5_mass_uniform_r
+   chb03,7,17204,14,0.3625958517504646,0.3640399385120322,0.30246510362887613,0.42238952809381336,-0.0014440867615675979,0.9690309690309691,0.9690309690309691,0.9170402747494735,0.5100520731834
+
+    318B |    9L | results\attribution_v3\tpfp_diagnostics.csv
+   subject,n_events,n_dropped_no_pernode,n_pad_windows,n_inter_h
+
+  91849B |  505L | results\attribution_v3\tpfp_events.csv
+   subject,event_idx,t_start,t_end,duration_s,n_windows,n_windows_resolved,label,label_str,near_miss,fp_class,gini,entropy_norm,top5_mass,mean_anomaly_score,max_anomaly_score,top5_channels
+
+    367B |    9L | results\ce_results.csv
+   subject,auroc,sensitivity,specificity,precision,f1
+
+    356B |    9L | results\ce_znorm_results.csv
+   subject,auroc,sensitivity,specificity,precision,f1
+
+    763B |   13L | results\cpd\chb14_gamma_scenarios.csv
+   scenario,pen,auroc,tp,fn,dr,fcp_h,lat_s
+
+   2708B |   49L | results\cpd\cpd_results.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2739B |   49L | results\cpd\cpd_results_v10_multivariate.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2476B |   49L | results\cpd\cpd_results_v11_roi.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2844B |   49L | results\cpd\cpd_results_v12_combined.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2801B |   49L | results\cpd\cpd_results_v3.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2810B |   49L | results\cpd\cpd_results_v4.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2844B |   49L | results\cpd\cpd_results_v5.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2708B |   49L | results\cpd\cpd_results_v6.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2751B |   49L | results\cpd\cpd_results_v7_smoothing.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   2665B |   49L | results\cpd\cpd_results_v8_l1.csv
+   subject,pen_mult,beta,n_cps,n_seizures,tp,fn,det_rate,fcp_h,mean_lat_s,n_inter_h,auroc
+
+   3100B |   73L | results\cpd\cpd_tolerance_sweep.csv
+   subject,pen,tolerance_s,tp,fn,n_sz,dr,fcp_h,lat_s,n_inter_h
+
+    392B |    9L | results\cpd\evaluation\eval_stat_tests_newweight.csv
+   subject,U,p_value,effect_r
+   chb03,1704022.0,8.08992080786478e-54,0.1174
+
+   1275B |   13L | results\cpd\evaluation\eval_summary.csv
+   tier,metric,value
+
+    961B |    9L | results\cpd\evaluation\eval_window_level_newweight.csv
+   subject,n_inter,n_ictal,prevalence_pct,auroc,auroc_lo,auroc_hi,auprc,auprc_lo,auprc_hi,op_threshold,sensitivity,specificity,precision,f1,fpr
+   chb03,17204,106,0.6124,0.9344,0.9197,0.9492,0.1068,0.0718,0.1714,2.9689,0.5943,0.95,0.0682,0.1223,0.05
+
+    419B |    3L | results\cpd\evaluation\locked_phaseA_event_results.csv
+   operating_point,pen,n_subjects,n_seizures,TP,FN,FP,interictal_hours,sensitivity,sensitivity_CI,sensitivity_macro,precision,precision_CI,f1,fp_per_day,fp_per_day_CI
+   balanced,1.0,8,76,57,19,461,278.2,0.75,"[0.642, 0.834]",0.732 +/- 0.257,0.11,"[0.086, 0.140]",0.1919,39.77,"[36.22, 43.57]"
+
+  23406B |  385L | results\cpd\evaluation\multiseed\multiseed_runs.csv
+   seed,subject,pen_mult,n_seizures,tp,fp,fn,sensitivity,fcp_h,mean_lat_s
+   0,chb03,0.3,7,7,1169,0,1.0,30.857897052353717,-6.857142857142857
+
+    455B |    7L | results\cpd\evaluation\multiseed\multiseed_summary_macro.csv
+   pen_mult,sz_total,dr_mean,dr_std,tp_mean,tp_min,tp_max,tp_swing,fcp_h_mean,fcp_h_std,lat_mean,lat_std
+   0.3,76,0.8438,0.0267,64.12,62,67,5,30.865,0.236,-3.17,2.18
+
+   2658B |   49L | results\cpd\evaluation\multiseed\multiseed_summary_persubject.csv
+   subject,pen_mult,n_seizures,tp_mean,tp_std,tp_min,tp_max,sens_mean,sens_std,fcp_h_mean,fcp_h_std
+   chb03,0.3,7,7.0,0.0,7,7,1.0,0.0,30.346,0.349
+
+ 329666B | 8650L | results\cpd\evaluation\oversegmentation\overseg_cp_level.csv
+   subject,cp_window,time_s,magnitude,seizure_aligned,in_buffer
+
+    366B |    9L | results\cpd\evaluation\oversegmentation\overseg_subject_summary.csv
+   subject,n_seizures,n_cps,n_aligned,n_spurious,n_in_buffer,aligned_lost_to_buffer,n_inter_h
+
+    532B |   21L | results\cpd\evaluation\oversegmentation\overseg_threshold_sweep.csv
+   delta,spur_pct,spurious_removed_frac,aligned_kept_frac
+
+   1349B |   31L | results\cpd\evaluation\sweep\mag_pen_grid.csv
+   min_mag_pct,pen_mult,sensitivity,precision,f1,fp_per_day,n_detected,n_total
+
+  20592B |  241L | results\cpd\evaluation\sweep\mag_pen_grid_detail.csv
+   subject,min_mag_pct,pen_mult,n_seizures,tp,fp,sensitivity,precision,f1,fp_per_day
+
+    771B |   16L | results\cpd\evaluation\sweep\mag_pen_pareto.csv
+   min_mag_pct,pen_mult,sensitivity,precision,f1,fp_per_day,n_detected,n_total
+
+   5874B |   49L | results\cpd\evaluation\szcore_event_level_new_decision19_mag50.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,129,7,247,1.0,0.051470588235294115,0.0979020979020979,81.72459304883414,81.47130200871321,-6.857142857142857,37.88
+
+   5844B |   49L | results\cpd\evaluation\szcore_event_level_new_decision19_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,104,7,202,1.0,0.06306306306306306,0.11864406779661017,65.8864936207655,65.68228999152072,-6.857142857142857,37.88
+
+    314B |    9L | results\cpd\evaluation\window_component_auroc_newweight.csv
+   subject,zrecon,ztemp,zgamma,ensemble
+   chb03,0.6591,0.6622,0.9686,0.9344
+
+    800B |    9L | results\cpd\window_metrics.csv
+   subject,tau,auroc,sensitivity,specificity,precision,f1,fpr,n_inter,n_ictal,prevalence_pct,tp_windows,fn_windows,fp_windows,tn_windows
+
+    401B |   10L | results\eval\tier1_auroc_auprc.csv
+   subject,n_inter,n_ictal,prevalence,AUROC,AUPRC
+
+   1966B |   33L | results\eval\tier2_event_metrics.csv
+   subject,pen_mult,n_seizures_gt,TP,FN,FP_events,Event_Sensitivity,FAR_h,Event_Precision,Mean_Latency_s,n_inter_h,AUROC
+
+    386B |    7L | results\eval\tier2_macro_summary.csv
+   pen_mult,TP_total,GT_total,FP_total,Event_Sensitivity,FAR_h,Event_Precision,Mean_Latency_s,Mean_AUROC
+
+   1820B |   57L | results\history_superseded\2026-07-25\ablation\event_ablation_persubject.csv
+   config,subject,tp,fp,n_seizures,sensitivity
+   full(3-view),chb03,7,48,7,1.0
+
+    341B |    8L | results\history_superseded\2026-07-25\ablation\event_ablation_pooled.csv
+   config,sensitivity,tp,n_seizures,fp_per_day,delta_sens_vs_full
+   full(3-view),0.7105,54,76,39.25,0.0
+
+    332B |    9L | results\history_superseded\2026-07-25\ablation\window_event_gap.csv
+   subject,win_per_sz,window_auroc,window_sens,event_sens,gap
+
+   4307B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\eval_event_level.csv
+   subject,pen_mult,beta,n_events,n_seizures,tp,fp,fn,sensitivity,precision,f1,fcp_h,fcp_h_lo,fcp_h_hi,fp_24h,mean_lat_s,n_inter_h
+   chb03,0.3,0.494,1152,7,7,1145,0,1.0,0.0061,0.0121,30.224,28.499,32.027,725.38,-1.1,37.88
+
+    393B |    9L | results\history_superseded\2026-07-25\cpd\evaluation\eval_stat_tests.csv
+   subject,U,p_value,effect_r
+   chb03,1735764.0,4.534897420159008e-58,0.1221
+
+    962B |    9L | results\history_superseded\2026-07-25\cpd\evaluation\eval_window_level.csv
+   subject,n_inter,n_ictal,prevalence_pct,auroc,auroc_lo,auroc_hi,auprc,auprc_lo,auprc_hi,op_threshold,sensitivity,specificity,precision,f1,fpr
+   chb03,17204,106,0.6124,0.9518,0.9399,0.9637,0.1447,0.1013,0.2213,3.1531,0.6698,0.95,0.0762,0.1368,0.05
+
+    702B |    7L | results\history_superseded\2026-07-25\cpd\evaluation\lock_mag60\szcore_summary_macro.csv
+   pen_mult,sensitivity,precision,f1,fp_per_day,mean_lat_s,hyp_events
+
+    702B |    7L | results\history_superseded\2026-07-25\cpd\evaluation\lock_mag70\szcore_summary_macro.csv
+   pen_mult,sensitivity,precision,f1,fp_per_day,mean_lat_s,hyp_events
+
+   6021B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore\szcore_event_level.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,263,7,546,1.0,0.025925925925925925,0.05054151624548736,166.616805983282,166.1004064208649,-6.857142857142857,37.88
+
+  40519B |  385L | results\history_superseded\2026-07-25\cpd\evaluation\szcore\szcore_multiseed.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h,seed
+   chb03,0.3,7,7,35,7,44,1.0,0.16666666666666666,0.2857142857142857,22.173339199296088,22.104616824069474,-18.285714285714285,37.88,0
+
+    710B |    7L | results\history_superseded\2026-07-25\cpd\evaluation\szcore\szcore_summary_macro.csv
+   pen_mult,sensitivity,precision,f1,fp_per_day,mean_lat_s,hyp_events
+
+   5723B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,108,7,235,1.0,0.06086956521739131,0.11475409836065574,68.42058952925649,68.20853191427152,-6.857142857142857,37.88
+
+   5716B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_mag70.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,78,7,182,1.0,0.08235294117647059,0.15217391304347827,49.414870215574126,49.261717493640546,-6.857142857142857,37.88
+
+   5874B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_newweight_mag50.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,129,7,247,1.0,0.051470588235294115,0.0979020979020979,81.72459304883414,81.47130200871321,-6.857142857142857,37.88
+
+   5844B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_newweight_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,104,7,202,1.0,0.06306306306306306,0.11864406779661017,65.8864936207655,65.68228999152072,-6.857142857142857,37.88
+
+   5811B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_old_locked_mag50.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,125,7,244,1.0,0.05303030303030303,0.10071942446043165,79.19049714034315,78.94506008596241,-1.1428571428571428,37.88
+
+   5829B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_event_level_old_locked_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,94,7,200,1.0,0.06930693069306931,0.12962962962962962,59.55125384953806,59.366685184643735,-1.1428571428571428,37.88
+
+   5723B |   49L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_mag60\szcore_event_level.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,108,7,235,1.0,0.06086956521739131,0.11475409836065574,68.42058952925649,68.20853191427152,-6.857142857142857,37.88
+
+    702B |    7L | results\history_superseded\2026-07-25\cpd\evaluation\szcore_mag60\szcore_summary_macro.csv
+   pen_mult,sensitivity,precision,f1,fp_per_day,mean_lat_s,hyp_events
+
+    480B |    9L | results\history_superseded\2026-07-25\locked\auroc_verification.csv
+   subject,auroc_ens,auroc_recon,auroc_temp,auroc_gamma,mzi_ens,n_inter,n_ictal
+   chb03,0.9575,0.6591,0.6622,0.9686,3.9855,17204,106
+
+    393B |    9L | results\history_superseded\2026-07-25\locked\eval_stat_tests.csv
+   subject,U,p_value,effect_r
+   chb03,1735764.0,4.534897420159008e-58,0.1221
+
+    962B |    9L | results\history_superseded\2026-07-25\locked\eval_window_level.csv
+   subject,n_inter,n_ictal,prevalence_pct,auroc,auroc_lo,auroc_hi,auprc,auprc_lo,auprc_hi,op_threshold,sensitivity,specificity,precision,f1,fpr
+   chb03,17204,106,0.6124,0.9518,0.9399,0.9637,0.1447,0.1013,0.2213,3.1531,0.6698,0.95,0.0762,0.1368,0.05
+
+   5723B |   49L | results\history_superseded\2026-07-25\locked\szcore_event_level_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,108,7,235,1.0,0.06086956521739131,0.11475409836065574,68.42058952925649,68.20853191427152,-6.857142857142857,37.88
+
+   5716B |   49L | results\history_superseded\2026-07-25\locked\szcore_event_level_mag70.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,78,7,182,1.0,0.08235294117647059,0.15217391304347827,49.414870215574126,49.261717493640546,-6.857142857142857,37.88
+
+    370B |    4L | results\history_superseded\2026-07-25\phaseA_appendix\mag_pen_grid_v2_reproducibility_check.csv
+   mag_pct,pen_mult,label,this_run_sensitivity,this_run_tp,previously_locked_sensitivity,previously_locked_tp,drift,status
+   60.0,1.0,balanced,0.7105,54,0.75,57,0.0395,MISMATCH (still drifting)
+
+   1820B |   57L | results\history_superseded\2026-07-25\phaseB\event_ablation_persubject.csv
+   config,subject,tp,fp,n_seizures,sensitivity
+   full(3-view),chb03,7,48,7,1.0
+
+    341B |    8L | results\history_superseded\2026-07-25\phaseB\event_ablation_pooled.csv
+   config,sensitivity,tp,n_seizures,fp_per_day,delta_sens_vs_full
+   full(3-view),0.7105,54,76,39.25,0.0
+
+    332B |    9L | results\history_superseded\2026-07-25\phaseB\window_event_gap.csv
+   subject,win_per_sz,window_auroc,window_sens,event_sens,gap
+
+   5548B |  145L | results\history_superseded\attribution_out\attribution_profile.csv
+   subject,ch_index,channel,region,hemisphere,mean_abs_z,sd_abs_z
+   chb03,0,FP1-F7,L-temp,L,0.1643,0.0998
+
+    893B |    9L | results\history_superseded\attribution_out\attribution_summary.csv
+   subject,n_seizures,real_consistency,null_consistency,p_seizure_specific,convergent_validity,lateralization_index,dominant_hemisphere,lateralization_agreement,dominant_channels
+   chb03,7,0.455,0.202,0.001,0.386,0.026,Bilateral,0.57,"FP2-F4, FP1-F3, T7-P7, P7-O1, P4-O2"
+
+   5552B |  145L | results\history_superseded\attribution_pernode_profile.csv
+   subject,ch_index,channel,region,hemisphere,mean_abs_z,sd_abs_z
+   chb03,0,FP1-F7,L-temp,L,1.0311,0.4124
+
+    966B |    9L | results\history_superseded\attribution_pernode_summary.csv
+   subject,n_seizures,seg_ok,consistency,cons_null,p_consistency,p_seizure_specific,topk_mass,p_occlusion,convergent_vs_eigcent,lateralization_index,dominant_channels
+   chb03,7,True,0.401,0.174,0.001,0.001,0.353,0.0918,0.301,0.231,"P7-O1, T7-P7, FZ-CZ, P4-O2, F3-C3"
+
+  46858B |  385L | results\history_superseded\mag_pen_grid_persubject.csv
+   subject,mag_pct,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+
+   2756B |   49L | results\history_superseded\mag_pen_grid_pooled.csv
+   TP,FN,FP,n_seizures,sensitivity,precision,f1,fp_per_day,mag_pct,pen_mult,on_pareto_frontier
+
+   5723B |   49L | results\history_superseded\szcore_event_level_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,108,7,235,1.0,0.06086956521739131,0.11475409836065574,68.42058952925649,68.20853191427152,-6.857142857142857,37.88
+
+   5716B |   49L | results\history_superseded\szcore_event_level_mag70.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,78,7,182,1.0,0.08235294117647059,0.15217391304347827,49.414870215574126,49.261717493640546,-6.857142857142857,37.88
+
+   1789B |   33L | results\history_topology\topo_standalone_auroc.csv
+   subject,feature,auroc_ictal_high,direction,detectability,n_inter,n_ictal
+
+    419B |    3L | results\locked\locked_phaseA_event_results.csv
+   operating_point,pen,n_subjects,n_seizures,TP,FN,FP,interictal_hours,sensitivity,sensitivity_CI,sensitivity_macro,precision,precision_CI,f1,fp_per_day,fp_per_day_CI
+   balanced,1.0,8,76,57,19,461,278.2,0.75,"[0.642, 0.834]",0.732 +/- 0.257,0.11,"[0.086, 0.140]",0.1919,39.77,"[36.22, 43.57]"
+
+    315B |   11L | results\phaseA_appendix\duration_bucket_summary.csv
+   operating_point,bucket,n,tp,sensitivity
+   balanced,<10s,3,2,0.667
+
+   5149B |  153L | results\phaseA_appendix\duration_hit_persubject.csv
+   subject,operating_point,seizure_idx,duration_s,hit,bucket
+   chb03,balanced,0,56,True,20-60s
+
+ 104419B |  769L | results\phaseA_appendix\mag_pen_grid_v2_persubject.csv
+   weight,mag_pct,subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+
+   6695B |   97L | results\phaseA_appendix\mag_pen_grid_v2_pooled.csv
+   weight,mag_pct,pen_mult,TP,FN,FP,n_seizures,sensitivity,precision,f1,fp_per_day,on_pareto_frontier
+
+   5874B |   49L | results\phaseA_appendix\szcore_event_level_new_decision19_mag50.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,129,7,247,1.0,0.051470588235294115,0.0979020979020979,81.72459304883414,81.47130200871321,-6.857142857142857,37.88
+
+   5844B |   49L | results\phaseA_appendix\szcore_event_level_new_decision19_mag60.csv
+   subject,pen_mult,n_seizures,tp,fp,n_ref,n_hyp,sensitivity,precision,f1,fp_per_day,fp_rate_full,mean_lat_s,n_inter_h
+   chb03,0.3,7,7,104,7,202,1.0,0.06306306306306306,0.11864406779661017,65.8864936207655,65.68228999152072,-6.857142857142857,37.88
+
+    631B |   17L | results\phaseA_appendix\weight_candidate_crosscheck_persubject.csv
+   operating_point,subject,locked_tp_mean,cand1_tp_mean,delta,n_seizures
+
+    239B |    5L | results\phaseA_appendix\weight_candidate_crosscheck_pooled.csv
+   weight,operating_point,sens_mean,sens_sd,fp_per_day_mean,fp_per_day_sd
+
+   2114B |   49L | results\phaseA_appendix\weight_seed_robustness_raw.csv
+   point,w_recon,w_temp,w_gamma,seed,sensitivity,fp_per_day,tp,n_seizures
+
+    454B |    7L | results\phaseA_appendix\weight_seed_robustness_summary.csv
+   point,w_recon,w_temp,w_gamma,sens_mean,sens_sd,fp_per_day_mean,fp_per_day_sd,win_rate_vs_locked,mean_paired_delta_sens
+
+   5070B |  128L | results\phaseA_appendix\weight_sensitivity_grid.csv
+   w_recon,w_temp,w_gamma,sensitivity,tp,n_seizures,fp_per_day,is_locked_point
+
+    480B |    9L | results\phaseB\auroc_verification.csv
+   subject,auroc_ens,auroc_recon,auroc_temp,auroc_gamma,mzi_ens,n_inter,n_ictal
+   chb03,0.9575,0.6591,0.6622,0.9686,3.9855,17204,106
+
+  11768B |  503L | results\phaseB\cross_view_consensus\cross_view_events.csv
+   subject,event_type,onset_s,n_views,would_be_removed
+
+    296B |    9L | results\phaseB\cross_view_consensus\cross_view_summary.csv
+   subject,n_fp,n_tp,fp_removal_rate,tp_removal_rate,selectivity_ratio
+
+    895B |    9L | results\phaseB\fp_diagnosis\fp_diagnosis_summary.csv
+   subject,pen,mag,approx_fp,authoritative_fp,approx_tp,authoritative_tp,fp_count_match,n_inter_h,pct_fp_near_boundary,null_pct_near_boundary,boundary_enrichment,median_n_underlying_cps,median_
+
+  28962B |  442L | results\phaseB\fp_diagnosis\fp_event_diagnostics.csv
+   subject,onset_s,end_s,duration_s,n_underlying_cps,mean_cp_magnitude,dist_to_file_boundary_s,near_boundary,dist_to_seizure_edge_s,frac_underlying_windows_in_buffer,session,hour_of_day
+
+  47631B |  527L | results\phaseB\fp_filter_step1_events.csv
+   subject,label,n_cps,duration_windows,peak_mag,mean_mag,persist_mean,persist_max
+   chb03,TP,2,16,1.6686270251870157,1.5245916593592201,2.027791681885719,2.677561264236768
+
+    227B |    7L | results\phaseB\fp_filter_step2_sweep.csv
+   P,TP,sens,FP,fp_day,dFP_pct,seizures_lost
+   80,39,0.5132,98,8.45,78.7,18
+
+   4588B |  229L | results\phaseB\fp_filter_step2b_duration_diag.csv
+   subject,seizure_idx,duration_s,hit,P
+   chb03,0,56,True,
+
+   2584B |  145L | results\phaseB\fp_filter_step2b_persubject.csv
+   P,subject,tp,fp,n_seizures
+   0,chb03,7,49,7
+
+    591B |   19L | results\phaseB\fp_filter_step2b_pooled.csv
+   P,TP,sens,FP,fp_day,dFP_pct,seizures_lost
+   0,57,0.75,461,39.77,0.0,0
+
+   2158B |  121L | results\phaseB\fp_filter_step2c_persubject.csv
+   P,subject,tp,fp,n_seizures
+   28,chb03,7,35,7
+
+    488B |   16L | results\phaseB\fp_filter_step2c_pooled.csv
+   P,TP,sens,FP,fp_day,dFP_pct,seizures_lost
+   28,57,0.75,426,36.75,7.6,0
+
+   1827B |   57L | results\phaseB_newweight\event_ablation_persubject.csv
+   config,subject,tp,fp,n_seizures,sensitivity
+   full(3-view),chb03,7,49,7,1.0
+
+    338B |    8L | results\phaseB_newweight\event_ablation_pooled.csv
+   config,sensitivity,tp,n_seizures,fp_per_day,delta_sens_vs_full
+   full(3-view),0.75,57,76,39.77,0.0
+
+    466B |    9L | results\results_log.csv
+   subject,n_inter,n_ictal,auroc,sensitivity,specificity,precision,f1
+
+    586B |    9L | results\znorm_results.csv
+   subject,auroc,sensitivity,specificity,precision,f1,med_inter,mad,med_z_ictal
+
+==========================================================================
+LOOSE FILES AT REPO ROOT (non-folder)
+==========================================================================
+       717B  .gitignore
+         0B  Dockerfile
+         0B  Makefile
+      8981B  README.md
+      6345B  edf_index.py
+         0B  entry.sh
+     18086B  evaluate_full.py
+   2500329B  file_list.txt
+      5312B  fp_filter_step2_cusum.py
+     12844B  fp_filter_step2b_duration_diag.py
+     10768B  fp_filter_step2c_fine_cliff.py
+     38183B  inventory.json
+         0B  mean_inter
+     11718B  oversegmentation_diag.py
+      1816B  pip_freeze.txt
+      2358B  results_scan.py
+     16353B  scan_out.txt
+      1789B  topo_standalone_auroc.csv
+
+==========================================================================
+results/ NON-CSV artifacts (npz/pt/json/png/pdf)
+==========================================================================
+     123KB  results\attribution\attribution_figure.png
+     123KB  results\attribution\attribution_out\attribution_figure.png
+     109KB  results\attribution\attribution_pernode_figure.png
+      50KB  results\attribution_v3\attribution_v3_concentration.png
+       1KB  results\attribution_v3\attribution_v3_provenance.json
+     141KB  results\attribution_v3\headmaps\headmap_chb03_median.png
+     329KB  results\attribution_v3\headmaps\headmap_chb03_perseizure.png
+     140KB  results\attribution_v3\headmaps\headmap_chb06_median.png
+     464KB  results\attribution_v3\headmaps\headmap_chb06_perseizure.png
+     139KB  results\attribution_v3\headmaps\headmap_chb13_median.png
+     527KB  results\attribution_v3\headmaps\headmap_chb13_perseizure.png
+     141KB  results\attribution_v3\headmaps\headmap_chb14_median.png
+     370KB  results\attribution_v3\headmaps\headmap_chb14_perseizure.png
+     142KB  results\attribution_v3\headmaps\headmap_chb15_median.png
+     885KB  results\attribution_v3\headmaps\headmap_chb15_perseizure.png
+     140KB  results\attribution_v3\headmaps\headmap_chb16_median.png
+     459KB  results\attribution_v3\headmaps\headmap_chb16_perseizure.png
+     138KB  results\attribution_v3\headmaps\headmap_chb17_median.png
+     149KB  results\attribution_v3\headmaps\headmap_chb17_perseizure.png
+     139KB  results\attribution_v3\headmaps\headmap_chb18_median.png
+     295KB  results\attribution_v3\headmaps\headmap_chb18_perseizure.png
+      87KB  results\attribution_v3\tpfp_concentration.png
+       2KB  results\attribution_v3\tpfp_summary.json
+      12KB  results\best_model.pt
+      36KB  results\cpd\evaluation\figures\fig_event_tradeoff.png
+      17KB  results\cpd\evaluation\figures\fig_per_subject_auroc_auprc.png
+      64KB  results\cpd\evaluation\figures\fig_pr_curves.png
+      44KB  results\cpd\evaluation\figures\fig_roc_curves.png
+      42KB  results\cpd\evaluation\figures\fig_timeline_chb18.png
+      16KB  results\cpd\evaluation\multiseed\figures\fig_multiseed_macro_dr.pdf
+      27KB  results\cpd\evaluation\multiseed\figures\fig_multiseed_macro_dr.png
+      17KB  results\cpd\evaluation\multiseed\figures\fig_multiseed_tp_persubject.pdf
+      27KB  results\cpd\evaluation\multiseed\figures\fig_multiseed_tp_persubject.png
+      16KB  results\cpd\evaluation\oversegmentation\figures\fig_overseg_magnitude_hist.pdf
+      24KB  results\cpd\evaluation\oversegmentation\figures\fig_overseg_magnitude_hist.png
+      14KB  results\cpd\evaluation\oversegmentation\figures\fig_overseg_threshold_sweep.pdf
+      33KB  results\cpd\evaluation\oversegmentation\figures\fig_overseg_threshold_sweep.png
+      20KB  results\cpd\evaluation\sweep\figures\fig_mag_pen_tradeoff.pdf
+      62KB  results\cpd\evaluation\sweep\figures\fig_mag_pen_tradeoff.png
+    1315KB  results\cpd\figures\figA_three_scores_8subjects.png
+    6312KB  results\cpd\figures\figB_raw_eeg_pelt_8subjects.png
+     653KB  results\cpd\figures\fig_3scores_8subj.png
+    2905KB  results\cpd\figures\fig_raw_eeg_pelt_8subj.png
+     135KB  results\figures\baseline_vs_znorm.png
+      80KB  results\figures\ce_comparison.png
+      81KB  results\figures\fig1_preprocessing_summary.png
+     318KB  results\figures\fig2_raw_vs_filtered.png
+     425KB  results\figures\fig_eeg_cpd_chb03_chb03_01.pdf
+    1173KB  results\figures\fig_eeg_cpd_chb03_chb03_01.png
+     495KB  results\figures\fig_eeg_cpd_chb15_chb15_28.pdf
+    2128KB  results\figures\fig_eeg_cpd_chb15_chb15_28.png
+     123KB  results\history_superseded\attribution_out\attribution_figure.png
+     109KB  results\history_superseded\attribution_pernode_figure.png
+       0KB  results\logs\2026-04-05_21-12-00\model_info.json
+       0KB  results\logs\2026-04-05_21-12-00\results.json
+       0KB  results\logs\2026-04-06_11-55-28\model_info.json
+       0KB  results\logs\2026-04-06_14-34-17\model_info.json
+       0KB  results\logs\2026-04-06_15-20-41\model_info.json
+       0KB  results\logs\2026-04-06_15-20-41\results.json
+       0KB  results\logs\2026-04-10_13-02-37\model_info.json
+       0KB  results\logs\2026-04-10_13-07-33\model_info.json
+       0KB  results\logs\2026-04-10_13-07-33\results.json
+       0KB  results\logs\2026-04-10_16-12-57\model_info.json
+       0KB  results\logs\2026-04-10_17-36-20\model_info.json
+       0KB  results\logs\2026-04-10_17-36-20\results.json
+       0KB  results\logs\2026-04-10_21-17-35\model_info.json
+       0KB  results\logs\2026-04-10_21-17-35\results.json
+       0KB  results\logs\2026-04-11_11-24-45\model_info.json
+       0KB  results\logs\2026-04-11_11-24-45\results.json
+       0KB  results\logs\2026-04-11_14-09-46\model_info.json
+       0KB  results\logs\2026-04-11_17-52-22\model_info.json
+       0KB  results\logs\2026-04-11_19-29-44\model_info.json
+       0KB  results\logs\2026-04-11_19-29-44\results.json
+       0KB  results\logs\2026-04-11_22-32-04\model_info.json
+       0KB  results\logs\2026-04-12_10-58-34\model_info.json
+       0KB  results\logs\2026-04-13_08-59-38\model_info.json
+       0KB  results\logs\2026-04-13_08-59-38\results.json
+       0KB  results\logs\2026-04-18_22-02-31\model_info.json
+       3KB  results\loss_curves.npz
+      31KB  results\phaseB\figures\fig_channel_heatmap.pdf
+      58KB  results\phaseB\figures\fig_channel_heatmap.png
+      25KB  results\phaseB\figures\fig_channel_montage.pdf
+      73KB  results\phaseB\figures\fig_channel_montage.png
+      45KB  results\phaseB\fp_diagnosis\figures\fig_adjacency_chb06_vs_chb18.pdf
+      70KB  results\phaseB\fp_diagnosis\figures\fig_adjacency_chb06_vs_chb18.png
+     309KB  results\phaseB\fp_diagnosis\figures\fig_timeline_chb06_vs_chb18.pdf
+     114KB  results\phaseB\fp_diagnosis\figures\fig_timeline_chb06_vs_chb18.png
+      18KB  results\phaseB\fp_diagnosis\figures\fig_zdist_chb06_vs_chb18.pdf
+      44KB  results\phaseB\fp_diagnosis\figures\fig_zdist_chb06_vs_chb18.png
+
+[done] read-only.

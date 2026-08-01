@@ -54,19 +54,15 @@ complementary, as the ablation requires.
 **Sequence length `L = 16`** (context = 15 past + current). Evidence-based: the old branch's warm-up was
 exactly 15 windows ⇒ context 16. Also a sensible ~16 s temporal receptive field. Validatable on VAL.
 
-**Sequence contiguity (R2 — hard requirement, must be verified before coding).** A predictive LSTM is only
-valid over **temporally contiguous** windows. A subject's interictal windows span multiple EDF files with
-time gaps; feeding the concatenated interictal array as one sequence (what the old branch apparently did →
-a single warm-up block) predicts *across* gaps and is wrong. The new branch MUST:
-  - reconstruct the chronological window→(EDF, time) mapping using `evaluation_protocol.parse_summary_edf_list`
-    / `edf_index.EdfIndex` (the exact convention behind every locked result — no new parser);
-  - form sequences **only within contiguous runs** (per EDF, and split at seizure/interictal boundaries);
-  - mask the first `L-1` windows of **each contiguous run** (excluded from z-norm statistics), not zero-filled.
-  Ictal windows of a seizure are contiguous → they get real predictions (no fill), fixing the old defect.
-  **Prerequisite to verify first:** the exact windowing convention (length/step, whether the stored
-  `{subj}_{split}_adjs` arrays preserve chronological order) — pinned from `dataprep/preprocessing.py` +
-  `build_graphs.py` before any LSTM code. If order/contiguity cannot be reconstructed, the design is revised
-  (documented) rather than run on an invalid assumption.
+**Sequence context — DECIDED (A):** the production LSTM runs over **each split-array (interictal / ictal)
+as one chronological sequence** (a single warm-up masked at the array start), matching the original branch's
+approach. The forensic confirmed discrimination is intrinsic to ictal windows (0.648 VAL) under exactly this
+concatenation, so per-seizure segmentation (which would penalise short seizures with per-seizure warm-up) is
+NOT used. The known blemish — interior seizures take context from the tail of the previous seizure (wrong
+real-time) — is inherited from the original method and **disclosed in Methods**. The clean alternative
+(per-EDF continuous scoring) requires regenerating graphs in chronological order + labels (raw EEG, ~34 GB)
+and is recorded as a **future-work escalation** if a reviewer requires it — not run now (time-boxed:
+IELTS 9 Oct, submit 15 Oct). This is a faithful-reproducible rebuild, not an improvement beyond the original.
 
 **Architecture defaults (tunable on VAL only):** 1-layer LSTM, hidden 64, linear head 64→16, MSE loss,
 Adam lr 1e-3, cosine, 200 epochs, batch (sequence) 64. These mirror the GAE optimiser choices for
@@ -99,8 +95,10 @@ sequence `x_t ∈ R^{18×5}` (pooled/flattened) as LSTM input — decided on VAL
 Because the old branch is unrecoverable, we cannot ask "does it match?" We ask "is it a good, stable,
 complementary temporal detector?" — judged on **VAL**, then the ensemble is scored once on **TEST**.
 
-- **L0 (input choice, R1):** the pooling of Z — mean-pool (18×16→16) vs flatten (→288) — is decided on the
-  **mean VAL standalone AUROC**, before any test contact. Whichever wins on VAL is locked.
+- **L0 (input choice, R1) — DECIDED:** forensic on VAL (design probe, current checkpoint) gave
+  flat-Z (288) VAL mean AUROC 0.648 vs pooled-Z (16) 0.602; flat wins on the two higher-ictal VAL
+  subjects (chb10 0.707, chb11 0.684). **Input = flattened Z (288).** Re-confirmed in production on the
+  adopted GAE.
 - **L1 (discriminative on VAL, R4):** temporal-branch standalone window-AUROC, reported **per VAL subject**
   (3 subjects → noisy) with the **mean ≥ 0.60** as the bar (the old branch's standalone was 0.647 on test;
   we require comparable quality on held-out VAL). No single-subject value is used as the criterion.

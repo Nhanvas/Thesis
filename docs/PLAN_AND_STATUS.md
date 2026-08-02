@@ -165,3 +165,29 @@ The active work item now (Gate A passed). Static frontend + offline JSON export 
 ---
 *Update this file at the end of each working session: tick completed items, append decisions, and revise the "next" list.*
 *Note: the project's custom-instructions FILE USAGE MAP (maintained separately in Claude Project settings, not a file in this repo) still lists the OLD weight (0.35/0.30/0.35) and OLD operating points — it should be updated to reflect Decisions #19/#20, and to list `mag_pen_grid_sweep_v2.py`, `rebuild_ensemble_new_weight.py`, `weight_*_sweep/check.py`, `duration_stratified_sensitivity.py` and their output CSVs as AUTHORITATIVE. Claude cannot edit that document directly.*
+
+================================================================================ BLOCK 1 → append to the END of docs/PLAN_AND_STATUS.md
+Decision #25 — Full rebuild campaign (2026-08) [IN PROGRESS]
+
+Trigger. During a full end-to-end verification (see below), the temporal (LSTM) branch — ensemble weight 0.35 — was found to be provenance-unrecoverable: no class, training code, inference code, config, or checkpoint exists in the repo, in thesis-cpd-final.ipynb, or in the Kaggle datasets (only the output arrays temporal_*_z{inter,ictal}.npy survive). A pipeline whose 35%-weight branch cannot be re-run is undeployable (blocks external validation + clinical use) and not defensible at Q3.
+
+Decision (author-approved). Rebuild the pipeline end-to-end so it is fully reproducible, and make the new pipeline the system-of-record. The frozen-component locked numbers remain valid and bit-exact reproducible but are superseded by the rebuild and archived, not deleted. Headline = whatever the new pipeline gives, reported as-is (multi-seed mean±SD). Nothing tuned on the 8 test subjects. This campaign also closes the dangling audit items (multi-seed mean±SD, warm-up, chb17, Decision-#19 thin margin) in one principled pass.
+
+Verification completed before the rebuild (all PASS, reproduce + match ROR):
+
+anchor thesis_repro_lock.py bit-exact (0.750/39.77 + 0.829/71.25); imports OK;
+§8 event ablation full=0.750, deltas recon −0.145 > temporal −0.132 > gamma −0.105;
+window macro AUROC 0.791 (recon 0.671); duration buckets; window↔event gap; stat CIs — all match ROR.
+Headline robust to the temporal warm-up artifact: neutralising the 15-window warm-up gives ΔTP=0 / ΔFP=0 on the balanced point (see ROR addendum).
+
+Findings folded into the rebuild:
+
+GAE-joint: class recovered from notebook cell 4, validated byte-exact against best_model_joint_lambda01.pt (strict load OK, chb13 AUROC 0.8360, bias fingerprint 0.8676). Training loop reconstructed (PREREG 01), smoke-passed. Multi-seed {42,1,2,3,4}, seed-42 canonical.
+LSTM temporal: unrecoverable → redesigned (PREREG 02): predictive LSTM on flattened GAE latent Z (288-D), context L=16, per-split-array sequence (context-A), robust-z. VAL forensic: flat 0.648 > pool 0.602 → flat locked. A reconstruction, not a recovery — stated in Methods.
+Warm-up artifact: per-array (one 15-window block), not per-seizure; window-tier only; ΔTP=0 on headline.
+chb17 interictal saturation (lag-1 autocorr 0.998, max 421): data-quality, separate from warm-up; disclose.
+Split contract (the original joint model): 12 train / 3 val (chb10, chb11, chb22) / 8 test — from notebook cell 2, NOT the 15+random-val of the A-only scaffolding harness.
+
+Sequence (PHA 1): GAE multi-seed → Gate R-GAE → production LSTM (train_lstm_temporal.py) → Gate R-LSTM → PREREG 03 (ensemble weights re-derived on non-test; repairs #19) → one end-to-end evaluation on the 8 test subjects → re-lock (archive old, new numbers to ROR §16). PHA 2: LOSO + Siena external (inference-only). PHA 3: running-time, epilepsy-vs-seizure scoping, metadata stratification. PHA 4: writing (Methods-first) + demo.
+
+Artifacts committed: docs/prereg/PREREG_01_GAE_joint_retrain.md, docs/prereg/PREREG_02_LSTM_temporal.md, src/retrain/{gae_joint,train_gae_joint,gae_gate_report,lstm_forensic,train_lstm_temporal}.py.

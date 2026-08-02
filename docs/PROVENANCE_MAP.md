@@ -146,3 +146,16 @@ functions the lock used, seeds `np.random.seed(0)` per subject. Verified bit-exa
 **Components from Kaggle (GPU):** run `notebooks/kaggle_gpu/thesis-cpd-final.ipynb` on Kaggle with
 the nhn2mm/* datasets mounted; use only cell 8 (pernode) + cell 16 (components) as handoff outputs.
 Do NOT propagate Sec 5B/5D ensemble/cache.
+
+================================================================================ BLOCK 2 → append to the END of docs/PROVENANCE_MAP.md
+Addendum (2026-08) — reconstruction provenance (Decision #25)
+
+GAE-joint (recon branch). Authoritative architecture = thesis-cpd-final.ipynb cell 4: encoder GCNConv 23→64→16; A-decoder = clamp(ZZᵀ,0,1) (inner product, no sigmoid); x_decoder MLP 16→32→5; score/loss = MSE(A_raw, Â) + 0.1·MSE(Xn, X̂). Reconstructed as src/retrain/gae_joint.py, validated byte-exact against best_model_joint_lambda01.pt (strict load; chb13 recon AUROC 0.8360; bias 0.8676; per-node self-check < 1e-8). Training loop reconstructed (PREREG 01) after the original training notebook was confirmed unrecoverable (not in repo, notebook, or Kaggle). Input construction (verified): An = A/max; Xn per-band min-max over channels; edges from RAW A. Graphs = top-k 20% (_topk20), datasets chbmit-topk20 (adjs) + chbmit-processed (features).
+
+Temporal (LSTM) branch — UNRECOVERABLE. No class / training / inference / config / checkpoint exists anywhere (repo, thesis-cpd-final.ipynb §3 only loads pre-computed arrays, Kaggle temporal-zscores holds only .npy outputs). The branch is redesigned from principles (PREREG 02), not recovered: predictive LSTM on flattened GAE latent Z, L=16, context-A, robust-z. Methods must state this as a reconstruction. Old ztemp arrays are corroboration only, never a training target.
+
+Gamma branch. src/dataprep/compute_gamma_aec.py retained + deterministic.
+
+Component assembly. Per-view robust-z pinned (notebook cell 14): med=median(inter∪ictal), mad=median(|x−med|)+1e-9, z=(x−med)/mad, per subject, per signal. Ensemble weights: OLD 0.35/0.30/0.35 (notebook §5B, superseded) → Decision #19 0.40/0.35/0.25 → to be re-derived on non-test (PREREG 03) for the rebuilt pipeline. Single source: src/ensemble_recipe.py.
+
+Split. data/splits/split_main.json = {15 train, 8 test}. The joint model was trained on 12 of the 15 (interictal only) with 3 held-out as validation subjects: train = chb01,02,04,05,07,08,09,12,19,20,21,23; val = chb10,11,22; test = chb03,06,13,14,15,16,17,18.

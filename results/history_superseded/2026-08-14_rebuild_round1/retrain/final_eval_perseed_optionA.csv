@@ -1,0 +1,11 @@
+seed,op,mag_pct,pen_mult,sensitivity,fp_per_day
+1,balanced,75.0,0.5,0.5789,38.473
+1,high-sensitivity,65.0,0.3,0.6447,59.953
+2,balanced,70.0,0.3,0.4737,42.873
+2,high-sensitivity,50.0,0.3,0.6184,73.582
+3,balanced,55.0,2.0,0.2105,41.061
+3,high-sensitivity,50.0,0.5,0.3947,73.755
+4,balanced,70.0,0.5,0.6447,37.611
+4,high-sensitivity,55.0,0.3,0.7763,73.323
+42,balanced,70.0,0.5,0.6579,39.681
+42,high-sensitivity,55.0,0.3,0.7500,72.029

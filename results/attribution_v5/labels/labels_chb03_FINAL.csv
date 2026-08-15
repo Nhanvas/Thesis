@@ -1,0 +1,8 @@
+subject,seizure_idx,fname,onset_s,offset_s,dominant_ch,note
+chb03,0,chb03_01.edf,362,414,"T7-P7, P7-O1","Left posterior temporal; T7-P7/P7-O1 sustained dense discharge, spreads bilaterally later."
+chb03,1,chb03_02.edf,731,796,"T7-P7","T7-P7 thick sustained high-amplitude band; left temporal dominant."
+chb03,2,chb03_03.edf,432,501,"T7-P7","Left temporal T7-P7 dominant within widespread discharge."
+chb03,3,chb03_04.edf,2162,2214,"T7-P7","Left posterior temporal T7-P7 dominant; broad spread."
+chb03,4,chb03_34.edf,1982,2029,"","DIFFUSE: broad bilateral discharge on hyperactive baseline, no single channel stands out."
+chb03,5,chb03_35.edf,2592,2656,"T7-P7","T7-P7 left temporal dominant but broad; very active baseline."
+chb03,6,chb03_36.edf,1725,1778,"T7-P7","Left posterior temporal T7-P7 dominant."

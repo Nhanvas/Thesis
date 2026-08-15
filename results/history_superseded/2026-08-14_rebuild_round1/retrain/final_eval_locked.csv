@@ -1,0 +1,3 @@
+operating_point,mag_pct,pen,n_subjects,n_seizures,TP,FN,FP,interictal_hours,sensitivity,sensitivity_CI,sensitivity_macro,precision,precision_CI,f1,fp_per_day,fp_per_day_CI
+balanced,70.0,0.5,8,76,50,26,460,278.2,0.6579,"[0.546, 0.755]",0.632 +/- 0.327,0.098,"[0.075, 0.127]",0.1706,39.68,"[36.14, 43.48]"
+high-sensitivity,55.0,0.3,8,76,57,19,835,278.2,0.75,"[0.642, 0.834]",0.744 +/- 0.328,0.0639,"[0.050, 0.082]",0.1178,72.03,"[67.23, 77.09]"

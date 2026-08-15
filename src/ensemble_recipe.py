@@ -5,23 +5,34 @@ The ensemble is a weighted sum of the three per-view robust-z-normalised compone
 scores (recon = GAE reconstruction error, temporal = LSTM prediction error,
 gamma = gamma-band AEC). The CPD stage (cpd_pipeline_v14) is scale-adaptive, so no
 further renormalisation is applied after the weighted sum: the weighted sum of the
-stored component z-scores IS the ensemble that reproduces the locked numbers
-(verified — event_ablation full(3-view)=0.750, duration_stratified ALL=0.750/0.829,
-both build from components with this exact recipe and the canonical seed).
+component z-scores IS the ensemble.
 
-WHY THIS FILE EXISTS
-  The ensemble weight (Decision #19) must live in exactly ONE place. Previously it was
-  duplicated inline across scripts, and a stale GPU ens cache (old weight) plus a
-  seeding-bug grid caused the reported numbers to drift (RESULTS_OF_RECORD §13).
-  Anything needing an ensemble score — evaluation, analysis, and the Phase C demo
-  export — imports ENS_WEIGHTS + build_ensemble from here. No script re-defines the
-  weight; NO persistent ensemble cache is created (always build fresh from components).
+WEIGHTS — Decision #26 (RESULTS_OF_RECORD §16), rebuilt pipeline:
+  EQUAL weights (1/3, 1/3, 1/3). Derived on NON-TEST (PREREG 03): the VAL macro-AUROC
+  surface was flat (24 weight triples within 0.005 of the argmax (0.10,0.35,0.55));
+  equal weights were adopted as the anti-overfit, TRAIN-consistent tie-break (repairs
+  the fragile margin of the old Decision #19). The tuple below is (0.3334,0.3333,0.3333)
+  — the exact strings used to produce the locked §16 numbers; the 0.0001 asymmetry is a
+  CLI rounding artifact (sum = 1.0) and is numerically negligible (CPD is scale-adaptive).
+  Use (1/3, 1/3, 1/3) if re-deriving from scratch.
+
+  SUPERSEDED: the old Decision #19 weight (0.40, 0.35, 0.25) and the pre-that
+  (0.35, 0.30, 0.35) belong to the frozen-component pipeline (ROR §1-§15), which is
+  historical only - do not use.
+
+PRODUCTION MODEL - the reported system of record is the DEEP SEED-ENSEMBLE: the ensemble
+  score is the mean over 5 training seeds {42,1,2,3,4} (variance reduction; GAE + gamma
+  are deterministic, the LSTM was the sole seed-variance source). See build_seed_ensemble.py
+  (seed-tag 99). This module builds the per-seed ensemble; seed-averaging happens upstream.
+
+NO persistent ensemble cache is ever created (always build fresh from components).
 """
 import os
 import numpy as np
 
-# Decision #19 (RESULTS_OF_RECORD §13.1). Order: (recon/GAE, temporal/LSTM, gamma AEC).
-ENS_WEIGHTS = (0.40, 0.35, 0.25)
+# Decision #26 (RESULTS_OF_RECORD §16). Order: (recon/GAE, temporal/LSTM, gamma AEC).
+# Equal weights; tuple matches the exact strings used for the locked §16 run.
+ENS_WEIGHTS = (0.3334, 0.3333, 0.3333)
 COMPONENT_KEYS = ("zrecon", "ztemp", "zgamma")   # on-disk file prefixes
 
 

@@ -1,0 +1,11 @@
+subject,seizure_idx,fname,onset_s,offset_s,dominant_ch,note
+chb06,0,chb06_01.edf,1724,1738,"","DIFFUSE: saturated high-amplitude background, brief (14s), broad bilateral ictal pattern, no single channel stands out."
+chb06,1,chb06_01.edf,7461,7476,"","DIFFUSE: near-continuous high-amplitude background, brief (15s), broad, no clear lead channel."
+chb06,2,chb06_01.edf,13525,13540,"","DIFFUSE: saturated background, brief (15s), broad bilateral, no dominant channel."
+chb06,3,chb06_04.edf,327,347,"","DIFFUSE: very active background, broad rhythmic discharge across all channels (20s), no lead."
+chb06,4,chb06_04.edf,6211,6231,"","DIFFUSE: pre-onset high-amplitude burst then broad discharge (20s), no reliable single channel."
+chb06,5,chb06_09.edf,12500,12516,"","DIFFUSE: saturated background, brief (16s), broad, unlocalizable by eye."
+chb06,6,chb06_10.edf,10833,10845,"","DIFFUSE: very brief (12s), broad on saturated background, no dominant channel."
+chb06,7,chb06_13.edf,506,519,"","DIFFUSE: near-continuous high-amplitude activity, brief (13s), no focal lead."
+chb06,8,chb06_18.edf,7799,7811,"","DIFFUSE: busy background, brief (12s), broad bilateral, unlocalizable."
+chb06,9,chb06_24.edf,9387,9403,"","DIFFUSE: least-disorganized of chb06; faint right-temporal (F8-T8) leaning but does not stand out from saturated background - left empty."

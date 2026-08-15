@@ -1,0 +1,5 @@
+operating_point,mag_pen,n_subjects,n_seizures,TP,FN,FP,interictal_hours,sensitivity,sensitivity_CI,precision,precision_CI,f1,fp_per_day,fp_per_day_CI
+balanced - shared (held-out),mag40/pen2,8,76,47,29,482,278.2,0.6184,"[0.506, 0.719]",0.0888,"[0.067, 0.116]",0.1554,41.58,"[37.95, 45.46]"
+balanced - calibrated (per-subject FP-budget),per-subject,8,76,48,28,467,278.2,0.6316,"[0.519, 0.731]",0.0932,"[0.071, 0.121]",0.1624,40.28,"[36.71, 44.11]"
+high-sensitivity - shared (held-out),mag60/pen0.3,8,76,54,22,813,278.2,0.7105,"[0.600, 0.800]",0.0623,"[0.048, 0.080]",0.1145,70.13,"[65.39, 75.12]"
+high-sensitivity - calibrated (per-subject FP-budget),per-subject,8,76,59,17,882,278.2,0.7763,"[0.671, 0.855]",0.0627,"[0.049, 0.080]",0.116,76.08,"[71.14, 81.28]"

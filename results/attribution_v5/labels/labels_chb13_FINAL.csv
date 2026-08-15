@@ -1,0 +1,13 @@
+subject,seizure_idx,fname,onset_s,offset_s,dominant_ch,note
+chb13,0,chb13_19.edf,2077,2121,"","DIFFUSE: broad high-amplitude discharge across whole montage on saturated background, no single channel stands out."
+chb13,1,chb13_21.edf,934,1004,"","DIFFUSE: broad/saturated, bilateral, no dominant channel."
+chb13,2,chb13_40.edf,142,173,"","DIFFUSE: bifrontal generalized rhythmic sharp-wave discharge (FP1-F7/FP1-F3/F3-C3/FP2-F4), no single lead. Possible frontal/eye-artifact contribution."
+chb13,3,chb13_40.edf,530,594,"","DIFFUSE: bifrontal generalized rhythmic discharge, bilateral, no single dominant channel."
+chb13,4,chb13_55.edf,458,478,"","DIFFUSE: very busy/saturated background, broad, unlocalizable."
+chb13,5,chb13_55.edf,2436,2454,"","DIFFUSE: broad rhythmic burst across many channels, no single lead."
+chb13,6,chb13_58.edf,2474,2491,"","DIFFUSE: bifrontal generalized rhythmic sharp waves, bilateral, no single dominant channel."
+chb13,7,chb13_59.edf,3339,3401,"","DIFFUSE: bifrontal-predominant generalized rhythmic discharge, bilateral, no single lead."
+chb13,8,chb13_60.edf,638,660,"","DIFFUSE: bifrontal generalized rhythmic sharp waves, no single dominant channel. Possible frontal/eye-artifact contribution."
+chb13,9,chb13_62.edf,851,916,"","DIFFUSE: bifrontal-predominant generalized rhythmic build-up, bilateral, no single lead."
+chb13,10,chb13_62.edf,1626,1691,"","DIFFUSE: broad/saturated background, unlocalizable by eye."
+chb13,11,chb13_62.edf,2664,2721,"","DIFFUSE: bifrontal generalized rhythmic discharge, bilateral, no single dominant channel."

@@ -1,0 +1,7 @@
+operating_point,mag_pct,pen_mult,seed,sensitivity,fp_per_day
+balanced,65.0,0.5,42,0.6579,45.202
+balanced,65.0,0.5,MEAN,0.6579,45.202
+balanced,65.0,0.5,SD,nan,nan
+high-sensitivity,55.0,0.3,42,0.7763,72.374
+high-sensitivity,55.0,0.3,MEAN,0.7763,72.374
+high-sensitivity,55.0,0.3,SD,nan,nan

@@ -1,0 +1,7 @@
+budget,subject,mag_pct,pen_mult,fp_per_day,sensitivity,A1,A2,A3
+balanced,chb10,50.0,2.0,39.93,0.4286,1,1,1
+balanced,chb11,50.0,2.0,38.88,1.6667,1,1,1
+balanced,chb22,50.0,2.0,39.56,1.0,1,1,1
+high-sensitivity,chb10,55.0,0.5,75.53,0.4286,1,1,1
+high-sensitivity,chb11,55.0,0.5,73.59,1.6667,1,1,1
+high-sensitivity,chb22,55.0,0.3,73.69,1.0,1,1,1

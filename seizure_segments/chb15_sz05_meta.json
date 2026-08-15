@@ -1,0 +1,30 @@
+{
+  "subject": "chb15",
+  "seizure_id": 5,
+  "edf_file": "chb15_20.edf",
+  "sfreq": 256.0,
+  "channels": [
+    "FP1-F7",
+    "F7-T7",
+    "T7-P7",
+    "P7-O1",
+    "FP1-F3",
+    "F3-C3",
+    "C3-P3",
+    "P3-O1",
+    "FP2-F4",
+    "F4-C4",
+    "C4-P4",
+    "P4-O2",
+    "FP2-F8",
+    "F8-T8",
+    "T8-P8",
+    "P8-O2",
+    "FZ-CZ",
+    "CZ-PZ"
+  ],
+  "window_start_s": 597.0,
+  "window_stop_s": 672.0,
+  "onset_s": 607.0,
+  "offset_s": 662.0
+}

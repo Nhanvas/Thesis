@@ -1,0 +1,9 @@
+subject,seizure_idx,fname,onset_s,offset_s,dominant_ch,note
+chb14,0,chb14_03.edf,1986,2000,"","DIFFUSE: broad fast discharge with bilateral posterior spread (left P7-O1 and right T8-P8/P8-O2), no single lead."
+chb14,1,chb14_04.edf,1372,1392,"T7-P7, P7-O1","Fast paroxysmal discharge; left posterior temporal-occipital (T7-P7/P7-O1) leads and darkest, but bilateral posterior spread (broad)."
+chb14,2,chb14_04.edf,2817,2839,"T7-P7, P7-O1","Fast posterior discharge, left posterior temporal-occipital (T7-P7/P7-O1) prominent; bilateral posterior spread (broad)."
+chb14,3,chb14_06.edf,1911,1925,"T7-P7","Brief left posterior temporal (T7-P7) burst leading, then broad spread (broad)."
+chb14,4,chb14_11.edf,1838,1879,"","DIFFUSE: bilateral (left temporal + right posterior temporal) rhythmic discharge, no single dominant channel."
+chb14,5,chb14_17.edf,3239,3259,"","DIFFUSE: busy background, broad bilateral rhythmic discharge, no single lead."
+chb14,6,chb14_18.edf,1039,1061,"","DIFFUSE: multifocal migrating fast bursts (FP2-F8, then T7-P7, then F8-T8/T8-P8), no single stable dominant channel."
+chb14,7,chb14_27.edf,2833,2849,"","DIFFUSE: broad fast discharge, bilateral, no single dominant channel."

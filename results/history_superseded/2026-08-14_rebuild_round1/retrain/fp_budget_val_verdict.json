@@ -1,0 +1,7 @@
+{
+  "overall_PASS": true,
+  "per_budget": {
+    "balanced": true,
+    "high-sensitivity": true
+  }
+}

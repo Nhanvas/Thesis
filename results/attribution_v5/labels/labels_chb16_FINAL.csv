@@ -1,0 +1,11 @@
+subject,seizure_idx,fname,onset_s,offset_s,dominant_ch,note
+chb16,0,chb16_10.edf,2290,2299,"","DIFFUSE: very brief (9s), broad burst on busy artifact-heavy background, no single lead."
+chb16,1,chb16_11.edf,1120,1129,"","DIFFUSE: brief (9s), broad frontal/posterior burst, no single dominant channel."
+chb16,2,chb16_14.edf,1854,1868,"F8-T8, T8-P8","Focal right temporal: dense high-frequency burst clearly standing out at F8-T8/T8-P8 (~1859-1862s)."
+chb16,3,chb16_16.edf,1214,1220,"","DIFFUSE: very brief (6s), broad burst, no single lead."
+chb16,4,chb16_17.edf,227,236,"","DIFFUSE: brief (9s), broad rhythmic burst across many channels, no single dominant channel."
+chb16,5,chb16_17.edf,1694,1700,"","DIFFUSE: very brief (6s), broad right-ish burst but no single clear lead, artifact-laden."
+chb16,6,chb16_17.edf,2162,2170,"","DIFFUSE: brief (8s), broad burst on busy background, no single dominant channel."
+chb16,7,chb16_17.edf,3290,3298,"","DIFFUSE: brief (8s), broad frontal-right burst, no single stable lead."
+chb16,8,chb16_18.edf,627,635,"","DIFFUSE: brief (8s), broad right-frontal burst but no single clear dominant channel."
+chb16,9,chb16_18.edf,1909,1916,"","DIFFUSE: very brief (7s), broad burst, right-ish but unlocalizable, artifact-heavy."

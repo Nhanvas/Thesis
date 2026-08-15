@@ -1,0 +1,17 @@
+budget,subject,mag_pct,pen_mult,fp_per_day,tp,n_seizures,sensitivity
+balanced,chb03,70.0,0.3,42.45,7,7,1.0
+balanced,chb06,70.0,0.3,36.71,1,10,0.1
+balanced,chb13,65.0,0.3,41.66,10,12,0.8333
+balanced,chb14,80.0,1.0,38.84,0,8,0.0
+balanced,chb15,70.0,0.5,37.73,18,20,0.9
+balanced,chb16,50.0,1.0,39.22,3,10,0.3
+balanced,chb17,65.0,0.5,40.15,2,3,0.6667
+balanced,chb18,75.0,0.5,37.82,5,6,0.8333
+high-sensitivity,chb03,40.0,0.5,72.86,7,7,1.0
+high-sensitivity,chb06,40.0,0.3,68.03,4,10,0.4
+high-sensitivity,chb13,40.0,0.5,70.16,10,12,0.8333
+high-sensitivity,chb14,60.0,1.0,75.84,2,8,0.25
+high-sensitivity,chb15,55.0,0.3,76.67,19,20,0.95
+high-sensitivity,chb16,50.0,0.3,70.85,9,10,0.9
+high-sensitivity,chb17,40.0,0.5,75.72,3,3,1.0
+high-sensitivity,chb18,60.0,0.3,76.31,5,6,0.8333

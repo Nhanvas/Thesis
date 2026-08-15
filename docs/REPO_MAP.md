@@ -14,9 +14,10 @@
 | `docs/ATTRIBUTION_SPEC.md` | Định nghĩa attribution (per-node recon-z, MAP@K) |
 | `results/retrain_v3p1/` | **BASELINE grids + OP** (`final_eval_seed42.csv`, `fp_budget_locked.csv`, `fp_budget_val_verdict.json`, `ens/`, `val_ens/`, `dec19/` = A0) |
 | `results/attribution_v5/labels/` | Attribution HIỆN HÀNH (`labels_*_FINAL.csv`, `rank_per_seizure.csv`) — nhãn AI-draft, chờ cô freeze |
-| `data/models_retrain/` | Checkpoint v3.1 canonical: `gae_joint_seed42.pt` + `lstm_temporal_seed{42,1,2,3,4}.pt` |
+| `data/models_retrain/` | Checkpoint v3.1 canonical: `gae_joint_seed42.pt` (1 GAE — seed42 dùng chung) + `lstm_temporal_seed{42,1,2,3,4}.pt` (5 seed LSTM). **COMMIT VÀO GIT** (nhỏ, KB) để không mất như trước. |
 | `data/models/best_model_joint_lambda01.pt` | GAE joint gốc (17.1KB, có x_decoder) |
-| `data/processed/`, `data/splits/` | Input processed + split cố định (seed 42) |
+| `data/processed/` | Graphs/features (phẳng, per-subject). **Canonical:** `{subj}_{split}_adjs_topk20.npy` + `{subj}_{split}_features.npy`. Biến thể `_multiband_topk20` / `_spli_topk20` / base `_adjs` = trung gian/thí nghiệm cũ (gitignored 32.9GB). |
+| `data/splits/` | Split cố định (seed 42) |
 | `src/` (flat) | Code active — chạy `python src/<name>.py` từ root (flat-import) |
 | `src/retrain/` | Chuỗi v3.1: `gae_joint · lstm_temporal · train_lstm_temporal_v3 · build_ens · build_seed_ensemble · score_ens · fp_budget_operating_point · derive_weights · retrain_io · aggregate_final` |
 | `src/dataprep/` | `preprocessing · graph_construction · feature_extraction · compute_gamma_aec · create_splits` |
@@ -69,3 +70,4 @@
 ## F. VIỆC CÒN NGỎ (không gấp)
 - `src/repro_lock_v3p1.py` (chưa có): viết sau — assert equal-weight + reproduce §0 (0.632/0.776) từ 5 `.pt`, để giữ claim "reproducible from clean clone" cho baseline mới.
 - Cân nhắc gitignore `seizure_segments/*_raw.npy` + `results/attribution_v5/labels/*.png` nếu repo nặng.
+- (Vệ sinh đĩa, không gấp) gom graph-variant cũ (`_multiband_*`, `_spli_*`, base `_adjs`) trong `data/processed/` vào `data/processed/_superseded_graphs/` — chỉ khi chắc pipeline chỉ đọc `_adjs_topk20`.

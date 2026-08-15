@@ -157,7 +157,7 @@ nhiều cột phức tạp) thì đổi sang `reportlab`, đổi trong `export_s
 
 | Reuse từ `src/` (không đụng vào) | Mới phải viết |
 |---|---|
-| `edf_index.py` ✅ đã verify | `config.py`, `db.py`, tất cả `routers/*.py` |
+| `edf_index.py` ✅ đã verify 23/23 subject, 0 FAIL/WARN (`smoke_test_edf_index.py`) | `config.py`, `db.py`, tất cả `routers/*.py` |
 | `evaluation_protocol.py` (parser summary) | `cpd_service.py`, `edf_reader.py`, `attribution_service.py`, `subject_resolver.py`, `review_repo.py`, `export_service.py` |
 | `ensemble_recipe.py` + `cpd_pipeline_v14.py` — dùng **1 lần** trong `scripts/build_timeline_json.py`, không dùng lúc request | `scripts/build_timeline_json.py` |
 | `attribution_gae_pernode.py` — công thức z-score tham chiếu cho `attribution_service.py` | Toàn bộ `demo/frontend/` |

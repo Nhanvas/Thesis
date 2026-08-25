@@ -64,3 +64,43 @@ def ensemble_for_subject(comp_dir, subj, weights=ENS_WEIGHTS):
     zi = load_components(comp_dir, subj, "inter")
     zc = load_components(comp_dir, subj, "ictal")
     return build_ensemble(*zi, weights=weights), build_ensemble(*zc, weights=weights)
+
+
+# ============================================================================
+# TIER-2 (Phase B) — ADDITIVE. Does NOT touch build_ensemble / ENS_WEIGHTS /
+# COMPONENT_KEYS above (the LOCKED §0 recon+temp+gamma path stays bit-exact).
+# Adds a first-class latent-Mahalanobis component and an N-branch equal-weight
+# ensemble so candidate subsets {recon,latent,temp,gamma} can be scored by the
+# SAME event harness (score_ens -> cpd_pipeline_v14 -> szcore_eval).
+# ============================================================================
+LATENT_KEY = "zlatent"
+# All robust-z component prefixes known to Tier-2 (order is display-only).
+COMPONENT_KEYS_EXT = ("zrecon", "zlatent", "ztemp", "zgamma")
+
+# Pre-registered candidate subsets (PREREG_TIER2 §2). Headline is fixed BEFORE TEST.
+CANDIDATES = {
+    "baseline_rtg": ("zrecon", "ztemp", "zgamma"),            # reproduces §0 ensemble (G2 baseline)
+    "rltg":         ("zrecon", "zlatent", "ztemp", "zgamma"), # PRIMARY headline (dual-readout)
+    "ltg":          ("zlatent", "ztemp", "zgamma"),           # SECONDARY (lean)
+    "rlg":          ("zrecon", "zlatent", "zgamma"),          # PRIMARY (temporal-free, Amendment A1)
+    "rg":           ("zrecon", "zgamma"),                     # latent-lift baseline (G2′)
+    "lg":           ("zlatent", "zgamma"),                    # lean secondary (temporal-free)
+}
+
+
+def build_ensemble_subset(comp_split, subset, weights=None):
+    """Equal-weight (default) sum of the named robust-z arrays for ONE split.
+    comp_split : dict {key -> 1D np.ndarray} for a single split (inter OR ictal).
+    subset     : tuple of keys, e.g. ('zrecon','zlatent','ztemp','zgamma').
+    Mirrors build_ensemble's defensive length-trunc + no post-hoc renorm (CPD is
+    scale-adaptive). With subset=('zrecon','ztemp','zgamma') and equal weights it
+    reproduces build_ensemble bit-for-bit."""
+    arrs = [np.asarray(comp_split[k], dtype=np.float64) for k in subset]
+    n = min(len(a) for a in arrs)
+    if weights is None:
+        weights = [1.0 / len(subset)] * len(subset)
+    assert len(weights) == len(subset), "weights/subset length mismatch"
+    out = np.zeros(n, dtype=np.float64)
+    for w, a in zip(weights, arrs):
+        out += w * a[:n]
+    return out

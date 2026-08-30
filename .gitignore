@@ -1,36 +1,35 @@
+# ===== Python env / caches =====
 venv/
 __pycache__/
 *.pyc
 *.pyo
-.ipynb_checkpoints/
 *.egg-info/
+.ipynb_checkpoints/
+
+# ===== Archives / model zips (Kaggle downloads) =====
 *.zip
 *.tar.gz
-# throwaway session tools (không thuộc bản ghi thesis)
-thesis_prov_scan.py
-thesis_prov_verify.py
-thesis_file_purpose.py
-thesis_model_probe.py
-b4_cleanup.py
-b5_reorg.py
-audit_inventory.*
-
-# --- data: chỉ commit artifact nhỏ authoritative; graph 34GB nằm ngoài git ---
-data/processed/*.npy
-data/processed/*.json
-data/processed/temporal_zscores/
 data/*.gz
 data/*.zip
-results/loss_curves.npz
+data/models_retrain/_archive/
 
-# superseded binaries (A-only checkpoints, old ens cache, rejected topology)
-archive/scaffolding/checkpoints/
+# ===== Processed data arrays (~30GB raw/graphs/features; regen from raw or Kaggle) =====
+#   Small authoritative artifacts stay TRACKED: data/models_retrain/*.pt, data/pernode/, data/splits/
+data/processed/*.npy
+data/processed/*.json
+data/processed/_superseded_graphs/
+
+# ===== Attribution head-map images (regenerable, large) =====
+results/**/labels/*.png
+figures/
+
+# ===== Audit scratch (local tooling + inventories) =====
+_project_audit/
+
+# ===== Superseded caches (out of repo) =====
+results/loss_curves.npz
 results/best_model.pt
 results/history_superseded/oldweight_ens_scores/
 results/history_topology/
 topo_features/
-
-b7_final_tidy.py
-results_scan.py
-dump_src.py
-fp_filter_step1_diagnose.py
+archive/scaffolding/checkpoints/

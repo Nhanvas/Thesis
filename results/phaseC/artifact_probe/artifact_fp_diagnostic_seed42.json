@@ -1,0 +1,53 @@
+{
+  "per_subject": {
+    "chb10": {
+      "aurocs": {
+        "hf_ratio": 0.745,
+        "line60": 0.511,
+        "delta_ratio": 0.525,
+        "var_mean": 0.664,
+        "max_abs": 0.706,
+        "grad_max": 0.796,
+        "flat_min": 0.658,
+        "chan_disp": 0.641
+      },
+      "best_metric": "grad_max",
+      "best_auroc": 0.796,
+      "n": 28526,
+      "n_fp_prone": 2853
+    },
+    "chb11": {
+      "aurocs": {
+        "hf_ratio": 0.677,
+        "line60": 0.586,
+        "delta_ratio": 0.513,
+        "var_mean": 0.653,
+        "max_abs": 0.742,
+        "grad_max": 0.796,
+        "flat_min": 0.73,
+        "chan_disp": 0.606
+      },
+      "best_metric": "grad_max",
+      "best_auroc": 0.796,
+      "n": 14231,
+      "n_fp_prone": 1424
+    },
+    "chb22": {
+      "aurocs": {
+        "hf_ratio": 0.71,
+        "line60": 0.602,
+        "delta_ratio": 0.603,
+        "var_mean": 0.598,
+        "max_abs": 0.699,
+        "grad_max": 0.782,
+        "flat_min": 0.739,
+        "chan_disp": 0.541
+      },
+      "best_metric": "grad_max",
+      "best_auroc": 0.782,
+      "n": 11476,
+      "n_fp_prone": 1148
+    }
+  },
+  "verdict": "BUILD artifact gate \u2014 FPs ARE artifact-associated (high confidence)"
+}

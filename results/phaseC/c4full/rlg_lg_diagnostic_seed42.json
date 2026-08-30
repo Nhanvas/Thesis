@@ -1,0 +1,24 @@
+{
+  "per_subject": {
+    "chb10": {
+      "latent": 0.8156,
+      "gamma": 0.8219,
+      "lg": 0.9309
+    },
+    "chb11": {
+      "latent": 0.641,
+      "gamma": 0.9307,
+      "lg": 0.9248
+    },
+    "chb22": {
+      "latent": 0.7361,
+      "gamma": 0.9653,
+      "lg": 0.9602
+    }
+  },
+  "rlg_lg_macro": 0.9386,
+  "c4full_lg": 0.926,
+  "rlg_full": 0.928,
+  "fidelity_ok": true,
+  "story": "rlg-lg > C4-full-lg by 0.013 -> plain latent+gamma already beats the directed variant; directed relation is net-negative at 2-branch. Clean negative."
+}

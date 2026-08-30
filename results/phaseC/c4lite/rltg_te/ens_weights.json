@@ -1,0 +1,10 @@
+{
+  "subset": [
+    "zrecon",
+    "zlatent",
+    "zgamma",
+    "zTE"
+  ],
+  "weights": "equal",
+  "built_as": "0.75*rlg + 0.25*zTE (identity)"
+}

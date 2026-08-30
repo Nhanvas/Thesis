@@ -1,0 +1,3 @@
+candidate,cell_B40,sens_B40,prec_B40,f1_B40,fpday_B40,f1_B75,fpday_B75,G2
+rlg,m50/p2.0,0.933,0.068,0.126,40.1,0.071,76.1,
+rltg_te,m40/p2.0,0.933,0.07,0.13,38.9,0.073,73.8,PASS

@@ -23,6 +23,9 @@
 | `src/dataprep/` | `preprocessing · graph_construction · feature_extraction · compute_gamma_aec · create_splits` |
 | `src/` (đã gom từ root) | `attribution_gae_pernode · attribution_detail · compare_labels_pernode · validate_dominant_hitk_FINAL · label_eeg_pilot · dump_components` |
 | `seizure_segments/`, `topo_features/` | Raw + ảnh cho attribution labeling (cân nhắc gitignore nếu repo phình) |
+| `src/phaseB/` | Tier-2: build_ens_tier2 · ensemble_recipe(CANDIDATES) · g2_val_gate · tier2_oneshot_compare · tier2_final_report · per_subject_op_check. Pipeline chốt = **rlg (recon+latent+gamma)**. |
+| `src/phaseC/` | Phase C: connectivity_probe · align_check(2). Front-end R&D (directed connectivity TE). |
+| `results/phaseB/tier2/` | rlg CHỐT: ens_test_tf/{rlg,lg}+components · {rlg,lg}_test grids · ONESHOT_rlg_vs_s0.csv · FINAL_report.csv · G2prime_val.csv |
 
 **Chuỗi inference cho web demo (đầu→cuối):**
 `src/dataprep/{preprocessing→graph_construction→feature_extraction→compute_gamma_aec}` → `src/retrain/gae_joint` (encode Z) → `src/retrain/lstm_temporal` (temporal) → gamma → `src/ensemble_recipe.build_ensemble` (equal 1/3) → `src/cpd_pipeline_v14` (PELT) → `src/retrain/fp_budget_operating_point` (OP label-free).
@@ -33,6 +36,7 @@
 
 `src/ensemble_recipe.py` → `ENS_WEIGHTS = (0.3334, 0.3333, 0.3333)` (equal). Khớp `ens_weights.json` trong mọi folder `retrain_v3p1/*`. **Đừng đổi về `1/3` chính xác** (sẽ buộc build lại). Weight cũ `(0.40,0.35,0.25)` = retired (test-tuned §13).
 
+docs/RESULTS_OF_RECORD_phaseB.md = rlg locked; docs/PHASE_C_HANDOFF.md = Phase C plan.
 ---
 
 ## C. ARCHIVE — KHÔNG cite (đã dời, còn trong git history)

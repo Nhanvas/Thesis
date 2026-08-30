@@ -1,0 +1,8 @@
+{
+  "subset": [
+    "zrecon",
+    "zlatent",
+    "zgamma"
+  ],
+  "weights": "equal"
+}

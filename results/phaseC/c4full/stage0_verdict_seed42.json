@@ -1,0 +1,72 @@
+{
+  "ckpt": "data/models_retrain/gae_multirel_seed42.pt",
+  "per_subject": {
+    "chb10": {
+      "recon_mr": 0.2998,
+      "latent_mr": 0.7568,
+      "latent_delta": 0.046,
+      "r2_only": 0.3752,
+      "r2_null": 0.4998,
+      "r2_margin": -0.1246,
+      "ens": 0.8061,
+      "n_inter": 28526,
+      "n_ictal": 117,
+      "latent_noR2": 0.7165,
+      "latent_dAUROC_R2": 0.0403
+    },
+    "chb11": {
+      "recon_mr": 0.6411,
+      "latent_mr": 0.6931,
+      "latent_delta": 0.0391,
+      "r2_only": 0.4808,
+      "r2_null": 0.4998,
+      "r2_margin": -0.0191,
+      "ens": 0.9447,
+      "n_inter": 14231,
+      "n_ictal": 204,
+      "latent_noR2": 0.7416,
+      "latent_dAUROC_R2": -0.0485
+    },
+    "chb22": {
+      "recon_mr": 0.3761,
+      "latent_mr": 0.8729,
+      "latent_delta": 0.0452,
+      "r2_only": 0.2879,
+      "r2_null": 0.5004,
+      "r2_margin": -0.2125,
+      "ens": 0.9761,
+      "n_inter": 11476,
+      "n_ictal": 55,
+      "latent_noR2": 0.7468,
+      "latent_dAUROC_R2": 0.1261
+    }
+  },
+  "macro_ensemble": 0.909,
+  "macro_latent": 0.7743,
+  "fidelity": {
+    "chb10": {
+      "zTE_auroc": 0.7098,
+      "null": 0.4999
+    },
+    "chb11": {
+      "zTE_auroc": 0.674,
+      "null": 0.4958
+    },
+    "chb22": {
+      "zTE_auroc": 0.8879,
+      "null": 0.5084
+    }
+  },
+  "checks": {
+    "1_ensemble>=0.928": false,
+    "2_latent_chb22>0.736": true,
+    "3_no_harm_chb10": false,
+    "3_no_harm_chb11": true,
+    "4a_fidelity_chb22_in_band": false,
+    "4b_R2_margin_chb22>=0.10": false,
+    "4b_R2_null_in_band": true,
+    "4b_chb22_is_maxR2": false,
+    "4c_no_collapse_chb22": true
+  },
+  "go": false
+}

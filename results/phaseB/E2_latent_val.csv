@@ -1,0 +1,5 @@
+subject,recon_auroc,latent_auroc,latent_auprc,n_inter,n_ictal
+chb10,0.2680,0.8156,0.1097,28526,117
+chb11,0.8517,0.6410,0.0254,14231,204
+chb22,0.6563,0.7361,0.0426,11476,55
+MACRO,0.5920,0.7309,0.0592,,

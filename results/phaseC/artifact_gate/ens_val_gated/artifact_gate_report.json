@@ -1,0 +1,30 @@
+{
+  "pctl": 95.0,
+  "per_subject": {
+    "chb10": {
+      "n_inter": 28526,
+      "flag_inter_pct": 5.0,
+      "n_ictal": 117,
+      "flag_ictal_pct": 77.78,
+      "thr": 2.0408,
+      "fill": 0.2038
+    },
+    "chb11": {
+      "n_inter": 14231,
+      "flag_inter_pct": 5.0,
+      "n_ictal": 204,
+      "flag_ictal_pct": 87.75,
+      "thr": 2.6977,
+      "fill": 0.2572
+    },
+    "chb22": {
+      "n_inter": 11476,
+      "flag_inter_pct": 5.0,
+      "n_ictal": 55,
+      "flag_ictal_pct": 90.91,
+      "thr": 2.6285,
+      "fill": 0.1616
+    }
+  },
+  "macro_ictal_flag_pct": 85.48
+}

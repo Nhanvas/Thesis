@@ -1,0 +1,4 @@
+candidate,cell_B40,sens_B40,prec_B40,f1_B40,fpday_B40,f1_B75,fpday_B75,G2
+rlg_ma15,m50/p2.0,0.933,0.068,0.126,40.1,0.071,76.1,
+rlg_median15,m75/p0.5,0.867,0.063,0.118,39.9,0.071,76.1,FAIL
+rlg_median9,m80/p0.5,0.933,0.07,0.13,38.9,0.072,74.5,PASS

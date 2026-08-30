@@ -1,0 +1,23 @@
+{
+  "per_subject": {
+    "chb10": {
+      "latent": 0.7568,
+      "gamma": 0.8219,
+      "lg": 0.8774
+    },
+    "chb11": {
+      "latent": 0.6931,
+      "gamma": 0.9307,
+      "lg": 0.9258
+    },
+    "chb22": {
+      "latent": 0.8729,
+      "gamma": 0.9653,
+      "lg": 0.9747
+    }
+  },
+  "macro_lg": 0.926,
+  "rlg_full": 0.928,
+  "c4full_3branch": 0.909,
+  "go": false
+}

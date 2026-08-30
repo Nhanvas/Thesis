@@ -37,7 +37,18 @@ for _p in (_here, _os.path.dirname(_here)):
 
 import argparse
 import json
+import os as _os, sys as _sys
 from pathlib import Path
+
+# build_ens_tier2 runs on Kaggle (all .py cp'd flat to /kaggle/working) OR locally
+# from src/phaseB (modules scattered in sibling src/ subdirs). Add both so imports
+# resolve either way.
+_here = _os.path.dirname(_os.path.abspath(__file__))
+_src = _os.path.dirname(_here)
+for _p in (_here, _src, _os.path.join(_src, "retrain"), _os.path.join(_src, "dataprep"),
+           _os.path.join(_src, "phaseB")):
+    if _os.path.isdir(_p) and _p not in _sys.path:
+        _sys.path.insert(0, _p)
 
 import numpy as np
 
@@ -46,6 +57,37 @@ import ensemble_recipe as ER
 
 VAL = ["chb10", "chb11", "chb22"]
 TEST = {"chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"}
+
+
+def rlg_components(gae, subj, adj_dir, feat_dir, gamma_dir, suffix, device):
+    """recon + gamma robust-z components WITHOUT lstm/ztemp — identical computation to
+    the zrecon/zgamma branches of retrain_io.build_subject_components. For GAE-only
+    (new-seed) rlg builds where no LSTM checkpoint exists."""
+    import gae_joint as G
+    import glob as _glob
+    ai = Path(adj_dir) / f"{subj}_interictal_adjs{suffix}.npy"
+    ac = Path(adj_dir) / f"{subj}_ictal_adjs{suffix}.npy"
+    fi = Path(feat_dir) / f"{subj}_interictal_features.npy"
+    fc = Path(feat_dir) / f"{subj}_ictal_features.npy"
+    rri = G.score_windows(gae, ai, fi, device); rrc = G.score_windows(gae, ac, fc, device)
+    zri, zrc = IO.robust_z(rri, rrc)
+
+    # gamma: require 'gamma' in the filename. IO.load_gamma globs *{subj}* which, when
+    # gamma files share a dir with raw windows (local data/processed), can grab
+    # {subj}_interictal.npy [N,18,1024] instead of gamma_aec_{subj}_inter.npy. This
+    # stricter glob is byte-identical to IO.load_gamma on a clean gamma dir (Kaggle).
+    def _gamma(split):
+        want_inter = (split == "inter")
+        for c in sorted(_glob.glob(f"{gamma_dir}/*gamma*{subj}*.npy")):
+            b = _os.path.basename(c).lower()
+            is_inter = "inter" in b
+            is_ictal = ("ictal" in b) and not is_inter
+            if (want_inter and is_inter) or ((not want_inter) and is_ictal):
+                return np.load(c).astype(np.float32)
+        raise FileNotFoundError(f"gamma {subj}/{split} (with 'gamma' in name) not in {gamma_dir}")
+    gi, gc = _gamma("inter"), _gamma("ictal")
+    zgi, zgc = IO.robust_z(gi, gc)
+    return {"zrecon": (zri, zrc), "zgamma": (zgi, zgc)}
 
 
 def latent_component(gae, subj, adj_dir, feat_dir, suffix, device):
@@ -128,7 +170,6 @@ def main():
 
     import torch
     import gae_joint as G
-    import lstm_temporal as T
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     sd = a.seed
 
@@ -137,24 +178,40 @@ def main():
     gamma_dir = IO.find_gamma_dir(a.input_root)
     ckpt_root = a.ckpt_root or a.input_root
     gae_ck = IO.find_ckpts(ckpt_root, "gae_joint_seed")
-    lstm_ck = IO.find_ckpts(ckpt_root, "lstm_temporal_seed")
     print(f"ckpt_root={ckpt_root}")
     print(f"device={dev} seed={sd} subjects={subjs}")
-
-    gae = G.GAEModel().to(dev)
-    gsd = IO.load_state(gae_ck[sd]); gae.load_state_dict(gsd.get("state_dict", gsd), strict=True); gae.eval()
-    lstm = T.LSTMPredictor(in_dim=18 * 16).to(dev)
-    lsd = IO.load_state(lstm_ck[sd]); lstm.load_state_dict(lsd.get("state_dict", lsd), strict=True); lstm.eval()
 
     active = [t.strip() for t in a.only.split(",")] if a.only else list(ER.CANDIDATES)
     bad = [t for t in active if t not in ER.CANDIDATES]
     if bad: raise SystemExit(f"unknown --only tags {bad}; valid={list(ER.CANDIDATES)}")
     need_latent = any("zlatent" in ER.CANDIDATES[t] for t in active)
+    need_temp = any("ztemp" in ER.CANDIDATES[t] for t in active)
+
+    gae = G.GAEModel().to(dev)
+    gsd = IO.load_state(gae_ck[sd]); gae.load_state_dict(gsd.get("state_dict", gsd), strict=True); gae.eval()
+
+    # LSTM is only needed for temporal candidates. rlg (recon+latent+gamma) is
+    # temporal-free, so a GAE-only new seed (no lstm_temporal_seed{S}.pt) can still
+    # build rlg. Only DISCOVER + load LSTM when a temporal candidate is active —
+    # find_ckpts raises if none exist, so calling it unconditionally would crash
+    # a legitimate rlg-only build on a GAE-only ckpt_root.
+    lstm = None
+    if need_temp:
+        lstm_ck = IO.find_ckpts(ckpt_root, "lstm_temporal_seed")
+        if sd not in lstm_ck:
+            raise SystemExit(f"temporal candidate active but no lstm_temporal_seed{sd} ckpt; "
+                             f"rlg-only build does not need it (drop ztemp candidates).")
+        import lstm_temporal as T
+        lstm = T.LSTMPredictor(in_dim=18 * 16).to(dev)
+        lsd = IO.load_state(lstm_ck[sd]); lstm.load_state_dict(lsd.get("state_dict", lsd), strict=True); lstm.eval()
     print(f"building candidates: {active}  (latent computed: {need_latent})")
     out = Path(a.out_dir)
     wa_all = {tag: {} for tag in active}
     for subj in subjs:
-        comp = IO.build_subject_components(gae, lstm, subj, adj_dir, feat_dir, gamma_dir, a.suffix, dev)
+        if lstm is None:
+            comp = rlg_components(gae, subj, adj_dir, feat_dir, gamma_dir, a.suffix, dev)
+        else:
+            comp = IO.build_subject_components(gae, lstm, subj, adj_dir, feat_dir, gamma_dir, a.suffix, dev)
         if need_latent:
             zli, zlc = latent_component(gae, subj, adj_dir, feat_dir, a.suffix, dev)
             comp["zlatent"] = (zli, zlc)

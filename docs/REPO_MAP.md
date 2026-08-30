@@ -1,77 +1,81 @@
-# REPO_MAP — hiện trạng repo sau lock baseline v3.1 (nguồn DUY NHẤT: folder nào có gì)
+# REPO_MAP -- F:/Study/Thesis/Code (post-cleanup 2026-08-30)
 
-**Cập nhật:** 2026-08-15 · sau reorg (archive pre-rebuild + round-1 + early-attribution + retired repro-lock).
-**Nhãn:** `CANONICAL` (đang dùng/cite) · `ARCHIVE` (`results/history_superseded/` hoặc `archive/`, không cite) · `EXTERNAL` (ngoài repo, script cần).
+SINGLE SOURCE OF TRUTH for "which folder holds what".
+On any number conflict, docs/RESULTS_OF_RECORD_phaseB.md WINS over this file and memory.
 
----
+STATUS: Phase C CLOSED. Final thesis pipeline = rlg (recon + latent-Mahalanobis + gamma, equal 1/3, temporal-free).
+Phase D = Future Work (docs/PHASE_D_HANDOFF.md). Restore point: git tag phase-c-final.
 
-## A. CANONICAL — dùng/cite cái này
+## A. LOCKED PIPELINE (rlg) -- canonical inference chain
+raw windows -> graphs (wPLI+AEC top-k20) -> Joint GAE (seed42)
+ -> 3 readouts [zrecon, zlatent, zgamma] -> equal 1/3 ensemble
+ -> PELT (cpd_pipeline_v14) -> label-free FP-budget OP -> SzCORE (timescoring)
 
-| Path | Vai trò |
-|---|---|
-| `docs/REBUILD_BASELINE_LOCK.md` | **Số + method + rationale rebuild — đọc trước tiên** |
-| `docs/RESULTS_OF_RECORD.md` §0 | Baseline-of-record (report §0; §1–§16 = history) |
-| `docs/ATTRIBUTION_SPEC.md` | Định nghĩa attribution (per-node recon-z, MAP@K) |
-| `results/retrain_v3p1/` | **BASELINE grids + OP** (`final_eval_seed42.csv`, `fp_budget_locked.csv`, `fp_budget_val_verdict.json`, `ens/`, `val_ens/`, `dec19/` = A0) |
-| `results/attribution_v5/labels/` | Attribution HIỆN HÀNH (`labels_*_FINAL.csv`, `rank_per_seizure.csv`) — nhãn AI-draft, chờ cô freeze |
-| `data/models_retrain/` | Checkpoint v3.1 canonical: `gae_joint_seed42.pt` (1 GAE — seed42 dùng chung) + `lstm_temporal_seed{42,1,2,3,4}.pt` (5 seed LSTM). **COMMIT VÀO GIT** (nhỏ, KB) để không mất như trước. |
-| `data/models/best_model_joint_lambda01.pt` | GAE joint gốc (17.1KB, có x_decoder) |
-| `data/processed/` | Graphs/features (phẳng, per-subject). **Canonical:** `{subj}_{split}_adjs_topk20.npy` + `{subj}_{split}_features.npy`. Biến thể `_multiband_topk20` / `_spli_topk20` / base `_adjs` = trung gian/thí nghiệm cũ (gitignored 32.9GB). |
-| `data/splits/` | Split cố định (seed 42) |
-| `src/` (flat) | Code active — chạy `python src/<name>.py` từ root (flat-import) |
-| `src/retrain/` | Chuỗi v3.1: `gae_joint · lstm_temporal · train_lstm_temporal_v3 · build_ens · build_seed_ensemble · score_ens · fp_budget_operating_point · derive_weights · retrain_io · aggregate_final` |
-| `src/dataprep/` | `preprocessing · graph_construction · feature_extraction · compute_gamma_aec · create_splits` |
-| `src/` (đã gom từ root) | `attribution_gae_pernode · attribution_detail · compare_labels_pernode · validate_dominant_hitk_FINAL · label_eeg_pilot · dump_components` |
-| `seizure_segments/`, `topo_features/` | Raw + ảnh cho attribution labeling (cân nhắc gitignore nếu repo phình) |
-| `src/phaseB/` | Tier-2: build_ens_tier2 · ensemble_recipe(CANDIDATES) · g2_val_gate · tier2_oneshot_compare · tier2_final_report · per_subject_op_check. Pipeline chốt = **rlg (recon+latent+gamma)**. |
-| `src/phaseC/` | Phase C: connectivity_probe · align_check(2). Front-end R&D (directed connectivity TE). |
-| `results/phaseB/tier2/` | rlg CHỐT: ens_test_tf/{rlg,lg}+components · {rlg,lg}_test grids · ONESHOT_rlg_vs_s0.csv · FINAL_report.csv · G2prime_val.csv |
+Code (run `python src/<...>.py` from repo root; flat imports):
+  dataprep : src/dataprep/{preprocessing,graph_construction,feature_extraction,compute_gamma_aec,create_splits}.py
+  GAE      : src/retrain/{gae_joint,train_gae_joint,retrain_io}.py
+  readouts : src/phaseB/latent_anomaly.py (zlatent) ; gamma via dataprep/compute_gamma_aec
+  ensemble : src/ensemble_recipe.py (ENS_WEIGHTS equal 1/3; CANDIDATES) ; src/phaseB/build_ens_tier2.py
+  CPD      : src/cpd_pipeline_v14.py
+  OP       : src/retrain/fp_budget_operating_point.py
+  scoring  : src/retrain/score_ens.py ; src/szcore_eval.py ; src/evaluation_protocol.py ; src/stat_validation.py
+  VAL-gate : src/phaseB/g2_val_gate.py ; src/phaseB/tier2_oneshot_compare.py
 
-**Chuỗi inference cho web demo (đầu→cuối):**
-`src/dataprep/{preprocessing→graph_construction→feature_extraction→compute_gamma_aec}` → `src/retrain/gae_joint` (encode Z) → `src/retrain/lstm_temporal` (temporal) → gamma → `src/ensemble_recipe.build_ensemble` (equal 1/3) → `src/cpd_pipeline_v14` (PELT) → `src/retrain/fp_budget_operating_point` (OP label-free).
+Models (TRACKED, small):
+  data/models_retrain/gae_joint_seed42.pt        = canonical GAE (rlg)
+  data/models_retrain/gae_joint_seed{1,2,3}.pt   = seed-robustness (window AUROC 0.929 +/- 0.002)
+  data/models_retrain/gae_multirel_seed42.pt     = Phase C C4-full (negative; provenance)
+  data/models/best_model_joint_lambda01.pt       = original joint GAE
+  data/models_retrain/_archive/                  = superseded zips/dirs + dropped LSTM (gitignored)
 
----
+## B. LOCKED NUMBERS -> docs/RESULTS_OF_RECORD_phaseB.md (sections 0-9)
+  rlg VAL-derived balanced : F1 0.213 @ 27.4 FP/day
+  rlg Pareto peak          : F1 0.426 @ 4.9 FP/day
+  window macro AUROC       : 0.805
+  WARN: do NOT cite 0.750/0.829 (pre-rebuild, unreproducible -> docs/archive/RESULTS_OF_RECORD.md)
+  WARN: RUBRIC_TRACKING.md still holds old numbers -> fix during report.
 
-## B. ENSEMBLE WEIGHT (single-source) — đã khớp baseline
+## C. data/ (mostly gitignored; regen from raw or Kaggle)
+  processed/ canonical inputs (gitignored, on disk/Kaggle):
+    {subj}_{interictal,ictal}.npy (raw z) ; _adjs_topk20.npy ; _features.npy ;
+    gamma_aec_{subj}_{inter,ictal}.npy ; {subj}_stats.json   [8 TEST + 3 VAL + 12 TRAIN]
+  pernode/ TRACKED = attribution per-node arrays (8 TEST)
+  splits/  TRACKED = split_main.json (LOCKED seed42)
 
-`src/ensemble_recipe.py` → `ENS_WEIGHTS = (0.3334, 0.3333, 0.3333)` (equal). Khớp `ens_weights.json` trong mọi folder `retrain_v3p1/*`. **Đừng đổi về `1/3` chính xác** (sẽ buộc build lại). Weight cũ `(0.40,0.35,0.25)` = retired (test-tuned §13).
+## D. results/
+  phaseB/tier2/       = rlg CANONICAL: ens_{val,test}_tf/rlg/*.npy + grids + ONESHOT + FINAL_report
+  phaseB/             = E1_ablation_val, E2_latent_val, S2_S3_negatives
+  retrain_v3p1/       = baseline grids/OP (final_eval_seed42, fp_budget_locked, t1_*, report_metrics)
+  phaseC/             = Phase C negatives (c4lite, c4full, c1, c_onset, artifact_gate, reencode)
+  attribution_v6/     = current attribution (labels_*.csv ; *.png gitignored) ; v5 = prior
+  history_superseded/ = ARCHIVE, do NOT cite (pre_rebuild_detection, rebuild_round1, ...)
 
-docs/RESULTS_OF_RECORD_phaseB.md = rlg locked; docs/PHASE_C_HANDOFF.md = Phase C plan.
----
+## E. docs/
+  CANONICAL (top): RESULTS_OF_RECORD_phaseB, REPO_MAP, PHASE_C_FINAL_HANDOFF, PHASE_C_CLOSEOUT_provenance,
+    PHASE_D_HANDOFF, REBUILD_BASELINE_LOCK, ATTRIBUTION_SPEC, Spatial_Localization..., TIEU_CHI_LABEL_v2,
+    Proposed_solution_updated_v5, RUBRIC_TRACKING, PLAN_AND_STATUS, PROVENANCE_MAP
+  prereg/ = PREREG_01..09 + C0 + TIER2 (+ amendment_A1)
+  demo/   = WEB_DEMO_SPEC_v4 (WINS on demo) + design/migration/context + THESIS_REPORT_WRITING_GUIDE
+  archive/ = superseded handoffs/plans -- do NOT cite
 
-## C. ARCHIVE — KHÔNG cite (đã dời, còn trong git history)
+## F. src/ namespaces
+  core (flat): ensemble_recipe, cpd_pipeline_v14, szcore_eval, evaluation_protocol, stat_validation, edf_index
+  dataprep/, retrain/ = pipeline (see A)
+  phaseB/ = Tier-2 rlg (latent_anomaly, build_ens_tier2, g2_val_gate, ...)
+  phaseC/ = Phase C R&D (connectivity_probe, build_te_branch, gae_joint_multirel, ...) -- mostly negative, provenance
+  attribution: attribution_gae_pernode, attribution_headmap, attribution_tpfp, compare_labels_pernode,
+    validate_dominant_hitk_FINAL, visualize_*
+  figures: fig5_eight_subjects, fig_A_three_scores, fig_B_raw_eeg_pelt, plot_event_level
+  experimental/one-off (NOT in rlg path): mag_pen_grid_sweep_v2, weight_*_sweep, duration_stratified_sensitivity,
+    event_ablation, window_*, rebuild_ensemble_new_weight, diagnose_fp_mechanism, eval_multiseed
+  archive/diagnostics/ = prior-chat diagnostic scripts (t1/t3/t4/...)
 
-| Path | Là gì |
-|---|---|
-| `results/history_superseded/2026-08-14_rebuild_round1/` | `retrain/` (round-1 znorm-bug) + `retrain_normfix/` (40ep) + `attrib_w403525/` (seed42 @ w403525, round-1 era) |
-| `results/history_superseded/pre_rebuild_detection/` | `cpd/ · phaseB/ · phaseB_newweight/ · phaseA_appendix/ · figures/ · logs/ · locked/` — nguồn §1–§14 (số 0.750/0.829 đã đưa cô) |
-| `results/history_superseded/pre_rebuild_detection/attribution_v3/` + `attribution/` | Attribution khung CŨ (Gini/eigencentrality, consistency/lateralization) — thay bởi `attribution_v5` |
-| `data/processed/_superseded_components_retrain_round1/` | Components round-1 (08-13, không phải v3.1) |
-| `results/history_superseded/{2026-07-25, oldweight_ens_scores}/` | Cache old-weight, grid cũ (đã có sẵn từ trước) |
-| `results/history_topology/` | Topology extension đã bác (A.5) |
-| `archive/` | Code superseded: `scaffolding/`, `rejected/`, `cpd_history/`, `probes_old/`, `attribution_superseded/`, **`fp_reduction_prior/`** (Decision #24 bác), **`orphan_best_model_20260509.pt`**, **`thesis_repro_lock.py`** (reproduce số RETIRED; đã hỏng do assert weight cũ) |
+## G. EXTERNAL (outside repo, NOT tracked)
+  F:/Study/Thesis/Dataset/CHB-MIT/           = EDF + "CHB info/summary/chb*-summary.txt" (score_ens --summary_dir)
+  F:/Study/Thesis/{Papers,Reports,Web demo,Agent,Threshold}/ = papers/PDFs, thesis reports, SzScan frontend,
+                                               Claude-project doc store, threshold side-analysis
+  Kaggle (nhn2mm, norncreades)               = graphs/features/gamma/checkpoints for GPU
 
----
-
-## D. EXTERNAL DEPENDENCIES (ngoài repo — clone máy mới cần)
-
-| Path / nguồn | Dùng cho |
-|---|---|
-| `F:/Study/Thesis/Dataset/CHB-MIT/CHB info/summary/` (`chb*-summary.txt`) | `score_ens.py --summary_dir`, `szcore_eval` dựng timeline seizure |
-| CHB-MIT EDF gốc (PhysioNet) | preprocessing từ EDF (chỉ khi chạy lại từ đầu) |
-| Kaggle datasets (`nhn2mm`, `norncreades/thesis-code-fix`): graph/feature `_topk20`, gamma, GAE+LSTM `.pt` | build_ens / train trên Kaggle GPU |
-| Graphs 32.9GB | **gitignored** — không trong repo |
-
----
-
-## E. TÊN TRÙNG — quy tắc (trùng TÊN ≠ trùng NỘI DUNG)
-
-- `final_eval_seed42.csv`: `retrain_v3p1/` (baseline) ≠ `retrain_v3p1/dec19/` (A0, weight cũ) ≠ `retrain_v3p1/val/` (VAL) — **3 bản khác nội dung, giữ cả 3**. Bản trong `history_superseded/` = archive.
-- Các CSV pre-rebuild trùng tên khác (`locked_phaseA_event_results`, `szcore_event_level_*`, `eval_*`, `event_ablation_*`) → đã dồn vào `history_superseded/`. Không còn bản active nào.
-
----
-
-## F. VIỆC CÒN NGỎ (không gấp)
-- `src/repro_lock_v3p1.py` (chưa có): viết sau — assert equal-weight + reproduce §0 (0.632/0.776) từ 5 `.pt`, để giữ claim "reproducible from clean clone" cho baseline mới.
-- Cân nhắc gitignore `seizure_segments/*_raw.npy` + `results/attribution_v5/labels/*.png` nếu repo nặng.
-- (Vệ sinh đĩa, không gấp) gom graph-variant cũ (`_multiband_*`, `_spli_*`, base `_adjs`) trong `data/processed/` vào `data/processed/_superseded_graphs/` — chỉ khi chắc pipeline chỉ đọc `_adjs_topk20`.
+## H. TAGS
+  pre-cleanup   = safety snapshot before 2026-08-30 cleanup
+  phase-c-final = LOCKED rlg thesis pipeline (restore point)

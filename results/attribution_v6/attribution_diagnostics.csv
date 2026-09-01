@@ -1,0 +1,9 @@
+subject,n_seizures,distinct_top1,max_share,null_p95,verdict
+chb03,7,5,0.429,0.429,ok
+chb06,10,7,0.3,0.3,ok
+chb13,12,6,0.417,0.333,CONCENTRATED
+chb14,8,5,0.25,0.375,ok
+chb15,20,9,0.5,0.25,CONCENTRATED
+chb16,10,4,0.5,0.3,CONCENTRATED
+chb17,3,3,0.333,0.667,ok
+chb18,6,5,0.333,0.5,ok

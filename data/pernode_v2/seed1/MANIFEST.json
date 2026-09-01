@@ -1,0 +1,269 @@
+{
+  "checkpoint": "data\\models_retrain\\gae_joint_seed1.pt",
+  "checkpoint_sha256": "6ffb9f5aa505178ded410caf82243a427d867173de4e6f999ad539dd7cbc0e45",
+  "bias_fingerprint": 1.37045,
+  "seed": 1,
+  "device": "cpu",
+  "self_check_max_abs_err": 3.725290298461914e-09,
+  "batch_size": 256,
+  "created_utc": "2026-09-01T09:36:40Z",
+  "test_subjects": [
+    "chb03",
+    "chb06",
+    "chb13",
+    "chb14",
+    "chb15",
+    "chb16",
+    "chb17",
+    "chb18"
+  ],
+  "val_subjects_tau_only": [
+    "chb10",
+    "chb11",
+    "chb22"
+  ],
+  "arrays": {
+    "chb03_interictal": {
+      "file": "chb03_interictal_pernode.npy",
+      "shape": [
+        17204,
+        18
+      ],
+      "mean": 0.017469236627221107,
+      "median": 0.014416517689824104,
+      "p99": 0.06850235164165497,
+      "sec": 5.0
+    },
+    "chb03_ictal": {
+      "file": "chb03_ictal_pernode.npy",
+      "shape": [
+        106,
+        18
+      ],
+      "mean": 0.022868603467941284,
+      "median": 0.01776481233537197,
+      "p99": 0.09073280543088913,
+      "sec": 0.0
+    },
+    "chb06_interictal": {
+      "file": "chb06_interictal_pernode.npy",
+      "shape": [
+        19826,
+        18
+      ],
+      "mean": 0.025200992822647095,
+      "median": 0.021613627672195435,
+      "p99": 0.09180518239736557,
+      "sec": 5.7
+    },
+    "chb06_ictal": {
+      "file": "chb06_ictal_pernode.npy",
+      "shape": [
+        45,
+        18
+      ],
+      "mean": 0.02120121382176876,
+      "median": 0.01515562366694212,
+      "p99": 0.10472186654806137,
+      "sec": 0.0
+    },
+    "chb13_interictal": {
+      "file": "chb13_interictal_pernode.npy",
+      "shape": [
+        12452,
+        18
+      ],
+      "mean": 0.01724320463836193,
+      "median": 0.015466710552573204,
+      "p99": 0.0545138455927372,
+      "sec": 3.8
+    },
+    "chb13_ictal": {
+      "file": "chb13_ictal_pernode.npy",
+      "shape": [
+        144,
+        18
+      ],
+      "mean": 0.024931972846388817,
+      "median": 0.022163614630699158,
+      "p99": 0.08322300761938095,
+      "sec": 0.0
+    },
+    "chb14_interictal": {
+      "file": "chb14_interictal_pernode.npy",
+      "shape": [
+        13983,
+        18
+      ],
+      "mean": 0.026513000950217247,
+      "median": 0.024318251758813858,
+      "p99": 0.08115784078836441,
+      "sec": 4.8
+    },
+    "chb14_ictal": {
+      "file": "chb14_ictal_pernode.npy",
+      "shape": [
+        49,
+        18
+      ],
+      "mean": 0.03173944726586342,
+      "median": 0.02694186568260193,
+      "p99": 0.1173691600561142,
+      "sec": 0.0
+    },
+    "chb15_interictal": {
+      "file": "chb15_interictal_pernode.npy",
+      "shape": [
+        17026,
+        18
+      ],
+      "mean": 0.013189787976443768,
+      "median": 0.011333230882883072,
+      "p99": 0.04547533392906189,
+      "sec": 6.0
+    },
+    "chb15_ictal": {
+      "file": "chb15_ictal_pernode.npy",
+      "shape": [
+        515,
+        18
+      ],
+      "mean": 0.019113369286060333,
+      "median": 0.016060758382081985,
+      "p99": 0.07385233789682388,
+      "sec": 0.2
+    },
+    "chb16_interictal": {
+      "file": "chb16_interictal_pernode.npy",
+      "shape": [
+        6428,
+        18
+      ],
+      "mean": 0.016948608681559563,
+      "median": 0.013528315350413322,
+      "p99": 0.07372841984033585,
+      "sec": 2.5
+    },
+    "chb16_ictal": {
+      "file": "chb16_ictal_pernode.npy",
+      "shape": [
+        28,
+        18
+      ],
+      "mean": 0.025252947583794594,
+      "median": 0.015661612153053284,
+      "p99": 0.10737835615873337,
+      "sec": 0.0
+    },
+    "chb17_interictal": {
+      "file": "chb17_interictal_pernode.npy",
+      "shape": [
+        9304,
+        18
+      ],
+      "mean": 0.034350913017988205,
+      "median": 0.01730222813785076,
+      "p99": 0.324291467666626,
+      "sec": 3.6
+    },
+    "chb17_ictal": {
+      "file": "chb17_ictal_pernode.npy",
+      "shape": [
+        74,
+        18
+      ],
+      "mean": 0.022122789174318314,
+      "median": 0.020003631711006165,
+      "p99": 0.06650270521640778,
+      "sec": 0.0
+    },
+    "chb18_interictal": {
+      "file": "chb18_interictal_pernode.npy",
+      "shape": [
+        14853,
+        18
+      ],
+      "mean": 0.015465229749679565,
+      "median": 0.012949449010193348,
+      "p99": 0.05689597874879837,
+      "sec": 5.0
+    },
+    "chb18_ictal": {
+      "file": "chb18_ictal_pernode.npy",
+      "shape": [
+        83,
+        18
+      ],
+      "mean": 0.02443571947515011,
+      "median": 0.021766038611531258,
+      "p99": 0.07645081728696823,
+      "sec": 0.0
+    },
+    "chb10_interictal": {
+      "file": "chb10_interictal_pernode.npy",
+      "shape": [
+        28526,
+        18
+      ],
+      "mean": 0.029540037736296654,
+      "median": 0.027789702638983727,
+      "p99": 0.08449602872133255,
+      "sec": 8.8
+    },
+    "chb10_ictal": {
+      "file": "chb10_ictal_pernode.npy",
+      "shape": [
+        117,
+        18
+      ],
+      "mean": 0.024829626083374023,
+      "median": 0.021190740168094635,
+      "p99": 0.09327445179224014,
+      "sec": 0.1
+    },
+    "chb11_interictal": {
+      "file": "chb11_interictal_pernode.npy",
+      "shape": [
+        14231,
+        18
+      ],
+      "mean": 0.014823759905993938,
+      "median": 0.012249840423464775,
+      "p99": 0.05492374673485756,
+      "sec": 4.2
+    },
+    "chb11_ictal": {
+      "file": "chb11_ictal_pernode.npy",
+      "shape": [
+        204,
+        18
+      ],
+      "mean": 0.02369842678308487,
+      "median": 0.02042173221707344,
+      "p99": 0.08004269748926163,
+      "sec": 0.1
+    },
+    "chb22_interictal": {
+      "file": "chb22_interictal_pernode.npy",
+      "shape": [
+        11476,
+        18
+      ],
+      "mean": 0.016997408121824265,
+      "median": 0.013997456058859825,
+      "p99": 0.06176042929291725,
+      "sec": 3.8
+    },
+    "chb22_ictal": {
+      "file": "chb22_ictal_pernode.npy",
+      "shape": [
+        55,
+        18
+      ],
+      "mean": 0.021069077774882317,
+      "median": 0.01762532815337181,
+      "p99": 0.07670532912015915,
+      "sec": 0.1
+    }
+  }
+}

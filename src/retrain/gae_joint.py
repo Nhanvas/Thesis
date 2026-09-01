@@ -4,7 +4,7 @@ gae_joint.py — Reconstructed joint-GAE model class + verified scoring.
 PURPOSE (PHA 1, code artifact #1): reconstruct the joint-GAE architecture as a clean,
 importable module and PROVE it is byte-compatible with the retained checkpoint
 `best_model_joint_lambda01.pt` BEFORE any training code is written. If this module loads
-the checkpoint with strict=True and reproduces the chb13 sanity AUROC (~0.836), the class
+the checkpoint with strict=True and reproduces the chb13 sanity AUROC, the class
 is correct and the only remaining unknown is the training loop.
 
 Architecture + scoring are VERIFIED against thesis-cpd-final.ipynb (cells 2/4/5/7) and the
@@ -29,7 +29,14 @@ from torch_geometric.utils import dense_to_sparse
 INPUT_DIM, HIDDEN_DIM, LATENT_DIM = 23, 64, 16
 N_CH, N_BANDS = 18, 5
 LAMBDA = 0.1                      # joint loss: MSE(A_raw, Â) + LAMBDA * MSE(Xn, X̂)
-BIAS_FINGERPRINT = 0.8676        # encoder.conv1.bias.abs().max() of the trained checkpoint
+# -- Checkpoint identity fingerprints -----------------------------------------
+# encoder.conv1.bias.abs().max() IDENTIFIES which checkpoint is loaded. Verified 2026-09-01
+# against results/phaseB/tier2/ens_test_tf/components/zrecon_* -- see docs/PROVENANCE.md.
+BIAS_FP_CANONICAL     = 1.1597   # data/models_retrain/gae_joint_seed42.pt  <- pipeline of record
+BIAS_FP_S0            = 0.8676   # archive/pre_rebuild_s0/...lambda01.pt    <- PRE-REBUILD, DO NOT USE
+CHB13_AUROC_CANONICAL = 0.8319
+CHB13_AUROC_S0        = 0.8360
+BIAS_FINGERPRINT      = BIAS_FP_CANONICAL   # backward compat
 
 
 # ============================================================================
@@ -138,7 +145,10 @@ def validate(adj_dir, feat_dir, model_path, suffix, device, batch_size):
     print("strict load: OK (all keys/shapes match reconstructed class)")
 
     bmax = model.encoder.conv1.bias.abs().max().item()
-    print(f"bias fingerprint = {bmax:.4f}  (expect ~{BIAS_FINGERPRINT})")
+    tag = ("CANONICAL" if abs(bmax - BIAS_FP_CANONICAL) < 0.01
+           else "PRE-REBUILD S0 -- DO NOT USE" if abs(bmax - BIAS_FP_S0) < 0.01
+           else "UNKNOWN CHECKPOINT")
+    print(f"bias fingerprint = {bmax:.4f}  -> {tag}")
     assert bmax > 0.005, "random-init detected — wrong checkpoint"
 
     adj_dir, feat_dir = Path(adj_dir), Path(feat_dir)
@@ -148,7 +158,8 @@ def validate(adj_dir, feat_dir, model_path, suffix, device, batch_size):
                        feat_dir / "chb13_ictal_features.npy", device, batch_size)
     y = np.concatenate([np.zeros(len(si)), np.ones(len(sc))])
     auc = roc_auc_score(y, np.concatenate([si, sc]))
-    print(f"chb13 recon AUROC = {auc:.4f}  (expect ~0.836)")
+    print(f"chb13 recon AUROC = {auc:.4f}  "
+          f"(canonical {CHB13_AUROC_CANONICAL}; S0 model gives {CHB13_AUROC_S0})")
 
     # per-node self-consistency (cell-8 check)
     pn = score_windows(model, adj_dir / f"chb13_interictal_adjs{suffix}.npy",
@@ -166,7 +177,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--adj_dir", default="/kaggle/input/datasets/nhn2mm/chbmit-topk20")
     ap.add_argument("--feat_dir", default="/kaggle/input/datasets/nhn2mm/chbmit-processed")
-    ap.add_argument("--model", default="/kaggle/input/datasets/nhn2mm/gae-joint-model/best_model_joint_lambda01.pt")
+    ap.add_argument("--model", required=True,
+                    help="path to the checkpoint; the S0 default was removed 2026-09-01 "
+                         "(it pointed at the pre-rebuild model). See docs/PROVENANCE.md.")
     ap.add_argument("--suffix", default="_topk20")
     ap.add_argument("--batch_size", type=int, default=512)
     ap.add_argument("--validate", action="store_true")

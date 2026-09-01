@@ -1,0 +1,49 @@
+{
+  "checkpoint": "data\\models_retrain\\gae_joint_seed42.pt",
+  "checkpoint_sha256": "dea06cb533df1c7d0520ae21c4cbb1b8a938297f937366bc9915b040726ea108",
+  "bias_fingerprint": 1.159699,
+  "seed": 42,
+  "device": "cpu",
+  "self_check_max_abs_err": 5.587935447692871e-09,
+  "batch_size": 256,
+  "created_utc": "2026-09-01T08:38:20Z",
+  "test_subjects": [
+    "chb03",
+    "chb06",
+    "chb13",
+    "chb14",
+    "chb15",
+    "chb16",
+    "chb17",
+    "chb18"
+  ],
+  "val_subjects_tau_only": [
+    "chb10",
+    "chb11",
+    "chb22"
+  ],
+  "arrays": {
+    "chb13_interictal": {
+      "file": "chb13_interictal_pernode.npy",
+      "shape": [
+        12452,
+        18
+      ],
+      "mean": 0.017463134601712227,
+      "median": 0.015774350613355637,
+      "p99": 0.054574545472860336,
+      "sec": 4.8
+    },
+    "chb13_ictal": {
+      "file": "chb13_ictal_pernode.npy",
+      "shape": [
+        144,
+        18
+      ],
+      "mean": 0.024985045194625854,
+      "median": 0.022373579442501068,
+      "p99": 0.08233463019132614,
+      "sec": 0.1
+    }
+  }
+}

@@ -102,6 +102,19 @@ ensemble was rebuilt per seed. **rlg is highly seed-stable:**
   `results/phaseB/tier2/ens_val_tf/rlg/ens_seed{1,2,3}_*.npy`. Caveat: seed42 ens built on Kaggle GPU;
   seeds 1/2/3 re-encoded locally on CPU (float noise max|Δ|≈8.6e-5 vs GPU, corr = 1.000000 — faithful).
 
+> **ERRATA (2026-09-01, machine-verified).** Ô "chb13 recon AUROC" của **seed 42** trong bảng trên
+> (0.836) là giá trị của joint model **§0 tiền-rebuild**, không phải của checkpoint canonical.
+> Đo lại từ `data/models_retrain/gae_joint_seed42.pt` trên input canonical: **0.8319**.
+> Checkpoint này được xác minh là checkpoint của one-shot TEST bằng đối chiếu trực tiếp với
+> `results/phaseB/tier2/ens_test_tf/components/zrecon_*`: Pearson **corr = 1.0000000 trên 16/16**
+> mảng (`src/verify_provenance.py`, sha256 `dea06cb5…`). Model §0 chỉ đạt 0.987–0.999 trên cùng
+> phép thử và đã bị cách ly vào `archive/pre_rebuild_s0/`.
+> Hàng đo lại: **0.8319 / 0.8349 / 0.8326 / 0.8339 → 0.833 ± 0.001**.
+> **Kết luận §7 KHÔNG đổi:** cả 4 seed vượt Gate R-GAE G1 (≥ 0.78), cụm vẫn chặt, noise floor
+> event-level (≈0.034 F1) không liên quan tới ô này.
+> **§1–§6 KHÔNG bị ảnh hưởng** — chúng tái tạo chính xác (corr = 1.0000000) từ checkpoint canonical.
+> Chi tiết: `docs/PROVENANCE.md`.
+
 ## 8 · Phase-C optimization round — negatives (added 2026-08)
 Phase C sought to Pareto-improve rlg by upgrading the front-end representation. Four levers were
 VAL-gated; **none earned the one-shot TEST — rlg stands.** These are reported as negative contributions.
@@ -151,3 +164,4 @@ Pre-condition diagnostic (label-free): rlg's FP-prone interictal windows ARE art
 ### 9.4 Unifying conclusion
 
 rlg is the performance ceiling for this dataset/split. Every lever — directed connectivity (C4-lite decision, C4-full representation), temporal smoothing (C1), plateau/slope gating, ensemble reweighting (measured), and artifact gating — net-washes at the event headline. The mechanism is understood: (a) window/representation gains die at the CPD-transfer (PELT keys on sustained level shifts, not rank separation); (b) per-subject rescue levers net-wash (each hard subject fails on a different mechanism); (c) the representation-limited ceiling subjects (chb06/chb14, oracle F1 ≤ 0.09) sit in the locked TEST set and cannot be addressed without label leakage. The negative is convergent across four layers and pre-registered throughout.
+

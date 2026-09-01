@@ -25,7 +25,10 @@ Models (TRACKED, small):
   data/models_retrain/gae_joint_seed42.pt        = canonical GAE (rlg)
   data/models_retrain/gae_joint_seed{1,2,3}.pt   = seed-robustness (window AUROC 0.929 +/- 0.002)
   data/models_retrain/gae_multirel_seed42.pt     = Phase C C4-full (negative; provenance)
-  data/models/best_model_joint_lambda01.pt       = original joint GAE
+    archive/pre_rebuild_s0/                       = QUARANTINED §0 pre-rebuild artifacts, DO NOT USE
+    best_model_joint_lambda01.pt                = §0 joint GAE (corr 0.99 w/ canonical — a trap)
+    pernode/                                    = per-node dumps from the §0 model
+  docs/PROVENANCE.md                            = machine-verified checkpoint identity (session gate)
   data/models_retrain/_archive/                  = superseded zips/dirs + dropped LSTM (gitignored)
 
 ## B. LOCKED NUMBERS -> docs/RESULTS_OF_RECORD_phaseB.md (sections 0-9)

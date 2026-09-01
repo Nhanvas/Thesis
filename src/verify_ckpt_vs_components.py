@@ -18,8 +18,7 @@ from gae_joint import load_checkpoint, score_windows
 PROC = ROOT / "data" / "processed"
 COMP = ROOT / "results" / "phaseB" / "tier2" / "ens_test_tf" / "components"
 SUBJ = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
-CANDS = [ROOT / "data" / "models" / "best_model_joint_lambda01.pt",
-         ROOT / "data" / "models_retrain" / "gae_joint_seed42.pt"]
+CANDS = [ROOT / "data" / "models_retrain" / "gae_joint_seed42.pt"]
 dev = torch.device("cpu")
 
 found = sorted(COMP.glob("zrecon_*"))

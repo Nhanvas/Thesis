@@ -299,3 +299,38 @@ focal vs generalized (localization vs diffuse-correct) · per-subject (chb06 tá
 
 **DELETE:** không xóa cứng gì (rule "archive, don't delete"). Mọi thứ cũ → `archive/` kèm banner
 provenance.
+
+## 11. AMENDMENT A2 (2026-09-01) — pre-registered BEFORE any number was seen
+
+Lý do: rlg là pipeline-of-record (RoR §1); mọi kết quả attribution phải truy vết được về
+checkpoint canonical, và các dump cũ không có manifest provenance.
+
+- **D1 — Regenerate, không tin dump cũ.** Mọi `*_pernode.npy` phát sinh trước amendment này
+  bị coi là provenance-unknown. Per-node recon error được dump lại bằng
+  `src/dump_pernode_recon.py` từ `data/models_retrain/gae_joint_seed42.pt`
+  (`gae_joint.score_windows(per_node=True)`), kèm manifest SHA-256. Dump legacy đã được xác minh
+  (2026-09-01) là sinh từ joint model §0 tiền-rebuild, nay cách ly ở `archive/pre_rebuild_s0/pernode/`
+  — KHÔNG dùng, kể cả để đối chiếu số. Checkpoint canonical: `docs/PROVENANCE.md`.
+- **D2 — Label source.** Kết quả chạy với nhãn AI-draft mang banner PROVISIONAL; số chính
+  thức chỉ phát sinh sau khi cô freeze `ictal_channels_FINAL.csv` (§3.2). Nhãn AI-draft
+  không được tái tạo từ trí nhớ/transcript — phải là file trên đĩa có provenance.
+- **D3 — Scope cơn (sửa §1).** PRIMARY = **toàn bộ 76 cơn TEST**, không điều kiện theo kết quả
+  CPD (attribution là XAI của nhánh GAE, độc lập detector → tránh selection bias).
+  SECONDARY = phân tầng detected vs missed. Điều này thay câu "mỗi cơn detector bắt đúng" ở §1.
+- **D4 — Multi-seed.** Macro-AUROC/AUPRC báo cho seed 42 (primary) và seed {1,2,3} (robustness),
+  theo tiền lệ RoR §7. SD qua seed là noise floor của attribution.
+- **Scope subject:** 8 TEST (chấm) + 3 VAL chb10/11/22 (CHỈ để chốt τ theo §4.2, không chấm).
+- Falsification: macro-AUROC không vượt phân phối permutation-null (§4.4, p ≥ 0.05) ⇒ báo
+  attribution là negative result, không reframe.
+
+- **D5 — min_windows (chốt trước khi thấy bất kỳ AUROC nào).** PRIMARY = toàn bộ 76 cơn TEST,
+  **không loại trừ theo số cửa sổ**; p95 trên 2 cửa sổ vẫn xác định được, và loại cơn sau khi thấy
+  số là selection bias. SECONDARY = sensitivity analysis loại 3 cơn có `n_windows < 3`. Báo cả hai.
+  Nếu chênh lệch > 1 SD-seed thì báo cáo phải nêu rõ kết luận phụ thuộc cơn ngắn.
+  Phân bố TEST (đo từ `results/attribution_v6/seizure_blocks.csv`): min 2, p25 5, median 12, max 52.
+
+- **Provenance nền (2026-09-01).** Toàn bộ attribution chạy trên
+  `data/models_retrain/gae_joint_seed42.pt`, sha256 `dea06cb5…`, bias fingerprint **1.1597**,
+  chb13 recon AUROC **0.8319**, xác minh corr = 1.0000000 trên 16/16 mảng zrecon đã commit.
+  Row→seizure map: `results/attribution_v6/{seizure_blocks.csv, ictal_row_to_seizure.csv}`,
+  76/76 cơn TEST khớp tuyệt đối. Gate mở phiên: `python src/verify_provenance.py`.

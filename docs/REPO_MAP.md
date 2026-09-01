@@ -1,100 +1,95 @@
-# REPO_MAP — where every file lives (post Phase-C reorg)
-**Replaces the pre-Phase-C version of this file.** If a path below doesn't exist yet in a given
-checkout, it reflects where things *should* go per the locked convention — check `PROJECT_STATUS.md`
-for what's actually been executed vs. pre-registered-but-not-run (Phase D).
+# REPO_MAP -- F:/Study/Thesis/Code (post-cleanup, updated 2026-09-01)
 
----
+SINGLE SOURCE OF TRUTH for "which folder holds what".
+On any number conflict, docs/RESULTS_OF_RECORD_phaseB.md WINS over this file and memory.
 
-## Top-level layout
+STATUS: Phase C CLOSED. Final thesis pipeline = rlg (recon + latent-Mahalanobis + gamma, equal 1/3, temporal-free).
+Phase D = Future Work (docs/PHASE_D_HANDOFF.md). Restore point: git tag phase-c-final.
 
-```
-.
-├── src/                          # ACTIVE code (flat within each subfolder; run as `python src/<name>.py`)
-│   ├── ensemble_recipe.py        #   SINGLE SOURCE: ensemble weight (equal 1/3) + build_ensemble()
-│   ├── cpd_pipeline_v14.py       #   SINGLE SOURCE: detection algorithm (PELT + magnitude filter + optional slope-gate/smoother, both default OFF)
-│   ├── retrain_io.py             #   shared helpers: robust_z, window_auroc, checkpoint/data discovery
-│   ├── gae_joint.py              #   GAE model class (single-relation — the ONE used by rlg)
-│   ├── latent_anomaly.py         #   latent-Mahalanobis readout (THE core of rlg's zlatent branch)
-│   ├── lstm_temporal.py, train_lstm_temporal_v3.py   # LSTM branch — DROPPED from rlg, kept as historical/methodological record (Amendment A1)
-│   ├── build_ens.py, build_seed_ensemble.py, score_ens.py, fp_budget_operating_point.py, derive_weights.py
-│   │                              #   PREREG 01-04 chain: build components → CPD grid → SzCORE scoring → weight/OP derivation
-│   ├── build_ens_tier2.py        #   Tier-2/Phase-C variant of build_ens (supports rlg / rg / lg / rlg-lg subsets)
-│   ├── attribution_gae_pernode.py, attribution_detail.py, compare_labels_pernode.py, label_eeg_pilot.py
-│   │                              #   attribution pipeline (per-node GAE recon-z; MUST point at gae_joint_seed42.pt, not the C4-full multirel checkpoint)
-│   └── dataprep/                 #   preprocessing.py → graph_construction.py → feature_extraction.py → create_splits.py
-│
-├── docs/                         # governance (authoritative)
-│   ├── PROJECT_STATUS.md         #   ★★ READ FIRST — current phase, deadlines, what's active
-│   ├── RESULTS_OF_RECORD_phaseB.md  #   ★★ THE single source of truth for every locked number (§1-§9)
-│   ├── PHASE_C_FULL_AUDIT.md     #   detailed reasoning trail behind every Phase-C verdict (companion to RESULTS §8-9)
-│   ├── PHASE_D_HANDOFF.md        #   Phase-D hypothesis + staged plan + why it was NOT executed
-│   ├── LOCKED_METRICS_REFERENCE.md  #   flat table reference for every locked CSV-level number (grid cells, per-seed, per-subject)
-│   ├── REPO_MAP.md               #   this file
-│   ├── ATTRIBUTION_SPEC.md       #   channel-attribution spec (locked method, PROVISIONAL results)
-│   ├── WEB_DEMO_SPEC_v4.md       #   ★ wins on any web-demo conflict
-│   ├── WEB_DEMO_CONTEXT_BOUNDARY.md  #   which files are "demo" vs "thesis/evaluation" — do not cross-contaminate
-│   ├── WEB_DEMO_DESIGN_SYSTEM.md #   visual design tokens for the demo
-│   ├── THESIS_REPORT_WRITING_GUIDE.md, RUBRIC_TRACKING.md, Report_format.md, Thesis_Registration_Form.md
-│   │                              #   report-writing structure/style + rubric checklist + formal format rules
-│   ├── PREREG_01_GAE_joint_retrain.md, PREREG_02_LSTM_temporal.md, PREREG_03_weights_final.md, PREREG_04_fp_budget_operating_point.md
-│   │                              #   original architecture/weight/OP pre-registrations (still the legal basis for the current design)
-│   ├── PREREG_TIER2_amendment_A1.md   #   the LSTM-drop / latent-readout-promotion decision (rlg's origin)
-│   ├── PHASE_C_FINAL_HANDOFF.md, PHASE_C_CLOSEOUT_provenance.md   #   Phase-C closure documents (paste-in provenance blocks)
-│   ├── S2_S3_negatives.md        #   Phase-B representation-search negative results (precedent for any future architecture change)
-│   ├── Literature_Review_and_Novelty_Assessment...md, Lit_review.txt, Spatial_Localization...md
-│   │                              #   literature review raw material (compress into report shape per writing guide §2)
-│
-├── notebooks/kaggle_gpu/         # GPU training notebooks (GAE, LSTM, C4-full multi-relational GAE)
-├── data/
-│   ├── models_retrain/           #   gae_joint_seed{42,1,2,3}.pt (rlg — CANONICAL), lstm_temporal_seed{42,1,2,3,4}.pt (historical),
-│   │                              #   gae_multirel_seed42.pt (Phase-C C4-full — TESTED, KILLED, do not use downstream)
-│   └── processed/ · splits/      #   components + fixed split (graphs gitignored, 32.9 GB local only)
-├── results/
-│   ├── phaseB/tier2/             #   ★ rlg provenance: ens_val_tf/, ens_test_tf/, {rlg,rg,lg}/ VAL grids, {rlg,lg}_test/ TEST grids
-│   ├── phaseC/                   #   C4-lite (build_te_branch outputs), C4-full (stage0/stage1 verdicts, train logs), artifact-gate, slope-gate seed-check
-│   ├── retrain_v3p1/              #   the rebuild-baseline (§0) grids — historical comparator only
-│   ├── attribution_v6/            #   current attribution execution (ictal-set labels, once frozen)
-│   ├── attribution_v5/            #   superseded attribution (dominant-channel/MAP@K) — archive, don't cite
-│   └── history_superseded/       #   pre-rebuild + round-1 + early-attribution — DO NOT cite
-├── archive/                      # superseded code + rejection records (fp_reduction_prior, S2/S5 GSL code, etc.)
-├── seizure_segments/ · topo_features/   # attribution labeling raw/figures
-└── requirements.txt · requirements-kaggle.txt · README.md
-```
+## A. LOCKED PIPELINE (rlg) -- canonical inference chain
+raw windows -> graphs (wPLI+AEC top-k20) -> Joint GAE (seed42)
+ -> 3 readouts [zrecon, zlatent, zgamma] -> equal 1/3 ensemble
+ -> PELT (cpd_pipeline_v14) -> label-free FP-budget OP -> SzCORE (timescoring)
 
----
+Code (run `python src/<...>.py` from repo root; flat imports):
+  dataprep : src/dataprep/{preprocessing,graph_construction,feature_extraction,compute_gamma_aec,create_splits}.py
+  GAE      : src/retrain/{gae_joint,train_gae_joint,retrain_io}.py
+  readouts : src/phaseB/latent_anomaly.py (zlatent) ; gamma via dataprep/compute_gamma_aec
+  ensemble : src/ensemble_recipe.py (ENS_WEIGHTS equal 1/3; CANDIDATES) ; src/phaseB/build_ens_tier2.py
+  CPD      : src/cpd_pipeline_v14.py
+  OP       : src/retrain/fp_budget_operating_point.py
+  scoring  : src/retrain/score_ens.py ; src/szcore_eval.py ; src/evaluation_protocol.py ; src/stat_validation.py
+  VAL-gate : src/phaseB/g2_val_gate.py ; src/phaseB/tier2_oneshot_compare.py
 
-## Two environments (unchanged discipline)
+Models (TRACKED, small):
+  data/models_retrain/gae_joint_seed42.pt        = canonical GAE (rlg)
+  data/models_retrain/gae_joint_seed{1,2,3}.pt   = seed-robustness (window AUROC 0.929 +/- 0.002)
+  data/models_retrain/gae_multirel_seed42.pt     = Phase C C4-full (negative; provenance)
+  data/models/best_model_joint_lambda01.pt       = original joint GAE
+  data/models_retrain/_archive/                  = superseded zips/dirs + dropped LSTM (gitignored)
 
-| Environment | Installs from | Used for |
-|---|---|---|
-| **CPU (local / Cursor)** | `requirements.txt` | `src/` (PELT detection, SzCORE scoring, stats, attribution scoring, weight/OP derivation, demo backend) |
-| **GPU (Kaggle)** | `requirements-kaggle.txt` | GAE + LSTM + gamma inference + component export; C4-full multi-relational training (Phase C, closed) |
+## B. LOCKED NUMBERS -> docs/RESULTS_OF_RECORD_phaseB.md (sections 0-9)
+  rlg VAL-derived balanced : F1 0.213 @ 27.4 FP/day
+  rlg Pareto peak          : F1 0.426 @ 4.9 FP/day
+  window macro AUROC       : 0.805
+  event headline (Phase C) : F1 0.361 @ 3.6 FP/day
+  GAE seed-stability (VAL) : window macro 0.929 +/- 0.002 ; event F1@3.6 0.51 +/- 0.034 (NOISE FLOORS)
+  WARN: do NOT cite 0.750/0.829/0.791 (pre-rebuild, unreproducible -> docs/archive/RESULTS_OF_RECORD.md)
+  window macro AUROC (TEST) : 0.805 -- VERIFIED 2026-09-01 from
+        results/phaseB/tier2/rlg_test/final_eval_seed42.csv (now recorded in RoR §3)
 
-```bash
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-# run everything from the repo ROOT:
-python src/score_ens.py --ens_dir results/phaseB/tier2/ens_test_tf --seed 42 \
-    --summary_dir "F:/Study/Thesis/Dataset/CHB-MIT/CHB info/summary" --out_dir results/phaseB/tier2
-```
+## C. data/ (mostly gitignored; regen from raw or Kaggle)
+  processed/ canonical inputs (gitignored, on disk/Kaggle):
+    {subj}_{interictal,ictal}.npy (raw z) ; _adjs_topk20.npy ; _features.npy ;
+    gamma_aec_{subj}_{inter,ictal}.npy ; {subj}_stats.json   [8 TEST + 3 VAL + 12 TRAIN]
+  pernode/ TRACKED = attribution per-node arrays (8 TEST)
+  splits/  TRACKED = split_main.json (LOCKED seed42)
 
----
+## D. results/
+  phaseB/tier2/       = rlg CANONICAL: ens_{val,test}_tf/rlg/*.npy + grids + ONESHOT + FINAL_report
+  phaseB/             = E1_ablation_val, E2_latent_val, S2_S3_negatives
+  retrain_v3p1/       = baseline grids/OP (final_eval_seed42, fp_budget_locked, t1_*, report_metrics)
+  phaseC/             = Phase C negatives (c4lite, c4full, c1, c_onset, artifact_gate, reencode)
+  attribution_v6/     = current attribution (labels_*.csv ; *.png gitignored) ; v5 = prior
+  history_superseded/ = ARCHIVE, do NOT cite (pre_rebuild_detection, rebuild_round1, ...)
 
-## Quick-lookup: "I need to..."
+## E. docs/
+  CANONICAL (top-level -- cite these):
+    RESULTS_OF_RECORD_phaseB.md   = ALL locked numbers (WINS over everything, incl. this file)
+    REPO_MAP.md                   = this file (paths)
+    RUBRIC_TRACKING.md            = v3, report scoring checklist (v1 numbers were WRONG -- see its banner)
+    PHASE_C_FINAL_HANDOFF.md      = C4-full closure ; PHASE_C_CLOSEOUT_provenance.md = commit trail
+    PHASE_D_HANDOFF.md            = Phase D = FUTURE WORK, NOT executed (deliberate, time-boxed)
+    ATTRIBUTION_SPEC.md           = v2, channel attribution (single source; supersedes TIEU_CHI_LABEL_v2)
+    PROJECT_STATUS.md             = current status / deadlines / what's next
+    PHASE_C_FULL_AUDIT.md         = narrative reasoning trail behind the Phase-C verdicts
+  prereg/  = PREREG_01..09 (+ C0, TIER2, TIER2_amendment_A1 at top level)
+  demo/    = WEB_DEMO_SPEC_v4.md (WINS on any demo conflict) + design/migration/context
+             + THESIS_REPORT_WRITING_GUIDE.md
+  archive/ = superseded -- DO NOT CITE. Includes RESULTS_OF_RECORD.md (pre-rebuild 0.750/0.829),
+             00-04 handoffs, PHASE_B_*/PHASE_C_HANDOFF, TIER2_*, MASTER_HANDOFF_v2, PROJECT_HANDOFF,
+             NEXT_TASKS_AND_PLAN, PLAN_AND_STATUS, PROVENANCE_MAP, REBUILD_BASELINE_LOCK,
+             Proposed_solution_updated_v5, Spatial_Localization..., TIEU_CHI_LABEL_dominant_channel_v2,
+             WEB_DEMO_SPEC.md (old)
 
-| Task | Read first | Then |
-|---|---|---|
-| Know the current locked numbers | `RESULTS_OF_RECORD_phaseB.md` §1–§9 | `LOCKED_METRICS_REFERENCE.md` for CSV-level detail |
-| Understand why a Phase-C lever was rejected | `RESULTS_OF_RECORD_phaseB.md` §8–9 (verdict) | `PHASE_C_FULL_AUDIT.md` (full reasoning) |
-| Write the report | `THESIS_REPORT_WRITING_GUIDE.md` | `RUBRIC_TRACKING.md` for exact numbers per section |
-| Run/extend attribution | `ATTRIBUTION_SPEC.md` | ensure checkpoint = `gae_joint_seed42.pt`, never `gae_multirel_seed42.pt` |
-| Build/extend the web demo | `WEB_DEMO_SPEC_v4.md` (wins on conflict) | `WEB_DEMO_DESIGN_SYSTEM.md`, `WEB_DEMO_CONTEXT_BOUNDARY.md` |
-| Consider a new optimization idea | `PROJECT_STATUS.md` §6 (what NOT to re-propose) | `PHASE_C_FULL_AUDIT.md` to check it wasn't already tested |
-| Understand why Phase D wasn't run | `PHASE_D_HANDOFF.md` | — |
-| Onboard a new chat from scratch | `PROJECT_STATUS.md` §7 | branches from there by task |
+## F. src/ namespaces
+  core (flat): ensemble_recipe, cpd_pipeline_v14, szcore_eval, evaluation_protocol, stat_validation, edf_index
+  dataprep/, retrain/ = pipeline (see A)
+  phaseB/ = Tier-2 rlg (latent_anomaly, build_ens_tier2, g2_val_gate, ...)
+  phaseC/ = Phase C R&D (connectivity_probe, build_te_branch, gae_joint_multirel, ...) -- mostly negative, provenance
+  attribution: attribution_gae_pernode, attribution_headmap, attribution_tpfp, compare_labels_pernode,
+    validate_dominant_hitk_FINAL, visualize_*
+  figures: fig5_eight_subjects, fig_A_three_scores, fig_B_raw_eeg_pelt, plot_event_level
+  experimental/one-off (NOT in rlg path): mag_pen_grid_sweep_v2, weight_*_sweep, duration_stratified_sensitivity,
+    event_ablation, window_*, rebuild_ensemble_new_weight, diagnose_fp_mechanism, eval_multiseed
+  archive/diagnostics/ = prior-chat diagnostic scripts (t1/t3/t4/...)
 
-**Do not cite:** anything under `results/history_superseded/` or `results/attribution_v5/`; the old
-`RESULTS_OF_RECORD.md` (pre-rebuild, superseded — retired); `REBUILD_BASELINE_LOCK.md` (superseded by
-`RESULTS_OF_RECORD_phaseB.md`); `PROVENANCE_MAP.md`, `PLAN_AND_STATUS.md`, `MASTER_HANDOFF_v2.md`,
-`NEXT_TASKS_AND_PLAN.md` (all retired, replaced by `PROJECT_STATUS.md`).
+## G. EXTERNAL (outside repo, NOT tracked)
+  F:/Study/Thesis/Dataset/CHB-MIT/           = EDF + "CHB info/summary/chb*-summary.txt" (score_ens --summary_dir)
+  F:/Study/Thesis/{Papers,Reports,Web demo,Agent,Threshold}/ = papers/PDFs, thesis reports, SzScan frontend,
+                                               Claude-project doc store, threshold side-analysis
+  Kaggle (nhn2mm, norncreades)               = graphs/features/gamma/checkpoints for GPU
+
+## H. TAGS
+  pre-cleanup   = safety snapshot before 2026-08-30 cleanup
+  phase-c-final = LOCKED rlg thesis pipeline (restore point)

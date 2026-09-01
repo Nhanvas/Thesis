@@ -46,6 +46,19 @@ vs §0 balanced (0.168 @ 38.6): **F1 +27%, precision +33%, FP/day −29%, sensit
 patient-independent SOTA band (F1 0.32–0.43); §0's frontier peaked ~0.351. Frontier is reported as a
 curve (dominance evidence), NOT as a selected operating point.
 
+
+**Window-level macro AUROC (TEST, rlg, seed 42) = 0.805** — verified 2026-09-01 from
+`results/phaseB/tier2/rlg_test/final_eval_seed42.csv` (window_auroc is constant per subject across all
+48 mag/pen cells; macro = unweighted mean over the 8 subjects). VAL macro from the same source = 0.928,
+consistent with §7 seed-42.
+
+| subject | chb03 | chb06 | chb13 | chb14 | chb15 | chb16 | chb17 | chb18 | macro |
+|---|---|---|---|---|---|---|---|---|---|
+| window AUROC | 0.964 | 0.501 | 0.822 | 0.698 | 0.879 | 0.876 | 0.782 | 0.920 | **0.805** |
+
+chb06 (0.501 ~ chance) and chb14 (0.698) are the representation-limited subjects; they cap pooled
+sensitivity and are the reason the window→event transfer cannot be lifted by decision-layer levers.
+
 ## 4 · Claim (precise)
 > Replacing the (unreproducible) temporal branch with a latent-manifold readout on the same GAE yields a
 > fully reproducible unsupervised patient-independent detector that MATCHES the §0 baseline at §0's own

@@ -1,3 +1,13 @@
+# PHASE D — STATUS: **NOT EXECUTED** (deliberate, time-boxed decision — FUTURE WORK)
+
+> Phase D was fully designed and pre-registered but **deliberately not run**: after Phase C closed
+> with converging negatives, the remaining time was allocated to the report (15 Oct), attribution,
+> the SzScan demo, and the defense (2–3 Nov). **rlg stands as the final thesis pipeline.**
+> Restore point: `git checkout phase-c-final`. Everything below is the original design document,
+> kept verbatim as the Future-Work specification and as defense material for "what would you do next?".
+
+---
+
 # PHASE D — MASTER HANDOFF (read this FIRST, in full)
 **Purpose:** start the Phase-D chat clean with the ENTIRE audit in hand — every lever tried,
 every result, every conclusion, my (Claude's) reasoning, and Boti's decisions. Phase D runs

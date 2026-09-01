@@ -107,11 +107,11 @@ Decision-layer, smoothing, and per-channel-feature levers are exhausted **with e
 
 Phase C-final (RESOLVED — negative, see §9). C4-full (multi-relational GAE) was built, trained, and VAL-gated; it did not beat rlg. Phase-C optimization is closed.
 
-9 · Phase-C optimization — CLOSED (added 2026-08)
+## 9 · Phase-C optimization — CLOSED (added 2026-08)
 
 Phase C is closed. Seven independent levers across the decision, representation, ensemble, and signal-quality layers were evaluated (pre-registered, VAL-gated); none Pareto-improved rlg at the event headline (F1 0.361 @ 3.6 FP/day). rlg is the ceiling and stays system-of-record. This is a convergent, evidence-based negative — not an untested closure.
 
-9.1 C4-full — multi-relational GAE (representation layer)
+### 9.1 C4-full — multi-relational GAE (representation layer)
 
 Joint R-GCN-style autoencoder fusing symmetric R1 (wPLI+AEC top-k20) + directed R2 (TE top-k20), NON-SHARED per-relation encoder weights, per-relation decoders (R1 inner-product, R2 asymmetric bilinear), node features identical to rlg. Trained seed42, PREREG_01 recipe, 270,187 interictal windows. No collapse (gate_R2 = ‖grad R2‖/‖grad R1‖ held 1.01–1.03 all 200 epochs — R2 fully used, cf. the S2 residual-gate→0 failure it was designed to detect; converged r2_recon 0.069→0.051). VAL window-macro AUROC (seed42):
 
@@ -127,14 +127,14 @@ Mechanism finding (report-worthy positive): directed connectivity genuinely resc
 
 Self-correction (integrity note): the Stage-0 input-fidelity band [0.78, 0.88] for chb22 zTE was mis-specified too tightly; measured 0.888 (0.83 ± 0.058), which REPRODUCES C0's direction more strongly, not a failure. Recorded so the 4a flag is not misread as an R2-input bug.
 
-9.2 Ensemble reweight / drop-recon (ensemble layer) — DEAD ON RECORD, not re-run
+### 9.2 Ensemble reweight / drop-recon (ensemble layer) — DEAD ON RECORD, not re-run
 
 The window-macro observation (rlg-lg 0.9386 > rlg-full 0.928) suggested dropping recon. But this was already measured at the event tier and rejected: §5 — "lg (latent+gamma, drop recon) underperforms rlg at §0 cells (0.579 balanced) → recon retained" (VAL grids in lg/, TEST grids in lg_test/). And PREREG_03 already found the weight surface flat (24 triples within 0.005 of argmax; equal weights adopted as anti-overfit). Window≠event again: drop-recon helps window-macro, hurts the event headline. Not re-run — the record already answers it.
 
-9.3 Artifact / signal-quality gate (signal layer)
+### 9.3 Artifact / signal-quality gate (signal layer)
 
 Pre-condition diagnostic (label-free): rlg's FP-prone interictal windows ARE artifact-associated (best-AUROC 0.78–0.80 across all 3 VAL subjects; null ~0.51; grad_max = max first-difference dominant → sudden jumps/pops that the ±5-SD amplitude preproc rejection lets through). A per-window grad_max score-suppression gate flagged 85% of ictal windows (seizures share high gradient) → unusable. A duration/isolation gate (suppress only isolated ≤2-window spikes, spare sustained seizures) reduced ictal-flag to 3.5% macro and produced a VAL Pareto win — but only at 5 FP/day, driven entirely by one subject (chb11), with the headline 3.6 FP/day unchanged. A 1-subject/1-budget effect at n=3 is a noise signature (cf. slope-gate); rejected without seed-check (per the hard-limit rule: a win must be at the 3.6 headline, ≥2/3 subjects, ≥3/4 seeds). Signal-quality FP-reduction is thus addressed (partly already in preprocessing) and does not lift the headline.
 
-9.4 Unifying conclusion
+### 9.4 Unifying conclusion
 
 rlg is the performance ceiling for this dataset/split. Every lever — directed connectivity (C4-lite decision, C4-full representation), temporal smoothing (C1), plateau/slope gating, ensemble reweighting (measured), and artifact gating — net-washes at the event headline. The mechanism is understood: (a) window/representation gains die at the CPD-transfer (PELT keys on sustained level shifts, not rank separation); (b) per-subject rescue levers net-wash (each hard subject fails on a different mechanism); (c) the representation-limited ceiling subjects (chb06/chb14, oracle F1 ≤ 0.09) sit in the locked TEST set and cannot be addressed without label leakage. The negative is convergent across four layers and pre-registered throughout.

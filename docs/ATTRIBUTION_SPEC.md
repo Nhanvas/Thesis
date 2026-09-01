@@ -305,12 +305,18 @@ provenance.
 Lý do: rlg là pipeline-of-record (RoR §1); mọi kết quả attribution phải truy vết được về
 checkpoint canonical, và các dump cũ không có manifest provenance.
 
-- **D1 — Regenerate, không tin dump cũ.** Mọi `*_pernode.npy` phát sinh trước amendment này
-  bị coi là provenance-unknown. Per-node recon error được dump lại bằng
-  `src/dump_pernode_recon.py` từ `data/models_retrain/gae_joint_seed42.pt`
-  (`gae_joint.score_windows(per_node=True)`), kèm manifest SHA-256. Dump legacy đã được xác minh
-  (2026-09-01) là sinh từ joint model §0 tiền-rebuild, nay cách ly ở `archive/pre_rebuild_s0/pernode/`
-  — KHÔNG dùng, kể cả để đối chiếu số. Checkpoint canonical: `docs/PROVENANCE.md`.
+- **D6.1 — Amendment sau khi G-S4 FAIL (2026-09-01, ghi trung thực).**
+  D6/G-S4 **FAIL như đã pre-register**: spread(|S|=12) = 0.9548 < spread(|S|=1) = 0.9660, p = 1.00.
+  Chẩn đoán: |S|=12 **không** là mô hình của cơn generalized — 6 kênh còn ở baseline khiến vector s
+  bimodal, entropy *giảm*. Bằng chứng nội tại: ô α=1.0 (không tiêm) cho spread cao nhất bảng (0.978).
+  Sửa **cấu trúc synthetic**, KHÔNG sửa metric và KHÔNG sửa ngưỡng: generalized ≡ |S| = 18 (mọi kênh
+  cùng lên), focal ≡ |S| ∈ {1,2}. Với |S|=18, AUROC không xác định (không có kênh âm) — đúng như §4.5
+  đã nêu: cơn generalized không ép localization, chỉ báo spread.
+  **G-S4′ (pre-register lại):** spread(|S|=18) > spread(|S|=1) tại α=2.0, Mann-Whitney một phía p<0.05.
+  **Nếu G-S4′ cũng FAIL:** kết luận là entropy chuẩn hoá của s **không dùng được** làm thước diffuseness
+  cho pipeline này; nhánh generalized của §4.5 phải thiết kế lại trước khi chấm nhãn thật, và điều đó
+  được báo cáo như một negative result về phương pháp, không phải giấu đi.
+  G-S1/G-S2/G-S3 giữ nguyên trạng thái PASS; chúng độc lập với G-S4.
 - **D2 — Label source.** Kết quả chạy với nhãn AI-draft mang banner PROVISIONAL; số chính
   thức chỉ phát sinh sau khi cô freeze `ictal_channels_FINAL.csv` (§3.2). Nhãn AI-draft
   không được tái tạo từ trí nhớ/transcript — phải là file trên đĩa có provenance.
@@ -334,3 +340,18 @@ checkpoint canonical, và các dump cũ không có manifest provenance.
   chb13 recon AUROC **0.8319**, xác minh corr = 1.0000000 trên 16/16 mảng zrecon đã commit.
   Row→seizure map: `results/attribution_v6/{seizure_blocks.csv, ictal_row_to_seizure.csv}`,
   76/76 cơn TEST khớp tuyệt đối. Gate mở phiên: `python src/verify_provenance.py`.
+
+- **D6 — Synthetic sanity check (§4.6), pre-registered 2026-09-01 trước khi có bất kỳ số nào.**
+  Thiết kế: lấy pseudo-seizure = khối window liên tiếp trong interictal, độ dài rút từ **phân bố
+  n_windows thực của 76 cơn TEST** (`seizure_blocks.csv`). Tiêm anomaly **nhân** `r_i ← α·r_i` vào
+  |S| kênh chọn ngẫu nhiên trong khối. Baseline robust-z (med/mad) tính trên interictal **loại trừ
+  khối** — phản ánh đúng cách pipeline dùng interictal làm baseline cho cửa sổ ictal. Aggregation
+  p95 theo D3/D5. RNG seed 42. R = 200 replicate/ô.
+  Lưới: α ∈ {1.0, 1.25, 1.5, 2.0, 3.0} × |S| ∈ {1, 2, 4, 8, 12}. GATE chạy trên **VAL** (chb10/11/22);
+  TEST chỉ là panel xác nhận, không dùng để chọn gì.
+  **Falsification (fail bất kỳ ⇒ dừng, không chấm nhãn thật):**
+  - G-S1 âm tính: α=1.0 ⇒ macro-AUROC ∈ [0.45, 0.55]. Lệch ⇒ lỗi cỗ máy.
+  - G-S2 trần trên: α=3.0, |S|=1 ⇒ macro-AUROC ≥ 0.95.
+  - G-S3 đơn điệu: macro-AUROC tăng theo α ở mọi |S| cố định.
+  - G-S4 spread: spread(|S|=12) > spread(|S|=1) tại α=2.0, Mann-Whitney p < 0.05
+    (spread = entropy chuẩn hoá của s; đây là phiên bản có GT của §4.5 focal-vs-generalized).

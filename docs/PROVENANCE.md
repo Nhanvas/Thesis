@@ -1,6 +1,6 @@
 # PROVENANCE — checkpoint identity (MACHINE-GENERATED, DO NOT EDIT BY HAND)
 
-Generated `2026-09-01 16:00` local by `src/verify_provenance.py --full`.
+Generated `2026-09-02 10:43` local by `src/verify_provenance.py --full`.
 Every number below was measured at generation time. Regenerate rather than edit.
 
 ## Identity test

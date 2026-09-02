@@ -1,5 +1,7 @@
 # RESULTS_OF_RECORD — PHASE B / TIER-2 (rlg optimized pipeline)
 **Status:** LOCKED (one-shot TEST executed once, as pre-registered in PREREG_TIER2 + Amendment A1).
+**Last verified 2026-09-02.** Before quoting any number here, run `python src/verify_provenance.py`
+(~20 s): it re-derives the canonical checkpoint identity from the committed TEST components.
 Reconciles into `docs/RESULTS_OF_RECORD.md`. §0 (recon+temp+gamma) remains the historical baseline;
 **rlg (recon+latent+gamma, temporal-free) is the Phase-B optimized pipeline of record.**
 **§1–§6 are LOCKED (unchanged). §7 (GAE seed-stability) and §8 (Phase-C negatives) added 2026-08 after the
@@ -102,18 +104,26 @@ ensemble was rebuilt per seed. **rlg is highly seed-stable:**
   `results/phaseB/tier2/ens_val_tf/rlg/ens_seed{1,2,3}_*.npy`. Caveat: seed42 ens built on Kaggle GPU;
   seeds 1/2/3 re-encoded locally on CPU (float noise max|Δ|≈8.6e-5 vs GPU, corr = 1.000000 — faithful).
 
-> **ERRATA (2026-09-01, machine-verified).** Ô "chb13 recon AUROC" của **seed 42** trong bảng trên
-> (0.836) là giá trị của joint model **§0 tiền-rebuild**, không phải của checkpoint canonical.
-> Đo lại từ `data/models_retrain/gae_joint_seed42.pt` trên input canonical: **0.8319**.
-> Checkpoint này được xác minh là checkpoint của one-shot TEST bằng đối chiếu trực tiếp với
-> `results/phaseB/tier2/ens_test_tf/components/zrecon_*`: Pearson **corr = 1.0000000 trên 16/16**
-> mảng (`src/verify_provenance.py`, sha256 `dea06cb5…`). Model §0 chỉ đạt 0.987–0.999 trên cùng
-> phép thử và đã bị cách ly vào `archive/pre_rebuild_s0/`.
-> Hàng đo lại: **0.8319 / 0.8349 / 0.8326 / 0.8339 → 0.833 ± 0.001**.
-> **Kết luận §7 KHÔNG đổi:** cả 4 seed vượt Gate R-GAE G1 (≥ 0.78), cụm vẫn chặt, noise floor
-> event-level (≈0.034 F1) không liên quan tới ô này.
-> **§1–§6 KHÔNG bị ảnh hưởng** — chúng tái tạo chính xác (corr = 1.0000000) từ checkpoint canonical.
-> Chi tiết: `docs/PROVENANCE.md`.
+> **ERRATA (2026-09-01, machine-verified — supersedes the seed-42 cell in the table above).**
+> The `chb13 recon AUROC` cell for **seed 42** (0.836) is the value of the **pre-rebuild §0 joint
+> model**, not of the canonical checkpoint. It was inherited from the §0-era gate and never re-measured
+> after the Phase-B rebuild. Re-measured from `data/models_retrain/gae_joint_seed42.pt` on canonical
+> inputs: **0.8319**.
+>
+> That checkpoint is verified to be the one that produced the one-shot TEST by direct comparison against
+> the committed components `results/phaseB/tier2/ens_test_tf/components/zrecon_*`:
+> Pearson **corr = 1.0000000 on 16/16 arrays** (`src/verify_provenance.py`;
+> sha256 `dea06cb533df1c7d0520ae21c4cbb1b8a938297f937366bc9915b040726ea108`, bias fingerprint 1.1597).
+> The §0 model scores only 0.9868–0.9994 on that same test and has been quarantined to
+> `archive/pre_rebuild_s0/`.
+>
+> Re-measured row: **0.8319 / 0.8349 / 0.8326 / 0.8339 → 0.833 ± 0.001**
+> (seed 42 / 1 / 2 / 3; bias fingerprints 1.1597 / 1.3705 / 1.5801 / 1.6370).
+>
+> **§7 conclusion UNCHANGED:** all four seeds clear Gate R-GAE G1 (chb13 ≥ 0.78), the cluster is still
+> tight, and the event-level noise floor (≈0.034 F1) does not depend on this cell.
+> **§1–§6 UNAFFECTED** — they reproduce exactly (corr = 1.0000000) from the canonical checkpoint.
+> Full detail: `docs/PROVENANCE.md`. Session gate: `python src/verify_provenance.py`.
 
 ## 8 · Phase-C optimization round — negatives (added 2026-08)
 Phase C sought to Pareto-improve rlg by upgrading the front-end representation. Four levers were
@@ -165,3 +175,66 @@ Pre-condition diagnostic (label-free): rlg's FP-prone interictal windows ARE art
 
 rlg is the performance ceiling for this dataset/split. Every lever — directed connectivity (C4-lite decision, C4-full representation), temporal smoothing (C1), plateau/slope gating, ensemble reweighting (measured), and artifact gating — net-washes at the event headline. The mechanism is understood: (a) window/representation gains die at the CPD-transfer (PELT keys on sustained level shifts, not rank separation); (b) per-subject rescue levers net-wash (each hard subject fails on a different mechanism); (c) the representation-limited ceiling subjects (chb06/chb14, oracle F1 ≤ 0.09) sit in the locked TEST set and cannot be addressed without label leakage. The negative is convergent across four layers and pre-registered throughout.
 
+
+---
+
+## 10 · Channel attribution — PROVISIONAL (added 2026-09-02)
+
+Full specification and results: **`docs/ATTRIBUTION_SPEC.md` (v3)**. Summarised here so that no number
+in this file has to be looked up elsewhere. Attribution is **XAI for the GAE reconstruction branch** —
+NOT seizure localization, NOT SOZ. It does not affect §1–§9: it reads the same canonical checkpoint and
+changes nothing in the detection pipeline.
+
+**Status: PROVISIONAL.** Labels are an AI draft converted verbatim from the v5 reader pass, not frozen
+by the supervisor. Machinery validation (below) is label-free and is NOT provisional.
+
+### 10.1 Machinery validation (label-free — report-worthy as-is)
+Synthetic per-channel anomaly injection into interictal per-node error, exact ground truth, 5 α × 5 |S|
+grid × 200 replicates, on VAL (gate) and TEST (confirmatory). Pre-registered gates G-S1/G-S2/G-S3
+**PASS**; permutation-null mean stayed in **0.4990–0.5013 across all 50 cells**.
+
+| α (injection strength) | 1.0 | 1.25 | 1.5 | 2.0 | 3.0 |
+|---|---|---|---|---|---|
+| macro-AUROC, VAL, \|S\|=1 | **0.4912** | 0.6962 | 0.8247 | 0.9547 | 0.9818 |
+
+GAE-seed robustness (4 seeds): channel-ranking Spearman **0.970 ± 0.026**; top-1 agreement 0.873.
+
+### 10.2 Real labels (36 focal seizures of 76; seed 42; p95 aggregation)
+| panel | n | macro-AUROC [95% CI] | macro-AUPRC | subject-const. control | Δ | p_perm |
+|---|---|---|---|---|---|---|
+| all focal | 36 | **0.6497** [0.5663, 0.7390] | 0.3095 | 0.7758 | −0.1261 | 0.0010 |
+| excl. chb15 | 16 | 0.6267 [0.4912, 0.7545] | 0.3432 | 0.6248 | +0.0020 | 0.0380 |
+| chb15 only | 20 | 0.6681 [0.5368, 0.7934] | 0.2826 | 0.8967 | −0.2286 | 0.0040 |
+
+Above chance (AUPRC 0.3095 = 4.2× the 0.073 prevalence, p_perm = 0.001), stable across seeds
+(0.6491–0.6600) and aggregations (mean-agg 0.6733).
+
+### 10.3 The decisive limitation — the D7 control is UNINFORMATIVE
+A subject-constant control (mean score of the *other* seizures of the same subject) scores **higher**
+than the per-seizure score. That looks like "attribution carries no per-seizure information", but the
+labels cannot support that reading: within-subject label **Jaccard = 0.8879** (chb17 = 1.0000;
+chb15 = 2 distinct label sets across 20 seizures). With a near-constant `y`, the control wins by
+noise-averaging alone. Corroborating: corr(y − ȳ, s − s̄) on chb15 = **+0.089**.
+
+⇒ **With the current labels, per-seizure attribution and a subject-level channel prior cannot be
+distinguished.** This is a limitation of the LABELS, not a finding about the method.
+
+### 10.4 Methodological negative — the spread metric does not work
+`§4.5` proposed normalised entropy of `s` as a focal-vs-generalized measure. It fails in both directions:
+synthetic spread is **U-shaped in |S|** (0.9644 → 0.9567 → **0.9441** at |S|=4 → 0.9503 → 0.9755), and on
+real labels focal 0.9693 > generalized 0.9594 (one-sided p = 0.984, opposite to the hypothesis). Entropy
+measures uniformity, not localisation. Reported as a methodological negative; usable only for the extreme
+contrast (all-channel vs 1–2 channel), where it does separate (p = 8.9e-11).
+
+### 10.5 What to ask the supervisor (evidence-backed)
+1. Labels must distinguish seizures **within** a patient (target within-subject Jaccard < 0.6), not only
+   the shared anatomical focus.
+2. Focal labels for chb06 and chb13, or explicit confirmation that all their seizures are generalized
+   (currently both contribute 0 focal seizures).
+3. chb15 supplies 20 of 36 focal seizures — any headline is dominated by one subject.
+
+### 10.6 Provenance
+Checkpoint as in §7 errata. Row→seizure map `results/attribution_v6/{seizure_blocks.csv,
+ictal_row_to_seizure.csv}` — 76/76 TEST seizures matched exactly on (edf_file, onset_s).
+Code: `src/attribution_pipeline.py` (one module, sub-commands; outputs verified byte-identical to the
+nine scripts it replaced). Results: `results/attribution_v6/`.

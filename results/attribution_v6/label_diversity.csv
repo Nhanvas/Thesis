@@ -1,0 +1,6 @@
+subject,n_focal,distinct_label_sets,mean_jaccard,union_size
+chb03,6,2,0.8333,2
+chb14,3,2,0.6667,2
+chb15,20,2,0.9053,2
+chb17,3,1,1.0,2
+chb18,3,3,0.1667,4

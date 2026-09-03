@@ -127,10 +127,29 @@ Bệnh nhân mới không có mảng đó. Demo fit cả bốn trên **toàn b�
 | z-score stats (mean/std per channel) | interictal | toàn bộ window |
 | ngưỡng artifact 5 SD | interictal | **bỏ hẳn** (không loại window nào — cần giữ vị trí thời gian) |
 | `LedoitWolf().fit(Zi)` cho `zlatent` | latent của interictal | latent của toàn bộ window |
-| robust-z median/MAD từng nhánh | (xác nhận lúc build) | toàn bộ window |
+| ~~robust-z median/MAD từng nhánh~~ | **toàn bộ window** | **toàn bộ window** — *không phải divergence* |
+
+**robust-z không phải divergence.** `retrain_io.robust_z(raw_i, raw_c)` dòng 56–60 đã fit median/MAD
+trên `np.concatenate([raw_i, raw_c])` — tức toàn bộ window. Demo làm y hệt thesis. Bảng trên giữ dòng này
+gạch ngang để phiên sau không đi kiểm tra lại.
 
 **Biện minh:** tỷ lệ window ictal cực thấp — đo trên chb06: 45 / (19826 + 45) = **0.23 %**. Không đủ để
 kéo lệch covariance, median hay MAD một cách có ý nghĩa.
+
+**ĐÃ KIỂM CHỨNG BẰNG PHÉP ĐO — 2026-09-03. Không cần chạy lại.**
+
+Tiêu chí đặt trước khi chạy: PASS nếu Spearman ≥ 0.98 **và** |ΔAUROC| ≤ 0.02 trên cả hai subject.
+
+| subject | AUROC (fit interictal — thesis) | AUROC (fit toàn bộ — demo) | Spearman | n_int / n_ict |
+|---|---|---|---|---|
+| chb06 | 0.6066 | 0.6051 | **1.0000** | 19826 / 45 |
+| chb13 | 0.6493 | 0.6408 | **0.9999** | 12452 / 144 |
+
+→ **PASS.** Đổi cách fit LedoitWolf gần như không làm đổi `zlatent` (thứ hạng gần như đồng nhất,
+ΔAUROC 0.0015 / 0.0085). Divergence (a) là vô hại về mặt đo lường.
+
+⚠️ Phép đo này **chỉ** phủ `zlatent`. Ba thứ còn lại — z-score stats, bỏ lọc artifact, và **hậu-cơn (b)**
+— cần tiền xử lý liên tục từ EDF nên chỉ quan sát được ở bước 1 của thứ tự build.
 
 #### (b) Đoạn hậu-cơn không bị loại — nguồn khác biệt LỚN HƠN nhóm (a)
 
@@ -494,7 +513,7 @@ Event 2
 |---|---|---|
 | O1 | **Operating point của demo** (ngưỡng phát hiện event). Thủ tục FP-budget là label-free nên dùng được, nhưng **giá trị budget cụ thể** phải **đọc từ file** (`src/retrain/fp_budget_operating_point.py` + `docs/RESULTS_OF_RECORD_phaseB.md`) lúc build — **tuyệt đối không gõ lại từ trí nhớ** | đọc file |
 | O2 | **Tham số PELT** (penalty, model, min_size) — lấy đúng từ `src/cpd_pipeline_v14.py`, không tự chọn lại | đọc file |
-| O3 | **robust-z của demo fit trên gì** — xác nhận bằng cách đọc `src/ensemble_recipe.py` và `retrain/retrain_io.robust_z` trước khi viết `pipeline_demo.py` | đọc file |
+| ~~O3~~ | ~~robust-z của demo fit trên gì~~ — **ĐÓNG 2026-09-03**: `retrain_io.robust_z` đã fit trên toàn bộ window (dòng 56–60). Không phải divergence, không cần xử lý | đã đóng |
 | O4 | **Subject nào dùng cho kịch bản upload live** — chọn theo số file thật, đo lúc dựng cache | đo |
 | O4b | **Mức độ gắn cờ đoạn hậu-cơn** (§1.6b) — quan sát ở bước 1, quyết định có nói riêng trong slide bảo vệ hay không. Không chỉnh mô hình, không chỉnh ngưỡng để "sửa" | quan sát |
 | O5 | **Gamma-AEC trong đường liên tục** — `dataprep/compute_gamma_aec.py` hiện chạy trên mảng đã tách; cần bản liên tục | viết mới trong `pipeline_demo.py` |

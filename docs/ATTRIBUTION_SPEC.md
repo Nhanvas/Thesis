@@ -190,7 +190,7 @@ eigencentrality-convergence framework is retired.
 
 ## 5. WEB DEMO (SzScan) tie-in
 Per seizure: timeline (WHEN, from PELT) + 18-channel heat map (WHERE, from `s`). Guardrails from
-`docs/demo/WEB_DEMO_SPEC_v4.md`: PROVISIONAL, no real-time claim, no SOZ claim, 8 TEST subjects only,
+`web_demo/SZSCAN_SPEC_v5.md`: PROVISIONAL, no real-time claim, no SOZ claim, 8 TEST subjects only,
 precomputed. Given §9.3, the demo must label the channel view **"channels with ictal-like reconstruction
 anomaly"** and must not imply per-seizure localisation.
 

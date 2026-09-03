@@ -7,7 +7,7 @@ evaluation_protocol.parse_summary_edf_list() sort file theo TÊN FILE
 (`edfs.sort(key=lambda x: x['fname'])`) — quy ước ĐÃ KHÓA cho pipeline evaluation
 sinh ra số liệu §0, KHÔNG được sửa file đó.
 
-Web demo đã chốt (WEB_DEMO_CONTEXT_BOUNDARY.md, quyết định #4): thứ tự HIỂN THỊ
+Web demo đã chốt (SZSCAN_SPEC_v5.md §5.1 + §6.1): thứ tự HIỂN THỊ
 trên UI sort theo `File Start Time` trong header EDF, không theo tên file — vì
 có mâu thuẫn thật trong CHB-MIT (vd chb03_24.edf tên đứng trước nhưng giờ ghi
 16:39 muộn hơn chb03_25.edf ghi lúc 15:38).
@@ -21,7 +21,7 @@ có quay vòng như vậy — 00:10 sẽ bị coi là "sớm hơn" 23:50 dù th�
 1 ngày.
 
 Cách xử lý ĐÚNG cần biết thêm NGÀY của mỗi file — thông tin này KHÔNG có trong
-`chb*-summary.txt`. Không có cách nào suy ra ngày tuyệt đối chỉ từ giờ-trong-
+`chb*-summary.md`. Không có cách nào suy ra ngày tuyệt đối chỉ từ giờ-trong-
 ngày một cách chắc chắn 100% khi dữ liệu vốn không cung cấp.
 
 QUYẾT ĐỊNH THỰC DỤNG (chấp nhận, không giả vờ hoàn hảo)
@@ -42,16 +42,22 @@ QUYẾT ĐỊNH THỰC DỤNG (chấp nhận, không giả vờ hoàn hảo)
 xảy ra. Nếu phát hiện thứ tự hiển thị sai với 1 subject cụ thể khi test thật,
 cần xem lại thủ công — không tin tưởng mù quáng heuristic này.
 
-QUAN HỆ VỚI edf_index.EdfIndex
--------------------------------
-EdfIndex vẫn dùng parse_summary_edf_list gốc (sort theo tên) để xây global
-timeline cho việc CHẠY CPD (đúng logic evaluation, khớp §0). File này chỉ đổi
-THỨ TỰ HIỂN THỊ trên UI — 2 việc tách biệt:
-    1. edf_index.EdfIndex          -> global timeline (backend chạy PELT)
-    2. edf_order.sorted_by_header  -> thứ tự file hiển thị (frontend duyệt)
-Sau khi PELT chạy xong, dùng EdfIndex.locate_range(start_s, end_s) để map mỗi
-detected_event về (filename, local_start_s, local_end_s), rồi tra order_index
-tương ứng ở đây để biết hiển thị ở vị trí thứ mấy trên UI.
+HAI VIỆC TÁCH BIỆT — ĐỪNG GỘP
+------------------------------
+    1. "event này thuộc file nào"  -> offset tích lũy, SZSCAN_SPEC_v5.md §1.5
+    2. "file này hiển thị thứ mấy" -> edf_order.sorted_by_header (file này)
+
+Việc (1) KHÔNG cần module tra cứu. Dưới kiến trúc v5, pipeline demo giữ MỌI
+window nên mảng score của mỗi file dài đúng bằng số window của file đó; offset
+từng file suy ra bằng cộng dồn. Không parse summary lúc runtime.
+
+⚠️ edf_index.py ĐÃ BỊ XÓA khỏi repo. Nó thuộc kiến trúc v3 (khi score là mảng
+theo segment nên phải dựng bảng tra global_offset -> file). KHÔNG viết lại nó.
+
+⚠️ File summary thật có đuôi .md, KHÔNG phải .txt:
+   F:/Study/Thesis/Dataset/CHB-MIT/CHB info/summary/chbNN-summary.md
+Đọc tên file / File Start Time / File End Time / duration là ĐƯỢC PHÉP.
+Đọc trường seizure lúc runtime là VI PHẠM guard #2 (SZSCAN_SPEC_v5.md §1.2).
 """
 import re
 from dataclasses import dataclass

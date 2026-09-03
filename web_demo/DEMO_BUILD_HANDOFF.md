@@ -60,13 +60,17 @@ web_demo/
 
 | File | Hành động | Lý do |
 |---|---|---|
-| `src/edf_index.py` | **Giữ nguyên code**, chỉ sửa docstring | `locate_range()` vẫn cần: sau khi PELT chạy trên timeline ghép, nó map event global → đúng file + offset cục bộ. Docstring cũ mô tả sai vai trò ("cắt EEG để hiển thị") — vai trò thật là gán event về file |
-| `src/edf_order.py` | **Giữ nguyên hoàn toàn** | Giải quyết vấn đề độc lập: thứ tự **hiển thị** file trên UI (theo giờ thật trong header EDF) khác thứ tự **xử lý** (theo TÊN FILE — quy ước khóa để khớp kết quả thesis). Có case lệch thật như `chb03_24/25` |
+| `edf_index.py` | **KHÔNG tồn tại, KHÔNG cần viết lại** | Thuộc kiến trúc v3 và đã bị xóa khỏi repo. Kiến trúc v5 suy offset từng file theo cấu tạo — xem `SZSCAN_SPEC_v5.md` §1.5. Tài liệu cũ `WEB_DEMO_CODE_MIGRATION_NOTES.md` mô tả nó như module sẵn có; tài liệu đó đã archive |
+| `web_demo/backend/edf_order.py` | **Giữ nguyên hoàn toàn** | Vấn đề độc lập: thứ tự **hiển thị** file trên UI (theo giờ thật trong header EDF) khác thứ tự **xử lý** (theo TÊN FILE — quy ước khóa để khớp kết quả thesis). Có case lệch thật như `chb03_24/25`. Chuyển từ `docs/demo/` sang đây 2026-09-03; demo-only, không dùng chung với thesis |
 | `src/cpd_pipeline_v14.py`, `ensemble_recipe.py`, `szcore_eval.py`, `retrain/gae_joint.py` | **Chỉ đọc, không sửa** | Single-source dùng chung với thesis |
 | `src/szcore_eval.build_timeline_masked()` | **CẤM gọi từ demo** | Cần ground-truth — xem `SZSCAN_SPEC_v5.md` §1.2 |
 
-Hai vấn đề độc lập, đừng gộp: `edf_index` = "event này thuộc file nào" (thời gian → file);
-`edf_order` = "file này hiện ở vị trí thứ mấy trên UI" (thứ tự hiển thị).
+Đừng gộp hai vấn đề: "event này thuộc file nào" (offset tích lũy, `SZSCAN_SPEC_v5.md` §1.5) và
+"file này hiện ở vị trí thứ mấy trên UI" (`edf_order.py`).
+
+⚠️ **Trước khi lấy tham số từ `src/retrain/fp_budget_operating_point.py`**, kiểm tra chuỗi import chạy
+được — `evaluation_protocol.py` và `stat_validation.py` từng bị archive nhầm và mới khôi phục về `src/`
+ngày 2026-09-03 (tag `repo-deps-fixed`, chi tiết `docs/REPO_MAP.md` §7.7).
 
 ---
 
@@ -95,12 +99,13 @@ def process_subject(files) -> dict[file -> list[Event]]:
     global_score = concat([score[f] for f in files_sorted])
     events_global = cpd_pipeline_v14.detect_events(global_score, ...)   # label-free
     op = operating point FP-budget (đọc tham số từ file, xem SPEC §8 O1)
+    offsets = cộng dồn len(score[f]) theo files_sorted     # không cần module tra cứu
     for ev in events_global:
-        file, local_offset = EdfIndex(subject).locate_range(ev.onset_s, ev.offset_s)
-        gán ev vào danh sách event của file đó
+        file = f sao cho offsets[f] <= ev.onset_win < offsets[f] + len(score[f])
+        gán ev vào danh sách event của file đó, onset cục bộ = ev.onset_win - offsets[file]
 ```
 
-**Bốn chỗ fit khác pipeline thesis** — đã ghi và biện minh trong `SZSCAN_SPEC_v5.md §1.4`. Đọc trước khi
+**Bốn chỗ fit khác pipeline thesis** — đã ghi và biện minh trong `SZSCAN_SPEC_v5.md §1.6`. Đọc trước khi
 viết, đừng suy luận lại từ đầu.
 
 ---
@@ -157,7 +162,7 @@ hỏi xin phép từng bước nhỏ thì quá chậm, phí sức tự động h
 |---|---|
 | Pipeline label-free ra kết quả khác xa thesis (quá nhiều/quá ít event) | Phát hiện ở **bước 1**, trước khi dựng UI. Nếu lệch quá mức, điều chỉnh **operating point** (label-free, hợp lệ) — **không** đụng mô hình, **không** dùng nhãn để chỉnh |
 | Bước Process 17 file mất ~6 phút lúc demo trực tiếp | Chọn subject ít file cho kịch bản live; cache sẵn phần còn lại |
-| Hội đồng hỏi vì sao số demo khác report | Câu trả lời soạn sẵn trong `SZSCAN_SPEC_v5.md §1.4` |
+| Hội đồng hỏi vì sao số demo khác report | Câu trả lời soạn sẵn trong `SZSCAN_SPEC_v5.md §1.6` |
 | Vô tình rò ground-truth vào demo | `test_guards.py` chặn ở CI/local, xem `CLAUDE.md` |
 | Thời gian: report 15/10, IELTS 09/10 | **Report là ưu tiên 1.** Nếu phải cắt, cắt theo thứ tự ngược từ bước 8 → 6. Bốn bước 0–5 là bản demo tối thiểu vẫn bảo vệ được |
 

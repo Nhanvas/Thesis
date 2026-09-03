@@ -77,21 +77,44 @@ file .edf
  → đọc 18 kênh chuẩn (bỏ EKG/EOG/Ref nếu file gốc có)
  → bandpass 0.5–60 Hz + notch 60 Hz          (giống thesis)
  → cắt window 4 s không chồng lấn @256 Hz    (giống thesis, KHÔNG bỏ window nào)
- → z-score per-channel                        (⚠ xem §1.4)
+ → z-score per-channel                        (⚠ xem §1.6)
  → CAR → wPLI + AEC → top-k 20%
  → band-powers 5 dải → node feat [adj-row 18 | bp 5]
- → Joint GAE seed42 → zrecon + zlatent(⚠ §1.4) ; gamma-AEC → zgamma
- → robust-z từng nhánh (⚠ §1.4) → ensemble equal 1/3
+ → Joint GAE seed42 → zrecon + zlatent(⚠ §1.6) ; gamma-AEC → zgamma
+ → robust-z từng nhánh (⚠ §1.6) → ensemble equal 1/3
  → [ghép mọi file của subject theo thứ tự TÊN FILE]
  → PELT (cpd_pipeline_v14) chạy MỘT lần trên timeline ghép
  → operating point label-free (FP-budget)
- → gán event global về đúng file bằng edf_index.locate_range()
+ → gán event global về đúng file bằng offset tích lũy (§1.5)
 ```
 
 **Không có window nào bị bỏ** ⇒ chỉ số window ↔ giây trong file là ánh xạ 1-1 tuyệt đối:
 `t_giây = window_index × 4`. Đây chính là thứ mà đường xử lý của thesis đã đánh mất.
 
-### 1.4 Divergence có chủ đích khỏi pipeline thesis — ĐÃ ĐƯỢC TÁC GIẢ DUYỆT
+### 1.5 Gán event về file — không cần module tra cứu
+
+Vì mảng score của mỗi file có độ dài **đúng bằng số window của chính file đó**, offset của từng file
+suy ra được **theo cấu tạo**:
+
+```python
+offsets, cur = {}, 0
+for f in files_sorted_by_name:
+    offsets[f] = cur
+    cur += len(score[f])
+# event global (on, off) thuộc file f khi  offsets[f] <= on < offsets[f] + len(score[f])
+# offset cục bộ = on - offsets[f]
+```
+
+Không parse file nào, không đọc summary, không cần module phụ — **và điều này tự động thỏa guard số 2
+ở §1.2**, vì không còn đọc `chb*-summary.md` lúc chạy.
+
+⚠️ **`edf_index.py` không tồn tại trong repo và không cần viết lại.** Nó thuộc kiến trúc v3 (khi score
+là mảng theo segment nên phải dựng bảng tra `global_offset → file`) và đã bị xóa. Tài liệu cũ
+`WEB_DEMO_CODE_MIGRATION_NOTES.md` mô tả nó như module sẵn có — tài liệu đó đã archive, đừng dùng.
+`edf_order.py` thì **vẫn giữ** (`web_demo/backend/edf_order.py`): vấn đề khác hẳn — thứ tự **hiển thị**
+file trên UI theo giờ thật trong header EDF, khác thứ tự **xử lý** theo tên file.
+
+### 1.6 Divergence có chủ đích khỏi pipeline thesis — ĐÃ ĐƯỢC TÁC GIẢ DUYỆT
 
 Bốn bước trong pipeline thesis fit trên "mảng interictal". Bệnh nhân mới **không có nhãn** nên không tồn
 tại mảng đó. Demo fit cả bốn trên **toàn bộ window của subject**:
@@ -118,7 +141,7 @@ kéo lệch covariance, median hay MAD một cách có ý nghĩa.
 > Cùng một mô hình, cùng trọng số, hai điều kiện đầu vào khác nhau — nên hai tập kết quả không đồng nhất
 > là đúng như dự kiến, không phải bất thường.
 
-### 1.5 Chi phí — đã đo, quyết định chạy live
+### 1.7 Chi phí — đã đo, quyết định chạy live
 
 Đo trên máy dev (Dell Latitude 3590, CPU): `build_adjacency` **13.2 ms/window** + `compute_band_powers`
 **3.7 ms/window** = **16.9 ms/window** → **~15 s cho 1 giờ EEG** (chưa kể đọc EDF, gamma-AEC, GAE
@@ -453,6 +476,8 @@ Event 2
 | O3 | **robust-z của demo fit trên gì** — xác nhận bằng cách đọc `src/ensemble_recipe.py` và `retrain/retrain_io.robust_z` trước khi viết `pipeline_demo.py` | đọc file |
 | O4 | **Subject nào dùng cho kịch bản upload live** — chọn theo số file thật, đo lúc dựng cache | đo |
 | O5 | **Gamma-AEC trong đường liên tục** — `dataprep/compute_gamma_aec.py` hiện chạy trên mảng đã tách; cần bản liên tục | viết mới trong `pipeline_demo.py` |
+
+| O6 | **`evaluation_protocol.py` và `stat_validation.py` vừa được khôi phục về `src/`** (2026-09-03, tag `repo-deps-fixed`) sau khi bị archive nhầm dù vẫn đang được import. `fp_budget_operating_point.py` phụ thuộc chuỗi này — kiểm tra `import` chạy được trước khi lấy tham số cho O1 | 1 lệnh |
 
 Không mục nào chặn việc bắt đầu dựng frontend.
 

@@ -116,8 +116,11 @@ file trên UI theo giờ thật trong header EDF, khác thứ tự **xử lý** 
 
 ### 1.6 Divergence có chủ đích khỏi pipeline thesis — ĐÃ ĐƯỢC TÁC GIẢ DUYỆT
 
-Bốn bước trong pipeline thesis fit trên "mảng interictal". Bệnh nhân mới **không có nhãn** nên không tồn
-tại mảng đó. Demo fit cả bốn trên **toàn bộ window của subject**:
+Có **hai nhóm divergence**, cùng một nguyên nhân gốc: bệnh nhân mới không có nhãn.
+
+#### (a) Bốn bước fit trên "mảng interictal"
+
+Bệnh nhân mới không có mảng đó. Demo fit cả bốn trên **toàn bộ window của subject**:
 
 | Bước | Thesis fit trên | Demo fit trên |
 |---|---|---|
@@ -129,17 +132,35 @@ tại mảng đó. Demo fit cả bốn trên **toàn bộ window của subject**
 **Biện minh:** tỷ lệ window ictal cực thấp — đo trên chb06: 45 / (19826 + 45) = **0.23 %**. Không đủ để
 kéo lệch covariance, median hay MAD một cách có ý nghĩa.
 
-**Hệ quả bắt buộc ghi nhận:**
+#### (b) Đoạn hậu-cơn không bị loại — nguồn khác biệt LỚN HƠN nhóm (a)
+
+`preprocessing.py` loại **4 giờ sau mỗi cơn** khỏi mảng interictal của thesis (`BUFFER_H`). Demo không
+biết cơn ở đâu nên **không loại được gì** — toàn bộ đoạn hậu-cơn đi thẳng qua PELT.
+
+EEG hậu-cơn bất thường thật (chậm khu trú, suy giảm biên độ, kết nối chức năng thay đổi). Nhiều khả năng
+demo sẽ **gắn cờ các đoạn đó**, trong khi thesis chưa từng chấm điểm chúng.
+
+Về lượng, đây là nguồn khác biệt lớn hơn hẳn nhóm (a): 4 giờ × số cơn, so với 0.23 % window ictal.
+
+**Đây không phải lỗi.** Trong khung post-hoc review triage, đưa đoạn hậu-cơn ra cho bác sĩ xem là hành vi
+hợp lý về lâm sàng — bác sĩ vẫn muốn nhìn đoạn đó. Nhưng nó phải được:
+1. **quan sát ở bước 1** của thứ tự build (chạy 1 subject, xem event rơi vào đâu so với cơn đã biết —
+   *chỉ để mắt người kiểm tra tính hợp lý, tuyệt đối không đưa nhãn vào code*);
+2. **nói ra khi bảo vệ**, không để hội đồng tự phát hiện.
+
+**Hệ quả bắt buộc ghi nhận (cho cả (a) và (b)):**
 - **Số của demo sẽ KHÁC số của thesis.** Không được ép khớp, không được điều chỉnh gì để khớp.
 - Demo **không** hiển thị bất kỳ metric đánh giá nào (sensitivity, FP/day, AUROC, operating point
   mag_pct/pen_mult). Những con số đó thuộc thesis, không thuộc sản phẩm.
 - Divergence này phải được **báo cô** (Assoc. Prof. Hà Thị Thanh Hương) vì là quyết định phương pháp.
 
 **Câu trả lời chuẩn bị sẵn cho hội đồng** — *"tại sao demo tìm ra event khác bảng trong report?"*:
-> Report đánh giá trên phân đoạn interictal đã lọc nhiễu và có nhãn, theo giao thức SzCORE. Demo chạy
-> hoàn toàn không nhãn trên bản ghi liên tục nguyên vẹn, vì đó mới là tình huống của một bệnh nhân mới.
-> Cùng một mô hình, cùng trọng số, hai điều kiện đầu vào khác nhau — nên hai tập kết quả không đồng nhất
-> là đúng như dự kiến, không phải bất thường.
+> Report đánh giá trên phân đoạn interictal đã lọc nhiễu, đã loại 4 giờ hậu-cơn, và có nhãn, theo giao
+> thức SzCORE. Demo chạy hoàn toàn không nhãn trên bản ghi liên tục nguyên vẹn — kể cả đoạn hậu-cơn —
+> vì đó mới là tình huống của một bệnh nhân mới. Cùng một mô hình, cùng trọng số, hai điều kiện đầu vào
+> khác nhau, nên hai tập kết quả không đồng nhất là đúng như dự kiến, không phải bất thường. Cụ thể,
+> demo có thể gắn cờ đoạn hậu-cơn mà report không hề chấm điểm; trong bối cảnh rà soát hậu kỳ thì đó là
+> hành vi hợp lý, không phải dương tính giả.
 
 ### 1.7 Chi phí — đã đo, quyết định chạy live
 
@@ -475,6 +496,7 @@ Event 2
 | O2 | **Tham số PELT** (penalty, model, min_size) — lấy đúng từ `src/cpd_pipeline_v14.py`, không tự chọn lại | đọc file |
 | O3 | **robust-z của demo fit trên gì** — xác nhận bằng cách đọc `src/ensemble_recipe.py` và `retrain/retrain_io.robust_z` trước khi viết `pipeline_demo.py` | đọc file |
 | O4 | **Subject nào dùng cho kịch bản upload live** — chọn theo số file thật, đo lúc dựng cache | đo |
+| O4b | **Mức độ gắn cờ đoạn hậu-cơn** (§1.6b) — quan sát ở bước 1, quyết định có nói riêng trong slide bảo vệ hay không. Không chỉnh mô hình, không chỉnh ngưỡng để "sửa" | quan sát |
 | O5 | **Gamma-AEC trong đường liên tục** — `dataprep/compute_gamma_aec.py` hiện chạy trên mảng đã tách; cần bản liên tục | viết mới trong `pipeline_demo.py` |
 
 | O6 | **`evaluation_protocol.py` và `stat_validation.py` vừa được khôi phục về `src/`** (2026-09-03, tag `repo-deps-fixed`) sau khi bị archive nhầm dù vẫn đang được import. `fp_budget_operating_point.py` phụ thuộc chuỗi này — kiểm tra `import` chạy được trước khi lấy tham số cho O1 | 1 lệnh |

@@ -153,6 +153,34 @@ phương pháp, không phải chi tiết kỹ thuật.
 Limitations của report và vào tài liệu trình cô. Hai divergence đã biết: (a) bốn bước fit trên toàn bộ
 window, (b) đoạn hậu-cơn không bị loại.
 
+**(D) Project #2 sinh vật liệu cho report.** Web demo là một **sản phẩm hoàn chỉnh**, nên bản thân quá
+trình thiết kế và xây dựng nó là nội dung phải báo cáo — độc lập với việc rubric có dòng riêng cho demo
+hay không (rà `RUBRIC_TRACKING.md`: **không có**; demo ăn điểm gián tiếp qua tiêu chí #4 *Design
+considers impacts* và #7 *Significance + applicability*).
+
+Phân biệt hai loại "demo", đừng lẫn:
+
+| Loại | Là gì | Cần gì |
+|---|---|---|
+| **Demo lúc bảo vệ** | Web đã hoàn chỉnh, trình bày end-to-end trước hội đồng | Bước 0–8 xong, kịch bản, subject ít file, cache dự phòng |
+| **Báo cáo quá trình build** | Chương/mục trong report mô tả kiến trúc và lập luận thiết kế | Chủ yếu **viết được ngay**, không chờ code |
+
+Phần lớn vật liệu cho loại thứ hai đã sẵn sàng, vì nó là **lập luận thiết kế có bằng chứng**, không phải
+kết quả thí nghiệm:
+
+- F1–F4 (`SZSCAN_SPEC_v5.md` §1.1) — vì sao không thể phát lại mảng score đã khóa lên trục thời gian.
+  Đây là dạng vật liệu tiêu chí #4 tìm kiếm: một quyết định kiến trúc ra bằng phép đo.
+- Kiến trúc label-free liên tục và ba guard (§1.2–§1.3).
+- Divergence (a) — **đã đo, PASS** (§1.6a).
+- Divergence (b) hậu-cơn — sự **tồn tại** là tất yếu logic; **mức độ** thì chờ bước 1.
+- Lựa chọn stack, phạm vi 8 subject, ràng buộc wording attribution.
+
+**Bốn chỗ phải chờ bước 1 mới điền được:** thời gian chạy thật đầu-cuối (hiện chỉ có 16.9 ms/window ở
+mức thành phần) · mức độ gắn cờ đoạn hậu-cơn (O4b) · operating point của demo (O1) · ảnh chụp app thật.
+
+→ Viết phần report về demo **ngay bây giờ** với bốn chỗ trống đó, đừng đợi build xong. Project #2 cung
+cấp nội dung kỹ thuật; project hiện tại quyết định cách viết vào report và đặt vào tiêu chí nào.
+
 ### 9.3 Câu hỏi nên hỏi đúng project nào
 
 | Câu hỏi | Hỏi ở |

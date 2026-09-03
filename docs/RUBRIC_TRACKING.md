@@ -1,4 +1,4 @@
-# RUBRIC TRACKING — thesis scoring checklist (v4, post-attribution, rev. B)
+# RUBRIC TRACKING — thesis scoring checklist (v5, post-attribution + demo, rev. A)
 
 Maps the 8 rubric criteria (`Thesis_Rubric.pdf`, total 100) to where each is covered and what still
 needs writing. Update the Status column as chapters get drafted.
@@ -13,6 +13,11 @@ Legend: ✅ evidence exists / 🟡 partial / 🔴 to write.
 > **RESOLVED** — 0.805 is verified and recorded in `RESULTS_OF_RECORD_phaseB.md` §3 with a per-subject
 > table; (b) `src/` was reorganised, so the figure paths in criterion #8 changed; (c) the attribution
 > study has been **executed** — criteria #7 and #8 now have real evidence and a real limitation.
+>
+> **v5 UPDATE (2026-09-03).** The **web demo (SzScan) had no row anywhere in this file**, so a whole
+> deliverable was going untracked. The rubric has 8 fixed criteria and no demo criterion, so the demo is
+> not a new row — it is folded into #4, #7 and #8, and §4 below states exactly what goes where and what
+> is already writable. Demo authority: `web_demo/SZSCAN_SPEC_v5.md`.
 >
 > `RESULTS_OF_RECORD_phaseB.md` wins over this file on any number conflict.
 
@@ -74,11 +79,63 @@ so will you, six weeks from now.
 | 1 | **Literature review + knowledge gap** (PI 7C, 15) | 🟡 | Ch.1 Intro + Related Work; `docs/archive/Spatial_Localization...md` (field survey); `Thesis_Reference_Sheet.md` | Write Related Work prose; complete the comparison table + pending DOIs; state the unsupervised graph-attribution gap explicitly. Use Yildiz = 0.68. **Never cite the Transformer sens 0.765/40.6 as CHB-MIT — it is a TUH result.** For the attribution chapter, EEG-CGS (AAAI 2023) is the framework comparator (bar 0.70/0.55/0.43/0.78, TUSZ). |
 | 2 | **Research problem + realistic constraints** (10) | 🟡 | Ch.1 Problem statement | Write problem/constraints: label-free, patient-independent, no per-channel SOZ ground truth, **post-hoc review triage (not a real-time alarm)**. Frame FP/day as review burden. |
 | 3 | **Appropriate principles / methods / tools** (PI 1A, 10) | ✅ | Ch.2/3 Methodology; `src/` | Methods prose with named equations: wPLI, AEC, top-k20, GAE loss `MSE(A) + 0.1·MSE(X)`, robust-z (median/MAD), latent Mahalanobis (LedoitWolf, per-subject interictal fit), PELT + penalty, SzCORE. Disclose that the original GAE training loop was reconstructed under PREREG_01 and validated by Gate R-GAE. For attribution, state the p95 aggregation and that it was pre-registered. |
-| 4 | **Design considers impacts** (PI 4C, 10) | ✅ | `docs/archive/Proposed_solution_updated_v5.md` §XIII **DM6** | Fold DM6 (deployment strategy) into the report's Decision-Matrix section so it is visible in the report, not only in the solution doc. |
+| 4 | **Design considers impacts** (PI 4C, 10) | 🟡 | `docs/archive/Proposed_solution_updated_v5.md` §XIII **DM6**; `web_demo/SZSCAN_SPEC_v5.md` §1 | Fold DM6 (deployment strategy) into the report's Decision-Matrix section so it is visible in the report, not only in the solution doc. **Add the SzScan design rationale — see §4 below.** The strongest exhibit is the measured F1–F4 finding: the deployment architecture was chosen by measurement, not preference. |
 | 5 | **Result meets/exceeds objectives** (20) | ✅ | Ch.4 Results; `RESULTS_OF_RECORD_phaseB.md` §1–§9; `results/phaseB/tier2/` | Write Results using §0.1. Frame honestly: the defensible win is **precision/F1 at matched-or-lower FP/day + full reproducibility**, not a sensitivity gain (0.632→0.645 is within CI). Report the Pareto frontier as dominance evidence. |
 | 6 | **Evaluation of validity / reliability / performance** (10) | ✅ | Ch.4 Evaluation | SzCORE-exact scoring (`timescoring`), Wilson CIs (sens/prec) + Poisson CIs (FP/day), **4-seed GAE robustness (§7)**, branch ablation (E1/E2), the **Phase-C negatives (§8–§9) as an honest reliability probe**, and now two more rigor exhibits: the **synthetic attribution sanity check** (exact ground truth, clean null on 50/50 cells) and the **machine-verified checkpoint provenance** (corr 1.0000000 on 16/16 committed TEST arrays, `docs/PROVENANCE.md`). The slope-gate false positive caught by multi-seed remains the strongest single exhibit. |
-| 7 | **Significance + impacts + applicability** (PI 4C, 10) | ✅ | Ch.5 Discussion; `ATTRIBUTION_SPEC.md` §9 | Clinical review-triage value; **channel attribution as the XAI differentiator, now with measured evidence** (§0.2), not a promise. Honest limitations: FP/day is structural to label-free anomaly detection; chb06/chb14 are representation-limited; attribution ≠ SOZ; the label file is dominant-channel not ictal-set (§3.3), so it cannot test per-seizure attribution (Jaccard 0.8879); the spread metric is a negative; single dataset, no external validation. |
-| 8 | **Written report: format + graphics + statistics + references** (15) | 🔴 | whole report; `src/figures/`; `Report_format.md` | Figures: pipeline diagram, CPD mechanism, connectivity, per-subject panel, attribution head-maps, synthetic AUROC-vs-α curve, AUROC-vs-\|S\| scatter. Correct citations; format compliance; Grammarly + AI/plagiarism check. Attribution figures are **already generated**: `src/figures/attribution_figures.py` → `figures/attribution/` (`fig1_synthetic`, `fig2_seed_robustness`, `fig3_rank_heatmap` — label-free and final; `fig4_persubject_forest` — PROVISIONAL; plus `attribution_top3_channels.csv` for the appendix). **Path update:** figure scripts now live in `src/figures/` (`fig5_eight_subjects.py`, `fig_B_raw_eeg_pelt.py`, `plot_event_level.py`, `attribution_headmap.py`, `visualize_channel_attribution.py`, `visualize_chb06_inversion.py`). `fig_A_three_scores.py` was **deleted** — it plotted the dropped `z_temporal` branch; recover from `git show phase-c-final:src/fig_A_three_scores.py` and retarget to zrecon/zlatent/zgamma if that figure is wanted. |
+| 7 | **Significance + impacts + applicability** (PI 4C, 10) | 🟡 | Ch.5 Discussion; `ATTRIBUTION_SPEC.md` §9 | Clinical review-triage value; **channel attribution as the XAI differentiator, now with measured evidence** (§0.2), not a promise. Honest limitations: FP/day is structural to label-free anomaly detection; chb06/chb14 are representation-limited; attribution ≠ SOZ; the label file is dominant-channel not ictal-set (§3.3), so it cannot test per-seizure attribution (Jaccard 0.8879); the spread metric is a negative; single dataset, no external validation. **Add the SzScan applicability paragraph and the two approved
+demo divergences as limitations — see §4 below.** |
+| 8 | **Written report: format + graphics + statistics + references** (15) | 🔴 | whole report; `src/figures/`; `Report_format.md`; `web_demo/UI/` | **Demo figures: the SzScan system-architecture diagram (writable now) and 2–3 UI screenshots (need step 2+ of the build; the locked mockups in `web_demo/UI/` are a fallback if the build runs late).** Figures: pipeline diagram, CPD mechanism, connectivity, per-subject panel, attribution head-maps, synthetic AUROC-vs-α curve, AUROC-vs-\|S\| scatter. Correct citations; format compliance; Grammarly + AI/plagiarism check. Attribution figures are **already generated**: `src/figures/attribution_figures.py` → `figures/attribution/` (`fig1_synthetic`, `fig2_seed_robustness`, `fig3_rank_heatmap` — label-free and final; `fig4_persubject_forest` — PROVISIONAL; plus `attribution_top3_channels.csv` for the appendix). **Path update:** figure scripts now live in `src/figures/` (`fig5_eight_subjects.py`, `fig_B_raw_eeg_pelt.py`, `plot_event_level.py`, `attribution_headmap.py`, `visualize_channel_attribution.py`, `visualize_chb06_inversion.py`). `fig_A_three_scores.py` was **deleted** — it plotted the dropped `z_temporal` branch; recover from `git show phase-c-final:src/fig_A_three_scores.py` and retarget to zrecon/zlatent/zgamma if that figure is wanted. |
+
+---
+
+## 4 · Web demo (SzScan) — where it goes in the report
+
+**Status: writable now, mostly.** The demo has no rubric criterion of its own, but it is a complete
+product and its design and construction are reportable work. Most of the material is **design rationale
+backed by measurement**, not experimental results — which is precisely what #4 rewards — so it does not
+wait on the build.
+
+Two different things are both called "the demo". Do not conflate them:
+
+| | What it is | Depends on |
+|---|---|---|
+| **Defense demo** | The finished web app shown end-to-end to the committee | Build steps 0–8 complete, a rehearsed scenario, a low-file-count subject, a fallback cache |
+| **Build documentation** | The report section describing architecture and design decisions | Almost nothing — writable now |
+
+### 4.1 What is already locked and writable
+
+| Content | Goes to | Source |
+|---|---|---|
+| Post-hoc review triage framing; proof-of-concept, **not** a validated clinical device | #2, #7 | `SZSCAN_SPEC_v5.md` §0 |
+| **F1–F4: why the locked score arrays cannot be replayed on a real time axis** — segment-ordered, timeline rebuilt from annotations, buffer gaps bootstrap-filled, interictal scores drift by `n_rejected` | **#4** (headline exhibit), #6 | `SZSCAN_SPEC_v5.md` §1.1; `src/szcore_eval.py:90, 98–113, 117–123` |
+| The label-free continuous architecture that follows from F1–F4, and the three hard guards | #4 | §1.2–§1.3 |
+| **Divergence (a)** — four fit steps move to all-windows. **Measured, PASS:** Spearman 1.0000 (chb06) / 0.9999 (chb13), ΔAUROC 0.0015 / 0.0085 | #4, #7 limitations | §1.6a |
+| **Divergence (b)** — the 4 h post-seizure buffer cannot be excluded without labels. Existence is logically certain; **magnitude is not yet measured** | #7 limitations | §1.6b |
+| Why demo output will not match thesis output, and the prepared answer for the committee | #7 | §1.6 |
+| Stack choice, 8-subject allowlist, attribution wording constraint | #4 | §2, §6.7; `ATTRIBUTION_SPEC.md` §9 |
+
+### 4.2 Four blanks that only the build can fill
+
+Write the section now and leave these open:
+
+1. End-to-end runtime per file — only the component cost is measured (16.9 ms/window ⇒ ~15 s per hour of
+   EEG); EDF read, gamma-AEC and GAE forward are not yet included.
+2. How much the demo flags post-ictal segments (`SZSCAN_SPEC_v5.md` §8 **O4b**).
+3. The demo's operating point (§8 **O1** — read from file, never retyped).
+4. Screenshots of the running app.
+
+Items 1–3 arrive at **build step 1**; item 4 at step 2 or later.
+
+### 4.3 Hazards specific to the demo section
+
+- **No evaluation metric of the demo appears anywhere** — not in the product, not as a demo result in
+  the report. Sensitivity / FP/day / AUROC belong to the thesis pipeline only.
+- **Never present demo output as validation of the thesis numbers.** Different input conditions by
+  construction; the two are not comparable and must not be made to match.
+- The two divergences are **methodological choices requiring the supervisor's review**, not
+  implementation details. State them as approved divergences, not as bugs.
+- Describe the demo as label-free **and say how that is enforced** (the three guards plus
+  `test_guards.py`). An unenforced claim is weaker than an enforced one.
 
 ---
 
@@ -88,6 +145,9 @@ so will you, six weeks from now.
   attribution/XAI differentiator feed these directly; make them prominent.
 - **#5 (20) is locked** — the numbers exist and are reproducible. Just write them clearly.
 - **#1 + #8 (30)** are the biggest *writing* lifts — front-load Related Work and start figures early.
+- **The demo is worth 0 points on its own but feeds #4 and #7 (20 pts combined).** Budget time
+  accordingly: write the design-rationale section early (§4.1 is writable today), and do not let the
+  build compete with #8, which is the only 🔴 and the largest single block of writing.
 - **Report every negative as a strength** (falsification with a documented mechanism), not as a hidden
   failure. There are now three: the Phase-C 7-lever program, the attribution spread metric, and the
   uninformative D7 control. Together they are the intellectual core of the Discussion.
@@ -118,3 +178,7 @@ so will you, six weeks from now.
 10. No checkpoint is identified by filename. The constants **0.8676 / 0.836** are pre-rebuild §0 values
     and must not appear as the canonical model's fingerprint. Canonical = bias 1.1597, chb13 0.8319
     (`docs/PROVENANCE.md`).
+11. **No demo output is presented as a thesis result**, and no demo evaluation metric appears anywhere
+    (§4.3).
+12. **The two demo divergences are stated as approved methodological choices** reported to the
+    supervisor — not as implementation details and not as defects (§4.1, `SZSCAN_SPEC_v5.md` §1.6).

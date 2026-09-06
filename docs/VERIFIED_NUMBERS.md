@@ -382,6 +382,45 @@ The rows for the final system and for seed 42 are identical, as they must be —
 same configuration reached by two different file paths. This is a consistency check on the
 scoring script, and it passed.
 
+## 6.4b Directed connectivity at the representation level
+
+Source: `results/phaseC/c4full/{stage0_verdict_seed42.json, stage0_lg_variant_seed42.json,
+rlg_lg_diagnostic_seed42.json}`. Validation subjects, window tier.
+
+| Subject | Latent readout, final system | Latent readout, multi-relational | Change |
+|---|---|---|---|
+| chb10 | 0.8156 | 0.7568 | −0.0588 |
+| chb11 | 0.6410 | 0.6931 | +0.0521 |
+| chb22 | 0.7361 | 0.8729 | **+0.1368** |
+
+Macro across the full ensemble falls from **0.928 to 0.909**. The two-branch comparison is the
+same story: 0.9386 without the added relation against 0.9260 with it.
+
+The added relation is not noise — its own discriminative check gives 0.7098, 0.6740 and 0.8879
+against a null near 0.50. It carries signal and still costs accuracy overall. Of nine
+pre-registered acceptance checks, four passed. This is the cleanest statement of
+complementary-but-insufficient in the project.
+
+## 6.4c Concentration of the top-ranked channel
+
+Source: `results/attribution_v6/attribution_diagnostics.csv`. Held-out subjects.
+
+| Subject | Seizures | Distinct top-1 channels | Largest share | Null 95th percentile | Verdict |
+|---|---|---|---|---|---|
+| chb03 | 7 | 5 | 0.429 | 0.429 | within null |
+| chb06 | 10 | 7 | 0.300 | 0.300 | within null |
+| chb13 | 12 | 6 | 0.417 | 0.333 | **concentrated** |
+| chb14 | 8 | 5 | 0.250 | 0.375 | within null |
+| chb15 | 20 | 9 | 0.500 | 0.250 | **concentrated** |
+| chb16 | 10 | 4 | 0.500 | 0.300 | **concentrated** |
+| chb17 | 3 | 3 | 0.333 | 0.667 | within null |
+| chb18 | 6 | 5 | 0.333 | 0.500 | within null |
+
+Three of eight subjects repeat their top-ranked channel more than chance allows. This is
+independent evidence for the same limitation the annotation comparison raises: within a
+patient, the method behaves partly as a subject-level channel prior rather than a per-seizure
+one. It strengthens that limitation rather than weakening the method.
+
 ## 6.5 Pre-registered validation gates
 
 Source: `results/phaseC/c4lite/G2prime_te_verdict.csv` and `results/phaseC/c1/G2_c1_verdict.csv`.
@@ -511,7 +550,22 @@ merged.
    reader's, or the agreement as clinical validation.
 6. **Parameter count.** 3,285, not approximately 8.7k.
 7. **Training subject count.** Twelve, not the fifteen the split file's first key implies.
-8. **Confidence intervals.** Dropped from the detection results by decision. Intervals remain
+8. **Five existing figures plot the earlier configuration, not the final system.** Checked
+   2026-09-06 by opening the files. `E1_operating_curve.png` marks the balanced point at
+   0.632 and 38.6; `E2_persubject_breakdown.png` uses the earlier configuration's two cells;
+   `W1_roc_curves.png` shows per-subject values of 0.954, 0.437, 0.805, 0.626, 0.826, 0.871,
+   0.747 and 0.938 for a macro of **0.775**, none of which match the final system, and it
+   also draws a pooled curve that the figure specification forbids. `W2_pr_curves.png` comes
+   from the same script family. `W3_score_distribution.png` could not be attributed from the
+   image and has no generating script in the repository. All five must be rebuilt from the
+   final system's committed grid and ensemble arrays before they enter any chapter.
+
+   Two of the ten existing assets were checked and are correct: the synthetic-injection figure
+   (the specification's warning about it was a false alarm; three cosmetic issues only) and the
+   per-subject attribution forest plot, which carries the provisional qualifier and matches the
+   summary file. The forest plot's title refers to a reader, which must change.
+
+9. **Confidence intervals.** Dropped from the detection results by decision. Intervals remain
    only for the attribution agreement, where removing them would make a provisional result look
    settled. The interval column of the metrics table, the interval sentences in the methodology
    and validity sections, and the two interval references become unused; nothing is renumbered
@@ -522,6 +576,8 @@ merged.
 # Part 9 · Values that must never appear
 
 `0.750` · `0.829` · `0.791` · `39.77` · `71.25` · `0.8676` · `0.836`
+
+Add **`0.775`** to what must be watched. It is the earlier configuration's macro window-tier value and it appears on an existing figure; the final system's value is 0.805.
 
 Two live hazards remain in files a chapter writer has to open:
 `src/retrain/train_gae_joint.py` repeats two of them in its opening docstring, and the graph
@@ -536,4 +592,7 @@ itself has already been corrected.
 |---|---|
 | Whether the machine-generated annotation is kept in the body, moved to an appendix, or deferred to a later publication | Decision pending; a fallback that does not depend on the answer is described in Part 7.1 |
 | Training-subject components, which would complete the weight-derivation cross-check | Not committed |
+| Five detection figures rebuilt from the final system | Build task; sources all present |
+| Library versions for the software table | One command, not yet run |
+| Published reference points for the comparison figure, checked against the source papers | Cannot be done without the papers |
 | One docstring line in the training script | One-line edit |

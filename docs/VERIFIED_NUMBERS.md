@@ -527,6 +527,48 @@ hypothesis. Reported as a methodological negative and never used to classify.
 
 ---
 
+# Part 7b · External comparators, checked against the source papers
+
+Five source papers were opened on 2026-09-06 and the figures this project relies on were read
+from them directly. The reference sheet's own caveats stand; these are the numeric rows that
+will appear in the comparison table and figure, so they were checked individually.
+
+## 7b.1 The unsupervised CHB-MIT comparator
+
+Yildiz et al., Table 1, CHB-MIT row, variational autoencoder:
+**precision 0.54, recall 0.64, accuracy 0.68, AUC 0.68**, each averaged over five test folds.
+
+**The value 0.68 that circulates in this project's notes is the accuracy and the discrimination
+value, not the sensitivity.** The sensitivity is 0.64. Placing 0.68 in a sensitivity column
+would be an error.
+
+Two further limits on this comparison, both from the paper's own description of its method.
+The five folds partition **windows**, not patients, so the evaluation is not patient-independent
+in the sense this thesis uses. And the paper reports no false-alarm rate, so the study
+**cannot be placed on a sensitivity-against-false-alarms plane at all**. It belongs in the
+comparison table with its scoring level stated, not on the comparison figure.
+
+## 7b.2 The patient-independent event-level band
+
+The 2025 challenge report gives, for the winning submission: **F1 0.43, sensitivity 0.37,
+precision 0.45, at 1.34 false alarms per day**, scored at event level on a held-out
+patient-independent dataset. A commercial system in the same comparison reached F1 0.441.
+
+Against this: the headline reported here is F1 0.213 at 27.4 false alarms per day, below the
+band. The trade-off curve reaches F1 0.426 at 4.9 false alarms per day, matching the winning
+submission's F1 — but at nearly four times its false-alarm rate, **on a different dataset**,
+and at a point located after the held-out set had been scored. Both halves of that sentence
+have to travel together.
+
+## 7b.3 The attribution comparator
+
+The graph-based channel-anomaly paper reports two variants. The figures this project cites —
+**0.704, 0.551, 0.432, 0.775** — are the stronger of the two; the other variant gives 0.667,
+0.433, 0.424, 0.745. The variant must be named wherever the numbers appear. The dataset is
+TUSZ, not CHB-MIT, so this is a scale reference and never a like-for-like comparison.
+
+---
+
 # Part 8 · Corrections to the locked documents
 
 Each of these is a place where a locked planning document states something the data does not

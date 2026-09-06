@@ -1,0 +1,28 @@
+# alternatives.txt — input for src/phaseB/score_alternatives.py
+#
+# Format:  <label shown in the output> | <path to the 48-cell grid csv>
+# The FIRST line is the incumbent; every other row is reported as a difference
+# from it. All grids below are VALIDATION grids (chb10, chb11, chb22).
+#
+# Labels here are for the intermediate file only. The report's own wording for
+# each row comes from the chapter, not from this file.
+
+final system (incumbent)              | results/phaseB/tier2/rlg/final_eval_seed42.csv
+
+# --- component ablations: remove one readout ---
+drop reconstruction readout           | results/phaseB/tier2/lg/final_eval_seed42.csv
+drop latent readout                   | results/phaseB/tier2/rg/final_eval_seed42.csv
+
+# --- design alternatives ---
+directed connectivity, score level    | results/phaseC/c4lite/rltg_te/final_eval_seed42.csv
+alternative smoothing, median 9       | results/phaseC/c1/rlg_median9/final_eval_seed42.csv
+alternative smoothing, median 15      | results/phaseC/c1/rlg_median15/final_eval_seed42.csv
+onset-slope change-point filtering    | results/phaseC/c_onset/slope75/final_eval_seed42.csv
+artifact gate, isolated spikes        | results/phaseC/artifact_gate/scored_gated_iso2/final_eval_seed42.csv
+artifact gate, per-window             | results/phaseC/artifact_gate/scored_gated/final_eval_seed42.csv
+
+# --- model-initialisation robustness: the same system, four trained models ---
+initialisation 42                     | results/phaseC/c_onset/seedcheck/seed42/slope0/final_eval_seed42.csv
+initialisation 1                      | results/phaseC/c_onset/seedcheck/seed1/slope0/final_eval_seed1.csv
+initialisation 2                      | results/phaseC/c_onset/seedcheck/seed2/slope0/final_eval_seed2.csv
+initialisation 3                      | results/phaseC/c_onset/seedcheck/seed3/slope0/final_eval_seed3.csv

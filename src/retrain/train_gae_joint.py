@@ -1,9 +1,12 @@
 """
 train_gae_joint.py — reconstructed training loop for the joint GAE (PHA 1, step 1).
 
-Depends on gae_joint.py (the class validated byte-compatible with the retained checkpoint:
-strict load OK, chb13 AUROC 0.8360, bias 0.8676). The ONLY new thing here is the training
-loop; the model, input construction, and loss are the verified ones.
+Depends on gae_joint.py. Model identity is established by reproducing the committed
+held-out component arrays from the checkpoint, never by a hard-coded constant: filenames,
+sizes and legacy fingerprints are not identity evidence, and reasoning from them once led
+this project to the wrong conclusion about which checkpoint was canonical. Run the
+provenance check for the current verdict. The ONLY new thing here is the training loop;
+the model, input construction, and loss are the verified ones.
 
 PRE-REGISTERED (PREREG 01): train on interictal windows of 12 TRAIN subjects, validate on
 3 held-out VAL subjects (subject-level), never touch ictal or the 8 TEST subjects. Loss is
@@ -138,7 +141,7 @@ def train_seed(seed, train_ds, val_ds, epochs, batch, lr, device,
                          Path(feat_dir) / "chb13_ictal_features.npy", device)
     auc = roc_auc_score(np.r_[np.zeros(len(si)), np.ones(len(sc))], np.r_[si, sc])
     print(f"  [seed {seed}] SAVED {ckpt.name} | final train={tr_curve[-1]:.6f} "
-          f"val={va_curve[-1]:.6f} | chb13 AUROC={auc:.4f} (locked ~0.836)")
+          f"val={va_curve[-1]:.6f} | chb13 AUROC={auc:.4f}")
     return auc
 
 

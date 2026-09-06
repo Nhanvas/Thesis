@@ -53,9 +53,15 @@ Fixed threshold vs top-k%:
   (not rescaled) so both topology changes and weight magnitude changes
   contribute to the anomaly score.
 
-  Diagnostic evidence (E_sparse): Frobenius distance between ictal
-  and interictal mean adjacency improves +88% to +411% across 8 test
-  subjects when switching from fixed t=0.05 to top-k 20%.
+  Diagnostic evidence: the per-subject output behind the earlier
+  "+88% to +411%" figure was never committed and that figure has not
+  been reproduced; do not cite it. The committed measurement is
+  results/diagnostics/density_frobenius_v2/. It reports the raw
+  Frobenius distance alongside two scale-comparable measures, because
+  the raw norm sums over entries that top-k removes and therefore
+  shrinks for arithmetic reasons whatever happens to separation. On
+  the normalised measures, top-k increases the ictal-to-interictal
+  separation on all eight held-out subjects.
 """
 
 import numpy as np

@@ -1,0 +1,5 @@
+operating_point,sensitivity,sensitivity_locked,precision,precision_locked,fp_per_day,fp_per_day_locked,MATCH
+s0_balanced_matched_cell,0.645,0.645,0.099,0.099,38.4,38.4,True
+s0_highsens_matched_cell,0.763,0.763,0.065,0.065,72.0,72.0,True
+val_derived_balanced,0.618,0.618,0.129,0.129,27.4,27.4,True
+val_derived_highsens,0.711,0.711,0.068,0.068,64.4,64.4,True

@@ -1,0 +1,105 @@
+{
+  "procedure_steps_performed": [
+    "simplex sweep on validation subjects",
+    "anti-overfit tie-break toward equal"
+  ],
+  "procedure_steps_not_performed": [
+    "training-subject cross-check (components not committed)"
+  ],
+  "scoring_tier": "window (macro AUROC across validation subjects)",
+  "branch_set": [
+    "zrecon",
+    "zlatent",
+    "zgamma"
+  ],
+  "subjects": [
+    "chb10",
+    "chb11",
+    "chb22"
+  ],
+  "simplex_step": 0.05,
+  "tie_break_tolerance": 0.005,
+  "n_grid_points": 231,
+  "best_weights": [
+    0.1,
+    0.45,
+    0.45
+  ],
+  "best_objective": 0.940538,
+  "n_within_tolerance": 29,
+  "tiebreak_adopted_weights": [
+    0.25,
+    0.35,
+    0.4
+  ],
+  "tiebreak_adopted_objective": 0.936292,
+  "equal_weights_exact": [
+    0.333333,
+    0.333333,
+    0.333333
+  ],
+  "equal_weights_objective": 0.928322,
+  "equal_weights_per_subject": {
+    "chb10": 0.849995,
+    "chb11": 0.95637,
+    "chb22": 0.978602
+  },
+  "nearest_lattice_to_equal": [
+    0.3,
+    0.35,
+    0.35
+  ],
+  "nearest_lattice_objective": 0.932468,
+  "gap_best_minus_equal_exact": 0.012216,
+  "equal_within_tolerance_of_best": false,
+  "neighbourhood_pm_step": [
+    {
+      "w": [
+        0.2,
+        0.4,
+        0.4
+      ],
+      "macro_auroc": 0.939274
+    },
+    {
+      "w": [
+        0.2,
+        0.35,
+        0.45
+      ],
+      "macro_auroc": 0.938159
+    },
+    {
+      "w": [
+        0.3,
+        0.3,
+        0.4
+      ],
+      "macro_auroc": 0.930853
+    },
+    {
+      "w": [
+        0.25,
+        0.3,
+        0.45
+      ],
+      "macro_auroc": 0.934177
+    },
+    {
+      "w": [
+        0.3,
+        0.35,
+        0.35
+      ],
+      "macro_auroc": 0.932468
+    },
+    {
+      "w": [
+        0.25,
+        0.4,
+        0.35
+      ],
+      "macro_auroc": 0.9368
+    }
+  ]
+}

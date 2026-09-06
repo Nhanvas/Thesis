@@ -191,10 +191,20 @@ total seizure duration (76 x 51.9 s = 1.10 h). The false-alarm denominator is th
 recorded time minus ictal time, with no post-ictal exclusion. Any description of a post-seizure
 buffer applied to this denominator would be incorrect.
 
-**Only 23 subjects are used.** The corpus directory contains a `chb24` folder, but no summary
-file for it exists in the summary directory, so it is absent from every count above. The reason
-for the exclusion is not recorded anywhere in the project and needs to be stated in the report,
-because the literature routinely describes this corpus as having 24 cases.
+**Only 23 subjects are used, and the report does not discuss the twenty-fourth.** The corpus
+directory contains a `chb24` folder, but no summary file for it exists anywhere in the release
+copy, and the preprocessing stage requires that file to segment recordings and locate seizures.
+The original study behind this corpus used 23 cases; the twenty-fourth was added to the archive
+afterwards. The decision, taken 2026-09-06, is to use 23 and to say nothing about the exclusion
+in the body.
+
+That decision carries one obligation. **Every corpus figure in the report is taken from this
+project's own parse of the 23 summary files** — 23 subjects, 182 seizures, 961.6 recorded hours,
+and the per-set and per-subject figures above — and never from a corpus description quoted out
+of a cited paper. Published descriptions of this corpus give 23 in some places and 24 in others;
+copying one into a chapter whose tables say 23 is an internal contradiction inside a single
+chapter. A one-sentence oral answer should be prepared for the defence, but it does not belong
+in the text.
 
 ---
 
@@ -525,6 +535,5 @@ itself has already been corrected.
 | Item | Status |
 |---|---|
 | Whether the machine-generated annotation is kept in the body, moved to an appendix, or deferred to a later publication | Decision pending; a fallback that does not depend on the answer is described in Part 7.1 |
-| Reason chb24 is excluded from the corpus | Not recorded anywhere in the project |
 | Training-subject components, which would complete the weight-derivation cross-check | Not committed |
 | One docstring line in the training script | One-line edit |

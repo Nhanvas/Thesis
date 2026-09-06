@@ -1,0 +1,242 @@
+Repo root: F:\Study\Thesis\Code   subj=chb03
+
+### Fig1.2 — connectivity heatmaps (one running-example subject)
+  FOUND: data\processed\chb03_interictal_adjs_topk20.npy
+    shape=(17204, 18, 18)  dtype=float32  min=0  max=0.9658
+  FOUND: data\processed\chb03_ictal_adjs_topk20.npy
+    shape=(106, 18, 18)  dtype=float32  min=0  max=0.8996
+
+### Fig2.2 / Table2.3 — seizure blocks (TEST set, durations + counts)
+  FOUND: results\attribution_v6\seizure_blocks.csv
+    shape=(89, 10)  columns=['subject', 'seizure_idx', 'edf_file', 'onset_s', 'offset_s', 'dur_s', 'n_windows', 'row_start', 'row_end', 'contiguous']
+    head:
+  subject  seizure_idx      edf_file  onset_s  offset_s  dur_s  n_windows  row_start  row_end  contiguous
+0   chb03            0  chb03_01.edf      362       414     52         14          0       13        True
+1   chb03            1  chb03_02.edf      731       796     65         17         14       30        True
+2   chb03            2  chb03_03.edf      432       501     69         18         31       48        True
+
+### Fig2.3 — raw vs preprocessed EEG (already exists)
+  FOUND: figures\raw_vs_preprocessed.png
+    image size=(2176, 1810)  mode=RGBA
+  FOUND: src\dataprep\plot_raw_vs_preprocessed.py
+    242 lines. First 15:
+      """
+      plot_raw_vs_preprocessed.py
+      ============================
+      Illustrative figure: a raw EEG segment vs. the SAME segment after the locked
+      preprocessing pipeline (bandpass 0.5-60 Hz -> notch 60 Hz -> z-score), reusing
+      the filter design, `open_edf`, and summary parser DIRECTLY from `preprocessing.py`
+      so this figure is guaranteed to match what the real pipeline computes (no logic
+      duplicated). ONE combined figure, 2 stacked panels (Raw / Preprocessed), same
+      subject / time window / channel. No seizure label is drawn on the plot.
+      
+      By default the segment is auto-picked to AVOID seizure windows (uses
+      `preprocessing.parse_summary` + `build_labels`), so the figure demonstrates
+      general preprocessing quality on ordinary background EEG, not seizure-specific
+      amplitude. Pass --include_seizure to lift that restriction, or --start to pick
+      an exact timestamp yourself once you've looked at a subject's data.
+
+### Fig2.4 / Fig2.5 — one window -> graph construction, and sparsification
+  FOUND: data\processed\chb03_interictal.npy
+    shape=(17204, 18, 1024)  dtype=float32  min=-4.996  max=5.001
+  FOUND: data\processed\chb03_interictal_features.npy
+    shape=(17204, 18, 5)  dtype=float32  min=-3.632  max=3.537
+  FOUND: data\processed\chb03_interictal_adjs_topk20.npy
+    shape=(17204, 18, 18)  dtype=float32  min=0  max=0.9658
+
+### Fig2.8 — reconstruction error, inverted vs normal patient
+  FOUND: data\pernode_v2\seed42\chb06_interictal_pernode.npy
+    shape=(19826, 18)  dtype=float32  min=9.854e-07  max=0.2959
+  FOUND: data\pernode_v2\seed42\chb06_ictal_pernode.npy
+    shape=(45, 18)  dtype=float32  min=5.576e-06  max=0.1459
+  FOUND: data\pernode_v2\seed42\chb03_interictal_pernode.npy
+    shape=(17204, 18)  dtype=float32  min=1.62e-06  max=0.2044
+  FOUND: data\pernode_v2\seed42\chb03_ictal_pernode.npy
+    shape=(106, 18)  dtype=float32  min=4.353e-06  max=0.1683
+  FOUND: src\figures\visualize_chb06_inversion.py
+    288 lines. First 15:
+      """
+      ================================================================================
+       visualize_chb06_inversion.py
+      ================================================================================
+      WHY THIS FILE EXISTS
+      ---------------------
+      "Inverted connectivity" for chb06 has been a text-only claim across every
+      document (med_z_ictal negative, AUROC 0.44 near chance, event sens 2-4/10).
+      This script makes it VISIBLE, using data that is already cached (no GPU, no
+      retrain) plus an optional best-effort layer if raw adjacency arrays are
+      available on disk.
+      
+      THREE PANELS
+      ------------
+      1. TIMELINE (always available -- uses cached ensemble scores):
+
+### Fig2.9 — ensemble weight-sweep grid (PREREG_03)
+  MISSING: results\retrain\prereg03\derive_weights_grid.csv
+  MISSING: results\retrain\derive_weights_grid.csv
+  MISSING: results\phaseB\prereg03\derive_weights_grid.csv
+
+### Fig3.1 dependency — Frobenius separation before/after sparsification (DM1)
+  FOUND: results\history_topology\topo_features
+    16 item(s) shown (first 30):
+      chb03_topo_ictal.npy
+      chb03_topo_inter.npy
+      chb06_topo_ictal.npy
+      chb06_topo_inter.npy
+      chb13_topo_ictal.npy
+      chb13_topo_inter.npy
+      chb14_topo_ictal.npy
+      chb14_topo_inter.npy
+      chb15_topo_ictal.npy
+      chb15_topo_inter.npy
+      chb16_topo_ictal.npy
+      chb16_topo_inter.npy
+      chb17_topo_ictal.npy
+      chb17_topo_inter.npy
+      chb18_topo_ictal.npy
+      chb18_topo_inter.npy
+  MISSING: results\dm1_frobenius.csv
+
+### Table3.2 / Fig3.8 — window-level per-subject results (TEST)
+  FOUND: results\phaseB\tier2\rlg_test\final_eval_seed42.csv
+    shape=(384, 12)  columns=['seed', 'subject', 'mag_pct', 'pen_mult', 'tp', 'fp', 'n_seizures', 'n_inter_h', 'sensitivity', 'precision', 'fp_per_day', 'window_auroc']
+    head:
+   seed subject  mag_pct  pen_mult  tp   fp  n_seizures  n_inter_h  sensitivity  precision  fp_per_day  window_auroc
+0    42   chb03     40.0       0.3   7  128           7      37.88          1.0   0.051852   81.091069        0.9643
+1    42   chb03     50.0       0.3   7  106           7      37.88          1.0   0.061947   67.153542        0.9643
+2    42   chb03     55.0       0.3   7   97           7      37.88          1.0   0.067308   61.451826        0.9643
+
+### Fig3.2 / Fig3.3 — window-level distributions, ROC, PR (already exist)
+  FOUND: figures\window_level\W1_roc_curves.png
+    image size=(884, 885)  mode=RGBA
+  FOUND: figures\window_level\W2_pr_curves.png
+    image size=(884, 885)  mode=RGBA
+  FOUND: figures\window_level\W3_score_distribution.png
+    image size=(2385, 1109)  mode=RGBA
+
+### Fig3.6 / Fig3.7 — event-level operating curve + per-subject (already exist)
+  FOUND: figures\event_level\E1_operating_curve.png
+    image size=(877, 747)  mode=RGBA
+  FOUND: figures\event_level\E2_persubject_breakdown.png
+    image size=(1394, 1280)  mode=RGBA
+  FOUND: src\figures\plot_event_level.py
+    297 lines. First 15:
+      """
+      ================================================================================
+       plot_event_level.py  â€”  E1 + E2 event-level result figures (baseline-of-record, Â§0)
+      ================================================================================
+      WHY THIS FILE
+      -------------
+      Both figures are built ONLY from `final_eval_seed42.csv` â€” the raw per-(subject,
+      mag_pct, pen_mult) SzCORE grid produced by `score_ens.py`'s fast grid (bit-identical
+      to `szcore_eval.evaluate_subject`; see that script's own --verify flag). Nothing
+      here reads a pre-pooled summary table (e.g. `report_metrics.csv` or the numbers
+      printed in RESULTS_OF_RECORD.md) â€” every number on both plots is recomputed from
+      TP/FP/n_seizures/n_inter_h at the row level, using the same pooled (micro)
+      aggregation SzCORE prescribes and Â§0 was locked with.
+      
+      Verified before writing this script (see the two `pool()` checks against
+
+### Fig3.5 — detection latency per matched seizure
+  FOUND: results\phaseB\tier2\rlg_test
+    1 item(s) shown (first 30):
+      final_eval_seed42.csv
+
+### Fig3.11 / Table3.8 — synthetic attribution validation grid
+  FOUND: results\attribution_v6\synthetic_sanity.csv
+    shape=(50, 10)  columns=['panel', 'alpha', 'n_injected', 'macro_AUROC', 'macro_AUPRC', 'recall_at_S', 'null_mean', 'null_p95', 'p_perm', 'spread_mean']
+    head:
+  panel  alpha  n_injected  macro_AUROC  macro_AUPRC  recall_at_S  null_mean  null_p95  p_perm  spread_mean
+0   VAL    1.0           1       0.4912       0.1895       0.0650     0.4990    0.5347  0.6314       0.9765
+1   VAL    1.0           2       0.4873       0.2339       0.1125     0.5003    0.5267  0.8062       0.9778
+2   VAL    1.0           4       0.5087       0.3359       0.2213     0.4994    0.5205  0.2258       0.9761
+
+### Fig3.12 / Fig3.13 — attribution scores, all seeds (already have figures, need data)
+  FOUND: results\attribution_v6\attribution_scores.csv
+    shape=(10944, 9)  columns=['seed', 'subject', 'seizure_idx', 'n_windows', 'agg', 'ch_idx', 'ch_name', 'score', 'rank']
+    head:
+   seed subject  seizure_idx  n_windows  agg  ch_idx ch_name      score  rank
+0    42   chb03            0         14  p95       0  FP1-F7   5.210460     4
+1    42   chb03            0         14  p95       1   F7-T7   4.430967     6
+2    42   chb03            0         14  p95       2   T7-P7  10.307344     1
+
+### Table3.9 / Fig3.14 — attribution vs reference annotation
+  FOUND: results\attribution_v6\attribution_summary.csv
+    shape=(14, 15)  columns=['panel', 'n_seizures', 'seed', 'agg', 'macro_AUROC', 'AUROC_CI_lo', 'AUROC_CI_hi', 'macro_AUPRC', 'AUPRC_CI_lo', 'AUPRC_CI_hi', 'recall_at_S', 'AUROC_subject_ctrl', 'delta_vs_ctrl', 'null_mean', 'p_perm']
+    head:
+                 panel  n_seizures  seed  agg  macro_AUROC  AUROC_CI_lo  AUROC_CI_hi  macro_AUPRC  AUPRC_CI_lo  AUPRC_CI_hi  recall_at_S  AUROC_subject_ctrl  delta_vs_ctrl  null_mean  p_perm
+0  ALL focal (D5 pr...          36    42  p95       0.6497       0.5663       0.7390       0.3095       0.2273       0.4088       0.1389              0.7758        -0.1261     0.5010   0.001
+1    focal excl. chb15          16    42  p95       0.6267       0.4912       0.7545       0.3432       0.1910       0.5174       0.2188              0.6248         0.0020     0.4996   0.038
+2           chb15 only          20    42  p95       0.6681       0.5368       0.7934       0.2826       0.1979       0.3938       0.0750              0.8967        -0.2286     0.5020   0.004
+  FOUND: results\attribution_v6\attribution_perseizure.csv
+    shape=(36, 9)  columns=['subject', 'seizure_idx', 'n_windows', 'n_ictal_ch', 'AUROC', 'AUPRC', 'recall_at_S', 'spread', 'AUROC_ctrl']
+    head:
+  subject  seizure_idx  n_windows  n_ictal_ch   AUROC   AUPRC  recall_at_S  spread  AUROC_ctrl
+0   chb03            0         14           2  1.0000  1.0000          1.0  0.9466         1.0
+1   chb03            1         17           1  0.8235  0.2500          0.0  0.9844         1.0
+2   chb03            2         18           1  0.5294  0.1111          0.0  0.9875         1.0
+
+### Table3.10 — within-patient annotation similarity
+  FOUND: results\attribution_v6\label_diversity.csv
+    shape=(5, 5)  columns=['subject', 'n_focal', 'distinct_label_sets', 'mean_jaccard', 'union_size']
+    head:
+  subject  n_focal  distinct_label_sets  mean_jaccard  union_size
+0   chb03        6                    2        0.8333           2
+1   chb14        3                    2        0.6667           2
+2   chb15       20                    2        0.9053           2
+
+### Fig3.15 — diffuseness (spread) vs |S|
+  FOUND: results\attribution_v6\synthetic_spread.csv
+    shape=(10, 5)  columns=['panel', 'alpha', 'n_injected', 'spread_mean', 'spread_sd']
+    head:
+  panel  alpha  n_injected  spread_mean  spread_sd
+0   VAL    2.0           1       0.9644     0.0187
+1   VAL    2.0           2       0.9567     0.0228
+2   VAL    2.0           4       0.9441     0.0227
+
+### Table A.2 — channel annotation per seizure (PROVISIONAL)
+  FOUND: results\attribution_v6\labels\ictal_channels_DRAFT.csv
+    shape=(76, 14)  columns=['subject', 'seizure_idx', 'edf_file', 'onset_s', 'offset_s', 'dur_s', 'n_windows', 'ictal_channels', 'n_ictal_channels', 'uncertain_channels', 'flags', 'focal_generalized', 'label_source', 'note']
+    head:
+  subject  seizure_idx      edf_file  onset_s  offset_s  dur_s  n_windows ictal_channels  n_ictal_channels  uncertain_channels  flags focal_generalized         label_source                 note
+0   chb03            0  chb03_01.edf      362       414     52         14    T7-P7|P7-O1                 2                 NaN    NaN             focal  AI-DRAFT (attrib...  Left posterior t...
+1   chb03            1  chb03_02.edf      731       796     65         17          T7-P7                 1                 NaN    NaN             focal  AI-DRAFT (attrib...  T7-P7 thick sust...
+2   chb03            2  chb03_03.edf      432       501     69         18          T7-P7                 1                 NaN    NaN             focal  AI-DRAFT (attrib...  Left temporal T7...
+
+### Table A.4 — top-1 concentration vs random null
+  FOUND: results\attribution_v6\attribution_diagnostics.csv
+    shape=(8, 6)  columns=['subject', 'n_seizures', 'distinct_top1', 'max_share', 'null_p95', 'verdict']
+    head:
+  subject  n_seizures  distinct_top1  max_share  null_p95       verdict
+0   chb03           7              5      0.429     0.429            ok
+1   chb06          10              7      0.300     0.300            ok
+2   chb13          12              6      0.417     0.333  CONCENTRATED
+
+### Table A.7 — top-3 channels per seizure (already exists)
+  FOUND: figures\attribution\attribution_top3_channels.csv
+    shape=(76, 9)  columns=['subject', 'seizure_idx', 'n_windows', 'rank1_channel', 'rank1_score', 'rank2_channel', 'rank2_score', 'rank3_channel', 'rank3_score']
+    head:
+  subject  seizure_idx  n_windows rank1_channel  rank1_score rank2_channel  rank2_score rank3_channel  rank3_score
+0   chb03            0         14         T7-P7      10.3073         P7-O1       9.1051         F3-C3       5.2172
+1   chb03            1         17         C4-P4       8.8546        FP1-F7       8.7019         C3-P3       6.6263
+2   chb03            2         18         FZ-CZ       9.5230         P7-O1       8.6628         C4-P4       7.1546
+
+### running example (Fig2.10/3.4/3.10) — raw EDF root + gamma-AEC script (needed for the regeneration script, next step)
+  FOUND: src\dataprep\compute_gamma_aec.py
+    136 lines. First 15:
+      # src/compute_gamma_aec.py
+      """
+      P2.2: Compute gamma AEC (30-60 Hz) anomaly scores for all subjects.
+      
+      Gamma band amplitude envelope correlation increases during seizures in 7/8
+      subjects including chb06 (where wPLI/AEC reconstruction is inverted).
+      HFO-related gamma amplitude coupling provides complementary signal to phase-
+      based connectivity.
+      
+      Outputs per subject:
+        gamma_aec_{subj}_inter.npy  [N_inter] float32 â€” z-normalized scores
+        gamma_aec_{subj}_ictal.npy  [N_ictal] float32 â€” z-normalized scores
+      
+      No GPU needed. All computation from existing raw windows.
+      """
+

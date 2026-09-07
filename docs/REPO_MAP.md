@@ -1,4 +1,4 @@
-# REPO_MAP — repository structure, post-cleanup, rev. 2026-09-03
+# REPO_MAP — repository structure, post-cleanup, rev. 2026-09-06
 
 > **Before quoting any number or loading any checkpoint, run the session gate:**
 > ```bash
@@ -13,7 +13,8 @@ this file (paths) > project instructions > memory.
 
 **Repo:** `F:/Study/Thesis/Code` · github.com/Nhanvas/Thesis · branch `main`
 **Tags:** `pre-cleanup` (safety snapshot) · `phase-c-final` (locked rlg thesis, restore point) ·
-`demo-spec-v5` (web-demo spec set locked) · `repo-deps-fixed` (two canonical deps restored — see §7.7)
+`demo-spec-v5` (web-demo spec set locked) · `repo-deps-fixed` (two canonical deps restored — see §7.7) ·
+`verification-complete` (every reported number traced to a source file — see `docs/VERIFIED_NUMBERS.md`)
 
 ---
 
@@ -27,7 +28,7 @@ Code/
 ├── data/         inputs, checkpoints, per-node dumps  (processed/ ~30 GB, gitignored)
 ├── results/      all committed outputs
 ├── archive/      superseded code and artifacts — DO NOT CITE, DO NOT RUN
-├── figures/      rendered report figures
+├── figures/      rendered report figures  (`archive/` holds five built from the earlier configuration — §7.8)
 ├── notebooks/    Kaggle GPU notebooks
 ├── logs/         preprocessing run logs (2026-04)
 ├── _project_audit/   local audit tooling (untracked, not part of the pipeline)
@@ -68,6 +69,11 @@ Code/
 | `plot_raw_vs_preprocessed.py` | Report figure: raw vs preprocessed segment. |
 | `create_splits.py` | ⚠️ **TRAP — see §7.1.** Generates the old **E_main 15/8** split, NOT the locked 12/3/8 split. |
 
+**Added 2026-09-06:** `density_frobenius_diagnostic.py` — graph density and ictal-to-interictal
+separation under both sparsification rules. Writes `results/diagnostics/density_frobenius_v2/`.
+Reports the raw Frobenius distance **and** two scale-comparable measures, because the raw one is not
+comparable between rules — see §7.9.
+
 ### 2.3 `src/retrain/` — Phase-B rebuild (18 files)
 
 | file | purpose |
@@ -102,6 +108,14 @@ Code/
 | `per_subject_op_check.py` | Per-subject label-free FP budget on rlg. |
 | `archive/gae_joint_gsl.py` · `train_gae_gsl.py` · `train_gae_compact.py` | S2 (learned graph structure) and S3 (Deep-SVDD) — **negatives**, settled, do not re-propose. |
 
+**Added 2026-09-06** (verification pass; all three read committed files only, none re-runs the model):
+
+| file | purpose |
+|---|---|
+| `derive_weights_rlg.py` | Repeats the pre-registered weight derivation for the branch set actually in use. Validation subjects only, with a hard guard against held-out data. → `results/phaseB/tier2/weights_rlg/`. |
+| `score_alternatives.py` | Applies the per-subject FP-budget rule, imported unchanged, to every design alternative and to the four trained models. Manifest: `src/phaseB/alternatives.txt`. → `results/phaseB/tier2/alternatives/`. |
+| `extract_latency_rlg.py` | Recovers detection latency, which the scoring writer silently dropped. Reproduces the four locked operating points before reporting anything. → `results/phaseB/tier2/latency/`. |
+
 ### 2.5 `src/phaseC/` — Phase-C levers, all negative (19 files)
 
 Directed connectivity (`connectivity_probe`, `build_te_branch`, `build_te_adj`, `gae_joint_multirel`,
@@ -118,6 +132,10 @@ plus `check_ckpts.py` and `place_seeds.py`.
 PELT change points) · `plot_event_level.py` (E1/E2 event-level figures) ·
 `visualize_channel_attribution.py` · `visualize_chb06_inversion.py` · `attribution_headmap.py`
 (display-only per-channel heat map).
+`describe_report_assets.py` (moved from the repository root 2026-09-06) — read-only inventory of every
+source file the exhibit list needs; prints columns, shapes and sample rows. Output kept at
+`docs/report_assets_inventory.txt`.
+
 `labeling/label_eeg_pilot.py` — blind channel-labelling EEG viewer; renders the `*_onset.png` images
 the reading pass scored. Run this if the supervisor asks for a new labelling round.
 
@@ -147,6 +165,10 @@ Outputs to `figures/attribution/`:
 | `RESULTS_OF_RECORD_phaseB.md` | **ALL NUMBERS.** §1–§6 locked TEST results · §7 seed stability + errata · §8–§9 Phase-C negatives · §10 attribution summary. |
 | `PROVENANCE.md` | **MACHINE-GENERATED.** Checkpoint identity, SHA-256, verification result. Regenerate, never hand-edit. |
 | `REPO_MAP.md` | this file — paths and purposes. |
+| `VERIFIED_NUMBERS.md` | **Every number traced to its source file, with the method used.** Written 2026-09-06. Part 8 lists the places the planning documents disagree with the data; Part 9 the values that must never appear. Use it before re-deriving anything. |
+| `LOCKED_DOCS_ADDENDUM.md` | Supersedes specific lines in the four locked planning documents. Distributed to all writing accounts. |
+| `FIGURE_REBUILD_BRIEF.md` | Specification for rebuilding the five figures that were built from the earlier configuration (§7.8). |
+| `report_assets_inventory.txt` · `requirements_snapshot.txt` | Machine-generated: exhibit source inventory, and the library versions behind the software table. |
 | `PROJECT_STATUS.md` | status, deadlines, remaining work. |
 | `RUBRIC_TRACKING.md` | v3 report checklist, 8 criteria / 100 pts. |
 | `ATTRIBUTION_SPEC.md` | v3 — the complete attribution study: problem, method, labels, metrics, results, amendments. |
@@ -207,7 +229,8 @@ offsets follow by construction — no lookup table, no summary parsing.
 | `models_retrain/gae_multirel_seed42.pt` | Phase-C C4-full negative, kept for provenance. Does not load with the standard `GAEModel`. |
 | `models_retrain/_archive/*.zip` | original Kaggle checkpoint zips, including 5 LSTM checkpoints (dropped branch). |
 | `pernode_v2/seed{42,1,2,3}/` | per-node reconstruction error, `[n_win, 18]` float32, 22 arrays + `MANIFEST.json` each. Regenerate: `attribution_pipeline.py dump --seed N`. |
-| `splits/split_main.json` | ⚠️ old E_main split — see §7.1. |
+| `splits/split_main.json` | ⚠️ read the right key — see §7.1. |
+| `summaries/` | 23 `chbNN-summary.txt` copies of the dataset summaries, added 2026-09-06. The scoring path builds its path with a `.txt` extension while the dataset ships `.md`; this folder is what `--summary_dir` should point at. The dataset copies are untouched. |
 
 **Locked splits (never violate).** TRAIN 12: chb01,02,04,05,07,08,09,12,19,20,21,23 ·
 VAL 3: chb10,11,22 · TEST 8 (ONE-SHOT): chb03,06,13,14,15,16,17,18 — 76 seizures, 278.2 interictal h.
@@ -225,6 +248,10 @@ VAL 3: chb10,11,22 · TEST 8 (ONE-SHOT): chb03,06,13,14,15,16,17,18 — 76 seizu
 | `attribution_v5/labels/` | ⚠️ **`labels_*_FINAL.csv` are the reader labels — IRREPLACEABLE, never delete.** The `*_onset.png` / `*_review.png` images are the views that were scored. |
 | `label_material/` | labelling inputs: `seizure_segments/` (76 per-seizure renderings + meta + raw npy) and a README pointing at the label files. |
 | `retrain_v3p1/` | §0 baseline grids and operating points (pre-Tier-2). Historical comparison only. |
+| `phaseB/tier2/weights_rlg/` | Weight surface for the final branch set: 231-point grid plus the exact equal-weight row, and a summary. Written 2026-09-06. |
+| `phaseB/tier2/alternatives/` | Every design alternative and every trained model at one budget ladder, under the pre-registered selection rule. The source for the alternatives table. |
+| `phaseB/tier2/latency/` | Detection latency per seizure and per subject, plus a reproduction check against the four locked operating points. |
+| `diagnostics/density_frobenius_v2/` | Graph density and separation under both sparsification rules. **Supersedes `density_frobenius_v1/`,** which reports only the raw measure — see §7.9. |
 | `history_topology/` | topology-feature probe (negative), with `topo_features/`. |
 | `history_superseded/` | ⚠️ **DO NOT CITE — see §7.4.** Pre-rebuild detection results, old attribution outputs, old weight grids. |
 
@@ -244,9 +271,15 @@ zips, already unpacked into the repo) · `scaffolding/` (pre-thesis E_main pipel
 
 ## 7 · TRAPS — each of these has caused or nearly caused a real error
 
-### 7.1 `create_splits.py` and `data/splits/split_main.json` are the WRONG split
-They encode the old **E_main 15 train / 8 test** design. The locked thesis split is **12 TRAIN / 3 VAL /
-8 TEST**. Never regenerate splits from that script; the split is fixed and listed in §4.
+### 7.1 `split_main.json` holds two splits, and the obvious key is the wrong one
+`create_splits.py` encodes the old **E_main 15 train / 8 test** design — never regenerate splits from it.
+
+The JSON file itself is subtler, and the earlier wording here was too blunt. Read on 2026-09-06, it holds
+**both**: the `train` key lists **fifteen** subjects, because it folds the three validation subjects back
+in, and `n_train` reads 15. But `inner_train`, `val` and `test` match the locked split exactly.
+
+So the file is usable — for the split table, read `inner_train` (12), `val` (3), `test` (8). Reading
+`train` or `n_train` gives fifteen training subjects, which is wrong and looks entirely plausible.
 
 ### 7.2 Five LSTM files in `src/retrain/` belong to a dropped branch
 The temporal branch was removed by **PREREG_TIER2 Amendment A1** — its training code was unrecoverable
@@ -272,9 +305,16 @@ describe the wrong model.
 are §0 values that still appear in old docs and old code comments. Run `src/verify_provenance.py`.
 
 ### 7.6 The label file is not the schema the spec asks for
-`results/attribution_v6/labels/ictal_channels_DRAFT.csv` records the reader's **dominant channel(s),
-1–2 per seizure** (40 DIFFUSE / 25 one-channel / 11 two-channel). `ATTRIBUTION_SPEC.md` §3.2 asks for
-every channel with clear ictal discharge. Any label-scored attribution number therefore answers a
+`results/attribution_v6/labels/ictal_channels_DRAFT.csv` records **dominant channel(s), 1–2 per seizure**
+(40 DIFFUSE / 25 one-channel / 11 two-channel). `ATTRIBUTION_SPEC.md` §3.2 asks for every channel with
+clear ictal discharge.
+
+**And the annotation is machine-generated.** Its `label_source` column reads, for all 76 rows, that it
+came from an automated pass. It was not produced by a human reader and has not been reviewed by the
+supervising clinician. No chapter may describe it as expert, as a reader's, or as clinical validation —
+see `docs/LOCKED_DOCS_ADDENDUM.md` §1.5 for the wording that replaces it. The upstream file is
+`results/attribution_v5/labels/labels_ALL_FINAL.csv`; "DRAFT" in the v6 filename refers to the format
+conversion, not to a lower-quality version. Any label-scored attribution number therefore answers a
 narrower question than the spec poses, and the near-constant labels make the D7 control uninformative.
 Detail: `ATTRIBUTION_SPEC.md` §3.3 and §9.3.
 
@@ -290,6 +330,34 @@ Both were live dependencies:
 Committed results were unaffected (they predate the cleanup); the ability to **reproduce** them was not.
 Both files are now back in `src/` (tag `repo-deps-fixed`). A third file, `edf_index.py`, was deleted in
 the same pass; the v5 demo architecture does not need it.
+
+### 7.8 Five committed figures were built from the earlier configuration
+Checked 2026-09-06 by opening them. `figures/event_level/E1_operating_curve.png` marks its balanced point
+at 0.632 and 38.6; `E2_persubject_breakdown.png` uses that configuration's two cells;
+`figures/window_level/W1_roc_curves.png` shows a macro of **0.775** against the final system's 0.805, and
+draws a pooled curve the figure specification forbids; `W2_pr_curves.png` comes from the same script;
+`W3_score_distribution.png` could not be attributed from the image and **has no generating script in the
+repository**.
+
+`src/figures/plot_event_level.py` says so in its own docstring, and its `LOCKED_OPS` constant holds the
+earlier configuration's two cells. It takes a `--csv` argument, but changing that argument alone is not
+enough.
+
+All five are now under `figures/archive/`. They are kept for comparison and **must not be referenced by
+any chapter**. Rebuild specification: `docs/FIGURE_REBUILD_BRIEF.md`.
+
+Two other committed figures were checked and are correct: `attribution_fig1_synthetic.png` (the exhibit
+list's warning about it was a false alarm) and `attribution_fig4_persubject_forest.png`.
+
+### 7.9 The sparsification diagnostic overwrites its own output, and its raw column misleads
+`density_frobenius_diagnostic.py` writes to a fixed directory with no record of the sampling stride, so
+re-running it at a different `--stride` silently replaces the committed numbers with different ones. This
+happened on 2026-09-06 during an import check and had to be undone. **The committed run is `--stride 20`.**
+
+Separately, the raw Frobenius column is **not comparable between the two rules**: the proportional rule
+removes about eighty percent of the entries the norm sums over, so it shrinks arithmetically and appears
+to favour the fixed threshold on six of eight subjects. The two normalised columns reverse that and agree
+on eight of eight. Any figure or claim about separation uses a normalised column.
 
 **Standing check — run after any file move, before committing:**
 ```bash

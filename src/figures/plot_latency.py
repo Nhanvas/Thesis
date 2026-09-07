@@ -56,8 +56,8 @@ def main():
     bins = np.arange(lat.min() - bin_width / 2, lat.max() + bin_width, bin_width)
     ax.hist(lat, bins=bins, color=DETECTED, edgecolor="black", linewidth=0.5, alpha=0.85)
 
-    ax.axvline(-30, color=CHANCE, ls="--", lw=1.3, label="matching tolerance (-30 s / +60 s)")
-    ax.axvline(60, color=CHANCE, ls="--", lw=1.3)
+    ax.axvline(-30, color=CHANCE, ls="--", lw=1.3, label="-30 s before onset (matching tolerance)")
+    ax.axvline(60, color=CHANCE, ls=":", lw=1.3, label="+60 s after seizure end (matching tolerance)")
     ax.axvline(med, color="black", ls="-", lw=1.3, label=f"median = {med:.0f} s")
 
     ax.set_xlabel("Latency of detected interval relative to annotated onset (s)")

@@ -204,8 +204,12 @@ methodology chapter — it invites an avoidable question about what informed the
 ## 2.5 The variant-effect figure
 
 Shade the band from −0.034 to +0.034 around zero. That is the spread across four independently
-trained models, and any variant inside it is a tie rather than a result. The
-reconstruction-removal variant sits at +0.012, inside the band.
+trained models — **0.0338**, drawn rounded — and any variant inside it is a tie rather than a
+result. The reconstruction-removal variant sits at +0.012, inside the band. Directed connectivity
+sits at −0.0339, on the boundary; the caption says so rather than presenting it as a rejection.
+
+An earlier draft of `VERIFIED_NUMBERS.md` gave this spread as 0.0345, which was wrong. The band
+itself was always drawn correctly at 0.034.
 
 ---
 

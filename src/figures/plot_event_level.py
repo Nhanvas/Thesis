@@ -153,12 +153,13 @@ def plot_e1(df, out_dir):
 
     for i, op in enumerate(MARKED_OPS):
         r = locate_locked(pooled, op)
+        f1 = 2 * r.precision * r.sensitivity / (r.precision + r.sensitivity)
         ax.scatter([r.fp_per_day], [r.sensitivity], s=170, marker=op["marker"],
                   facecolor=op["color"], edgecolor="black", linewidth=1.1, zorder=6,
                   label=op["label"])
         xytext = (20, 22) if op["key"] == "headline" else (30, -60)
         ax.annotate(
-            f"{op['label']}\nsens={r.sensitivity:.3f}  FP/day={r.fp_per_day:.1f}\n"
+            f"{op['label']}\nsens={r.sensitivity:.3f}  F1={f1:.3f}  FP/day={r.fp_per_day:.1f}\n"
             f"TP/FN/FP={int(r.tp)}/{int(r.fn)}/{int(r.fp)}",
             xy=(r.fp_per_day, r.sensitivity), xytext=xytext, textcoords="offset points",
             fontsize=8, color=op["color"],
@@ -173,7 +174,7 @@ def plot_e1(df, out_dir):
     ax.set_ylim(0.20, 0.95)
     ax.set_xlim(0, pooled.fp_per_day.max() * 1.08)
     ax.grid(alpha=0.25, lw=0.5)
-    ax.legend(loc="lower right", fontsize=8, framealpha=0.95)
+    ax.legend(loc="upper left", fontsize=8, framealpha=0.95)
 
     _save(fig, out_dir, "fig3_6_operating_curve")
     return pooled
@@ -228,18 +229,20 @@ def plot_fig3_7(df, out_dir):
     metric_handles = [Patch(facecolor=metric_colors[m], edgecolor="black", label=metric_labels[m])
                       for m in metrics]
     axa.legend(handles=metric_handles, loc="upper right", fontsize=8, framealpha=1.0)
+    for xi, sv in zip(x, sens):
+        if sv == 0:
+            axa.text(xi, 0.02, "0", ha="center", va="bottom", fontsize=8)
 
-    # ---- panel (b): FP/day per subject, own log-scale axis ----
+    # ---- panel (b): FP/day per subject, linear axis (range spans well under one decade) ----
     axb.bar(x, fpd, width=0.55, color=op["color"], edgecolor="black", linewidth=0.4)
     for xi, v in zip(x, fpd):
-        axb.text(xi, v * 1.06, f"{v:.1f}", ha="center", va="bottom", fontsize=7)
+        axb.text(xi, v + fpd.max() * 0.015, f"{v:.1f}", ha="center", va="bottom", fontsize=7)
 
     axb.set_xticks(x); axb.set_xticklabels(subs)
-    axb.set_ylabel("False positives / day (log scale)")
-    axb.set_yscale("log")
-    axb.set_ylim(top=fpd.max() * 1.6)
+    axb.set_ylabel("False positives / day")
+    axb.set_ylim(0, fpd.max() * 1.15)
     axb.set_title("(b) Per-subject false-positive rate")
-    axb.grid(axis="y", which="both", alpha=0.2, lw=0.5)
+    axb.grid(axis="y", alpha=0.2, lw=0.5)
 
     fig.suptitle(f"Fig 3.7 — event-level per-subject breakdown at the headline point only "
                 f"({op['label']})\n(seed 42, final system, SzCORE any-overlap scoring)",

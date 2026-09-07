@@ -342,7 +342,7 @@ budget rule unchanged. Three subjects, 13 seizures, budget target 5 false alarms
 | Final system | 0.846 | 0.333 | 0.478 | 4.6 | — |
 | Remove the reconstruction readout | 0.923 | 0.333 | 0.490 | 5.0 | +0.012 |
 | Remove the latent readout | 0.692 | 0.257 | 0.375 | 5.4 | −0.103 |
-| Directed connectivity at the score level | 0.769 | 0.312 | 0.444 | 4.6 | −0.034 |
+| Directed connectivity at the score level | 0.769 | 0.312 | 0.444 | 4.6 | −0.0339 |
 | Alternative smoothing, median 9 | 0.615 | 0.250 | 0.356 | 5.0 | −0.123 |
 | Alternative smoothing, median 15 | 0.692 | 0.281 | 0.400 | 4.8 | −0.078 |
 | Onset-slope change-point filtering | 0.846 | 0.324 | 0.468 | 4.8 | −0.010 |
@@ -351,13 +351,18 @@ budget rule unchanged. Three subjects, 13 seizures, budget target 5 false alarms
 
 **Three readings that must not be got wrong.**
 
-1. Removing the reconstruction readout gains 0.012, which is **below the 0.034 spread across
-   models** and is therefore a tie, not an improvement. On the held-out set at the matched cell
+1. Removing the reconstruction readout gains 0.0115, reported as 0.012, which is **below the 0.0338
+   spread across models** and is therefore a tie, not an improvement. On the held-out set at the matched cell
    it loses outright: F1 0.162 against 0.172.
 2. The per-window artifact gate produces no detections at all, because it suppresses the great
    majority of ictal windows. This is a real outcome with a known mechanism, not a missing
    value. The F1 cell reads undefined and carries an explanation.
-3. Everything in this table is measured on three validation subjects and 13 seizures. The small
+3. Directed connectivity at −0.0339 sits **on the boundary** of the 0.0338 band, outside it by one
+   ten-thousandth. It is not a clean rejection and must not be written as one. That reading fits the
+   conclusion already reached about this lever — complementary but insufficient — better than a
+   decisive failure would.
+
+4. Everything in this table is measured on three validation subjects and 13 seizures. The small
    sample is precisely why the noise threshold is as wide as it is, so stating it strengthens
    rather than weakens the argument.
 
@@ -376,7 +381,13 @@ Same source, same budget, four models of the final system:
 | seed 2 | 0.923 | 0.333 | 0.490 | 5.0 |
 | seed 3 | 0.846 | 0.306 | 0.449 | 5.2 |
 
-Standard deviation of F1: **0.0345**. The results of record quote 0.034; reproduced.
+Standard deviation of F1 across the four models: **0.0338** (sample standard deviation over the
+four-decimal values 0.4783, 0.5306, 0.4898, 0.4490). The results of record quote 0.034, which is
+this value rounded; reproduced.
+
+**An earlier draft of this document gave 0.0345.** That figure was arrived at without running the
+computation and is wrong. Any exhibit or sentence citing 0.0345 is citing an error. A band drawn at
+0.034 is correct, being the rounded value.
 
 The rows for the final system and for seed 42 are identical, as they must be — they are the
 same configuration reached by two different file paths. This is a consistency check on the

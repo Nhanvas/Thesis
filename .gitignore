@@ -21,7 +21,7 @@ data/processed/_superseded_graphs/
 
 # ===== Attribution head-map images (regenerable, large) =====
 results/**/labels/*.png
-figures/
+/figures/
 
 # ===== Audit scratch (local tooling + inventories) =====
 _project_audit/

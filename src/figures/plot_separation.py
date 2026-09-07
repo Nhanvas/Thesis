@@ -89,8 +89,7 @@ def main():
 
     out_dir = Path(a.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    for ext in ("png", "pdf"):
-        fig.savefig(out_dir / f"fig3_1_separation.{ext}", bbox_inches="tight")
+    fig.savefig(out_dir / "fig3_1_separation.png", bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / 'fig3_1_separation.png').resolve()}")
 

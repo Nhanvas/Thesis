@@ -245,7 +245,7 @@ def plot_fig3_7(df, out_dir):
     axb.grid(axis="y", alpha=0.2, lw=0.5)
 
     fig.suptitle(f"Fig 3.7 — event-level per-subject breakdown at the headline point only "
-                f"({op['label']})\n(seed 42, final system, SzCORE any-overlap scoring)",
+                f"(m{op['mag']:.0f}/p{op['pen']:.1f})\n(seed 42, final system, SzCORE any-overlap scoring)",
                 y=1.01, fontsize=10.5)
     fig.tight_layout()
     _save(fig, out_dir, "fig3_7_persubject_event")
@@ -254,11 +254,9 @@ def plot_fig3_7(df, out_dir):
 # ----------------------------------------------------------------------------
 def _save(fig, out_dir, name):
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
-    for ext in ("png", "pdf"):
-        fig.savefig(out_dir / f"{name}.{ext}", bbox_inches="tight")
+    fig.savefig(out_dir / f"{name}.png", bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / (name + '.png')).resolve()}")
-    print(f"  [saved] {(out_dir / (name + '.pdf')).resolve()}")
 
 
 # Values from docs/VERIFIED_NUMBERS.md §1.1, checked to the brief's stated precision

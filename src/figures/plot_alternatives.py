@@ -5,7 +5,7 @@
 Horizontal dot plot of the difference in event-level F1 vs the incumbent (final)
 system, from results/phaseB/tier2/alternatives/alternatives_vs_incumbent.csv.
 Shades the band [-0.034, +0.034] around zero -- the spread across four
-independently trained models (docs/VERIFIED_NUMBERS.md §6.4, SD of F1 = 0.0345,
+independently trained models (docs/VERIFIED_NUMBERS.md §6.4, SD of F1 = 0.0338,
 rounded to 0.034 in the results of record) -- every variant inside it is a tie,
 not a result.
 
@@ -115,14 +115,15 @@ def main():
     ax.legend(loc="upper left", fontsize=8)
     fig.text(0.5, -0.02,
              "Not plotted: artifact gate, every window — 0 detections, F1 undefined "
-             "(suppresses nearly all ictal windows).",
+             "(suppresses nearly all ictal windows).\n"
+             "Directed connectivity sits at -0.0339, on the boundary of the tie band "
+             "— not a clean rejection.",
              ha="center", fontsize=8, color="#555555")
 
     fig.tight_layout()
     out_dir = Path(a.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    for ext in ("png", "pdf"):
-        fig.savefig(out_dir / f"fig3_9_alternatives_effect.{ext}", bbox_inches="tight")
+    fig.savefig(out_dir / "fig3_9_alternatives_effect.png", bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / 'fig3_9_alternatives_effect.png').resolve()}")
 

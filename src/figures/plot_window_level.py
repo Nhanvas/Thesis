@@ -150,8 +150,7 @@ def plot_fig3_3(data, out_dir, window_auroc_path):
 def _save(fig, out_dir, name):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    for ext in ("png", "pdf"):
-        fig.savefig(out_dir / f"{name}.{ext}", bbox_inches="tight")
+    fig.savefig(out_dir / f"{name}.png", bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / (name + '.png')).resolve()}")
 

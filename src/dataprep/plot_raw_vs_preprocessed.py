@@ -224,8 +224,8 @@ def main():
     dur_samp = int(args.duration * P.FS)
     if args.start is None:
         ch_idx = raw.ch_names.index(args.channel)
-        start_samp = find_eventful_segment(raw, ch_idx, seizure_list, args.duration,
-                                           avoid_seizures=not args.include_seizure)
+        start_samp, _ = find_denoising_demo_segment(raw, ch_idx, seizure_list, args.duration,
+                                                    avoid_seizures=not args.include_seizure)
         print(f"[auto] most eventful {args.duration:g}s segment (channel {args.channel}) "
               f"starts at t={start_samp / P.FS:.2f}s")
     else:

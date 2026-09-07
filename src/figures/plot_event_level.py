@@ -1,50 +1,55 @@
 """
 ================================================================================
- plot_event_level.py  —  E1 + E2 event-level result figures (baseline-of-record, §0)
+ plot_event_level.py  —  Fig 3.6 + Fig 3.7 event-level result figures (final system)
 ================================================================================
 WHY THIS FILE
 -------------
-Both figures are built ONLY from `final_eval_seed42.csv` — the raw per-(subject,
-mag_pct, pen_mult) SzCORE grid produced by `score_ens.py`'s fast grid (bit-identical
-to `szcore_eval.evaluate_subject`; see that script's own --verify flag). Nothing
-here reads a pre-pooled summary table (e.g. `report_metrics.csv` or the numbers
-printed in RESULTS_OF_RECORD.md) — every number on both plots is recomputed from
-TP/FP/n_seizures/n_inter_h at the row level, using the same pooled (micro)
-aggregation SzCORE prescribes and §0 was locked with.
+Both figures are built ONLY from `results/phaseB/tier2/rlg_test/final_eval_seed42.csv`
+— the raw per-(subject, mag_pct, pen_mult) SzCORE grid for the final system. Nothing
+here reads a pre-pooled summary table — every number on both plots is recomputed from
+TP/FP/n_seizures/n_inter_h at the row level, using the pooled (micro) aggregation:
+totals summed across the 8 held-out subjects first, then divided.
 
-Verified before writing this script (see the two `pool()` checks against
-RESULTS_OF_RECORD.md §0):
-  balanced  (mag70/pen0.5): pooled sens=0.6316, FP/day=38.56, TP/FN/FP=48/28/447
-      -> matches locked 0.632 / 38.6 / 48/28/447
-  high-sens (mag55/pen0.3): pooled sens=0.7763, FP/day=72.72, TP/FN/FP=59/17/843
-      -> matches locked 0.776 / 72.7 / 59/17/843
+This is the second generation of this script. The first drew the earlier
+configuration's two operating points (mag70/pen0.5 balanced, mag55/pen0.3
+high-sensitivity) and a pooled macro curve on E2 that the exhibit list forbids;
+see docs/FIGURE_REBUILD_BRIEF.md for why it was replaced. Verified against
+docs/VERIFIED_NUMBERS.md before writing this version:
+  headline    (m50/p2.0): pooled sens=0.6184, prec=0.1288, F1=0.2132, FP/day=27.4
+      -> matches 0.618 / 0.129 / 0.213 / 27.4
+  best-on-curve (m80/p5.0): pooled sens=0.4737, prec=0.3871, F1=0.4260, FP/day=4.9
+      -> matches 0.474 / 0.387 / 0.426 / 4.9
 
 FIGURES
 -------
-E1  Sensitivity vs FP/day operating curve (Pareto trade-off), the full 48-point
-    mag_pct x pen_mult grid, pooled/micro across the 8 test subjects. Dominated
-    points shown de-emphasised (grey); the Pareto frontier connected; the two
-    LOCKED operating points (balanced, high-sensitivity) marked + annotated with
-    their exact sensitivity / FP-day / TP-FN-FP.
+Fig 3.6  Sensitivity vs FP/day operating curve (Pareto trade-off), the full 48-cell
+    mag_pct x pen_mult grid, pooled/micro across the 8 held-out subjects. Dominated
+    points shown de-emphasised (grey); the Pareto frontier connected. Exactly two
+    points are marked: the headline (m50/p2.0, the system's reported result) and
+    the best point on the curve (m80/p5.0), labelled as the best achievable point
+    on this curve and NOT as a result — it was located after the held-out set had
+    already been scored.
 
-E2  Per-subject breakdown at the two locked operating points only:
-      panel (a) sensitivity / precision / F1 per subject x 2 operating points
-                (balanced = solid, high-sensitivity = hatched)
-      panel (b) FP/day per subject x 2 operating points, own log-scale axis
+Fig 3.7  Per-subject breakdown at the headline operating point ONLY (one operating
+    point, not two — the earlier figure's second point was the earlier
+    configuration's and does not belong here):
+      panel (a) sensitivity / precision / F1 per subject
+      panel (b) FP/day per subject, own log-scale axis
                 (FP/day spans ~2 orders of magnitude across subjects; sens/
                 precision/F1 do not, so a shared axis would flatten one of them)
+
+No confidence intervals (brief rule 4). One shared palette (src/figures/palette.py).
 
 USAGE
 -----
   python plot_event_level.py
-  python plot_event_level.py --figure e1
-  python plot_event_level.py --figure e2
-  python plot_event_level.py --csv results/retrain_v3p1/final_eval_seed42.csv \
-      --out_dir docs/figures/event_level
+  python plot_event_level.py --figure fig3_6
+  python plot_event_level.py --figure fig3_7
 ================================================================================
 """
 import argparse
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
@@ -53,24 +58,21 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
-# ----------------------------------------------------------------------------
-# Locked operating points (RESULTS_OF_RECORD.md §0 / docs/REBUILD_BASELINE_LOCK.md)
-# ----------------------------------------------------------------------------
-LOCKED_OPS = [
-    dict(key="balanced", label="Balanced (mag70/pen0.5)", mag=70.0, pen=0.5,
-         color="#1f4e79", marker="o"),
-    dict(key="highsens", label="High-sensitivity (mag55/pen0.3)", mag=55.0, pen=0.3,
-         color="#c0392b", marker="^"),
-]
+sys.path.insert(0, str(Path(__file__).parent))
+from palette import INTERICTAL, ICTAL, HEADLINE, BEST_ACHIEVABLE, apply_rc
 
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.size": 10,
-    "axes.titlesize": 11,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "figure.dpi": 150,
-})
+# ----------------------------------------------------------------------------
+# The headline operating point (brief rule 3) and the best point on the
+# trade-off curve, located post hoc and never presented as a result.
+# ----------------------------------------------------------------------------
+HEADLINE_OP = dict(key="headline", label="Headline (m50/p2.0)", mag=50.0, pen=2.0,
+                    color=HEADLINE, marker="o")
+BEST_ON_CURVE_OP = dict(key="best_on_curve",
+                        label="Best point on curve (m80/p5.0) — located post hoc, not a result",
+                        mag=80.0, pen=5.0, color=BEST_ACHIEVABLE, marker="^")
+MARKED_OPS = [HEADLINE_OP, BEST_ON_CURVE_OP]
+
+apply_rc()
 
 
 # ============================================================================
@@ -149,12 +151,12 @@ def plot_e1(df, out_dir):
     ax.scatter(frontier.fp_per_day, frontier.sensitivity, s=32, color="#404040",
               zorder=4, label="Pareto frontier")
 
-    for i, op in enumerate(LOCKED_OPS):
+    for i, op in enumerate(MARKED_OPS):
         r = locate_locked(pooled, op)
         ax.scatter([r.fp_per_day], [r.sensitivity], s=170, marker=op["marker"],
                   facecolor=op["color"], edgecolor="black", linewidth=1.1, zorder=6,
                   label=op["label"])
-        xytext = (16, -36) if op["key"] == "balanced" else (-150, 26)
+        xytext = (20, 22) if op["key"] == "headline" else (30, -60)
         ax.annotate(
             f"{op['label']}\nsens={r.sensitivity:.3f}  FP/day={r.fp_per_day:.1f}\n"
             f"TP/FN/FP={int(r.tp)}/{int(r.fn)}/{int(r.fp)}",
@@ -166,94 +168,84 @@ def plot_e1(df, out_dir):
 
     ax.set_xlabel("False positives per day (pooled, 278.2 interictal h)")
     ax.set_ylabel("Event sensitivity (pooled, 76 seizures)")
-    ax.set_title("Event-level operating curve — SzCORE pooled, 8 test subjects\n"
-                "full mag% x pen grid, seed 42 (baseline-of-record)")
+    ax.set_title("Fig 3.6 — event-level operating curve, final system\n"
+                "full mag% x pen grid, pooled across 8 held-out subjects, seed 42")
     ax.set_ylim(0.20, 0.95)
     ax.set_xlim(0, pooled.fp_per_day.max() * 1.08)
     ax.grid(alpha=0.25, lw=0.5)
     ax.legend(loc="lower right", fontsize=8, framealpha=0.95)
 
-    _save(fig, out_dir, "E1_operating_curve")
+    _save(fig, out_dir, "fig3_6_operating_curve")
     return pooled
 
 
 # ============================================================================
-# E2 — per-subject breakdown at the two locked operating points
+# Fig 3.7 — per-subject breakdown at the headline operating point only
 # ============================================================================
-def plot_e2(df, out_dir):
+def plot_fig3_7(df, out_dir):
     subs = sorted(df.subject.unique())
     n = len(subs)
     x = np.arange(n)
 
-    op_rows = {}
-    for op in LOCKED_OPS:
-        d = df[(np.isclose(df.mag_pct, op["mag"])) & (np.isclose(df.pen_mult, op["pen"]))]
-        d = d.set_index("subject").reindex(subs)
-        if d[["tp", "fp", "n_seizures", "n_inter_h"]].isna().any().any():
-            raise ValueError(f"missing subject rows at {op['key']} (mag{op['mag']}/pen{op['pen']})")
-        op_rows[op["key"]] = d
+    op = HEADLINE_OP
+    d = df[(np.isclose(df.mag_pct, op["mag"])) & (np.isclose(df.pen_mult, op["pen"]))]
+    d = d.set_index("subject").reindex(subs)
+    if d[["tp", "fp", "n_seizures", "n_inter_h"]].isna().any().any():
+        raise ValueError(f"missing subject rows at {op['key']} (mag{op['mag']}/pen{op['pen']})")
+
+    tp = d["tp"].values.astype(float); fp = d["fp"].values.astype(float)
+    nsz = d["n_seizures"].values.astype(float)
+    sens = tp / nsz
+    prec = np.divide(tp, tp + fp, out=np.full_like(tp, np.nan), where=(tp + fp) > 0)
+    f1 = np.divide(2 * prec * sens, prec + sens,
+                   out=np.full_like(tp, np.nan), where=(prec + sens) > 0)
+    fpd = fp / d["n_inter_h"].values.astype(float) * 24
+
+    print(f"\n[Fig 3.7] per-subject values at the headline point ({op['label']}):")
+    for s, sv, pv, fv, fd in zip(subs, sens, prec, f1, fpd):
+        print(f"  {s}: sens={sv:.3f} prec={pv:.3f} f1={fv:.3f} fp/day={fd:.1f}")
 
     metric_colors = dict(sensitivity="#1b7837", precision="#762a83", f1="#2166ac")
     metric_labels = dict(sensitivity="Sensitivity", precision="Precision", f1="F1")
+    vals = dict(sensitivity=sens, precision=prec, f1=f1)
     metrics = ["sensitivity", "precision", "f1"]
 
     fig, (axa, axb) = plt.subplots(2, 1, figsize=(9.4, 8.4),
                                    gridspec_kw=dict(height_ratios=[1.35, 1]))
 
-    # ---- panel (a): sensitivity / precision / F1, grouped OP -> metric ----
-    n_ops, n_met = len(LOCKED_OPS), len(metrics)
-    group_w = 0.80
-    bar_w = group_w / (n_ops * n_met)
-    for oi, op in enumerate(LOCKED_OPS):
-        d = op_rows[op["key"]]
-        tp = d["tp"].values.astype(float); fp = d["fp"].values.astype(float)
-        nsz = d["n_seizures"].values.astype(float)
-        sens = tp / nsz
-        prec = np.divide(tp, tp + fp, out=np.full_like(tp, np.nan), where=(tp + fp) > 0)
-        f1 = np.divide(2 * prec * sens, prec + sens,
-                       out=np.full_like(tp, np.nan), where=(prec + sens) > 0)
-        vals = dict(sensitivity=sens, precision=prec, f1=f1)
-        for mi, met in enumerate(metrics):
-            offset = (oi * n_met + mi - (n_ops * n_met - 1) / 2) * bar_w
-            hatch = None if op["key"] == "balanced" else "//"
-            axa.bar(x + offset, vals[met], width=bar_w * 0.92, color=metric_colors[met],
-                   hatch=hatch, edgecolor="black", linewidth=0.4)
+    # ---- panel (a): sensitivity / precision / F1, grouped by subject ----
+    bar_w = 0.8 / len(metrics)
+    for mi, met in enumerate(metrics):
+        offset = (mi - (len(metrics) - 1) / 2) * bar_w
+        axa.bar(x + offset, vals[met], width=bar_w * 0.92, color=metric_colors[met],
+               edgecolor="black", linewidth=0.4)
 
     axa.set_xticks(x); axa.set_xticklabels(subs)
     axa.set_ylabel("Score")
-    axa.set_ylim(0, 1.22)
-    axa.set_title("(a) Per-subject event sensitivity / precision / F1 — "
-                 "balanced (solid) vs high-sensitivity (hatched)")
+    axa.set_ylim(0, 1.1)
+    axa.set_title(f"(a) Per-subject event sensitivity / precision / F1 — {op['label']}")
     axa.grid(axis="y", alpha=0.25, lw=0.5)
     metric_handles = [Patch(facecolor=metric_colors[m], edgecolor="black", label=metric_labels[m])
                       for m in metrics]
-    op_handles = [Patch(facecolor="white", edgecolor="black", label="Balanced"),
-                 Patch(facecolor="white", edgecolor="black", hatch="//", label="High-sensitivity")]
-    axa.legend(handles=metric_handles + op_handles, loc="upper right", ncol=2, fontsize=8,
-              framealpha=1.0)
+    axa.legend(handles=metric_handles, loc="upper right", fontsize=8, framealpha=1.0)
 
     # ---- panel (b): FP/day per subject, own log-scale axis ----
-    bw = 0.34
-    for oi, op in enumerate(LOCKED_OPS):
-        d = op_rows[op["key"]]
-        fpd = d["fp"].values.astype(float) / d["n_inter_h"].values.astype(float) * 24
-        offset = (oi - (n_ops - 1) / 2) * bw
-        axb.bar(x + offset, fpd, width=bw * 0.92, color=op["color"], edgecolor="black",
-               linewidth=0.4, label=op["label"])
-        for xi, v in zip(x + offset, fpd):
-            axb.text(xi, v * 1.06, f"{v:.0f}", ha="center", va="bottom", fontsize=7)
+    axb.bar(x, fpd, width=0.55, color=op["color"], edgecolor="black", linewidth=0.4)
+    for xi, v in zip(x, fpd):
+        axb.text(xi, v * 1.06, f"{v:.1f}", ha="center", va="bottom", fontsize=7)
 
     axb.set_xticks(x); axb.set_xticklabels(subs)
     axb.set_ylabel("False positives / day (log scale)")
     axb.set_yscale("log")
+    axb.set_ylim(top=fpd.max() * 1.6)
     axb.set_title("(b) Per-subject false-positive rate")
     axb.grid(axis="y", which="both", alpha=0.2, lw=0.5)
-    axb.legend(loc="upper left", fontsize=8)
 
-    fig.suptitle("Event-level per-subject breakdown at the two locked operating points\n"
-                "(seed 42, baseline-of-record, SzCORE any-overlap scoring)", y=1.01, fontsize=10.5)
+    fig.suptitle(f"Fig 3.7 — event-level per-subject breakdown at the headline point only "
+                f"({op['label']})\n(seed 42, final system, SzCORE any-overlap scoring)",
+                y=1.01, fontsize=10.5)
     fig.tight_layout()
-    _save(fig, out_dir, "E2_persubject_breakdown")
+    _save(fig, out_dir, "fig3_7_persubject_event")
 
 
 # ----------------------------------------------------------------------------
@@ -266,29 +258,50 @@ def _save(fig, out_dir, name):
     print(f"  [saved] {(out_dir / (name + '.pdf')).resolve()}")
 
 
+# Values from docs/VERIFIED_NUMBERS.md §1.1, checked to the brief's stated precision
+# (three decimals for sensitivity/precision/F1, one decimal for FP/day).
+EXPECTED = {
+    "headline": dict(sens=0.618, prec=0.129, f1=0.213, fpd=27.4),
+    "best_on_curve": dict(sens=0.474, prec=0.387, f1=0.426, fpd=4.9),
+}
+
+
+def check_marked_points(pooled):
+    print("\n[check] marked operating points against docs/VERIFIED_NUMBERS.md:")
+    for op in MARKED_OPS:
+        r = locate_locked(pooled, op)
+        exp = EXPECTED[op["key"]]
+        sens, prec, fpd = round(r.sensitivity, 3), round(r.precision, 3), round(r.fp_per_day, 1)
+        f1 = round(2 * r.precision * r.sensitivity / (r.precision + r.sensitivity), 3)
+        print(f"  {op['key']}: sens={sens} prec={prec} f1={f1} fp/day={fpd}  "
+             f"TP/FN/FP={int(r.tp)}/{int(r.fn)}/{int(r.fp)}")
+        if (sens, prec, f1, fpd) != (exp["sens"], exp["prec"], exp["f1"], exp["fpd"]):
+            raise ValueError(f"{op['key']} does not match VERIFIED_NUMBERS.md: "
+                             f"got {(sens, prec, f1, fpd)}, expected "
+                             f"{(exp['sens'], exp['prec'], exp['f1'], exp['fpd'])} -- stop")
+        print(f"    OK, matches {exp}")
+
+
 # ============================================================================
 def main():
-    ap = argparse.ArgumentParser(description="E1 + E2 event-level figures (baseline-of-record, §0)")
-    ap.add_argument("--csv", default="results/retrain_v3p1/final_eval_seed42.csv")
-    ap.add_argument("--out_dir", default="docs/figures/event_level")
-    ap.add_argument("--figure", choices=["e1", "e2", "both"], default="both")
+    ap = argparse.ArgumentParser(description="Fig 3.6 + Fig 3.7 event-level figures (final system)")
+    ap.add_argument("--csv", default="results/phaseB/tier2/rlg_test/final_eval_seed42.csv")
+    ap.add_argument("--out_dir", default="figures/event_level")
+    ap.add_argument("--figure", choices=["fig3_6", "fig3_7", "both"], default="both")
     a = ap.parse_args()
 
     df = load_grid(a.csv)
     print(f"loaded grid: {df.shape[0]} rows, {df.subject.nunique()} subjects, "
          f"{df.mag_pct.nunique()} mag_pct x {df.pen_mult.nunique()} pen_mult")
 
-    if a.figure in ("e1", "both"):
-        print("\n[E1] operating curve ...")
+    if a.figure in ("fig3_6", "both"):
+        print("\n[Fig 3.6] operating curve ...")
         pooled = plot_e1(df, a.out_dir)
-        for op in LOCKED_OPS:
-            r = locate_locked(pooled, op)
-            print(f"  check {op['key']}: sens={r.sensitivity:.4f} fp/day={r.fp_per_day:.2f} "
-                 f"TP/FN/FP={int(r.tp)}/{int(r.fn)}/{int(r.fp)}")
+        check_marked_points(pooled)
 
-    if a.figure in ("e2", "both"):
-        print("\n[E2] per-subject breakdown ...")
-        plot_e2(df, a.out_dir)
+    if a.figure in ("fig3_7", "both"):
+        print("\n[Fig 3.7] per-subject breakdown ...")
+        plot_fig3_7(df, a.out_dir)
 
     print(f"\nDone -> {Path(a.out_dir).resolve()}")
 

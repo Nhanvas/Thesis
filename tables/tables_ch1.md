@@ -1,9 +1,18 @@
 # Tables — Chapter 1
 
-Three tables. Same rules as the rest of the pack: three decimals for sensitivity, precision, F1 and
-discrimination; one decimal for false alarms per day; no internal shorthand in any cell; a cell whose
-value has not been read from a source is written `— not reported` and never left blank and never
-estimated.
+Three tables for Chapter 1. Tables 1.1, 1.2 and 1.3.
+
+## Rules applied throughout
+
+1. Three decimals for discrimination, sensitivity, precision and F1; one decimal for false alarms per
+   day. Same rule in tables and figures.
+2. No confidence intervals on any detection table. Intervals appear only on Table 3.9.
+3. No internal shorthand: no lever codes, no file names, no phase names, no branch nicknames in a
+   table cell or heading.
+4. A cell whose value has not been read from a source is written `— not reported` and never left
+   blank and never estimated.
+5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
+6. Every table ends with a source line naming the file or paper its values were read from.
 
 `docs/VERIFIED_NUMBERS.md` is the authority for this study's numbers. Every published figure below was
 read from its source paper.
@@ -109,3 +118,5 @@ filled weeks. A reader comparing the two must find them identical.
 not running by the report deadline, remove row 7 from **both** this table and Fig 1.4 and move the
 application to future work. A timeline listing work that was not done is the first thing a committee
 asks about.
+
+*Source: project schedule; the defense date is 5–6 November.*

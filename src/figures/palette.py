@@ -17,6 +17,10 @@ CHANCE = "#8C8C8C"       # grey, dashed
 HEADLINE = "#B8860B"     # dark goldenrod -- the one operating point every figure marks
 BEST_ACHIEVABLE = "#6A3D9A"  # purple -- the post-hoc best point, never a result
 
+# One sequential colormap for every adjacency / band-power heatmap in the report
+# (docs/FIGURE_FIXES_R3.md §1, Fig 2.4): Fig 1.2, Fig 2.4 panels (b)/(c), Fig 2.5.
+SEQUENTIAL_CMAP = "viridis"
+
 RC = {
     "font.family": "serif",
     "font.size": 10,

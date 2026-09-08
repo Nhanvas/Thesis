@@ -10,26 +10,29 @@ If a number looks wrong here, the CSV is wrong — fix the CSV by rerunning
 Usage (from repo ROOT):
     python src/figures/attribution_figures.py
 
-Outputs -> figures/attribution/
+Outputs -> figures/ (root, exhibit-numbered) and results/report_tables/ for the appendix table,
+per docs/FIGURE_FIXES_R3.md §2 (renamed off the old figures/attribution/ working names so a
+writer looking for the figure by its report number can find it):
 
-    attribution_fig1_synthetic.png        LABEL-FREE.  macro-AUROC vs injection strength, VAL + TEST.
+    fig3_11_attribution_synthetic.png        LABEL-FREE.  macro-AUROC vs injection strength, VAL + TEST.
                                           Rubric #6 (validity) and #8. The single strongest visual
                                           exhibit that the machinery is correct: clean null at a=1.0,
                                           monotone rise, ceiling at a=3.0.
-    attribution_fig2_seed_robustness.png  LABEL-FREE.  Channel-ranking agreement across GAE seeds
+    fig3_12_attribution_seed_stability.png  LABEL-FREE.  Channel-ranking agreement across GAE seeds
                                           {42,1,2,3}. Rubric #6.
-    attribution_fig3_rank_heatmap.png     LABEL-FREE.  Per-seizure channel RANK (1..18) for all 76
+    fig3_13_attribution_rank_heatmap.png     LABEL-FREE.  Per-seizure channel RANK (1..18) for all 76
                                           TEST seizures, grouped by subject. Rank is scale-free, so
                                           seizures are directly comparable. Rubric #7, #8.
-    attribution_fig4_persubject_forest.png
+    fig3_14_attribution_persubject_forest.png
                                           PROVISIONAL (uses draft labels). Per-subject AUROC with
                                           bootstrap CI, against the macro and the D7 control. Replaces
                                           the AUROC-vs-|S| scatter: the on-disk labels give |S| in
                                           {1,2} only (SPEC §3.3), so a trend over |S| is not
                                           estimable. Rerun if the labels are frozen.
-    attribution_top3_channels.csv         LABEL-FREE.  Appendix table: top-3 channels per seizure.
+    results/report_tables/tableA7_top_channels.csv
+                                          LABEL-FREE.  Appendix table: top-3 channels per seizure.
 
-Figures 1-3 and the CSV never need redoing. Only fig 4 depends on the label freeze.
+Figures 1-3 and the table never need redoing. Only fig 4 depends on the label freeze.
 """
 import csv
 import sys
@@ -44,7 +47,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 SRC = ROOT / "results" / "attribution_v6"
-OUT = ROOT / "figures" / "attribution"
+OUT = ROOT / "figures"
+TABLE_OUT = ROOT / "results" / "report_tables"
 CH = ["FP1-F7", "F7-T7", "T7-P7", "P7-O1", "FP1-F3", "F3-C3", "C3-P3", "P3-O1",
       "FP2-F4", "F4-C4", "C4-P4", "P4-O2", "FP2-F8", "F8-T8", "T8-P8", "P8-O2",
       "FZ-CZ", "CZ-PZ"]
@@ -97,7 +101,7 @@ def fig1_synthetic():
     axes[1].legend(fontsize=8, frameon=False, loc="lower right")
     fig.suptitle("Synthetic channel-anomaly injection: the attribution score recovers a known "
                  "ground truth", fontsize=11.5)
-    save(fig, "attribution_fig1_synthetic.png")
+    save(fig, "fig3_11_attribution_synthetic.png")
 
 
 # ---------------------------------------------------------------- shared loader
@@ -146,7 +150,7 @@ def fig2_seed_robustness():
     a2.grid(alpha=0.25, lw=0.6, axis="y")
 
     fig.suptitle("Channel attribution is stable across GAE random seeds", fontsize=11.5)
-    save(fig, "attribution_fig2_seed_robustness.png")
+    save(fig, "fig3_12_attribution_seed_stability.png")
 
 
 # ---------------------------------------------------------------- fig 3
@@ -176,7 +180,7 @@ def fig3_rank_heatmap():
     cb.set_label("channel rank within the seizure  (1 = most anomalous)")
     ax.set_title("Per-seizure channel ranking, GAE reconstruction anomaly\n"
                  "76 TEST seizures × 18 channels, seed 42, p95 aggregation", fontsize=11)
-    save(fig, "attribution_fig3_rank_heatmap.png")
+    save(fig, "fig3_13_attribution_rank_heatmap.png")
 
 
 # ---------------------------------------------------------------- fig 4
@@ -248,7 +252,7 @@ def fig4_persubject_forest():
     ax.set_title("Attribution vs the reader's dominant channel — PROVISIONAL\n"
                  "draft labels are dominant-channel (1-2 per seizure), not the full ictal set",
                  fontsize=10.5)
-    save(fig, "attribution_fig4_persubject_forest.png")
+    save(fig, "fig3_14_attribution_persubject_forest.png")
 
 
 # ---------------------------------------------------------------- appendix table
@@ -264,8 +268,8 @@ def table_top3():
                     "rank1_channel": CH[top[0]], "rank1_score": round(float(v[top[0]]), 4),
                     "rank2_channel": CH[top[1]], "rank2_score": round(float(v[top[1]]), 4),
                     "rank3_channel": CH[top[2]], "rank3_score": round(float(v[top[2]]), 4)})
-    OUT.mkdir(parents=True, exist_ok=True)
-    p = OUT / "attribution_top3_channels.csv"
+    TABLE_OUT.mkdir(parents=True, exist_ok=True)
+    p = TABLE_OUT / "tableA7_top_channels.csv"
     with open(p, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(out[0].keys()))
         w.writeheader()

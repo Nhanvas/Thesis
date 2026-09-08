@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 
 from graph_construction import apply_car, compute_wpli, compute_aec, combine_adjacency, DEFAULT_ALPHA
 import preprocessing as P
-from palette import apply_rc
+from palette import SEQUENTIAL_CMAP, apply_rc
 
 ROOT = Path(_src).parent
 PROC = ROOT / "data" / "processed"
@@ -70,9 +70,9 @@ def main():
     channels = P.COMMON_CHANNELS
 
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.6))
-    im0 = axes[0].imshow(A_inter, vmin=0, vmax=vmax, cmap="viridis")
+    im0 = axes[0].imshow(A_inter, vmin=0, vmax=vmax, cmap=SEQUENTIAL_CMAP)
     axes[0].set_title("Interictal")
-    im1 = axes[1].imshow(A_ictal, vmin=0, vmax=vmax, cmap="viridis")
+    im1 = axes[1].imshow(A_ictal, vmin=0, vmax=vmax, cmap=SEQUENTIAL_CMAP)
     axes[1].set_title("Ictal")
 
     for ax in axes:
@@ -82,7 +82,7 @@ def main():
         ax.set_yticklabels(channels, fontsize=6)
 
     cbar = fig.colorbar(im1, ax=axes, shrink=0.85, pad=0.02)
-    cbar.set_label("Combined wPLI + AEC adjacency weight (unsparsified)")
+    cbar.set_label("Combined wPLI + AEC adjacency weight (before sparsification)")
 
     # No figure number / descriptive title on the image (brief §1 rule 5).
     OUT.parent.mkdir(parents=True, exist_ok=True)

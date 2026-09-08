@@ -811,6 +811,16 @@ def cmd_eval(a):
     sf = np.array([spread_one(S[(42, "p95", *k)]) for k in focal])
     sg = np.array([spread_one(S[(42, "p95", *k)]) for k in gen])
     _, pg = mannwhitneyu(sg, sf, alternative="greater")
+
+    # Per-seizure generalized (diffuse) spread, for Fig 3.15 (docs/FIGURE_FIXES_R3.md §1):
+    # the group mean (sg.mean(), written into attribution_summary.csv below) was already
+    # committed, but the 40 individual points behind it were computed and discarded. This
+    # persists them (same spread_one call, same S/lab already loaded -- no new computation)
+    # so the figure script can read committed per-seizure values instead of typing in the mean.
+    per_gen = [{"subject": k[0], "seizure_idx": k[1], "n_windows": lab[k]["nw"],
+                "spread": round(spread_one(S[(42, "p95", *k)]), 4)} for k in gen]
+    write_csv(OUT / "attribution_perseizure_generalized.csv", per_gen)
+
     print("\n=== §4.5 spread, real labels ===")
     print(f"  focal (n={len(sf)}) {sf.mean():.4f}   generalized (n={len(sg)}) {sg.mean():.4f}"
           f"   one-sided p={pg:.3e}")

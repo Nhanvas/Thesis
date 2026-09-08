@@ -108,10 +108,10 @@ def main():
     ax.axvline(MACRO_WINDOW_AUROC, color=CHANCE, ls="--", lw=1.1,
               label=f"Across-patient window AUROC ({MACRO_WINDOW_AUROC})")
     ax.axhline(POOLED_EVENT_F1, color=HEADLINE, ls="--", lw=1.1,
-              label=f"Pooled event F1 at m50/p2.0 ({POOLED_EVENT_F1})")
+              label=f"Pooled event F1 at the reported operating point ({POOLED_EVENT_F1})")
 
     ax.set_xlabel("Window-level discrimination (AUROC)")
-    ax.set_ylabel("Event-level F1 (m50/p2.0)")
+    ax.set_ylabel("Event-level F1 (at the reported operating point)")
     # No figure number / descriptive title on the image (brief §1 rule 5).
     ax.legend(fontsize=8, loc="upper left")
     ax.grid(alpha=0.25, lw=0.5)

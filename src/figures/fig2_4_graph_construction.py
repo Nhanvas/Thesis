@@ -35,7 +35,7 @@ from graph_construction import (apply_car, compute_wpli, compute_aec, combine_ad
                                 apply_topk_threshold, DEFAULT_ALPHA, DEFAULT_KEEP_RATIO)
 import preprocessing as P
 from feature_extraction import BANDS
-from palette import INTERICTAL, apply_rc
+from palette import INTERICTAL, SEQUENTIAL_CMAP, apply_rc
 
 ROOT = Path(_src).parent
 PROC = ROOT / "data" / "processed"
@@ -70,7 +70,8 @@ def main():
     ax_adj = fig.add_subplot(gs[1, 0])
     ax_graph = fig.add_subplot(gs[1, 1])
 
-    # (a) signal segment, stacked with offset
+    # (a) signal segment, stacked with offset. docs/FIGURE_FIXES_R3.md §1, Fig 2.4: no
+    # amplitude scale was shown -- same fix as Fig 2.3, an explicit scale bar in microvolts.
     t = np.arange(window.shape[1]) / P.FS
     offset = 6.0 * np.median(np.std(window, axis=1))
     for i, ch in enumerate(channels):
@@ -79,37 +80,53 @@ def main():
     ax_sig.set_yticklabels(list(reversed(channels)), fontsize=6)
     ax_sig.set_xlabel("Time (s)")
     ax_sig.set_title("(a)")
+    bar_uv = round(offset / 6.0, -1) or 10.0
+    y0, y1 = ax_sig.get_ylim(); x0, x1 = ax_sig.get_xlim()
+    bx = x0 + 0.02 * (x1 - x0); by0 = y0 + 0.02 * (y1 - y0); by1 = by0 + bar_uv
+    ax_sig.plot([bx, bx], [by0, by1], color="black", lw=1.6, solid_capstyle="butt", clip_on=False)
+    ax_sig.text(bx + 0.012 * (x1 - x0), (by0 + by1) / 2, f"{bar_uv:g} µV",
+               fontsize=7, va="center", ha="left")
 
-    # (b) band power heatmap
+    # (b) band power heatmap -- one sequential colormap shared with (c), Fig 1.2 and Fig 2.5
+    # (docs/FIGURE_FIXES_R3.md §1: they previously used different colormaps), and the
+    # colorbar is now labelled with the quantity and its unit.
     band_names = list(BANDS.keys())
-    im_b = ax_band.imshow(feats, aspect="auto", cmap="magma")
+    im_b = ax_band.imshow(feats, aspect="auto", cmap=SEQUENTIAL_CMAP)
     ax_band.set_xticks(range(len(band_names)))
     ax_band.set_xticklabels(band_names)
     ax_band.set_yticks(range(len(channels)))
     ax_band.set_yticklabels(channels, fontsize=6)
     ax_band.set_title("(b)")
-    fig.colorbar(im_b, ax=ax_band, shrink=0.85, pad=0.02)
+    cb_b = fig.colorbar(im_b, ax=ax_band, shrink=0.85, pad=0.02)
+    cb_b.set_label("Log band power (z-scored)")
 
     # (c) weighted adjacency before sparsification
-    im_c = ax_adj.imshow(A, vmin=0, vmax=A.max(), cmap="viridis")
+    im_c = ax_adj.imshow(A, vmin=0, vmax=A.max(), cmap=SEQUENTIAL_CMAP)
     ax_adj.set_xticks(range(len(channels))); ax_adj.set_yticks(range(len(channels)))
     ax_adj.set_xticklabels(channels, rotation=90, fontsize=6)
     ax_adj.set_yticklabels(channels, fontsize=6)
     ax_adj.set_title("(c)")
     fig.colorbar(im_c, ax=ax_adj, shrink=0.85, pad=0.02)
 
-    # (d) graph after top-20% sparsification -- SAME node layout as (c)
+    # (d) graph after top-20% sparsification -- SAME node layout as (c). Node labels are
+    # placed radially OUTSIDE the node markers (docs/FIGURE_FIXES_R3.md §1: they were
+    # unreadable at print size sitting on top of the nodes -- panel (d) is the payoff of the
+    # figure), and the axes are widened so the outward labels are not clipped.
     G = nx.from_numpy_array(A_topk)
     G = nx.relabel_nodes(G, {i: channels[i] for i in range(len(channels))})
     n = len(channels)
     angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
     pos = {channels[i]: (np.cos(angles[i]), np.sin(angles[i])) for i in range(n)}
+    label_pos = {channels[i]: (1.18 * np.cos(angles[i]), 1.18 * np.sin(angles[i])) for i in range(n)}
     weights = [G[u][v]["weight"] for u, v in G.edges()]
     max_w = max(weights) if weights else 1.0
     nx.draw_networkx_nodes(G, pos, ax=ax_graph, node_size=180, node_color=INTERICTAL)
-    nx.draw_networkx_labels(G, pos, ax=ax_graph, font_size=6)
+    nx.draw_networkx_labels(G, label_pos, ax=ax_graph, font_size=7.5)
     nx.draw_networkx_edges(G, pos, ax=ax_graph,
                            width=[3.5 * wt / max_w for wt in weights], alpha=0.7)
+    ax_graph.set_xlim(-1.4, 1.4)
+    ax_graph.set_ylim(-1.4, 1.4)
+    ax_graph.set_aspect("equal")
     ax_graph.set_title("(d)")
     ax_graph.set_axis_off()
 

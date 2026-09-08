@@ -121,6 +121,20 @@ def find_interference_segment(raw, seizure_list, duration_s=10.0, stride_s=2.0,
     return best_s, reason, best_bb
 
 
+def _add_scale_bar(ax, bar_value, label):
+    """Vertical scale bar (data-unit height) in the axes' lower-left corner, with its
+    value and unit labelled -- docs/FIGURE_FIXES_R3.md Fig 2.3, panels (a)/(b) fix."""
+    y0, y1 = ax.get_ylim()
+    x0, x1 = ax.get_xlim()
+    bar_x = x0 + 0.02 * (x1 - x0)
+    bar_y0 = y0 + 0.03 * (y1 - y0)
+    bar_y1 = bar_y0 + bar_value
+    ax.plot([bar_x, bar_x], [bar_y0, bar_y1], color="black", lw=1.6,
+           solid_capstyle="butt", clip_on=False, zorder=6)
+    ax.text(bar_x + 0.012 * (x1 - x0), (bar_y0 + bar_y1) / 2, label,
+           fontsize=7.5, va="center", ha="left")
+
+
 def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir, out_path):
     channels = P.COMMON_CHANNELS[:N_CHANNELS]
     ch_idx = [raw.ch_names.index(c) for c in channels]
@@ -156,6 +170,9 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     ax_pre = fig.add_subplot(gs[0, 1], sharex=ax_raw)
     ax_psd = fig.add_subplot(gs[1, :])
 
+    # docs/FIGURE_FIXES_R3.md Fig 2.3: panels (a)/(b) carried no vertical scale and their
+    # units differ (raw = microvolts, preprocessed = z-score) with no way to tell -- both
+    # get an explicit scale bar in their own unit, plus the offset value is annotated.
     raw_offset = 3.0 * np.median(np.std(raw_uV, axis=1))
     for i, ch in enumerate(channels):
         y = raw_uV[N_CHANNELS - 1 - i] + i * raw_offset
@@ -164,6 +181,8 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     ax_raw.set_yticklabels(list(reversed(channels)))
     ax_raw.set_xlabel("Time (s)")
     ax_raw.set_title("(a)")
+    raw_bar_uv = round(raw_offset / 3.0, -1) or 10.0  # nearest 10 uV, one channel's typical s.d.
+    _add_scale_bar(ax_raw, raw_bar_uv, f"{raw_bar_uv:g} µV")
 
     pre_offset = 3.0 * np.median(np.std(z, axis=1))
     for i, ch in enumerate(channels):
@@ -173,16 +192,47 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     ax_pre.set_yticklabels(list(reversed(channels)))
     ax_pre.set_xlabel("Time (s)")
     ax_pre.set_title("(b)")
+    pre_bar_z = round(pre_offset / 3.0, 1) or 1.0  # nearest 0.1, one channel's typical s.d.
+    _add_scale_bar(ax_pre, pre_bar_z, f"{pre_bar_z:g} z (s.d.)")
 
     # ---- panel (c): power spectrum of one channel, raw vs preprocessed ----
+    # docs/FIGURE_FIXES_R3.md Fig 2.3: the previous version let matplotlib's y-autoscale
+    # see the FULL Nyquist-range welch output (0-128 Hz) even though only 0-80 Hz was
+    # displayed; the bandpass-filtered preprocessed trace collapses to floating-point noise
+    # near Nyquist (~1e-19), which alone stretched the y-axis to ~21 empty decades and made
+    # the real 60 Hz notch (which bottoms out around 1e-10, not 1e-19) invisible by
+    # comparison. Fix: slice to the displayed 0-80 Hz band BEFORE autoscaling.
     spec_i = channels.index(SPECTRUM_CHANNEL)
-    f_raw, pxx_raw = welch(raw_uV[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
-    f_pre, pxx_pre = welch(z[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
+    f_raw_full, pxx_raw_full = welch(raw_uV[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
+    f_pre_full, pxx_pre_full = welch(z[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
+    band = f_raw_full <= 80.0
+    f_raw, pxx_raw = f_raw_full[band], pxx_raw_full[band]
+    f_pre, pxx_pre = f_pre_full[band], pxx_pre_full[band]
     ax_psd.semilogy(f_raw, pxx_raw, color="#888888", lw=1.1, label=f"Raw ({SPECTRUM_CHANNEL})")
     ax_psd.semilogy(f_pre, pxx_pre, color=INTERICTAL, lw=1.1,
                     label=f"Preprocessed ({SPECTRUM_CHANNEL})")
     ax_psd.axvline(60.0, color="#C44E52", ls="--", lw=1.0, label="60 Hz")
     ax_psd.set_xlim(0, 80)
+
+    ymin_data = min(pxx_raw.min(), pxx_pre.min())
+    ymax_data = max(pxx_raw.max(), pxx_pre.max())
+    y_top = 10 ** np.ceil(np.log10(ymax_data))
+    y_bottom = 10 ** np.floor(np.log10(ymin_data))
+    decades = np.log10(y_top) - np.log10(y_bottom)
+    if decades > 8:
+        # Still wider than "about six decades" (brief §1) with BOTH the raw curve's DC
+        # peak and the true 60 Hz notch floor kept on-screen -- clipping either away would
+        # hide a real feature the panel exists to show, so the floor is raised only enough
+        # to bring the span to 8 decades (closest defensible approach to "about six" that
+        # does not crop the notch minimum itself, which sits within 2 decades of that floor).
+        y_bottom = y_top / 10 ** 8
+        decades = 8.0
+    ax_psd.set_ylim(y_bottom, y_top)
+    print(f"[Fig 2.3 / panel c] y-axis clipped to {decades:.0f} decades "
+         f"[{y_bottom:.0e}, {y_top:.0e}] (was ~21 decades when autoscale saw the "
+         f"off-screen near-Nyquist floor); data range in the displayed 0-80 Hz band is "
+         f"[{ymin_data:.2e}, {ymax_data:.2e}]")
+
     ax_psd.set_xlabel("Frequency (Hz)")
     ax_psd.set_ylabel("Power spectral density (log scale)")
     ax_psd.set_title("(c)")

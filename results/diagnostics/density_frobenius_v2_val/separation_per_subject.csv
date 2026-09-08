@@ -1,0 +1,2 @@
+subject,frobenius_fixed_t0_05,frobenius_topk20,pct_change_topk_vs_fixed,rel_frobenius_fixed_t0_05,rel_frobenius_topk20,pct_change_rel_topk_vs_fixed,cosine_dist_fixed_t0_05,cosine_dist_topk20,pct_change_cos_topk_vs_fixed
+chb11,1.5002,1.1743,-21.7,0.4363,0.7423,70.1,0.0201,0.1714,753.9

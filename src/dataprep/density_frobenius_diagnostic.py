@@ -70,6 +70,7 @@ from graph_construction import (apply_car, compute_wpli, compute_aec, combine_ad
 ROOT = Path(_root)
 PROC = ROOT / "data" / "processed"
 TEST_SUBJ = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
+VAL_SUBJ = ["chb10", "chb11", "chb22"]
 
 
 def raw_combined(window, alpha=DEFAULT_ALPHA, fs=256):
@@ -137,11 +138,17 @@ def main():
     ap.add_argument("--keep_ratio", type=float, default=DEFAULT_KEEP_RATIO)
     ap.add_argument("--out_dir",
                     default=str(ROOT / "results" / "diagnostics" / "density_frobenius_v2"))
+    ap.add_argument("--subjects", nargs="+", default=TEST_SUBJ,
+                    help="subject IDs to process (default: the 8 held-out subjects). "
+                         "Pass e.g. --subjects chb11 for the validation-patient run "
+                         "needed by Fig 2.5 (Figure Brief Round 2, Task E) -- use a "
+                         "different --out_dir so the held-out committed output at "
+                         "density_frobenius_v2/ is never overwritten.")
     a = ap.parse_args()
     proc, out = Path(a.proc_dir), Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
 
     dens_rows, sep_rows = [], []
-    for subj in TEST_SUBJ:
+    for subj in a.subjects:
         fi, fc = proc / f"{subj}_interictal.npy", proc / f"{subj}_ictal.npy"
         if not (fi.is_file() and fc.is_file()):
             print(f"[skip] {subj}: raw windows not found at {fi} / {fc}"); continue

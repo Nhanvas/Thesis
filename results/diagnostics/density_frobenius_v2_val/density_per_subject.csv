@@ -1,0 +1,5 @@
+subject,split,rule,n_windows_sampled,mean_density
+chb11,interictal,fixed_t0.05,712,0.9289
+chb11,interictal,topk20,712,0.1961
+chb11,ictal,fixed_t0.05,204,0.964
+chb11,ictal,topk20,204,0.1961

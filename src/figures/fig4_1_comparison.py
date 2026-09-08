@@ -133,18 +133,18 @@ def main():
     fig, ax = plt.subplots(figsize=(9.2, 6.2))
 
     ax.plot(pareto["fp_day"], pareto["sens"], color="#4C4C4C", lw=1.4, marker="o",
-            ms=3.5, zorder=3, label="This work -- Pareto front (committed grid)")
+            ms=3.5, zorder=3, label="This work, achievable trade-off curve")
 
     ax.scatter([headline["fp_day"]], [headline["sens"]], color=HEADLINE, s=110,
                marker="D", zorder=5, edgecolor="black", linewidth=0.6,
-               label="Reported operating point (m50/p2.0)")
+               label="Reported operating point")
     ax.annotate("Reported\noperating point", (headline["fp_day"], headline["sens"]),
                 xytext=(12, -34), textcoords="offset points", fontsize=8, color=HEADLINE,
                 ha="left", bbox=dict(facecolor="white", alpha=0.85, edgecolor="none", pad=1))
 
     ax.scatter([best["fp_day"]], [best["sens"]], color=BEST_ACHIEVABLE, s=110,
                marker="*", zorder=5, edgecolor="black", linewidth=0.6,
-               label="Best point on the curve (located post-hoc)")
+               label="Best point on the curve, located after scoring")
     ax.annotate("Best point,\nlocated after scoring", (best["fp_day"], best["sens"]),
                 xytext=(-105, 8), textcoords="offset points", fontsize=8,
                 color=BEST_ACHIEVABLE, ha="left",
@@ -157,7 +157,7 @@ def main():
     label_offsets = {
         "Ali et al. 2024, 5-fold": (14, 22),
         "Ali et al. 2024, leave-one-out": (14, -30),
-        "Community challenge 2025, winner": (8, 6),
+        "Community challenge 2025, winner": (38, 14),
     }
     for p in PUBLISHED_POINTS:
         marker = same_corpus_marker if p["same_corpus"] else diff_corpus_marker

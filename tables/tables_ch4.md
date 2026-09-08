@@ -19,8 +19,9 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
    so at the top of the block.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
-This file holds Table 4.1, Table 1.1 and the Figure 4.1 plotting note. See `tables/README.md` for
-what lives in the other three chapter files and for which tables are still unfilled.
+This file holds Table 4.1, Table 4.2 and the Figure 4.1 plotting note. Table 1.1 now lives in
+`tables/tables_ch1.md`. See `tables/README.md` for what lives in the other chapter files and for
+which tables are still unfilled.
 
 ---
 
@@ -93,12 +94,33 @@ the 0.90 to 0.99 that the corpus is usually associated with.
 *Source: the five source papers, read on 2026-09-07; `docs/VERIFIED_NUMBERS.md` Part 7b for the
 entries verified earlier; `docs/LOCKED_DOCS_ADDENDUM.md` §1.6 to §1.8.*
 
-## Table 1.1 — Representative seizure detection approaches
+## Table 4.2 — Computational and deployment cost profile
 
-Table 1.1 is Table 4.1 without the two rows for this study and without the final comparison
-paragraphs. Chapter 1 presents it as the landscape; Chapter 4 adds this work to it and draws the
-comparison. Keep the column order and the wording of the cells identical between the two, so a
-reader turning back finds the same table with one row added.
+Two columns only. There is no speculative column for other systems: the comparison is made in prose
+where a published figure exists, and inventing one where it does not is worse than leaving it out.
+
+| Property | This system |
+|---|---|
+| Trainable parameters | 3,285 |
+| Stored model size | 15,258 bytes |
+| Processing time per analysis window | 16.9 ms on the development processor |
+| Processing time per hour of recording | approximately 15 s on the same processor |
+| Accelerator required at inference | None |
+| Accelerator required for training | One consumer graphics processor, once, for the shared model |
+| Per-patient training | None — the same weights serve every patient |
+| Per-patient calibration | Background statistics estimated from the patient's own recording, no annotation |
+| Peak memory at inference | — not measured |
+| Energy per hour of recording | — not measured |
+
+The two unmeasured rows stay in the table with that wording. A cost profile that quietly omits the
+quantities nobody measured reads as complete when it is not.
+
+**Two figures to confirm before this table is final.** The per-window and per-hour times are recorded
+in the application specification and were measured on one processor; state which processor in the
+caption. The parameter count and model size come from the checkpoint itself and are already verified.
+
+*Source: `docs/VERIFIED_NUMBERS.md` Parts 2.1 and 2.2 for the model; the application specification
+for the timing.*
 
 ## Figure 4.1 — which points may be plotted
 

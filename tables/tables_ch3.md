@@ -19,7 +19,7 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
    so at the top of the block.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
-This file holds Tables 3.1 through 3.10. See `tables/README.md` for what lives in the other three
+This file holds Tables 3.1 through 3.12. See `tables/README.md` for what lives in the other
 chapter files and for which tables are still unfilled.
 
 ---
@@ -267,3 +267,30 @@ chb18 is the one patient whose annotations vary, and it is also the one patient 
 exceeds its control. Those two facts are the same fact.
 
 *Source: `results/attribution_v6/label_diversity.csv`; `docs/VERIFIED_NUMBERS.md` Part 7.4.*
+
+---
+
+## Table 3.11 — Processing time per stage — WAITING
+
+Waits on the application build. Nothing here can be filled by estimation; a timing table with
+invented rows is worse than an absent one.
+
+When the application runs, measure each stage of Table 2.11 on one recording of known length and
+report time per hour of recording, on a named processor.
+
+---
+
+## Table 3.12 — Objectives and requirements achieved — WAITING
+
+Written last, from the finished Chapters 2 and 3. Its structure is fixed by the exhibit list: the four
+goals as the first rows, then each of the ten design requirements from Table 1.2, each with the
+outcome achieved.
+
+Two rows will have to record partial outcomes, and they should be written plainly rather than softened.
+Goal 3, the channel-level explanation, is validated on synthetic injections but only provisionally
+compared against a draft annotation that has not been clinically reviewed. Goal 4, the application,
+is complete only if the build finishes before the deadline; if it does not, the row records that it
+was designed and specified but not delivered, and the timeline figure drops its corresponding task.
+
+A table of objectives where every row reads "achieved" invites the question of what the objectives
+were for.

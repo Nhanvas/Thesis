@@ -74,8 +74,6 @@ def plot_fig3_2(data, out_dir):
         ax.set_xticklabels([f"interictal\n(n={len(inter)})", f"ictal\n(n={len(ictal)})"], fontsize=8)
         ax.set_title(s, fontsize=10)
         ax.grid(axis="y", alpha=0.25, lw=0.5)
-    fig.suptitle("Fig 3.2 — fused ensemble score distributions per patient, held-out set "
-                 "(seed 42, final system)", fontsize=11, y=1.02)
     axes[0, 0].set_ylabel("fused ensemble score")
     axes[1, 0].set_ylabel("fused ensemble score")
     fig.tight_layout()
@@ -141,8 +139,6 @@ def plot_fig3_3(data, out_dir, window_auroc_path):
     ax_pr.legend(fontsize=7, loc="upper right")
     ax_pr.grid(alpha=0.25, lw=0.5)
 
-    fig.suptitle("Fig 3.3 — per-patient discrimination curves, held-out set "
-                "(seed 42, final system) — no pooled or macro-mean curve", fontsize=11, y=1.02)
     fig.tight_layout()
     _save(fig, out_dir, "fig3_3_roc_pr_curves")
 

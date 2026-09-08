@@ -19,10 +19,40 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
    so at the top of the block.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
-This file holds Tables 2.2 through 2.12. See `tables/README.md` for what lives in the other three
+This file holds Tables 2.1 through 2.12. See `tables/README.md` for what lives in the other
 chapter files and for which tables are still unfilled.
 
 ---
+
+## Table 2.1 — Candidate public scalp EEG seizure corpora — STRUCTURE ONLY
+
+Columns, per the exhibit list: corpus · subjects · hours · seizures · channels · sampling rate ·
+annotation type · availability.
+
+Only the adopted row can be filled from this project's own record. **Every other row needs that
+corpus's own documentation opened and cited**, and no cell may be filled from recollection — that
+failure has already happened once in this project, on a citation supplied from memory and rejected.
+
+| Corpus | Subjects | Hours | Seizures | Channels | Rate | Annotation | Availability |
+|---|---|---|---|---|---|---|---|
+| CHB-MIT | 23 | 961.6 | 182 | 18 bipolar derivations | 256 Hz | Seizure onset and offset per recording; no channel-level annotation | Open, PhysioNet |
+| TUH Seizure Corpus | | | | | | | |
+| Siena Scalp EEG | | | | | | | |
+| Helsinki neonatal | | | | | | | |
+
+Suggested rows are those four; add or drop as Chapter 2 requires. For each added row, open the
+corpus's description paper or dataset page, fill the cells from it, and add the citation to the
+reference sheet with a **VERIFIED FROM SOURCE** marker, exactly as was done for the four dataset
+citations.
+
+The verdict paragraph after the table gives the reason for the choice: seizure onset and offset are
+annotated, the corpus is open and widely used so results are comparable, the montage is consistent
+across patients, and the recordings are continuous and long enough for a false-alarm rate per day to
+be meaningful. The absence of channel-level annotation is stated here as a known limitation, because
+it is the reason the channel attribution work is scored against a draft annotation rather than a
+clinical one.
+
+*Source: the CHB-MIT row from `docs/VERIFIED_NUMBERS.md` Part 3. Remaining rows: not yet sourced.*
 
 ## Table 2.2 — Characteristics of the selected corpus
 
@@ -150,6 +180,33 @@ docstring also repeats two values belonging to a superseded model; neither may r
 *Source: `docs/VERIFIED_NUMBERS.md` Parts 2.1 and 2.2, read from the checkpoint state dictionary
 and from `src/retrain/gae_joint.py` and `src/retrain/train_gae_joint.py`.*
 
+## Table 2.8 — Decision matrix for the detection stage
+
+| Criterion | Threshold on the fused score | Change point detection |
+|---|---|---|
+| Requires a score level to be chosen | Yes — and the level has no patient-independent value | No |
+| Direction of response | Detects upward departures only | Detects a change in either direction |
+| Behaviour when a patient's score falls during a seizure | Fails to detect | Detects the change |
+| Calibration data required | Seizure-free data, to set the level | None beyond the score series itself |
+| Effect of setting the level for an acceptable false-alarm rate | Sensitivity falls toward zero | Not applicable |
+| Question the stage answers | Is the score high now? | When did the state change? |
+| Transfers between patients without adjustment | No — score scales are unbounded and differ per patient | Yes |
+| **Adopted** | | **✔** |
+
+The verdict paragraph should give three numbered reasons and no more. First, a threshold calibrated
+on seizure-free data detects only upward shifts, and so fails any patient whose score falls during a
+seizure. Second, a threshold set to an acceptable false-alarm rate drives sensitivity toward zero,
+because the per-patient score scales are unbounded and a level tolerable for one patient is far too
+high for another. Third, change point detection is threshold-free and direction-agnostic, and it
+answers the question the task actually poses, which is when the state changed rather than whether the
+score is currently large.
+
+A registered comparison against a window-level threshold as an alternative decision rule was carried
+out and is reported as a considered and rejected alternative.
+
+*Source: the locked decision record; the registered window-threshold comparison; the per-patient
+score-scale property stated with Table 2.12.*
+
 ## Table 2.9 — Synthetic validation grid
 
 | Dimension | Values |
@@ -168,6 +225,68 @@ The injected channels are known exactly, so this grid has ground truth that the 
 not provide. It tests the scoring machinery, not the clinical claim.
 
 *Source: `docs/ATTRIBUTION_SPEC.md` §9.1; `results/attribution_v6/synthetic_sanity.csv`.*
+
+## Table 2.10 — Decision matrix for deployment strategy
+
+Weighted matrix. Scores are 1 to 5, higher is better. **The weights are an engineering judgement and
+Boti sets them** — the values below are a proposal, not a result, and the accompanying paragraph must
+say that the weighting is a judgement rather than a measurement.
+
+| Criterion | Weight | Cloud service | On-premise server | Bedside device |
+|---|---|---|---|---|
+| Patient data remains within the institution | 0.30 | 1 | 5 | 5 |
+| No specialised hardware required | 0.20 | 4 | 5 | 2 |
+| One installation serves every patient | 0.20 | 5 | 5 | 1 |
+| Cost to a hospital in a low-resource setting | 0.15 | 2 | 4 | 2 |
+| Energy and hardware footprint | 0.10 | 3 | 4 | 4 |
+| Maintenance burden on the institution | 0.05 | 5 | 3 | 2 |
+| **Weighted total** | **1.00** | **2.85** | **4.65** | **3.15** |
+| **Adopted** | | | **✔** | |
+
+Three numbered reasons for the verdict. Inference runs on a general-purpose processor, so no
+specialised hardware is required and an ordinary server suffices. The recordings are paediatric and
+should not leave the hospital network, which rules out the cloud option regardless of its other
+merits. And because no per-patient training is needed, one installation serves every patient, which a
+bedside device cannot match.
+
+The paragraph closes by stating that this is an engineering judgement built from measured properties
+of the system, not a costed procurement analysis, and that the weights would differ at another
+institution.
+
+**Check the arithmetic before use.** The totals above follow from the weights and scores as given; if
+Boti changes any weight or score, recompute rather than adjusting the total.
+
+*Source: the outline's deployment section; the measured processing cost in Table 4.2; the
+single-model property in Table 1.2 row 3.*
+
+## Table 2.11 — Application processing stages — STRUCTURE ONLY
+
+Columns: stage · input · output.
+
+The content comes from the application specification, which is not attached to this project. The
+stages below follow from the locked pipeline and the application's data boundary, and should be
+checked against that specification before use rather than accepted from here.
+
+| Stage | Input | Output |
+|---|---|---|
+| Ingest | Uploaded recording file | Channel-ordered signal at the analysis sampling rate |
+| Preprocess | Signal | Fixed-length windows, filtered and normalised, **every window retained** |
+| Graph construction | Windows | One weighted graph per window |
+| Encode | Graphs and node features | Latent node representations |
+| Score | Latent representations and reconstructions | Three per-window anomaly values |
+| Standardise and fuse | Three values per window | One fused score per window |
+| Segment | Fused score series | Detected intervals with start and end times |
+| Attribute | Per-node reconstruction error | Per-channel values for the displayed interval |
+| Present | Intervals and per-channel values | Reviewer interface |
+
+**The row that matters most is the second.** The application retains every window, where the study
+drops artifact windows. That is what gives the application a real time axis, and it is a deliberate
+divergence from the study pipeline that must be reported to the supervisor rather than smoothed over.
+The consequence — that the application's numbers will differ from the thesis's numbers, and must not
+be made to match — belongs in the paragraph after this table.
+
+*Source: the locked pipeline; the application's data boundary. Stage boundaries not yet confirmed
+against the application specification.*
 
 ## Table 2.12 — Reported metrics and their definitions
 

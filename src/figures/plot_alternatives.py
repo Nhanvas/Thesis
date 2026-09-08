@@ -110,7 +110,6 @@ def main():
     ax.set_yticklabels(labels, fontsize=9)
     ax.set_ylim(-0.8, len(plot_rows) - 0.2)
     ax.set_xlabel("Change in event-level F1 vs final system (validation, 3 subjects, 13 seizures)")
-    ax.set_title("Fig 3.9 — effect of each design alternative on event-level F1", fontsize=11)
     ax.grid(axis="x", alpha=0.25, lw=0.5)
     ax.legend(loc="upper left", fontsize=8)
     fig.text(0.5, -0.02,

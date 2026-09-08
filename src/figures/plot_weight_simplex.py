@@ -110,9 +110,6 @@ def main():
     ax.set_aspect("equal")
     ax.axis("off")
     ax.legend(loc="upper right", fontsize=8, framealpha=0.95, bbox_to_anchor=(1.02, 1.0))
-    ax.set_title("Fig 2.9 — ensemble weight surface, validation macro AUROC\n"
-                "231-point simplex grid; equal weighting falls outside the near-best region",
-                fontsize=11)
 
     fig.tight_layout()
     out_dir = Path(a.out_dir)

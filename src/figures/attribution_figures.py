@@ -102,8 +102,6 @@ def fig1_synthetic():
         ax.grid(alpha=0.25, lw=0.6)
     axes[0].set_ylabel("macro-AUROC over 200 pseudo-seizures")
     axes[1].legend(fontsize=8, frameon=False, loc="lower right")
-    fig.suptitle("Synthetic channel-anomaly injection: the attribution score recovers a known "
-                 "ground truth", fontsize=11.5)
     save(fig, "fig3_11_attribution_synthetic.png")
 
 
@@ -152,7 +150,6 @@ def fig2_seed_robustness():
     a2.set_title(f"top-1 channel agreement  (mean {np.mean(agree):.3f})", fontsize=10)
     a2.grid(alpha=0.25, lw=0.6, axis="y")
 
-    fig.suptitle("Channel attribution is stable across GAE random seeds", fontsize=11.5)
     save(fig, "fig3_12_attribution_seed_stability.png")
 
 
@@ -181,8 +178,6 @@ def fig3_rank_heatmap():
         ax.axvline(b, color="w", lw=0.9, alpha=0.65)
     cb = fig.colorbar(im, ax=ax, fraction=0.030, pad=0.02)
     cb.set_label("channel rank within the seizure  (1 = most anomalous)")
-    ax.set_title("Per-seizure channel ranking, GAE reconstruction anomaly\n"
-                 "76 TEST seizures × 18 channels, seed 42, p95 aggregation", fontsize=11)
     save(fig, "fig3_13_attribution_rank_heatmap.png")
 
 
@@ -252,9 +247,6 @@ def fig4_persubject_forest():
     ax.set_xlim(0, 1.05)
     ax.set_xlabel("macro-AUROC over seizures  (bootstrap 95% CI; ◇ = subject-constant control)")
     ax.grid(alpha=0.25, lw=0.6, axis="x")
-    ax.set_title("Attribution vs the reader's dominant channel — PROVISIONAL\n"
-                 "draft labels are dominant-channel (1-2 per seizure), not the full ictal set",
-                 fontsize=10.5)
     save(fig, "fig3_14_attribution_persubject_forest.png")
 
 

@@ -7,20 +7,30 @@ number in every file below; `docs/LOCKED_DOCS_ADDENDUM.md` where it supersedes t
 
 This directory replaces the single `docs/TABLES_PACK.md` (moved to `docs/archive/` by
 docs/FIGURE_ROUND6.md §4) and the CSV outputs formerly under `results/report_tables/` (moved to
-`tables/csv/` by the same round).
+`tables/csv/` by the same round). `docs/FIGURE_ROUND8.md` §4 added `tables_ch1.md` and filed the
+eight qualitative tables (previously collected in `TABLES_QUALITATIVE.md`) into their chapter
+files; that source file is archived at `docs/archive/TABLES_QUALITATIVE.md`.
 
 ## Where each table lives
 
 | File | Tables |
 |---|---|
-| `tables/tables_ch2.md` | 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.9, 2.12 |
-| `tables/tables_ch3.md` | 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 |
-| `tables/tables_ch4.md` | 4.1, 1.1, the Figure 4.1 plotting note |
+| `tables/tables_ch1.md` | 1.1, 1.2, 1.3 — supplied; do not rebuild |
+| `tables/tables_ch2.md` | 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 2.12 |
+| `tables/tables_ch3.md` | 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12 |
+| `tables/tables_ch4.md` | 4.1, 4.2, the Figure 4.1 plotting note |
 | `tables/tables_appendix.md` | A.1, A.2, A.3, A.4, A.5, A.6, A.7 |
 
-Each of the four files above repeats the rules section (decimal convention, no-blank-cells rule,
+No table appears in more than one file. Table 1.1 was removed from `tables/tables_ch4.md` in
+Round 8, since it now lives only in `tables/tables_ch1.md`; Chapter 4 keeps Table 4.1, which adds
+this work's two rows to the same landscape and draws the comparison.
+
+Each of the five files above repeats the rules section (decimal convention, no-blank-cells rule,
 source-line requirement) in full at its own top, so a writer opening one file does not have to
-find another to know the conventions.
+find another to know the conventions. **Exception:** `tables/tables_ch1.md` is supplied from
+outside this pack and was not rewritten to match; it opens with its own shorter rules paragraph
+rather than the numbered "Rules applied throughout" list the other four files share. The content
+is otherwise complete and is not to be modified here.
 
 ## `tables/csv/`
 
@@ -47,27 +57,32 @@ and `attribution_figures.py::table_top3` call; it writes sentence-case headers w
 variable names and no internal shorthand, three decimals for sensitivity/precision/F1/
 discrimination, one decimal for false alarms per day, and `undefined` left as the literal word.
 
-## Tables not filled here, and why
+## Tables filed but still incomplete, and why
+
+Being filed into the correct chapter file (Round 8) is not the same as being finished. These
+tables carry their own "STRUCTURE ONLY" or "WAITING" marker in-place and must not be treated as
+ready to drop in.
 
 | Table | What is missing |
 |---|---|
-| 1.2 | Design requirements and targets. Comes from the outline's requirements section, not from a result file. |
 | 1.3, and the timeline figure | Calendar dates. Boti supplies. |
-| 2.1 | Candidate corpora. Every cell needs the corpus's own documentation and a citation; none of it is in this repository. |
-| 2.8, 2.10 | Decision matrices for the detection stage and the deployment strategy. Qualitative; the criteria come from the outline. |
+| 2.1 | Candidate corpora. Every cell but the adopted CHB-MIT row needs that corpus's own documentation opened and cited; none of it is in this repository. |
 | 2.11 | Application processing stages. Comes from the application specification, which is not attached to this project. |
 | 3.11, 3.12 | Processing time per stage waits on the application build. The objectives table is written last, from the finished Chapters 2 and 3. |
-| 4.2 | Cost profile. One measured value exists — 16.9 ms per window on the development processor, about 15 s per hour of recording — recorded in the application specification. The rest is not measured and must be marked so. |
+| 4.2 | Cost profile. One measured value exists — 16.9 ms per window on the development processor, about 15 s per hour of recording — recorded in the application specification. Two rows (peak memory, energy per hour) are not measured and are marked so in the table itself. |
 
 As of docs/FIGURE_ROUND6.md, Tables A.1, A.2, A.3 and A.7 are no longer in this list: all four are
 now emitted from committed files and live in `tables/tables_appendix.md` (A.3 as a CSV pointer,
-the other three as rendered markdown tables).
+the other three as rendered markdown tables). As of docs/FIGURE_ROUND8.md, Tables 1.1, 1.2, 2.8
+and 2.10 are also no longer in this list: 1.1 and 1.2 are supplied complete in `tables_ch1.md`,
+and 2.8 and 2.10 are complete decision matrices in `tables_ch2.md` (2.10's weights remain an
+engineering judgement Boti sets, not a measurement, but the table itself is filled).
 
-## Status of each table (readiness, as of Round 6)
+## Status of each table (readiness, as of Round 8)
 
 | Ready to drop in | Needs re-running an emit script | Needs an input only Boti has |
 |---|---|---|
-| 1.1 · 2.2 · 2.3 · 2.4 · 2.5 · 2.6 · 2.7 · 2.9 · 2.12 · 3.1 · 3.2 · 3.3 · 3.5 · 3.6 · 3.7 · 3.8 · 3.9 · 3.10 · 4.1 · A.4 · A.5 · A.6 | 3.4 · A.1 · A.2 · A.3 · A.7 | 1.2 · 1.3 · 2.1 · 2.8 · 2.10 · 2.11 · 3.11 · 3.12 · 4.2 |
+| 1.1 · 1.2 · 2.2 · 2.3 · 2.4 · 2.5 · 2.6 · 2.7 · 2.8 · 2.9 · 2.10 · 2.12 · 3.1 · 3.2 · 3.3 · 3.5 · 3.6 · 3.7 · 3.8 · 3.9 · 3.10 · 4.1 · A.4 · A.5 · A.6 | 3.4 · A.1 · A.2 · A.3 · A.7 | 1.3 · 2.1 · 2.11 · 3.11 · 3.12 · 4.2 |
 
 "Needs re-running an emit script" tables are already filled with committed, self-checked values;
 re-running the script only reproduces them from source rather than filling in anything new.

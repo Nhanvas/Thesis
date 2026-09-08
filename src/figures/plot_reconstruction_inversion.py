@@ -72,8 +72,6 @@ def main():
         ax.legend(fontsize=8)
     axes[0].set_ylabel("density")
 
-    fig.suptitle("Fig 2.8 — reconstruction error in two validation patients: "
-                "expected direction (chb11) vs inversion (chb10)", fontsize=11, y=1.03)
     fig.tight_layout()
 
     out_dir = Path(a.out_dir)

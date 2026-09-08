@@ -81,10 +81,6 @@ def main():
     for xi, v in zip(x, df["pct_change_cos_topk_vs_fixed"]):
         ax2.text(xi, v + 15, f"+{v:.0f}%", ha="center", va="bottom", fontsize=8)
 
-    fig.suptitle("Fig 3.1 — top-k(20%) sparsification increases ictal/interictal separation "
-                "on 8 of 8 subjects, both normalised measures\n"
-                "(the raw Frobenius column is not shown: it is not comparable between "
-                "sparsification rules)", fontsize=10.5, y=1.05)
     fig.tight_layout()
 
     out_dir = Path(a.out_dir)

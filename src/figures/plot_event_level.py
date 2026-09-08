@@ -65,10 +65,10 @@ from palette import INTERICTAL, ICTAL, HEADLINE, BEST_ACHIEVABLE, apply_rc
 # The headline operating point (brief rule 3) and the best point on the
 # trade-off curve, located post hoc and never presented as a result.
 # ----------------------------------------------------------------------------
-HEADLINE_OP = dict(key="headline", label="Headline (m50/p2.0)", mag=50.0, pen=2.0,
+HEADLINE_OP = dict(key="headline", label="Reported operating point", mag=50.0, pen=2.0,
                     color=HEADLINE, marker="o")
 BEST_ON_CURVE_OP = dict(key="best_on_curve",
-                        label="Best point on curve (m80/p5.0) — located post hoc, not a result",
+                        label="Best point on the curve, located after scoring",
                         mag=80.0, pen=5.0, color=BEST_ACHIEVABLE, marker="^")
 MARKED_OPS = [HEADLINE_OP, BEST_ON_CURVE_OP]
 
@@ -169,8 +169,6 @@ def plot_e1(df, out_dir):
 
     ax.set_xlabel("False positives per day (pooled, 278.2 interictal h)")
     ax.set_ylabel("Event sensitivity (pooled, 76 seizures)")
-    ax.set_title("Fig 3.6 — event-level operating curve, final system\n"
-                "full mag% x pen grid, pooled across 8 held-out subjects, seed 42")
     ax.set_ylim(0.20, 0.95)
     ax.set_xlim(0, pooled.fp_per_day.max() * 1.08)
     ax.grid(alpha=0.25, lw=0.5)
@@ -244,9 +242,6 @@ def plot_fig3_7(df, out_dir):
     axb.set_title("(b) Per-subject false-positive rate")
     axb.grid(axis="y", alpha=0.2, lw=0.5)
 
-    fig.suptitle(f"Fig 3.7 — event-level per-subject breakdown at the headline point only "
-                f"(m{op['mag']:.0f}/p{op['pen']:.1f})\n(seed 42, final system, SzCORE any-overlap scoring)",
-                y=1.01, fontsize=10.5)
     fig.tight_layout()
     _save(fig, out_dir, "fig3_7_persubject_event")
 

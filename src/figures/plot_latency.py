@@ -62,9 +62,6 @@ def main():
 
     ax.set_xlabel("Latency of detected interval relative to annotated onset (s)")
     ax.set_ylabel("Matched seizures")
-    ax.set_title(f"Fig 3.5 — detection latency, headline operating point (m50/p2.0)\n"
-                f"n={n} matched of 76 seizures; truncated at {lat.min():.0f} s by the -30 s "
-                f"tolerance and 4 s window quantisation")
     ax.legend(fontsize=8, loc="upper right")
     ax.grid(axis="y", alpha=0.25, lw=0.5)
 

@@ -282,6 +282,31 @@ def score_szcore(ref_intervals, hyp_intervals, total_dur_s, n_inter_h):
                 fp_rate_full=float(s.fpRate))
 
 
+def per_interval_match(ref_intervals, hyp_intervals, total_dur_s):
+    """Per-HYP-interval match assignment, straight from the timescoring library's own
+    EventScoring object (docs/FIGURE_ROUND5.md §2: "I need the assignment from the
+    scorer, not from reading the picture") -- not a re-implementation of the tolerance
+    rule. EventScoring already builds `tpMask`, a per-sample mask of where a reference
+    event (extended by toleranceStart/toleranceEnd) was matched by the hyp mask; a hyp
+    event is a false positive exactly where the library's own FP-counting loop says so
+    (none of its samples fall in tpMask). This only reads that mask back out per hyp
+    event instead of just the aggregate counts score_szcore returns.
+
+    Returns a list of dicts, one per hyp interval (in `hyp_intervals` order):
+        {onset_s, end_s, matched (bool)}
+    """
+    fs = 1
+    N = max(int(total_dur_s), 1)
+    ref = Annotation(list(ref_intervals), fs, N)
+    hyp = Annotation(list(hyp_intervals), fs, N)
+    s = scoring.EventScoring(ref, hyp, SZ_PARAM)
+    out = []
+    for (h0, h1) in s.hyp.events:
+        matched = bool(np.any(s.tpMask[round(h0 * s.fs):round(h1 * s.fs)]))
+        out.append({"onset_s": h0, "end_s": h1, "matched": matched})
+    return out
+
+
 def matched_latency(ref_intervals, hyp_intervals, tol_start=30, tol_end=60):
     """Mean (hyp_onset - ref_onset) over reference events that have an
     overlapping hypothesis event within SzCORE tolerance. Negative = early."""

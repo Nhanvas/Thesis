@@ -1,10 +1,12 @@
 """
 ================================================================================
- label_eeg_pilot.py  —  BLIND channel-labeling viewer for PREREG_05 (§7)
+ label_eeg_pilot.py  —  channel-labeling viewer
 ================================================================================
-Shows RAW scalp EEG around each seizure so the reader can mark the suspect
-bipolar derivation(s), exactly the way a clinician reads ictal EEG. It displays
-NO model / GAE / per-node output — the annotation must stay blind (PREREG_05 §2.3).
+Renders segments of the raw scalp EEG recording around each seizure so the reader
+can mark the suspect bipolar derivation(s), exactly the way a clinician reads
+ictal EEG. It reads the recordings and the summary timings only, and never any
+model output. The annotations produced from this script are an AI draft, not
+blind and not supervisor-frozen; authority rests with the supervisor.
 
 What it does, per subject:
   1. Reads the subject's summary, enumerates seizures in the SAME global order the
@@ -21,7 +23,8 @@ What it does, per subject:
   3. Writes/updates labels_{subj}.csv with one row per seizure, meta pre-filled,
      label columns BLANK for the reader to fill (primary_ch, secondary_ch, ...).
 
-It never reads pernode / ensemble / any results file. Blind by construction.
+It never reads pernode / ensemble / any results file, and the annotations it
+produces are an AI draft, not blind and not supervisor-frozen.
 
 USAGE (Cursor / CPU)
   pip install mne scipy matplotlib numpy

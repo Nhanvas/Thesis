@@ -115,7 +115,11 @@ def main():
     G = nx.from_numpy_array(A_topk)
     G = nx.relabel_nodes(G, {i: channels[i] for i in range(len(channels))})
     n = len(channels)
-    angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
+    # docs/FIGURE_ROUND5.md §7: node 0 (channels[0] == "FP1-F7") is already first in the
+    # cyclic order shared with panel (c)'s top row, but angle 0 places it at 3 o'clock,
+    # not at the top -- a one-line +pi/2 rotation puts it at 12 o'clock instead, so the
+    # visual starting point matches panel (c)'s first row without changing the order.
+    angles = np.linspace(0, 2 * np.pi, n, endpoint=False) + np.pi / 2
     pos = {channels[i]: (np.cos(angles[i]), np.sin(angles[i])) for i in range(n)}
     label_pos = {channels[i]: (1.18 * np.cos(angles[i]), 1.18 * np.sin(angles[i])) for i in range(n)}
     weights = [G[u][v]["weight"] for u, v in G.edges()]

@@ -202,39 +202,41 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     # near Nyquist (~1e-19), which alone stretched the y-axis to ~21 empty decades and made
     # the real 60 Hz notch (which bottoms out around 1e-10, not 1e-19) invisible by
     # comparison. Fix: slice to the displayed 0-80 Hz band BEFORE autoscaling.
+    # docs/FIGURE_ROUND5.md §1: clipping the shared y-axis at a fixed floor (the R3 fix)
+    # cut the preprocessed curve off above ~30 Hz, making it look like the band-pass
+    # stops at 30 Hz rather than 60 Hz -- contradicting Table 2.5's 30-60 Hz gamma band.
+    # A lower floor is not the fix: the raw and preprocessed traces sit ~2-3 decades
+    # apart in absolute power (the z-scoring step rescales amplitude), so no single
+    # shared range shows both curves' full extent without truncating one of them.
+    # Fix: normalise EACH spectrum to its OWN peak (dB relative to that trace's own
+    # maximum) so both curves occupy the same range regardless of their absolute
+    # power difference -- the panel then shows exactly what it exists to show: the
+    # 60 Hz peak present in the raw trace and absent after filtering, and the roll-off
+    # above 60 Hz. Which normalisation was used is stated in the axis label itself.
     spec_i = channels.index(SPECTRUM_CHANNEL)
     f_raw_full, pxx_raw_full = welch(raw_uV[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
     f_pre_full, pxx_pre_full = welch(z[spec_i], fs=P.FS, nperseg=min(1024, dur_samp))
     band = f_raw_full <= 80.0
     f_raw, pxx_raw = f_raw_full[band], pxx_raw_full[band]
     f_pre, pxx_pre = f_pre_full[band], pxx_pre_full[band]
-    ax_psd.semilogy(f_raw, pxx_raw, color="#888888", lw=1.1, label=f"Raw ({SPECTRUM_CHANNEL})")
-    ax_psd.semilogy(f_pre, pxx_pre, color=INTERICTAL, lw=1.1,
-                    label=f"Preprocessed ({SPECTRUM_CHANNEL})")
+
+    db_raw = 10 * np.log10(pxx_raw / pxx_raw.max())
+    db_pre = 10 * np.log10(pxx_pre / pxx_pre.max())
+    print(f"[Fig 2.3 / panel c] normalisation: each trace expressed in dB relative to its "
+         f"OWN maximum (raw peak={pxx_raw.max():.3e}, preprocessed peak={pxx_pre.max():.3e} "
+         f"-- {pxx_raw.max() / pxx_pre.max():.1f}x apart in absolute power, which is why a "
+         f"shared floor could not show both curves)")
+
+    ax_psd.plot(f_raw, db_raw, color="#888888", lw=1.1, label=f"Raw ({SPECTRUM_CHANNEL})")
+    ax_psd.plot(f_pre, db_pre, color=INTERICTAL, lw=1.1,
+               label=f"Preprocessed ({SPECTRUM_CHANNEL})")
     ax_psd.axvline(60.0, color="#C44E52", ls="--", lw=1.0, label="60 Hz")
     ax_psd.set_xlim(0, 80)
-
-    ymin_data = min(pxx_raw.min(), pxx_pre.min())
-    ymax_data = max(pxx_raw.max(), pxx_pre.max())
-    y_top = 10 ** np.ceil(np.log10(ymax_data))
-    y_bottom = 10 ** np.floor(np.log10(ymin_data))
-    decades = np.log10(y_top) - np.log10(y_bottom)
-    if decades > 8:
-        # Still wider than "about six decades" (brief §1) with BOTH the raw curve's DC
-        # peak and the true 60 Hz notch floor kept on-screen -- clipping either away would
-        # hide a real feature the panel exists to show, so the floor is raised only enough
-        # to bring the span to 8 decades (closest defensible approach to "about six" that
-        # does not crop the notch minimum itself, which sits within 2 decades of that floor).
-        y_bottom = y_top / 10 ** 8
-        decades = 8.0
-    ax_psd.set_ylim(y_bottom, y_top)
-    print(f"[Fig 2.3 / panel c] y-axis clipped to {decades:.0f} decades "
-         f"[{y_bottom:.0e}, {y_top:.0e}] (was ~21 decades when autoscale saw the "
-         f"off-screen near-Nyquist floor); data range in the displayed 0-80 Hz band is "
-         f"[{ymin_data:.2e}, {ymax_data:.2e}]")
+    y_bottom = min(db_raw.min(), db_pre.min())
+    ax_psd.set_ylim(max(y_bottom, -80.0) - 2, 3)
 
     ax_psd.set_xlabel("Frequency (Hz)")
-    ax_psd.set_ylabel("Power spectral density (log scale)")
+    ax_psd.set_ylabel("Power spectral density (dB relative to each trace's own peak)")
     ax_psd.set_title("(c)")
     ax_psd.legend(fontsize=8, loc="upper right", framealpha=1.0)
 

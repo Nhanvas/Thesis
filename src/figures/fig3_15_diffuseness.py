@@ -48,7 +48,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from palette import INTERICTAL, ICTAL, apply_rc
+from palette import INTERICTAL, ICTAL, DIFFUSE_GROUP, apply_rc
 
 ROOT = Path(_src).parent
 SYNTH_CSV = ROOT / "results" / "attribution_v6" / "synthetic_spread.csv"
@@ -83,6 +83,18 @@ def main():
     test_panel = synth[(synth.panel == "TEST") & (np.isclose(synth.alpha, 2.0))].sort_values("n_injected")
     if test_panel.empty:
         raise SystemExit(f"Fig 3.15: no TEST/alpha=2.0 rows in {SYNTH_CSV} -- stop")
+    # docs/FIGURE_ROUND5.md §5: synthetic_spread.csv's own grid is {1,2,4,12,18}, not
+    # {1,2,4,8,12} -- the pre-registered grid for the DISCRIMINATION experiment
+    # (synthetic_sanity.csv / docs/ATTRIBUTION_REPORT_PACK.md §2.6). The spread
+    # (diffuseness) experiment was run on its own, different grid
+    # (docs/ATTRIBUTION_REPORT_PACK.md §3.5 quotes it at |S|=1,2,4,12,18); this is a
+    # fact about that experiment's design, not a missing point, and no point at 8 is
+    # added here to make the two grids agree.
+    grid_here = sorted(int(x) for x in test_panel.n_injected.unique())
+    print(f"[Fig 3.15] synthetic_spread.csv injected-channel grid (TEST, alpha=2.0): "
+         f"{grid_here} -- differs from the discrimination experiment's pre-registered "
+         f"grid [1, 2, 4, 8, 12] (synthetic_sanity.csv); the two experiments were run "
+         f"on different grids, this is not an omission")
 
     summ = pd.read_csv(SUMMARY_CSV)
     row = summ[summ.panel == "spread focal vs generalized"]
@@ -144,11 +156,11 @@ def main():
     ax.axvline(divider_x, color="0.75", lw=1.0, ls=":", zorder=1)
 
     # Real diffuse (generalized) points -- categorical strip, jittered in x only.
-    ax.scatter(DIFFUSE_X + jitter_gen, persz_gen.spread, color="#6A3D9A", s=26, alpha=0.75,
+    ax.scatter(DIFFUSE_X + jitter_gen, persz_gen.spread, color=DIFFUSE_GROUP, s=26, alpha=0.75,
               edgecolor="black", linewidth=0.3,
               label=f"Real, diffuse / generalized (per seizure, n={len(persz_gen)})", zorder=4)
     ax.plot([DIFFUSE_X - JITTER_HALF_WIDTH - 0.35, DIFFUSE_X + JITTER_HALF_WIDTH + 0.35],
-           [generalized, generalized], color="#6A3D9A", lw=2.2, solid_capstyle="butt", zorder=5,
+           [generalized, generalized], color=DIFFUSE_GROUP, lw=2.2, solid_capstyle="butt", zorder=5,
            label=f"Diffuse/generalized group mean ({generalized:.4f})")
 
     ax.set_xticks(NUMERIC_TICKS + [DIFFUSE_X])
@@ -158,14 +170,12 @@ def main():
     ax.set_xlabel("Number of annotated channels")
     ax.set_ylabel("Diffuseness (spread)")
 
-    ax.text(0.5, 0.02, f"generalized mean sits LOWER than focal "
-           f"({generalized:.4f} < {focal:.4f}, one-sided p={p_perm:.3f}) "
-           "-- the wrong direction for the hypothesis",
-           transform=ax.transAxes, ha="center", va="bottom", fontsize=8.5, color="0.25")
-
-    # No figure number / descriptive title, and no restated-caption text box
-    # on the image (brief §1 rule 5) -- the focal-vs-generalized comparison
-    # is printed to console above and belongs in the report's caption.
+    # docs/FIGURE_ROUND5.md §5: the explanatory sentence used to sit inside the image as
+    # an axes text box. No figure in this report carries a sentence of prose inside the
+    # axes -- moved out, printed to console below as caption text instead.
+    print(f"[CAPTION] generalized mean sits LOWER than focal "
+         f"({generalized:.4f} < {focal:.4f}, one-sided p={p_perm:.3f}) -- the wrong "
+         "direction for the hypothesis.")
     ax.legend(fontsize=7.8, loc="upper center", ncol=2)
     ax.grid(alpha=0.25, lw=0.5)
 

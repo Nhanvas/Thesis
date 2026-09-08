@@ -56,11 +56,25 @@ def main():
     print(f"[Fig 3.4] score vs annotation: tp={sc['tp']} fp={sc['fp']} "
          f"n_ref={sc['n_ref']} n_hyp={sc['n_hyp']}")
 
+    # docs/FIGURE_ROUND5.md §2: the match assignment comes from the scorer itself
+    # (timescoring's own tpMask, exposed by szcore_eval.per_interval_match), not from
+    # reading the picture -- one detection starts close to the end of the first
+    # annotated seizure and whether that counts as a match depends on the tolerance
+    # rule, not on how it looks.
+    per_iv = SE.per_interval_match(seizures, events, result["n_windows"] * 4)
+    print(f"[Fig 3.4] per-interval match assignment, from the scorer "
+         f"(note: the scorer merges/splits intervals per its own "
+         f"minDurationBetweenEvents/maxEventDuration rules before matching, so this "
+         f"list may not be 1:1 with the {len(events)} detected intervals above):")
+    for iv in per_iv:
+        print(f"    [{iv['onset_s']:.0f}, {iv['end_s']:.0f}] s -> "
+             f"{'MATCHED (true positive)' if iv['matched'] else 'false positive'}")
+
     fig, axes = plt.subplots(4, 1, figsize=(11, 10), sharex=True,
                              gridspec_kw={"height_ratios": [1, 1, 1, 1.3]})
-    comp_names = [("zrecon", "GAE reconstruction (zrecon)"),
-                 ("zlatent", "Latent Mahalanobis (zlatent)"),
-                 ("zgamma", "Gamma-band AEC (zgamma)")]
+    comp_names = [("zrecon", "Reconstruction error (standardised)"),
+                 ("zlatent", "Latent Mahalanobis distance (standardised)"),
+                 ("zgamma", "Gamma-band amplitude coupling (standardised)")]
     for ax, (key, label) in zip(axes[:3], comp_names):
         ax.plot(t_min, result[key], color="#4C72B0", lw=0.7)
         ax.set_ylabel(label, fontsize=8.5)

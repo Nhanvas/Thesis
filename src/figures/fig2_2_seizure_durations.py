@@ -93,7 +93,13 @@ def main():
                   f"Training + validation subjects (n={len(other_dur)})"])
 
     ax.set_xscale("log")
-    ax.set_xlim(all_dur.min() * 0.9, all_dur.max() * 1.1)
+    # docs/FIGURE_ROUND5.md §6: the axis previously started at all_dur.min()*0.9 = 5.4 s,
+    # so the "4 s analysis window" legend entry fell outside the plotted range and never
+    # appeared -- a meaningful reference (the shortest annotated seizure is barely longer
+    # than one and a half analysis windows) silently dropped. Lower limit extended to
+    # 3.5 s so the line is drawn; upper limit clipped to just past the longest seizure
+    # (205 s) rather than the previous *1.1 padding, which ran well past the last bar.
+    ax.set_xlim(3.5, 215.0)
     ax.axvline(4.0, color="black", ls="--", lw=1.2, label="4 s analysis window")
     n_short = int((held_dur < 20).sum())
     # Moved clear of the 4 s line (docs/FIGURE_FIXES_R3.md §1): the previous placement sat

@@ -16,6 +16,10 @@ DETECTED = "#55A868"     # green
 CHANCE = "#8C8C8C"       # grey, dashed
 HEADLINE = "#B8860B"     # dark goldenrod -- the one operating point every figure marks
 BEST_ACHIEVABLE = "#6A3D9A"  # purple -- the post-hoc best point, never a result
+# docs/FIGURE_ROUND5.md §5: the diffuse/generalized group in Fig 3.15 was drawn in this
+# same purple, which is reserved for BEST_ACHIEVABLE elsewhere in the figure set --
+# reusing it for an unrelated category breaks the one meaning that colour carries.
+DIFFUSE_GROUP = "#B07AA1"  # muted mauve -- Fig 3.15's diffuse/generalized annotation group
 
 # One sequential colormap for every adjacency / band-power heatmap in the report
 # (docs/FIGURE_FIXES_R3.md §1, Fig 2.4): Fig 1.2, Fig 2.4 panels (b)/(c), Fig 2.5.

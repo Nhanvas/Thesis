@@ -99,6 +99,12 @@ def main():
     ax_score.grid(alpha=0.2, lw=0.4)
 
     # ---- panel (b): raw EEG, six channels, concurrent with the score window ----
+    # docs/FIGURE_ROUND5.md §4: P.open_edf only reads and renames channels -- it applies
+    # no band-pass/notch filtering (that happens later, in the windowing pipeline, not
+    # here) -- so this panel shows the RAW recording, not the band-pass filtered signal.
+    # The microvolt scale bar confirms it is not the z-scored version either.
+    print("[Fig 3.10] signal panel: RAW recording (P.open_edf applies no filtering; "
+         "amplitude in microvolts, not the z-scored version)")
     raw = P.open_edf(RAW_DIR / SUBJ / EDF_NAME)
     channels = P.COMMON_CHANNELS[:N_CHANNELS]
     ch_idx = [raw.ch_names.index(c) for c in channels]
@@ -106,7 +112,17 @@ def main():
     seg_uV = raw.get_data(picks=ch_idx, start=s0, stop=s1) * 1e6
     t_axis = view_t0 + np.arange(seg_uV.shape[1]) / P.FS
 
-    offset = 4.0 * np.median(np.std(seg_uV, axis=1))
+    # docs/FIGURE_ROUND5.md §4: the six traces were overlapping into a solid block. An
+    # offset set from the median standard deviation understates the separation needed,
+    # because amplitude inside the false-positive interval itself can run far larger
+    # than the window's typical spread. Use each channel's own peak-to-peak range over
+    # the WHOLE displayed window (not just its std) and set the offset above the largest
+    # of those, so no two traces can touch anywhere in the view, including at their
+    # largest excursions inside the shaded interval.
+    ptp = seg_uV.max(axis=1) - seg_uV.min(axis=1)
+    offset = 1.15 * ptp.max()
+    print(f"[Fig 3.10] per-channel peak-to-peak in view (uV): "
+         f"{dict(zip(channels, np.round(ptp, 1)))}; vertical offset set to {offset:.1f} uV")
     for i, ch in enumerate(channels):
         y = seg_uV[N_CHANNELS - 1 - i] + i * offset
         ax_sig.plot(t_axis, y, color=INTERICTAL, lw=0.6)

@@ -1,7 +1,8 @@
 """
-emit_tables.py -- Task D, Figure Brief Round 2.
+emit_tables.py -- Task D, Figure Brief Round 2. Output location moved to
+tables/csv/ by docs/FIGURE_ROUND6.md §2 (was results/report_tables/).
 
-Emits the four report tables to results/report_tables/. Every value is read
+Emits the four report tables to tables/csv/. Every value is read
 from a committed file; nothing is typed in. Each table keeps a numeric
 self-check against docs/VERIFIED_NUMBERS.md and stops rather than writing a
 value it cannot confirm (brief rule 1).
@@ -14,6 +15,11 @@ Table A.2  channel annotation for all 76 held-out seizures
            <- results/attribution_v6/labels/ictal_channels_DRAFT.csv
 Table A.3  the full 384-row parameter grid, pass-through
            <- results/phaseB/tier2/rlg_test/final_eval_seed42.csv
+
+docs/FIGURE_ROUND6.md §3: each table above (A.3 excepted -- 384 rows, a CSV
+attachment/appendix listing only) is also rendered to a markdown table via
+render_markdown(), written alongside its CSV in tables/csv/ and meant to be
+pasted verbatim into the matching chapter file under tables/ (see §4).
 
 USAGE
     python src/figures/emit_tables.py
@@ -37,7 +43,7 @@ GRID_CSV = ROOT / "results" / "phaseB" / "tier2" / "rlg_test" / "final_eval_seed
 SUMMARY_DIR = ROOT / "data" / "summaries"
 LABELS_CSV = ROOT / "results" / "attribution_v6" / "labels" / "ictal_channels_DRAFT.csv"
 SPLIT_JSON = ROOT / "data" / "splits" / "split_main.json"
-OUT_DIR = ROOT / "results" / "report_tables"
+OUT_DIR = ROOT / "tables" / "csv"
 
 MAG_PCT, PEN_MULT = 50.0, 2.0
 
@@ -61,6 +67,34 @@ EXPECTED_TABLE_A1_TOTALS = {
     "validation": (3, 91, 115.82, 13),
     "held-out": (8, 231, 279.39, 76),
 }
+
+
+# ============================================================================
+# docs/FIGURE_ROUND6.md §3 -- render a table to a markdown block ready to paste
+# into a chapter file. Column headers are given explicitly (sentence case, no
+# code-variable names) rather than derived from the DataFrame's own column
+# names, which are lower_snake_case internal identifiers.
+# ============================================================================
+def render_markdown(df: pd.DataFrame, headers: dict, csv_path: Path) -> str:
+    cols = list(headers.keys())
+    missing = [c for c in cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"render_markdown: columns {missing} not in dataframe "
+                          f"(have {list(df.columns)}) -- stop")
+    def esc(v):
+        # A literal "|" (e.g. multiple annotated channels joined "A|B") would
+        # otherwise be read as a markdown cell delimiter and break the table.
+        return str(v).replace("|", "\\|")
+
+    lines = ["| " + " | ".join(headers[c] for c in cols) + " |",
+              "|" + "|".join(["---"] * len(cols)) + "|"]
+    for _, row in df.iterrows():
+        lines.append("| " + " | ".join(esc(row[c]) for c in cols) + " |")
+    md = "\n".join(lines) + "\n"
+    md_path = csv_path.with_suffix(".md")
+    md_path.write_text(md, encoding="utf-8")
+    print(f"  [render_markdown] wrote {md_path} ({len(df)} rows)")
+    return md
 
 
 # ============================================================================
@@ -108,9 +142,13 @@ def emit_table_34():
 
     out = pd.DataFrame(rows)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out.to_csv(OUT_DIR / "table_3_4_event_level_per_patient.csv", index=False)
+    csv_path = OUT_DIR / "table_3_4_event_level_per_patient.csv"
+    out.to_csv(csv_path, index=False)
     print(f"[Table 3.4] wrote {len(out)} rows, self-check OK against brief §5")
     print(out.to_string(index=False))
+    render_markdown(out, {"patient": "Patient", "seizures": "Seizures",
+                          "sensitivity": "Sensitivity", "precision": "Precision",
+                          "f1": "F1", "fp_per_day": "False alarms / day"}, csv_path)
     return out
 
 
@@ -149,7 +187,8 @@ def emit_table_a1():
 
     out = pd.DataFrame(rows)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out.to_csv(OUT_DIR / "table_A1_corpus_metadata.csv", index=False)
+    csv_path = OUT_DIR / "table_A1_corpus_metadata.csv"
+    out.to_csv(csv_path, index=False)
 
     print(f"[Table A.1] wrote {len(out)} rows (expect 23)")
     if len(out) != 23:
@@ -176,6 +215,9 @@ def emit_table_a1():
     total_sz_dur_h = out[out.set == "held-out"].total_seizure_duration_s.sum() / 3600.0
     print(f"  held-out total seizure duration = {total_sz_dur_h:.3f} h "
           f"(brief: ~1.10 h, 76 x 51.9 s)")
+    render_markdown(out, {"subject": "Patient", "set": "Set", "recordings": "Recordings",
+                          "recorded_hours": "Recorded hours (h)", "seizures": "Seizures",
+                          "total_seizure_duration_s": "Total seizure duration (s)"}, csv_path)
     return out
 
 
@@ -193,7 +235,8 @@ def emit_table_a2():
     out.rename(columns={"ictal_channels": "annotated_channels"}, inplace=True)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out.to_csv(OUT_DIR / "table_A2_channel_annotation.csv", index=False)
+    csv_path = OUT_DIR / "table_A2_channel_annotation.csv"
+    out.to_csv(csv_path, index=False)
     print(f"[Table A.2] wrote {len(out)} rows (expect 76)")
     if len(out) != 76:
         raise ValueError(f"Table A.2: {len(out)} rows, expected 76 -- stop")
@@ -204,11 +247,20 @@ def emit_table_a2():
         raise ValueError("Table A.2: label_source is not uniformly the machine-generated "
                           "draft banner -- stop, this changes what the report's banner "
                           "can claim (docs/VERIFIED_NUMBERS.md §7.1)")
+    # docs/FIGURE_ROUND6.md §3: render to markdown, carrying label_source through
+    # verbatim (column renamed for sentence case; the AI-draft banner TEXT is
+    # not altered).
+    render_markdown(out, {"subject": "Patient", "seizure_idx": "Seizure index",
+                          "annotated_channels": "Annotated channels",
+                          "label_source": "Label source"}, csv_path)
     return out
 
 
 # ============================================================================
-# Table A.3 -- full parameter grid, pass-through
+# Table A.3 -- full parameter grid, pass-through. docs/FIGURE_ROUND6.md §3: 384
+# rows -- deliberately NOT rendered to markdown. Goes into the report as a CSV
+# attachment or a long appendix listing; the chapter file gets a one-line
+# pointer to this CSV instead.
 # ============================================================================
 def emit_table_a3():
     df = pd.read_csv(GRID_CSV)

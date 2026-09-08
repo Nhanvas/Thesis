@@ -10,7 +10,8 @@ If a number looks wrong here, the CSV is wrong — fix the CSV by rerunning
 Usage (from repo ROOT):
     python src/figures/attribution_figures.py
 
-Outputs -> figures/ (root, exhibit-numbered) and results/report_tables/ for the appendix table,
+Outputs -> figures/ (root, exhibit-numbered) and tables/csv/ for the appendix table
+(moved from results/report_tables/ by docs/FIGURE_ROUND6.md §2),
 per docs/FIGURE_FIXES_R3.md §2 (renamed off the old figures/attribution/ working names so a
 writer looking for the figure by its report number can find it):
 
@@ -29,7 +30,7 @@ writer looking for the figure by its report number can find it):
                                           the AUROC-vs-|S| scatter: the on-disk labels give |S| in
                                           {1,2} only (SPEC §3.3), so a trend over |S| is not
                                           estimable. Rerun if the labels are frozen.
-    results/report_tables/table_A7_top_channels.csv
+    tables/csv/table_A7_top_channels.csv
                                           LABEL-FREE.  Appendix table: top-3 channels per seizure.
 
 Figures 1-3 and the table never need redoing. Only fig 4 depends on the label freeze.
@@ -40,6 +41,8 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import emit_tables  # for render_markdown, docs/FIGURE_ROUND6.md §3
 
 import matplotlib
 matplotlib.use("Agg")
@@ -48,7 +51,7 @@ import numpy as np
 
 SRC = ROOT / "results" / "attribution_v6"
 OUT = ROOT / "figures"
-TABLE_OUT = ROOT / "results" / "report_tables"
+TABLE_OUT = ROOT / "tables" / "csv"
 CH = ["FP1-F7", "F7-T7", "T7-P7", "P7-O1", "FP1-F3", "F3-C3", "C3-P3", "P3-O1",
       "FP2-F4", "F4-C4", "C4-P4", "P4-O2", "FP2-F8", "F8-T8", "T8-P8", "P8-O2",
       "FZ-CZ", "CZ-PZ"]
@@ -275,6 +278,14 @@ def table_top3():
         w.writeheader()
         w.writerows(out)
     print(f"  wrote {p}  ({len(out)} seizures)")
+
+    import pandas as pd
+    df = pd.DataFrame(out)
+    emit_tables.render_markdown(df, {
+        "subject": "Patient", "seizure_idx": "Seizure index", "n_windows": "Ictal windows",
+        "rank1_channel": "Rank-1 channel", "rank1_score": "Rank-1 score",
+        "rank2_channel": "Rank-2 channel", "rank2_score": "Rank-2 score",
+        "rank3_channel": "Rank-3 channel", "rank3_score": "Rank-3 score"}, p)
 
 
 if __name__ == "__main__":

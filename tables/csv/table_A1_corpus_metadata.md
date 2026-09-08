@@ -1,0 +1,25 @@
+| Patient | Set | Recordings | Recorded hours (h) | Seizures | Total seizure duration (s) |
+|---|---|---|---|---|---|
+| chb01 | train | 42 | 40.55 | 7 | 442 |
+| chb02 | train | 36 | 35.27 | 3 | 172 |
+| chb03 | held-out | 38 | 38.0 | 7 | 402 |
+| chb04 | train | 42 | 156.06 | 4 | 378 |
+| chb05 | train | 39 | 39.0 | 5 | 558 |
+| chb06 | held-out | 18 | 66.73 | 10 | 153 |
+| chb07 | train | 19 | 67.05 | 3 | 325 |
+| chb08 | train | 20 | 20.01 | 5 | 919 |
+| chb09 | train | 19 | 67.87 | 4 | 276 |
+| chb10 | validation | 25 | 50.02 | 7 | 447 |
+| chb11 | validation | 35 | 34.79 | 3 | 806 |
+| chb12 | train | 24 | 23.69 | 40 | 1475 |
+| chb13 | held-out | 33 | 33.0 | 12 | 535 |
+| chb14 | held-out | 26 | 26.0 | 8 | 169 |
+| chb15 | held-out | 40 | 40.01 | 20 | 1992 |
+| chb16 | held-out | 19 | 19.0 | 10 | 84 |
+| chb17 | held-out | 21 | 21.01 | 3 | 293 |
+| chb18 | held-out | 36 | 35.63 | 6 | 317 |
+| chb19 | train | 30 | 29.93 | 3 | 236 |
+| chb20 | train | 29 | 27.6 | 8 | 294 |
+| chb21 | train | 33 | 32.83 | 4 | 199 |
+| chb22 | validation | 31 | 31.0 | 3 | 204 |
+| chb23 | train | 9 | 26.56 | 7 | 424 |

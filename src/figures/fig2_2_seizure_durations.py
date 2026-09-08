@@ -10,7 +10,7 @@ a subset of the 182 (it is) or a separate group, and in at least one bin the hel
 appeared to exceed the total -- an artefact of the overlay, not the data.
 
 Source: data/summaries/*.txt, parsed with evaluation_protocol.parse_summary_edf_list
-(the same parser results/report_tables/table_A1 uses).
+(the same parser tables/csv/table_A1 uses).
 
 Self-check against docs/VERIFIED_NUMBERS.md Part 3, held-out set (n=76):
 minimum 6 s, median 45 s, mean 51.9 s, maximum 205 s, 23 shorter than 20 s,

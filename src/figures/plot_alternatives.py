@@ -69,7 +69,7 @@ EXPECTED_DELTA = {
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default="results/phaseB/tier2/alternatives/alternatives_vs_incumbent.csv")
-    ap.add_argument("--out_dir", default="figures/alternatives")
+    ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
     apply_rc()

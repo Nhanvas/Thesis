@@ -287,7 +287,7 @@ def check_marked_points(pooled):
 def main():
     ap = argparse.ArgumentParser(description="Fig 3.6 + Fig 3.7 event-level figures (final system)")
     ap.add_argument("--csv", default="results/phaseB/tier2/rlg_test/final_eval_seed42.csv")
-    ap.add_argument("--out_dir", default="figures/event_level")
+    ap.add_argument("--out_dir", default="figures")
     ap.add_argument("--figure", choices=["fig3_6", "fig3_7", "both"], default="both")
     a = ap.parse_args()
 

@@ -36,7 +36,7 @@ EXPECTED_COS = {
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default="results/diagnostics/density_frobenius_v2/separation_per_subject.csv")
-    ap.add_argument("--out_dir", default="figures/graph")
+    ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
     apply_rc()

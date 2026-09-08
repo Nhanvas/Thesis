@@ -29,7 +29,7 @@ from palette import DETECTED, CHANCE, apply_rc
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default="results/phaseB/tier2/latency/latency_per_seizure.csv")
-    ap.add_argument("--out_dir", default="figures/event_level")
+    ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
     apply_rc()

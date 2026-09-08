@@ -39,7 +39,7 @@ def load(component_dir, subj):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--component_dir", default="results/phaseB/tier2/ens_val_tf/components")
-    ap.add_argument("--out_dir", default="figures/reconstruction")
+    ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
     apply_rc()

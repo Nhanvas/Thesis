@@ -160,7 +160,7 @@ def main():
     ap.add_argument("--score_dir", default="results/phaseB/tier2/ens_test_tf/rlg")
     ap.add_argument("--window_auroc_json",
                     default="results/phaseB/tier2/ens_test_tf/rlg/window_auroc_seed42.json")
-    ap.add_argument("--out_dir", default="figures/window_level")
+    ap.add_argument("--out_dir", default="figures")
     args = ap.parse_args()
 
     apply_rc()

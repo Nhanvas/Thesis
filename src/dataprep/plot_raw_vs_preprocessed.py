@@ -267,7 +267,7 @@ def main():
     ap.add_argument("--start", type=float, default=None,
                     help="segment start (s) into the EDF file; omit for auto-pick")
     ap.add_argument("--duration", type=float, default=10.0)
-    ap.add_argument("--out", default="figures/raw_vs_preprocessed.png")
+    ap.add_argument("--out", default="figures/fig2_3_raw_vs_preprocessed.png")
     args = ap.parse_args()
 
     raw_dir = Path(args.raw_dir)

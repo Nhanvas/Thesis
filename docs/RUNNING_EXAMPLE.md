@@ -1,101 +1,88 @@
-# Running-example recording — Task A, Figure Brief Round 2
+# Running-example recording — Fig 2.10 · Fig 3.4 · Fig 3.10
 
-**Status: blocked. No chb13 EDF file satisfies the brief's two conditions
-simultaneously.** Per §2 rule ("If no single recording satisfies both
-conditions, say so and stop; do not silently relax one of them or switch
-patient") and rule 8 ("A refusal is a valid answer"), this is reported as a
-blocker rather than resolved by relaxing a condition or using a different
-patient. Fig 2.10, Fig 3.4 and Fig 3.10 cannot be built until this is
-resolved by whoever owns the brief.
+**Status: resolved. Chosen recording: `chb13/chb13_62.edf`. One file suffices for all
+three figures.**
 
-## What was checked
+## What changed since the previous version of this file
 
-Patient **chb13** (locked by the brief; window-level discrimination 0.822,
-close to the across-patient 0.805 — see `docs/VERIFIED_NUMBERS.md` §1.2).
-Operating point **m50/p2.0** (`min_mag_pct=50, pen_mult=2.0`), the reported
-headline (brief rule 6).
+The previous version of this file reported the running example as blocked: at the
+substituted-timeline operating point (`m50/p2.0`, scored via
+`szcore_eval.build_timeline_masked`), no chb13 file had both a matched seizure and a
+false positive, and every false positive fell in a seizure-free file. That was read as
+"a real structural property of the chb13 detections."
 
-Method (`src/figures/find_running_example.py`):
+`docs/diagnostic_q_chb13.md` and `docs/FIGURE_ROUND4.md` §1 disproved that reading: the
+committed background score array for chb13 (`ens_seed42_chb13_inter.npy`, 12,452
+entries) is exhausted by global window 12,451 — inside `chb13_15.edf`, 41.9% of the way
+through the concatenated 33-file timeline. Every window after that point, in every file
+regardless of seizure content, receives a bootstrap-resampled score and is excluded from
+`real_inter`. The eight seizure-containing files all happen to sit after that exhaustion
+point in file order, so "no seizure-containing file produces a false positive" was an
+artefact of the substituted timeline, not a property of the detector. That conclusion is
+withdrawn and must not be cited.
 
-1. Load the committed ensemble arrays
-   `results/phaseB/tier2/ens_test_tf/rlg/ens_seed42_chb13_{inter,ictal}.npy`.
-2. Reconstruct the per-subject timeline with `szcore_eval.build_timeline_masked`
-   (seed 0, matching the canonical convention already used by
-   `src/phaseB/extract_latency_rlg.py`), which concatenates chb13's 33 EDF
-   files in filename order.
-3. Detect change points with `cpd_pipeline_v14.detect_changepoints` at
-   m50/p2.0 with `inter_mask=real_inter` — the same call the locked grid was
-   produced from. No smoother or penalty logic was re-implemented.
-4. Recover each EDF file's window range deterministically (`duration_s //
-   4`, the same rule `build_timeline_masked` uses; no randomness involved),
-   then, for each file, restrict the reference seizures and the raw
-   per-change-point hypothesis intervals to that file's window range and
-   score them with the SAME `szcore_eval.score_szcore` (timescoring,
-   authoritative) call used everywhere else in this project — not a
-   re-implementation of the matcher.
-5. Summed over all 33 files this reproduces the committed grid exactly: 9
-   TP / 12 seizures (sensitivity 0.750) and 9/(9+32) = 0.220 precision,
-   matching `results/phaseB/tier2/rlg_test/final_eval_seed42.csv` and the
-   brief's own self-check line for chb13 (`0.750 0.220 0.340 23.4`). This
-   confirms the per-file split is not losing or double-counting events at
-   the boundaries.
+`docs/FIGURE_ROUND4.md` §3 approved a deviation for these three figures only: recompute
+the anomaly score on every window of one continuous recording (no artifact rejection, no
+`build_timeline_masked`), using the study's fitted checkpoint, calibration and covariance.
+See `src/figures/continuous_rescore.py`.
 
-## Result — per file
+## Recording selection (R4 §3.2)
 
-| File | Seizures | TP | FP | Both present? |
-|---|---|---|---|---|
-| chb13_02.edf | 0 | 0 | 3 | no |
-| chb13_03.edf | 0 | 0 | 4 | no |
-| chb13_04.edf | 0 | 0 | 1 | no |
-| chb13_05.edf | 0 | 0 | 2 | no |
-| chb13_06.edf | 0 | 0 | 0 | no |
-| chb13_07.edf | 0 | 0 | 1 | no |
-| chb13_08.edf | 0 | 0 | 1 | no |
-| chb13_09.edf | 0 | 0 | 1 | no |
-| chb13_10.edf | 0 | 0 | 4 | no |
-| chb13_11.edf | 0 | 0 | 0 | no |
-| chb13_12.edf | 0 | 0 | 2 | no |
-| chb13_13.edf | 0 | 0 | 3 | no |
-| chb13_14.edf | 0 | 0 | 6 | no |
-| chb13_15.edf | 0 | 0 | 4 | no |
-| chb13_16.edf | 0 | 0 | 0 | no |
-| chb13_18.edf | 0 | 0 | 0 | no |
-| chb13_19.edf | 1 | 1 | 0 | no |
-| chb13_21.edf | 1 | 1 | 0 | no |
-| chb13_22.edf | 0 | 0 | 0 | no |
-| chb13_24.edf | 0 | 0 | 0 | no |
-| chb13_30.edf | 0 | 0 | 0 | no |
-| chb13_36.edf | 0 | 0 | 0 | no |
-| chb13_37.edf | 0 | 0 | 0 | no |
-| chb13_38.edf | 0 | 0 | 0 | no |
-| chb13_39.edf | 0 | 0 | 0 | no |
-| chb13_40.edf | 2 | 0 | 0 | no |
-| chb13_47.edf | 0 | 0 | 0 | no |
-| chb13_55.edf | 2 | 2 | 0 | no |
-| chb13_56.edf | 0 | 0 | 0 | no |
-| chb13_58.edf | 1 | 1 | 0 | no |
-| chb13_59.edf | 1 | 1 | 0 | no |
-| chb13_60.edf | 1 | 0 | 0 | no |
-| chb13_62.edf | 3 | 3 | 0 | no |
+Candidates were tried in the order R4 prefers: files with several seizures first.
+`chb13_62.edf` (3 annotated seizures) was tried first and satisfied both conditions
+immediately — **no second file was needed**.
 
-Totals: 12 seizures, 9 TP, 32 FP — no file has both a TP and an FP.
+Recomputed at the reported operating point (`min_mag_pct=50`, `pen_mult=2.0`,
+`cpd_pipeline_v14.detect_events`, label-free — `inter_mask=None`, since a single
+continuous file needs no multi-file buffer mask and `build_timeline_masked` is forbidden
+for these three scripts):
 
-## Why this happens (not a bug)
+| | |
+|---|---|
+| Detected intervals | `(760,764)`, `(960,1064)`, `(1660,1684)`, `(1860,1864)`, `(2120,2204)` s |
+| Annotated seizures | `(851,916)`, `(1626,1691)`, `(2664,2721)` s |
+| Matched against annotation (`szcore_eval.score_szcore`, SzCORE tolerance) | **tp=2, fp=3**, n_ref=3, n_hyp=5 |
 
-Every false positive at this operating point falls in a file that contains
-no seizure at all; every file that contains a seizure produces only matched
-(TP) or entirely missed (chb13_40, chb13_60 — FN) detections, never an
-extra unmatched change point. Files with a seizure are short, dominated by
-the one ictal transition PELT is tuned to find; the false alarms cluster in
-the longer seizure-free files. This is a real structural property of the
-chb13 detections at m50/p2.0, not an artefact of the per-file bookkeeping —
-the per-file split reproduces the committed pooled sensitivity (0.750) and
-precision (0.220) for chb13 exactly.
+Both conditions are met on this single file: at least one correctly detected seizure
+(2) and at least one false positive (3). Per R4 §3.2, all three figures use it.
 
-## Consequence
+## Acceptance gate (R4 §3.3)
 
-Fig 2.10, Fig 3.4 and Fig 3.10 are **not built**. Building any of them would
-require either relaxing a condition (e.g. allowing the false positive to be
-drawn from a neighbouring file, or allowing the "one recording" to mean
-something looser than one EDF file) or switching away from chb13 — both
-forbidden by the brief. This is reported as a blocker per §7 of the brief.
+Ictal windows are never artifact-rejected, so the committed
+`results/phaseB/tier2/ens_test_tf/rlg/ens_seed42_chb13_ictal.npy` array is complete and
+rows follow seizure order (`results/attribution_v6/ictal_row_to_seizure.csv` gives the
+row → file/window mapping). The recomputed fused score was aligned at `chb13_62.edf`'s
+three seizures (global rows 95–143) against the corresponding committed rows:
+
+| Seizure (global index) | n windows | Pearson r |
+|---|---|---|
+| 9 | 17 | 0.999610 |
+| 10 | 17 | 1.000000 |
+| 11 | 15 | 0.999775 |
+| **Pooled (49 windows)** | | **0.999861** |
+
+**Gate: pooled correlation ≥ 0.99 → PASS.** The recomputation reproduces the study's own
+pipeline. (The same calibration was independently checked component-by-component before
+this gate: recomputing `zrecon`/`zlatent`/`zgamma` on the committed ictal
+adjacency/feature/gamma arrays and comparing to the committed
+`results/phaseB/tier2/ens_test_tf/components/{zrecon,zlatent,zgamma}_chb13_ictal.npy`
+files gives correlations of 0.9999999999, 0.9999999999, and 1.0 respectively — the
+end-to-end pipeline, not just the final fused score, matches.)
+
+## What each figure shows
+
+- **Fig 2.10** — fused score vs. time (minutes) for the full `chb13_62.edf`, 12 raw
+  change points, all three annotated seizures shaded.
+- **Fig 3.4** — the three component scores (`zrecon`, `zlatent`, `zgamma`), the fused
+  score, detected intervals (green) and annotated seizures (red), stacked on a shared
+  axis.
+- **Fig 3.10** — the false-positive interval `[2120, 2204]` s (chosen as the FP interval
+  with the largest separation from any annotated seizure's tolerance window), fused score
+  above and the raw six-channel EEG below, ±60 s context. No annotated seizure overlaps
+  `[2120, 2204]` s — confirmed directly from the summary file (nearest seizure ends at
+  1691 s / next begins at 2664 s).
+
+Caption text (printed by each script, not baked into the PNG): *"Scores were recomputed
+on the continuous recording with every window retained (no artifact rejection), using
+the study's fitted checkpoint, z-score statistics, robust-z calibration and latent-space
+covariance; they are not the source of any reported number."*

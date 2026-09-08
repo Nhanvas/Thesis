@@ -29,7 +29,7 @@ writer looking for the figure by its report number can find it):
                                           the AUROC-vs-|S| scatter: the on-disk labels give |S| in
                                           {1,2} only (SPEC §3.3), so a trend over |S| is not
                                           estimable. Rerun if the labels are frozen.
-    results/report_tables/tableA7_top_channels.csv
+    results/report_tables/table_A7_top_channels.csv
                                           LABEL-FREE.  Appendix table: top-3 channels per seizure.
 
 Figures 1-3 and the table never need redoing. Only fig 4 depends on the label freeze.
@@ -269,7 +269,7 @@ def table_top3():
                     "rank2_channel": CH[top[1]], "rank2_score": round(float(v[top[1]]), 4),
                     "rank3_channel": CH[top[2]], "rank3_score": round(float(v[top[2]]), 4)})
     TABLE_OUT.mkdir(parents=True, exist_ok=True)
-    p = TABLE_OUT / "tableA7_top_channels.csv"
+    p = TABLE_OUT / "table_A7_top_channels.csv"
     with open(p, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(out[0].keys()))
         w.writeheader()

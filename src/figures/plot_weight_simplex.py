@@ -39,7 +39,7 @@ def to_xy(w_recon, w_latent, w_gamma):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default="results/phaseB/tier2/weights_rlg/derive_weights_rlg_grid.csv")
-    ap.add_argument("--out_dir", default="figures/weights")
+    ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
     apply_rc()

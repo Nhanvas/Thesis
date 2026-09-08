@@ -21,7 +21,11 @@ data/processed/_superseded_graphs/
 
 # ===== Attribution head-map images (regenerable, large) =====
 results/**/labels/*.png
-/figures/
+# Root-level report figures (figures/*.png) are tracked natively -- every exhibit now
+# lives directly under figures/ by exhibit number. Anything else placed under figures/
+# (working subdirectories, scratch output) stays ignored by default.
+/figures/*
+!/figures/*.png
 
 # ===== Audit scratch (local tooling + inventories) =====
 _project_audit/

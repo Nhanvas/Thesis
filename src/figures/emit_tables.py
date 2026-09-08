@@ -88,9 +88,14 @@ def emit_table_34():
             f1_str = "undefined"
         else:
             f1_str = f"{2 * prec * sens / (prec + sens):.3f}"
+        # docs/FIGURE_ROUND4.md §4: the report's convention is three decimals for
+        # sensitivity/precision/F1/discrimination and one decimal for FP/day. round()
+        # alone drops trailing zeros when written to CSV (1.0 instead of 1.000, 0.22
+        # instead of 0.220) -- format as fixed-decimal strings instead. `undefined`
+        # stays as it is.
         rows.append(dict(patient=subj, seizures=int(r.n_seizures),
-                          sensitivity=round(sens, 3), precision=round(prec, 3),
-                          f1=f1_str, fp_per_day=round(fpd, 1)))
+                          sensitivity=f"{sens:.3f}", precision=f"{prec:.3f}",
+                          f1=f1_str, fp_per_day=f"{fpd:.1f}"))
 
         exp_sens, exp_prec, exp_f1, exp_fpd = EXPECTED_TABLE_34[subj]
         got_f1 = None if f1_str == "undefined" else float(f1_str)

@@ -217,17 +217,28 @@ def main():
         ax_top.text(xc, label_y, name, ha="center", va="bottom", fontsize=9,
                     color=(ICTAL if name == "Ictal" else "black"), clip_on=False)
 
-    ax_top.annotate("onset", xy=(ONSET_S, y_top), xytext=(ONSET_S, y_top * 1.20),
-                    ha="center", fontsize=7.5, color=ICTAL,
+    # Round 9 item 1: onset/offset are only 22 s apart, so centred labels at
+    # the same height collide with each other and with the ictal shading
+    # edge. Staggered heights plus an outward horizontal nudge (away from
+    # the shaded interval) clear both.
+    onset_span = OFFSET_S - ONSET_S
+    nudge = max(2.0, 0.15 * onset_span)
+    ax_top.annotate("onset", xy=(ONSET_S, y_top), xytext=(ONSET_S - nudge, y_top * 1.13),
+                    ha="right", va="bottom", fontsize=7.5, color=ICTAL,
                     arrowprops=dict(arrowstyle="-", color=ICTAL, lw=0.8))
-    ax_top.annotate("offset", xy=(OFFSET_S, y_top), xytext=(OFFSET_S, y_top * 1.20),
-                    ha="center", fontsize=7.5, color=ICTAL,
+    ax_top.annotate("offset", xy=(OFFSET_S, y_top), xytext=(OFFSET_S + nudge, y_top * 1.24),
+                    ha="left", va="bottom", fontsize=7.5, color=ICTAL,
                     arrowprops=dict(arrowstyle="-", color=ICTAL, lw=0.8))
 
-    # Brackets beneath the overview marking where each excerpt was taken from.
+    # Brackets marking where each excerpt was taken from. Round 9 item 1:
+    # -0.08 axes-fraction (below the spine) sat on top of the tick-label
+    # numbers. Moved to a small POSITIVE axes-fraction instead -- just above
+    # the axis line, inside the autoscale margin below the lowest trace
+    # excursion -- which clears the tick labels entirely by sitting on the
+    # opposite side of the spine.
     trans = mtransforms.blended_transform_factory(ax_top.transData, ax_top.transAxes)
     for name, (t0, t1) in excerpts.items():
-        ax_top.plot([t0, t1], [-0.08, -0.08], transform=trans, color="black", lw=4.0,
+        ax_top.plot([t0, t1], [0.012, 0.012], transform=trans, color="black", lw=4.0,
                     solid_capstyle="butt", clip_on=False, zorder=5)
 
     ax_top.set_xlim(background_pre_start, background_post_end)

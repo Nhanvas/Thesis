@@ -9,7 +9,9 @@ This directory replaces the single `docs/TABLES_PACK.md` (moved to `docs/archive
 docs/FIGURE_ROUND6.md §4) and the CSV outputs formerly under `results/report_tables/` (moved to
 `tables/csv/` by the same round). `docs/FIGURE_ROUND8.md` §4 added `tables_ch1.md` and filed the
 eight qualitative tables (previously collected in `TABLES_QUALITATIVE.md`) into their chapter
-files; that source file is archived at `docs/archive/TABLES_QUALITATIVE.md`.
+files; that source file is archived at `docs/archive/TABLES_QUALITATIVE.md`. `docs/FIGURE_ROUND9.md`
+§3 replaced `tables_ch1.md` with a supplied version carrying the same rules block as the other
+chapter files.
 
 ## Where each table lives
 
@@ -27,10 +29,8 @@ this work's two rows to the same landscape and draws the comparison.
 
 Each of the five files above repeats the rules section (decimal convention, no-blank-cells rule,
 source-line requirement) in full at its own top, so a writer opening one file does not have to
-find another to know the conventions. **Exception:** `tables/tables_ch1.md` is supplied from
-outside this pack and was not rewritten to match; it opens with its own shorter rules paragraph
-rather than the numbered "Rules applied throughout" list the other four files share. The content
-is otherwise complete and is not to be modified here.
+find another to know the conventions. `tables/tables_ch1.md` was replaced in Round 9 with a
+supplied version whose rules block now matches the other four chapter files.
 
 ## `tables/csv/`
 

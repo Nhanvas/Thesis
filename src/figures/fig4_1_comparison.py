@@ -157,7 +157,7 @@ def main():
     label_offsets = {
         "Ali et al. 2024, 5-fold": (14, 22),
         "Ali et al. 2024, leave-one-out": (14, -30),
-        "Community challenge 2025, winner": (38, 14),
+        "Community challenge 2025, winner": (14, -32),
     }
     for p in PUBLISHED_POINTS:
         marker = same_corpus_marker if p["same_corpus"] else diff_corpus_marker

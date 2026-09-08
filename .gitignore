@@ -24,8 +24,15 @@ results/**/labels/*.png
 # Root-level report figures (figures/*.png) are tracked natively -- every exhibit now
 # lives directly under figures/ by exhibit number. Anything else placed under figures/
 # (working subdirectories, scratch output) stays ignored by default.
+# docs/FIGURE_ROUND9.md §4: figures/drawio_sources/ holds the editable sources for the
+# hand-drawn diagrams and must stay tracked -- it needs its own exception, since a
+# blanket "/figures/*" rule hides everything under figures/ from git, including new
+# subdirectories, until explicitly un-ignored (this is what swallowed figures/tables/
+# unnoticed for two rounds).
 /figures/*
 !/figures/*.png
+!/figures/drawio_sources/
+!/figures/drawio_sources/**
 
 # ===== Audit scratch (local tooling + inventories) =====
 _project_audit/

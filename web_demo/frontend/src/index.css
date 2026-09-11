@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Self-hosted fonts — no Google Fonts CDN, defense machine may have no internet. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-v20-latin-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-v20-latin-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-v20-latin-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-v20-latin-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-v20-latin-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-v20-latin-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== SZSCAN_DESIGN_v2.md §9 — design tokens, copied verbatim ===== */
+:root {
+  /* nền & chrome */
+  --color-bg:              #FFFFFF;
+  --color-surface:         #FFFFFF;
+  --color-eeg-canvas:      #FEFBEF;
+  --color-footer:          #0F172A;
+  --color-border:          #E2E8F0;
+  --color-border-strong:   #CBD5E1;
+
+  --header-gradient:       linear-gradient(90deg, #624C8A 0%, #10182B 100%);
+  --color-brand:           #776399;   /* chrome: header, nút primary */
+  --color-interaction:     #7C3AED;   /* playhead + đang chọn (chỉ trong canvas nội dung) */
+
+  --color-text:            #0F172A;
+  --color-text-secondary:  #475569;
+  --color-text-muted:      #64748B;
+
+  /* nguồn gốc event */
+  --color-ai:              #334155;
+  --color-human:           #2563EB;   /* độc quyền cho event Human, KHÔNG dùng cho nút */
+
+  /* review status */
+  --color-accept:          #16A34A;  --color-accept-bg:    #F0FDF4;
+  --color-reject:          #DC2626;  --color-reject-bg:    #FEF2F2;
+  --color-uncertain:       #D97706;  --color-uncertain-bg: #FFFBEB;
+  --color-unseen:          #94A3B8;
+
+  /* EEG */
+  --color-eeg-raw:         #64748B;
+  --color-eeg-filtered:    #0F172A;
+  --color-grid:            #E2E8F0;
+  --color-grid-strong:     #CBD5E1;
+
+  /* attribution (teal) */
+  --color-attr-low:        #CBD5E1;
+  --color-attr-mid:        #2DD4BF;
+  --color-attr-high:       #0F766E;
+
+  /* layout */
+  --radius-panel:          10px;
+  --radius-control:        6px;
+  --shadow-panel:          0 1px 3px rgb(15 23 42 / 8%);
+
+  --font-ui:               'Inter', sans-serif;
+  --font-mono:             'IBM Plex Mono', monospace;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--color-bg);
+  color: var(--color-text);
+}

@@ -24,7 +24,7 @@ this file (paths) > project instructions > memory.
 Code/
 ├── src/          code — 7 canonical modules + 6 role-scoped folders
 ├── docs/         governance and specifications (the only citable docs)
-├── web_demo/     SzScan web demo — spec set, locked UI, backend/frontend (see §3b)
+├── web_demo/     SzScan web demo — spec set, locked UI, backend/frontend, build IN PROGRESS (see §3b)
 ├── data/         inputs, checkpoints, per-node dumps  (processed/ ~30 GB, gitignored)
 ├── results/      all committed outputs
 ├── archive/      superseded code and artifacts — DO NOT CITE, DO NOT RUN
@@ -187,7 +187,18 @@ Outputs to `figures/attribution/`:
 
 ---
 
-## 3b · `web_demo/` — SzScan (spec set locked 2026-09-03, build not started)
+## 3b · `web_demo/` — SzScan (spec set locked 2026-09-03, build IN PROGRESS)
+
+**Build status as of 2026-09-10.** Full session-by-session detail (real console output, bugs found and
+fixed, open items) lives in `web_demo/BUILD_PROGRESS.md` — this section is a summary for wayfinding,
+not the source of truth for build history.
+
+| Step (`DEMO_BUILD_HANDOFF.md` §6) | Status |
+|---|---|
+| 0 — repo scaffold, Tailwind tokens, `test_guards.py` PASS | done |
+| 1 — `pipeline_demo.py` (`process_file`) + CLI, real timing | done |
+| 2 — Log in + empty Database + footer | not started (prompt drafted, not yet run) |
+| 3-8 | not started |
 
 **Authority inside demo scope:** `UI/` (locked PNGs — wins on anything visible) >
 `SZSCAN_SPEC_v5.md` > `SZSCAN_DESIGN_v2.md` > `DEMO_BUILD_HANDOFF.md`.
@@ -200,9 +211,20 @@ Scientific authority (`RESULTS_OF_RECORD_phaseB.md` etc.) still governs any numb
 | `DEMO_BUILD_HANDOFF.md` | stack, folder layout, build order, risks. Absorbs `WEB_DEMO_CODE_MIGRATION_NOTES.md`. |
 | `CLAUDE.md` | rules for Claude Code when building the demo. Carries the three hard guards. |
 | `PROJECT2_SETUP.md` | how to stand up the second Claude project + which files to upload. |
-| `UI/` | 29 locked PNG mockups + `UI (figma).fig`. **Author-designed and frozen — never propose a redesign.** |
+| `BUILD_PROGRESS.md` | **new, 2026-09-10.** Step-by-step build log kept by Project #2 — what was built each step, real (not summarized) console output, bugs found and fixed, open items carried forward. Read this first when resuming or reviewing the build. |
+| `UI/` | 29 locked PNG mockups + `UI (figma).fig`. **Author-designed and frozen — never propose a redesign.** One file (`Annotaiton (format_ ID-summary.txt).png`) was briefly modified by the build tooling during Step 1 and reverted the same session via `git checkout` — see `BUILD_PROGRESS.md` §6. Root cause not yet confirmed as of this writing. |
 | `backend/edf_order.py` | orders EDFs by header time for UI display, which differs from the by-filename order used for processing. Moved here 2026-09-03; demo-only, not shared with the thesis. |
-| `backend/` · `frontend/` · `cache/` | created when coding starts. `cache/` is gitignored. |
+| `backend/pipeline_demo.py` | **new, 2026-09-10 (Step 1).** `process_file()` — label-free continuous ensemble score (zrecon + zlatent + zgamma, `ensemble_recipe.CANDIDATES["rlg"]`) for one EDF file; stops before change-point detection. Measured end-to-end (after a filter-cost optimization): roughly **9.76 s per hour of EEG** on the dev CPU (`chb06_01.edf`) — but run-to-run variance on that machine was large across otherwise-identical code (see `BUILD_PROGRESS.md` §4), so treat this as a rough figure, not a locked number. |
+| `backend/tests/test_guards.py` | **new, 2026-09-10 (Step 0).** Enforces the three hard guards below plus the write guard by scanning the `web_demo/` source tree. 4/4 passing as of the last raw-console check (Step 1). |
+| `backend/main.py` · `db.py` · `export_txt.py` | stubs only (Step 0), not yet implemented. |
+| `frontend/` | Vite + React + Tailwind scaffold (Step 0). `tailwind.config.js` + `src/design-tokens.js` mirror `SZSCAN_DESIGN_v2.md` §9's tokens verbatim (verified line-by-line); fonts self-hosted, no CDN calls. |
+| `cache/` | gitignored, empty — not used yet. |
+| `CC_STEP0_PROMPT.md` · `CC_STEP1_PROMPT.md` · `CC_STEP1_FILTER_OPT_PROMPT.md` · `CC_STEP2_PROMPT.md` | **Project #2 build tooling, not app code** — the per-step instructions handed to Claude Code. Harmless to leave in place; not part of the shipped demo. |
+
+**Repo-root clutter from the 2026-09-10 build session — not part of the demo, safe to delete or
+gitignore, don't mistake for real repo structure:** several `step1_*.md` files (raw terminal-output
+captures, used to independently verify Claude Code's claims rather than trust its summaries) were
+written at the repo root instead of under `web_demo/`. Full list in `web_demo/BUILD_PROGRESS.md` §2.
 
 **Three hard guards (SPEC §1.2) — the demo is presented as label-free:** never call
 `szcore_eval.build_timeline_masked()`; never read the seizure fields from `chb*-summary.md` at runtime;
@@ -211,7 +233,10 @@ never load `{subj}_{interictal,ictal}.npy`. Plus: demo code writes only inside `
 **Why:** the committed `ens_seed42_*` arrays are segment-ordered with no window→second index, and
 `build_timeline_masked()` rebuilds a timeline *from the annotations*, bootstrap-filling gaps. Positional
 information was destroyed at preprocessing. The demo therefore recomputes label-free on the continuous
-recording (measured 16.9 ms/window ⇒ ~15 s per hour of EEG on the dev CPU).
+recording. **Correction, 2026-09-10:** "measured 16.9 ms/window ⇒ ~15 s per hour of EEG," here and in
+`CLAUDE.md`, was a *component* benchmark — `build_adjacency` + `compute_band_powers` only — never a
+full-pipeline measurement. Step 1 measured the actual full `process_file()` cost; see the
+`pipeline_demo.py` row above and `BUILD_PROGRESS.md` §4 for the real figure and its caveats.
 
 **`edf_index.py` does not exist and is not needed.** It belonged to the retired v3 architecture and was
 deleted. Under v5 each file's score array has length equal to that file's window count, so per-file

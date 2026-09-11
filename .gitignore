@@ -44,3 +44,10 @@ results/history_superseded/oldweight_ens_scores/
 results/history_topology/
 topo_features/
 archive/scaffolding/checkpoints/
+
+# ===== web_demo (SzScan) =====
+web_demo/cache/
+web_demo/backend/.env
+web_demo/backend/szscan.db
+web_demo/frontend/node_modules/
+web_demo/frontend/dist/

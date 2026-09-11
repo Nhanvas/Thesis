@@ -1,19 +1,19 @@
 """
-Fig 2.14 - Event-based scoring rules.
+Fig 2.14 - Event-based scoring rules, in three panels.
 
-Drawn to scale on a real time axis, so the 30 s pre-onset tolerance and the 60 s
-post-offset tolerance are visibly different lengths and the 90 s merge gap can be
-read off the axis.
+One rule per panel, drawn to scale on a common time axis, so the 30 s pre-onset
+tolerance, the 60 s post-offset tolerance and the 90 s merge gap can be read off
+the axis rather than taken on trust.
 
-The five parameters are read from src/szcore_eval.py, not typed in here: the script
-imports them and stops if they are missing, so the drawing cannot drift from the
-scorer.
+The five parameters are read from src/szcore_eval.py, not typed in here: the
+script imports them and stops if they cannot be found, so the drawing cannot
+drift from the scorer that implements the rule.
 
-The scenario is illustrative. It is constructed to show, in one picture, every
-outcome the scoring rule can produce: a detection matched by direct overlap, a
-detection matched only because it falls inside the post-offset tolerance, two
-detections merged because they are closer than the merge gap, a false positive,
-and a missed seizure. No number in this figure is a result.
+The waveform is SYNTHETIC and illustrative. It is generated from a fixed seed and
+is not a recording. It is drawn so a reader can see what the boxes refer to; no
+property of it affects the scoring, which depends only on the interval endpoints.
+Drawing a real recording here would invite the question of which recording and
+whether this is a result, and this figure is neither.
 
 Source of parameters: src/szcore_eval.py
 Output: figures/fig2_14_event_scoring.png
@@ -21,12 +21,12 @@ Output: figures/fig2_14_event_scoring.png
 import sys
 from pathlib import Path
 
+import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyArrowPatch
 
-# --- repo imports -----------------------------------------------------------
 ROOT = Path(__file__).resolve().parents[2]
 for p in (ROOT / "src", ROOT / "src" / "figures"):
     if str(p) not in sys.path:
@@ -34,26 +34,19 @@ for p in (ROOT / "src", ROOT / "src" / "figures"):
 
 from palette import ICTAL, DETECTED, CHANCE, HEADLINE, apply_rc  # noqa: E402
 
-# --- parameters, read from the scorer ---------------------------------------
 try:
     import szcore_eval as SZ
-except Exception as exc:                                    # pragma: no cover
+except Exception as exc:                                     # pragma: no cover
     sys.exit(f"FAIL: cannot import src/szcore_eval.py ({exc}). "
              "This figure must not be drawn with typed-in parameters.")
 
 
 def _param(*names):
-    """Find a scoring parameter wherever szcore_eval keeps it.
-
-    The parameters live on a dataclass instance rather than at module level, so
-    look there too. Never fall back to a typed-in value: if none of the names is
-    found, stop, because a figure that teaches the tolerance rule must not be
-    able to disagree with the scorer that implements it.
-    """
-    for n in names:                                  # module-level constant
+    """Find a scoring parameter wherever szcore_eval keeps it."""
+    for n in names:
         if hasattr(SZ, n):
             return getattr(SZ, n), f"szcore_eval.{n}"
-    for holder in dir(SZ):                           # field of a config object
+    for holder in dir(SZ):
         if holder.startswith("__"):
             continue
         obj = getattr(SZ, holder)
@@ -81,151 +74,170 @@ print(f"  tolerance after offset : {TOL_END:g} s   <- {src_b}")
 print(f"  merge gap              : {MERGE_GAP:g} s   <- {src_c}")
 print(f"  maximum event duration : {MAX_EVENT:g} s   <- {src_d}")
 
-assert TOL_END > TOL_START, "post-offset tolerance should exceed the pre-onset one"
-
-# --- illustrative scenario --------------------------------------------------
-T_MAX = 700.0
-
-# annotated seizures (start, end)
-SEIZURES = [(100.0, 160.0), (300.0, 330.0), (480.0, 510.0)]
-
-# raw detected intervals, before merging
-RAW = [(130.0, 150.0), (175.0, 195.0), (350.0, 375.0), (600.0, 630.0)]
+# --- illustrative signal ----------------------------------------------------
+T_MAX = 420.0
+FS_PLOT = 14.0
+RNG = np.random.default_rng(42)
+t = np.arange(0, T_MAX, 1.0 / FS_PLOT)
 
 
-def merge(intervals, gap):
-    out = []
-    for s, e in sorted(intervals):
-        if out and s - out[-1][1] < gap:
-            out[-1] = (out[-1][0], e)
-        else:
-            out.append((s, e))
-    return out
+def _trace(seizure=None, spike_at=None):
+    """Background activity, optionally with a rhythmic burst and a transient."""
+    x = np.convolve(RNG.normal(0, 1.0, t.size), np.ones(5) / 5.0,
+                    mode="same") * 0.30
+    if seizure is not None:
+        s, e = seizure
+        m = (t >= s) & (t <= e)
+        ramp = np.sin(np.pi * (t[m] - s) / (e - s)) ** 0.5
+        x[m] += 1.00 * ramp * np.sin(2 * np.pi * 0.9 * (t[m] - s))
+        x[m] += RNG.normal(0, 0.20, m.sum())
+    if spike_at is not None:
+        m = np.abs(t - spike_at) < 3.0
+        x[m] += 2.0 * np.exp(-((t[m] - spike_at) ** 2) / 0.40)
+    return x
 
 
-MERGED = merge(RAW, MERGE_GAP)
+SEIZURE = (150.0, 250.0)            # the same annotated seizure in all panels
 
+PANELS = [
+    dict(
+        tag="(a)",
+        title="Any overlap inside the tolerance window counts as a match",
+        lanes=["Reference", "Hypothesis"],
+        detections=[[(265.0, 300.0)]],
+        outcomes=[["match"]],
+        tolerance=True,
+        spike=None,
+        note="The detection begins after the annotated seizure has ended. It "
+             "still counts, because it falls inside the post-offset tolerance.",
+    ),
+    dict(
+        tag="(b)",
+        title=f"Detections closer than {MERGE_GAP:g} s are merged before scoring",
+        lanes=["Reference", "Hypothesis,\nas produced",
+               "Hypothesis,\nafter merging"],
+        detections=[[(140.0, 190.0), (215.0, 265.0)], [(140.0, 265.0)]],
+        outcomes=[[None, None], ["match"]],
+        tolerance=False,
+        spike=None,
+        note="Two detections separated by less than the merge gap become one "
+             "interval, which is then scored once.",
+    ),
+    dict(
+        tag="(c)",
+        title="A detection outside the tolerance window is a false alarm",
+        lanes=["Reference", "Hypothesis"],
+        detections=[[(160.0, 230.0), (345.0, 375.0)]],
+        outcomes=[["match", "false alarm"]],
+        tolerance=True,
+        spike=360.0,
+        note="False alarms are counted per recorded day. Specificity is not "
+             "defined at event level, because a true-negative event has no "
+             "meaning once a timeline is expressed as events.",
+    ),
+]
 
-def matches(det, seiz):
-    s, e = seiz
-    return det[1] > s - TOL_START and det[0] < e + TOL_END
-
-
-# outcome per merged detection, and per seizure
-det_outcome, used = [], set()
-for d in MERGED:
-    hit = next((i for i, z in enumerate(SEIZURES) if matches(d, z)), None)
-    det_outcome.append(("true positive", hit) if hit is not None
-                       else ("false positive", None))
-    if hit is not None:
-        used.add(hit)
-missed = [i for i in range(len(SEIZURES)) if i not in used]
-
-print(f"\nscenario: {len(SEIZURES)} annotated seizures, "
-      f"{len(RAW)} raw detections merged into {len(MERGED)}")
-for d, (lab, hit) in zip(MERGED, det_outcome):
-    print(f"  [{d[0]:6.0f}, {d[1]:6.0f}] s -> {lab}"
-          + (f" (seizure {hit + 1})" if hit is not None else ""))
-for i in missed:
-    print(f"  seizure {i + 1} at [{SEIZURES[i][0]:.0f}, "
-          f"{SEIZURES[i][1]:.0f}] s -> missed")
-
-# --- drawing ----------------------------------------------------------------
 apply_rc()
-fig, ax = plt.subplots(figsize=(11.0, 4.3))
+fig, axes = plt.subplots(3, 1, figsize=(10.2, 10.8),
+                         gridspec_kw=dict(height_ratios=[2, 3, 2], hspace=1.05,
+                                          bottom=0.11, top=0.96))
 
-LANE = {"ref": 2.55, "raw": 1.55, "merged": 0.55}
-H = 0.34
+LANE_GAP = 1.0
+BOX_H = 0.60
+SIG_AMP = 0.25
 
-# tolerance margins, drawn first so the seizure bars sit on top
-for s, e in SEIZURES:
-    ax.add_patch(Rectangle((s - TOL_START, LANE["ref"] - H / 2), TOL_START, H,
-                           facecolor=ICTAL, alpha=0.13, edgecolor="none",
-                           zorder=1))
-    ax.add_patch(Rectangle((e, LANE["ref"] - H / 2), TOL_END, H,
-                           facecolor=ICTAL, alpha=0.13, edgecolor="none",
-                           zorder=1))
+for ax, P in zip(axes, PANELS):
+    n = len(P["lanes"])
+    ys = [(n - 1 - i) * LANE_GAP for i in range(n)]
 
-for i, (s, e) in enumerate(SEIZURES):
-    ax.add_patch(Rectangle((s, LANE["ref"] - H / 2), e - s, H,
-                           facecolor=ICTAL, alpha=0.85, edgecolor=ICTAL,
-                           linewidth=1.0, zorder=3))
-    if i in missed:
-        ax.text((s + e) / 2, LANE["ref"] - H / 2 - 0.17, "missed",
-                ha="center", va="top", fontsize=8, color=ICTAL)
+    y_ref = ys[0]
+    ax.plot(t, y_ref + SIG_AMP * _trace(seizure=SEIZURE), color=CHANCE,
+            linewidth=0.55, zorder=2)
 
-for s, e in RAW:
-    ax.add_patch(Rectangle((s, LANE["raw"] - H / 2), e - s, H,
-                           facecolor=DETECTED, alpha=0.85, edgecolor=DETECTED,
-                           linewidth=1.0, zorder=3))
+    if P["tolerance"]:
+        ax.add_patch(Rectangle((SEIZURE[0] - TOL_START, y_ref - BOX_H / 2),
+                               (SEIZURE[1] + TOL_END) - (SEIZURE[0] - TOL_START),
+                               BOX_H, facecolor="none", edgecolor=ICTAL,
+                               linewidth=1.1, linestyle=(0, (5, 4)), zorder=4))
+    ax.add_patch(Rectangle((SEIZURE[0], y_ref - BOX_H / 2),
+                           SEIZURE[1] - SEIZURE[0], BOX_H, facecolor="none",
+                           edgecolor=ICTAL, linewidth=1.6, zorder=5))
 
-for d, (lab, hit) in zip(MERGED, det_outcome):
-    ax.add_patch(Rectangle((d[0], LANE["merged"] - H / 2), d[1] - d[0], H,
-                           facecolor=DETECTED, alpha=0.85, edgecolor=DETECTED,
-                           linewidth=1.0, zorder=3))
-    ax.text((d[0] + d[1]) / 2, LANE["merged"] - H / 2 - 0.17, lab,
-            ha="center", va="top", fontsize=8,
-            color=DETECTED if lab == "true positive" else CHANCE)
+    for li, dets in enumerate(P["detections"]):
+        y = ys[li + 1]
+        ax.plot(t, y + SIG_AMP * _trace(seizure=SEIZURE, spike_at=P["spike"]),
+                color=CHANCE, linewidth=0.55, zorder=2)
+        for di, (s, e) in enumerate(dets):
+            ax.add_patch(Rectangle((s, y - BOX_H / 2), e - s, BOX_H,
+                                   facecolor="none", edgecolor=DETECTED,
+                                   linewidth=1.6, zorder=5))
+            lab = P["outcomes"][li][di]
+            if lab:
+                ax.text((s + e) / 2, y - BOX_H / 2 - 0.11, lab, ha="center",
+                        va="top", fontsize=8.5,
+                        color=DETECTED if lab == "match" else HEADLINE,
+                        zorder=6)
 
-# the merge that happened, marked between the raw and merged lanes
-m_a, m_b = RAW[0], RAW[1]
-ax.annotate("", xy=((m_a[1] + m_b[0]) / 2, LANE["merged"] + H / 2 + 0.06),
-            xytext=((m_a[1] + m_b[0]) / 2, LANE["raw"] - H / 2 - 0.06),
-            arrowprops=dict(arrowstyle="-|>", color=CHANCE, linewidth=0.9,
-                            shrinkA=0, shrinkB=0))
-ax.text((m_a[1] + m_b[0]) / 2 + 8, (LANE["raw"] + LANE["merged"]) / 2,
-        f"gap {m_b[0] - m_a[1]:.0f} s < {MERGE_GAP:g} s, joined",
-        fontsize=8, style="italic", color=CHANCE, va="center")
+    if P["tolerance"]:
+        y_a = y_ref + BOX_H / 2 + 0.15
+        for x0, x1, lab in (
+            (SEIZURE[0] - TOL_START, SEIZURE[0], f"{TOL_START:g} s before onset"),
+            (SEIZURE[1], SEIZURE[1] + TOL_END, f"{TOL_END:g} s after offset"),
+        ):
+            ax.add_patch(FancyArrowPatch((x0, y_a), (x1, y_a),
+                                         arrowstyle="<->", mutation_scale=7,
+                                         color=ICTAL, linewidth=0.9, zorder=6))
+            ax.text((x0 + x1) / 2, y_a + 0.04, lab, ha="center", va="bottom",
+                    fontsize=8, color=ICTAL, zorder=6)
 
-# tolerance call-outs on the first seizure
-s0, e0 = SEIZURES[0]
-y_tol = LANE["ref"] + H / 2 + 0.20
-ax.add_patch(FancyArrowPatch((s0 - TOL_START, y_tol), (s0, y_tol),
-                             arrowstyle="<->", mutation_scale=8,
-                             color=ICTAL, linewidth=0.9))
-ax.text(s0 - TOL_START / 2, y_tol + 0.07, f"{TOL_START:g} s before onset",
-        ha="center", va="bottom", fontsize=8, color=ICTAL)
-ax.add_patch(FancyArrowPatch((e0, y_tol), (e0 + TOL_END, y_tol),
-                             arrowstyle="<->", mutation_scale=8,
-                             color=ICTAL, linewidth=0.9))
-ax.text(e0 + TOL_END / 2, y_tol + 0.07, f"{TOL_END:g} s after offset",
-        ha="center", va="bottom", fontsize=8, color=ICTAL)
+    if len(P["detections"]) == 2:
+        a = P["detections"][0][0][1]
+        b = P["detections"][0][1][0]
+        y_g = ys[1]
+        ax.add_patch(FancyArrowPatch((a, y_g), (b, y_g), arrowstyle="<->",
+                                     mutation_scale=6, color=HEADLINE,
+                                     linewidth=1.0, zorder=7))
+        ax.annotate(f"gap {b - a:.0f} s, under {MERGE_GAP:g} s",
+                    xy=((a + b) / 2, y_g + BOX_H / 2 - 0.02),
+                    xytext=(b + 45, y_g + BOX_H / 2 + 0.30), ha="left",
+                    va="center", fontsize=8, color=HEADLINE, zorder=8,
+                    bbox=dict(boxstyle="round,pad=0.18", facecolor="white",
+                              edgecolor="none"),
+                    arrowprops=dict(arrowstyle="-", color=HEADLINE,
+                                    linewidth=0.7, shrinkA=1, shrinkB=2))
 
-# the tolerance-only match, called out on the second seizure
-d_tol = MERGED[1]
-ax.annotate("matched by the post-offset tolerance,\nno overlap of the annotation itself",
-            xy=(d_tol[1], LANE["merged"] + H / 2 - 0.05),
-            xytext=(d_tol[1] + 30, (LANE["raw"] + LANE["merged"]) / 2 + 0.08),
-            ha="left", va="center", fontsize=8, color=HEADLINE,
-            arrowprops=dict(arrowstyle="-", color=HEADLINE, linewidth=0.8,
-                            shrinkA=2, shrinkB=2,
-                            connectionstyle="angle,angleA=0,angleB=90,rad=0"))
+    ax.set_title(f"{P['tag']}  {P['title']}", loc="left", fontsize=10.5,
+                 fontweight="bold", pad=18)
+    ax.annotate(P["note"], xy=(0.5, 0), xycoords="axes fraction",
+                xytext=(0, -46), textcoords="offset points", ha="center",
+                va="top", fontsize=8.5, style="italic", color="0.30")
 
-ax.set_yticks([LANE["merged"], LANE["raw"], LANE["ref"]])
-ax.set_yticklabels(["Detected intervals,\nafter merging",
-                    "Detected intervals,\nas produced",
-                    "Annotated seizures,\nwith tolerance"])
-ax.tick_params(axis="y", length=0)
-ax.set_xlim(0, T_MAX)
-ax.set_ylim(-0.15, LANE["ref"] + 1.25)
-ax.set_xlabel("Time (s)")
-for side in ("top", "right", "left"):
-    ax.spines[side].set_visible(False)
-ax.grid(axis="x", color=CHANCE, alpha=0.18, linewidth=0.6)
-ax.set_axisbelow(True)
+    ax.set_yticks(ys)
+    ax.set_yticklabels(P["lanes"], fontsize=9)
+    ax.tick_params(axis="y", length=0)
+    ax.set_xlim(60, T_MAX)
+    ax.set_ylim(-LANE_GAP * 0.72, ys[0] + BOX_H / 2 + 0.50)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.grid(axis="x", color=CHANCE, alpha=0.15, linewidth=0.6)
+    ax.set_axisbelow(True)
+    ax.set_xlabel("Time (s)", fontsize=9, labelpad=2)
 
-fig.tight_layout()
 OUT = ROOT / "figures" / "fig2_14_event_scoring.png"
 OUT.parent.mkdir(parents=True, exist_ok=True)
 fig.savefig(OUT, dpi=300, bbox_inches="tight", facecolor="white")
 print(f"\nwrote {OUT}")
 
 print("\ncaption text:")
-print(f"  Event-based scoring. A detected interval is matched to an annotated "
-      f"seizure by any overlap after a {TOL_START:g} s tolerance before onset "
-      f"and {TOL_END:g} s after offset; detections separated by less than "
-      f"{MERGE_GAP:g} s are merged, and detections longer than "
-      f"{MAX_EVENT / 60:g} minutes are split. The scenario shown is "
-      f"illustrative and reports no result. Specificity is not defined at "
-      f"event level, because a true-negative event has no meaning once a "
-      f"timeline is expressed as events; false alarms per day replaces it.")
+print(f"  Event-based scoring. (a) A detected interval is matched to an "
+      f"annotated seizure by any overlap, after the annotation is extended by "
+      f"{TOL_START:g} s before onset and {TOL_END:g} s after offset; the "
+      f"detection shown begins after the seizure has ended and still counts. "
+      f"(b) Detections separated by less than {MERGE_GAP:g} s are merged into "
+      f"one interval before scoring. (c) A detection outside the tolerance "
+      f"window is a false alarm. Detections longer than {MAX_EVENT / 60:g} "
+      f"minutes are split, which is not shown. The signal is synthetic and "
+      f"illustrative; the scoring depends only on the interval endpoints. "
+      f"Specificity is not defined at event level, because a true-negative "
+      f"event has no meaning once a timeline is expressed as events; false "
+      f"alarms per day replaces it.")

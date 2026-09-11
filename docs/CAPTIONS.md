@@ -133,10 +133,10 @@ timeline carries a resampled score, ranging from 40.0 to 66.9 percent. *Mandator
 rate is measured on these timelines, and the direction of the resulting bias is not established.
 
 **Figure 2.14.** Event-based scoring. A detected interval is matched to an annotated seizure by any
-overlap after a thirty-second tolerance before onset and sixty seconds after offset; detections closer
-than ninety seconds are merged. *Mandatory:* specificity is not defined at event level, because a
-true-negative event has no meaning once a timeline is expressed as events; false alarms per day
-replaces it.
+overlap after a 30 s tolerance before onset and 60 s after offset; detections separated by less than
+90 s are merged, and detections longer than 5 minutes are split. The scenario shown is illustrative and
+reports no result. *Mandatory:* specificity is not defined at event level, because a true-negative event
+has no meaning once a timeline is expressed as events; false alarms per day replaces it.
 
 **Table 2.1.** Candidate public scalp EEG seizure corpora.
 

@@ -33,6 +33,10 @@ results/**/labels/*.png
 !/figures/*.png
 !/figures/drawio_sources/
 !/figures/drawio_sources/**
+# docs/FIGURE_ROUND10.md §3: figures/archive/ holds cut exhibits (archived, not deleted,
+# so a cut can be reversed) and must stay tracked for the same reason drawio_sources does.
+!/figures/archive/
+!/figures/archive/**
 
 # ===== Audit scratch (local tooling + inventories) =====
 _project_audit/

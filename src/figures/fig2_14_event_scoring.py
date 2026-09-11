@@ -43,25 +43,43 @@ except Exception as exc:                                    # pragma: no cover
 
 
 def _param(*names):
-    """Return the first attribute found, else stop."""
-    for n in names:
+    """Find a scoring parameter wherever szcore_eval keeps it.
+
+    The parameters live on a dataclass instance rather than at module level, so
+    look there too. Never fall back to a typed-in value: if none of the names is
+    found, stop, because a figure that teaches the tolerance rule must not be
+    able to disagree with the scorer that implements it.
+    """
+    for n in names:                                  # module-level constant
         if hasattr(SZ, n):
-            return getattr(SZ, n)
-    sys.exit(f"FAIL: none of {names} found in src/szcore_eval.py. "
-             "Do not hard-code the value; fix the lookup.")
+            return getattr(SZ, n), f"szcore_eval.{n}"
+    for holder in dir(SZ):                           # field of a config object
+        if holder.startswith("__"):
+            continue
+        obj = getattr(SZ, holder)
+        if isinstance(obj, (str, int, float, list, dict, tuple)):
+            continue
+        for n in names:
+            if hasattr(obj, n):
+                return getattr(obj, n), f"szcore_eval.{holder}.{n}"
+    sys.exit(f"FAIL: none of {names} found in src/szcore_eval.py, at module "
+             "level or on any configuration object. Fix the lookup here; do "
+             "not edit szcore_eval.py and do not hard-code the value.")
 
 
-TOL_START = float(_param("TOLERANCE_START", "toleranceStart", "TOL_START"))
-TOL_END = float(_param("TOLERANCE_END", "toleranceEnd", "TOL_END"))
-MERGE_GAP = float(_param("MIN_DURATION_BETWEEN_EVENTS",
-                         "minDurationBetweenEvents", "MERGE_GAP"))
-MAX_EVENT = float(_param("MAX_EVENT_DURATION", "maxEventDuration", "MAX_EVENT"))
+TOL_START, src_a = _param("toleranceStart", "TOLERANCE_START", "TOL_START")
+TOL_END, src_b = _param("toleranceEnd", "TOLERANCE_END", "TOL_END")
+MERGE_GAP, src_c = _param("minDurationBetweenEvents",
+                          "MIN_DURATION_BETWEEN_EVENTS", "MERGE_GAP")
+MAX_EVENT, src_d = _param("maxEventDuration", "MAX_EVENT_DURATION", "MAX_EVENT")
+TOL_START, TOL_END = float(TOL_START), float(TOL_END)
+MERGE_GAP, MAX_EVENT = float(MERGE_GAP), float(MAX_EVENT)
 
-print("parameters read from src/szcore_eval.py")
-print(f"  tolerance before onset : {TOL_START:g} s")
-print(f"  tolerance after offset : {TOL_END:g} s")
-print(f"  merge gap              : {MERGE_GAP:g} s")
-print(f"  maximum event duration : {MAX_EVENT:g} s")
+print("parameters, and where each was read from")
+print(f"  tolerance before onset : {TOL_START:g} s   <- {src_a}")
+print(f"  tolerance after offset : {TOL_END:g} s   <- {src_b}")
+print(f"  merge gap              : {MERGE_GAP:g} s   <- {src_c}")
+print(f"  maximum event duration : {MAX_EVENT:g} s   <- {src_d}")
 
 assert TOL_END > TOL_START, "post-offset tolerance should exceed the pre-onset one"
 

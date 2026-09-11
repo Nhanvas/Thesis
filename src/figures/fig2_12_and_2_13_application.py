@@ -104,10 +104,14 @@ BANDS = [
 ]
 
 X0, X1 = 3.0, 66.0
+X1_WIDE = 95.0
+WIDE = {"Browser", "Application server"}
+XMID = (X0 + X1) / 2
 BOX_H = 13.0
 
 for name, colour, y, items in BANDS:
-    axa.add_patch(Rectangle((X0 - 1.6, y - 2.4), (X1 - X0) + 3.2, BOX_H + 6.0,
+    xr = X1_WIDE if name in WIDE else X1
+    axa.add_patch(Rectangle((X0 - 1.6, y - 2.4), (xr - X0) + 3.2, BOX_H + 6.0,
                             facecolor="none", edgecolor=colour, linewidth=1.0,
                             linestyle=(0, (3, 3)), zorder=1))
     axa.text(X0 - 0.6, y + BOX_H + 1.2, name, fontsize=9.5, fontweight="bold",
@@ -115,7 +119,7 @@ for name, colour, y, items in BANDS:
              bbox=dict(boxstyle="square,pad=0.12", facecolor="white",
                        edgecolor="none"))
     n = len(items)
-    w = ((X1 - X0) - 1.6 * (n - 1)) / n
+    w = ((xr - X0) - 1.6 * (n - 1)) / n
     for i, label in enumerate(items):
         x = X0 + i * (w + 1.6)
         axa.add_patch(Rectangle((x, y), w, BOX_H, facecolor="white",
@@ -124,28 +128,28 @@ for name, colour, y, items in BANDS:
                  fontsize=7.6, color="0.15", zorder=4)
 
 for y_from, y_to in ((80, 58 + BOX_H), (58, 32 + BOX_H), (32, 6 + BOX_H)):
-    axa.add_patch(FancyArrowPatch(((X0 + X1) / 2, y_from),
-                                  ((X0 + X1) / 2, y_to), arrowstyle="<|-|>",
+    axa.add_patch(FancyArrowPatch((XMID, y_from),
+                                  (XMID, y_to), arrowstyle="<|-|>",
                                   mutation_scale=8, color=CHANCE,
                                   linewidth=1.0, zorder=2))
 
 # the forbidden inputs
-FX, FW = 71.0, 26.0
-axa.add_patch(Rectangle((FX, 6), FW, 67, facecolor="white", edgecolor=ICTAL,
+FX, FW = 70.0, 25.0
+axa.add_patch(Rectangle((FX, 3.6), FW, 45.8, facecolor="white", edgecolor=ICTAL,
                         linewidth=1.4, zorder=3))
-axa.text(FX + FW / 2, 66, "Never read at runtime", ha="center", va="center",
+axa.text(FX + FW / 2, 43.5, "Never read at runtime", ha="center", va="center",
          fontsize=9.5, fontweight="bold", color=ICTAL, zorder=4)
 for i, txt in enumerate(["Seizure onset and\noffset annotations",
                          "Any timeline rebuilt\nfrom annotations",
                          "Pre-split background\nand seizure arrays"]):
-    axa.text(FX + FW / 2, 54 - i * 14, txt, ha="center", va="center",
+    axa.text(FX + FW / 2, 33.5 - i * 10.5, txt, ha="center", va="center",
              fontsize=8.2, color=ICTAL, zorder=4)
 
 for y in (32 + BOX_H / 2, 6 + BOX_H / 2):
     axa.add_patch(FancyArrowPatch((FX, y), (X1 + 1.6, y), arrowstyle="-[",
                                   mutation_scale=7, color=ICTAL,
                                   linewidth=1.3, zorder=4))
-axa.text((X1 + FX) / 2, 25, "blocked", ha="center", va="center", fontsize=8,
+axa.text((X1 + FX) / 2, 25.5, "blocked", ha="center", va="center", fontsize=8,
          style="italic", color=ICTAL, rotation=90, zorder=4)
 
 OUT_A = ROOT / "figures" / "fig2_12_application_architecture.png"
@@ -175,15 +179,12 @@ for i in range(N_CELL):
     x = i * cell + RNG.uniform(0.0, cell - band)
     axb.add_patch(Rectangle((x, y), band, BAR_H, facecolor=ICTAL,
                             edgecolor="none", alpha=0.80))
-for s in (0.30, 0.72):
-    axb.add_patch(Rectangle((s, y), 0.022, BAR_H, facecolor=HEADLINE,
-                            edgecolor="none"))
 axb.text(-0.02, y + BAR_H / 2, "The recording\nas it exists", ha="right",
          va="center", fontsize=8.5)
 axb.text(1.02, y + BAR_H / 2,
          f"every window has a position in time\n"
          f"shaded: the {DROPPED_FRAC * 100:.0f} % of windows removed by "
-         f"artifact rejection\nsolid: annotated seizures",
+         f"artifact rejection, at schematic positions",
          ha="left", va="center", fontsize=8, style="italic", color="0.35")
 
 # row 2 — the stored array

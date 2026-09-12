@@ -11,12 +11,11 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
 
 1. Three decimals for discrimination, sensitivity, precision and F1; one decimal for false alarms
    per day. Same rule in tables and figures.
-2. No confidence intervals on any detection table. Intervals appear only on Table 3.9.
+2. No confidence intervals on any detection table. Intervals appear only on Table 3.7.
 3. No internal shorthand: no lever codes, no file names, no phase names, no branch nicknames in a
    table cell or heading.
 4. A cell whose value has not been read from a file is written `— not measured` and never left
-   blank and never estimated. Two tables below are deliberately incomplete for this reason and say
-   so at the top of the block.
+   blank and never estimated. Table 4.2 carries two such rows and says so.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
 This file holds Table 4.1, Table 4.2 and the Figure 4.1 plotting note. Table 1.1 now lives in
@@ -44,7 +43,7 @@ able to check the conversion.
 | Tang et al., 2022 | Diffusion-convolutional recurrent graph network | TUSZ | Self-supervised pre-training, supervised fine-tuning | Patient-independent | Window | — | — not reported | Discrimination 0.875 |
 | Bomela et al., 2020 | Algebraic connectivity of a dynamic graph, no learning | Scalp EEG, private | None | — | Event | 0.936 | 3.8 (0.16 /h) | — |
 | Community challenge, 2025 (winner) | Best of 28 submitted algorithms | Private, 65 patients, 4360 h, 398 seizures | Supervised | Patient-independent | Event | 0.370 | **1.34** | F1 0.430; precision 0.450 |
-| **This study (reported point)** | **Graph autoencoder with three anomaly readouts and change-point detection** | **CHB-MIT, 8 held-out patients, 76 seizures** | **Unsupervised, patient-independent** | **Patient-independent** | **Event** | **0.618** | **27.4** | **F1 0.213; precision 0.129** |
+| **This study (reported point)** | **Graph autoencoder with three anomaly readouts and change-point detection** | **CHB-MIT, 8 test patients, 76 seizures** | **Unsupervised, patient-independent** | **Patient-independent** | **Event** | **0.618** | **27.4** | **F1 0.213; precision 0.129** |
 | **This study (best point on the curve)** | As above, threshold located after scoring | As above | As above | Patient-independent | Event | 0.474 | 4.9 | F1 0.426; precision 0.387 |
 
 ### The one row that carries the comparison
@@ -66,7 +65,7 @@ sensitivity 0.37 to 0.58 at precision 0.27 to 0.45, producing between 1.34 and 1
 day. Those results are on a private corpus of a different recording protocol, so the comparison is
 of magnitude, not of rank. The reported point here sits below that band on false alarms; the best
 point on the curve reaches an F1 of 0.426, matching the winning submission's F1, but at nearly
-four times its false-alarm rate and at a threshold located after the held-out set was scored.
+four times its false-alarm rate and at a threshold located after the test set was scored.
 
 **A commercial system reached an F1 of 0.441.** That figure is quoted by the challenge report from
 a separate 2021 evaluation on different data; it is **not** a result of the challenge itself. Any
@@ -103,8 +102,7 @@ where a published figure exists, and inventing one where it does not is worse th
 |---|---|
 | Trainable parameters | 3,285 |
 | Stored model size | 15,258 bytes |
-| Processing time per analysis window | 16.9 ms on the development processor |
-| Processing time per hour of recording | approximately 15 s on the same processor |
+| Processing time per hour of recording | 9.76 s, measured end to end on one four-hour recording |
 | Accelerator required at inference | None |
 | Accelerator required for training | One consumer graphics processor, once, for the shared model |
 | Per-patient training | None — the same weights serve every patient |
@@ -115,12 +113,19 @@ where a published figure exists, and inventing one where it does not is worse th
 The two unmeasured rows stay in the table with that wording. A cost profile that quietly omits the
 quantities nobody measured reads as complete when it is not.
 
-**Two figures to confirm before this table is final.** The per-window and per-hour times are recorded
-in the application specification and were measured on one processor; state which processor in the
-caption. The parameter count and model size come from the checkpoint itself and are already verified.
+**The processing time is indicative, not a benchmark.** It was measured end to end, from reading the
+recording through to the fused score, on one four-hour recording, once. A run-to-run variation of
+roughly fivefold, 22 to 110 s on identical code and the same file, is recorded on the adjacency and
+band power stage and is attributed to background load on the development machine. The paragraph
+accompanying this table should state the figure and that variation, and should not present the
+end-to-end number as a repeated measurement. A per-window figure of 16.9 ms circulates in this
+project's notes; it covers adjacency construction and band powers only, was never a full-pipeline
+measurement, and must not appear in the report.
 
-*Source: `docs/VERIFIED_NUMBERS.md` Parts 2.1 and 2.2 for the model; the application specification
-for the timing.*
+The processor model is `— to be named in the caption`. State it there rather than in the cell.
+
+*Source: `docs/VERIFIED_NUMBERS.md` Parts 2.1 and 2.2 for the parameter count and the stored model
+size; `web_demo/BUILD_PROGRESS.md` §4 for the processing time, including the run-to-run variation.*
 
 ## Figure 4.1 — which points may be plotted
 

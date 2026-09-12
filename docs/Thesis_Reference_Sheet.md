@@ -273,3 +273,51 @@ in this project's PDF set.
 | **J2** | **Shoeb, A. (2009). Application of Machine Learning to Epileptic Seizure Onset Detection and Treatment. PhD Thesis, Massachusetts Institute of Technology.** | http://hdl.handle.net/1721.1/54669 | Dataset citation — the corpus's originating thesis | **⭐ VERIFIED FROM SOURCE — dataset citation page.** Cite wherever the corpus is introduced, together with J1 and J3 | The thesis whose data collection produced the CHB-MIT recordings; cited by PhysioNet as one of the three required citations for the corpus | Cite by the MIT DSpace handle, not by DOI — this is a pre-DOI-era thesis |
 | **J3** | **Pollard, T., Moody, B.E., Lehman, L., Gow, B., Fernandes, C., Xie, C., Johnson, A., Mark, R.G., Heldt, T. (2026). PhysioNet as a global platform for biomedical research. *Nature Health*.** | 10.1038/s44360-026-00096-z | Dataset citation — the hosting platform | **⭐ VERIFIED FROM SOURCE — dataset citation page.** Cite wherever the corpus is introduced, together with J1 and J2 | The current PhysioNet-platform citation the corpus's own citation page directs users to cite alongside the database and originating-thesis references | None — this is the platform citation, not a result or method claim |
 | **J4** | **American Clinical Neurophysiology Society (2006). A proposal for standard montages to be used in clinical EEG. ACNS Guideline 6.** | — (ACNS Guideline, no DOI in this project's records) | Montage standard | Cited by the montage figure (Fig 2.1, the bipolar montage on a head schematic) and by the preprocessing section, wherever the corpus's electrode placement is described | **⭐ VERIFIED FROM SOURCE — reference 64 of Ingolfsson et al. 2024 (C6).** Ingolfsson et al. 2024's own Methods section states that the corpus follows the international 10–20 system of electrode placement — that sentence is what the montage figure's caption rests on | The guideline itself was not read directly from a PDF in this project; the citation and the 10–20 claim both come via C6's reference list and Methods text, not from opening ACNS Guideline 6 itself — say so if asked how this was verified |
+
+---
+
+## Report numbering map
+
+Which reference sheet entry each numbered citation in the report refers to. The numbers are the
+fixed working numbers; they are renumbered by order of first appearance at consolidation.
+
+| # | Sheet | # | Sheet | # | Sheet | # | Sheet |
+|---|---|---|---|---|---|---|---|
+| 1 | I1 | 18 | E12 | 35 | D1 | 52 | E6 |
+| 2 | A2 | 19 | E14 | 36 | E10 | 53 | B1 |
+| 3 | I4 | 20 | C7 | 37 | E13 | 54 | verified at source |
+| 4 | A7 | 21 | C5 (unused) | 38 | E11 | 55 | verified at source |
+| 5 | F6 | 22 | E9 | 39 | J2 | 56 | E5 |
+| 6 | B10 | 23 | B5 | 40 | verified at source | 57 | verified at source |
+| 7 | none, see below | 24 | H4 | 41 | verified at source | 58 | C4 |
+| 8 | B2 | 25 | G9 | 42 | verified at source | 59 | E2 |
+| 9 | A8 | 26 | H7 | 43 | J1 | 60 | C3 |
+| 10 | E3 | 27 | G2 | 44 | **J3**, see below | 61 | B11 |
+| 11 | F7 | 28 | B4 | 45 | E4 | 62 | verified (unused) |
+| 12 | D2 | 29 | E7 | 46 | C1 | 63 | unverified (unused) |
+| 13 | A6 | 30 | F1 | 47 | A11 | 64 | none, see below |
+| 14 | A4 (unused) | 31 | **merged into 16** | 48 | verified at source | 65 | C9 |
+| 15 | verified at source | 32 | D4 | 49 | E4 | 66 | C6 |
+| 16 | F2 | 33 | G1 | 50 | E1 | 67 | G6 (optional) |
+| 17 | C2 | 34 | D5 | 51 | verified at source | 68 | **J4**, see below |
+
+### Four decisions
+
+**44 is J3, Pollard et al. (2026), not Goldberger et al. (2000).** The corpus's own citation page asks
+users to cite the current platform reference. When a corpus states what it wants cited, follow it.
+
+**31 is the same paper as 16**, Ali, Angelova and Karmakar (2024), sheet F2. Every chapter uses 16.
+The duplicate disappears at consolidation.
+
+**64 has no source.** The claim it supported, about pooling a minority class across patients, stands
+uncited.
+
+**68 is J4, ACNS Guideline 6 (2006).** No DOI; enter it in Zotero by hand as a standard. It was
+sourced through the reference list of 66 rather than opened directly.
+
+### One slot still open
+
+**7** was reserved for a citation in the caption of Figure 1.1 and no source was ever selected. The
+caption as written describes a figure drawn from this project's own corpus data, so it needs no
+external reference beyond the corpus citations already carried in the text. Recommend retiring the
+slot rather than finding a source for it.

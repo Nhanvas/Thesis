@@ -11,39 +11,20 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
 
 1. Three decimals for discrimination, sensitivity, precision and F1; one decimal for false alarms
    per day. Same rule in tables and figures.
-2. No confidence intervals on any detection table. Intervals appear only on Table 3.9.
+2. No confidence intervals on any detection table. Intervals appear only on Table 3.7.
 3. No internal shorthand: no lever codes, no file names, no phase names, no branch nicknames in a
    table cell or heading.
 4. A cell whose value has not been read from a file is written `— not measured` and never left
-   blank and never estimated. Two tables below are deliberately incomplete for this reason and say
-   so at the top of the block.
+   blank and never estimated. Table 3.9 is deliberately unfilled for this reason and says so at the
+   top of its block.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
-This file holds Tables 3.1 through 3.12. See `tables/README.md` for what lives in the other
-chapter files and for which tables are still unfilled.
+This file holds Tables 3.1 through 3.9. Table 3.9 is written last, from the finished chapters.
+See `tables/README.md` for what lives in the other chapter files.
 
 ---
 
-## Table 3.1 — Graph density under each sparsification rule
-
-| Rule | Interictal density | Ictal density | Edges retained of 153 |
-|---|---|---|---|
-| Fixed correlation threshold, 0.05 | 0.921 to 0.973 | 0.949 to 0.974 | 141 to 149 |
-| Retain the strongest 20 % of edges | 0.196 for every patient | 0.196 for every patient | 30 |
-
-The proportional rule holds density constant across every patient and both states. The fixed
-threshold leaves the graph almost complete, and its density varies from patient to patient.
-
-**Exception.** Under the proportional rule chb17 gives an interictal density of 0.224 rather than
-0.196, and the computation raised a divide-by-zero warning for that patient, indicating a channel
-with zero variance in its mean adjacency. One sentence of explanation belongs wherever this
-appears.
-
-*Source: `results/diagnostics/density_frobenius_v2/`, regenerated at the committed stride;
-`docs/VERIFIED_NUMBERS.md` Part 4.1. Edge counts follow from the density and the 153 undirected
-pairs of 18 channels.*
-
-## Table 3.2 — Window-level discrimination per patient
+## Table 3.1 — Window-level discrimination per patient
 
 | Patient | Discrimination |
 |---|---|
@@ -58,12 +39,12 @@ pairs of 18 channels.*
 | **Across patients** | **0.805** |
 
 chb06 sits at chance; chb14 is the second weakest. The across-patient value is the unweighted mean,
-not a pooled value, for the reason given with Table 2.12.
+not a pooled value, for the reason given in §2.7.2.
 
 *Source: `results/phaseB/tier2/ens_test_tf/rlg/window_auroc_seed42.json`;
 `docs/VERIFIED_NUMBERS.md` Part 1.2.*
 
-## Table 3.3 — Event-level detection results
+## Table 3.2 — Event-level detection results
 
 | Configuration | Operating point | Sensitivity | Precision | F1 | False alarms / day |
 |---|---|---|---|---|---|
@@ -74,11 +55,11 @@ not a pooled value, for the reason given with Table 2.12.
 | Final system, at the low false-alarm budget | m75/p10.0 | 0.342 | 0.382 | 0.361 | 3.6 |
 
 Row 3 is the reported result of this system: its threshold was fixed on the validation patients
-before any held-out patient was scored. Row 5 is included because every design alternative in
-Table 3.6 was gated at that false-alarm budget.
+before any test patient was scored. Row 5 is included because every design alternative in
+Table 3.5 was gated at that false-alarm budget.
 
 The best point available on the trade-off curve reaches F1 0.426 at 4.9 false alarms per day, with
-sensitivity 0.474 and precision 0.387. It was located by scanning the grid after the held-out set
+sensitivity 0.474 and precision 0.387. It was located by scanning the grid after the test set
 had been scored, and is reported as a property of the curve, never as the system's result.
 
 **Operating-point notation.** `m` is the change-point magnitude percentile and `p` the penalty
@@ -89,7 +70,7 @@ mix the two forms.
 `ONESHOT_rlg_vs_s0.csv` and `FINAL_report.csv`, and reproduced end to end from the ensemble arrays;
 `docs/VERIFIED_NUMBERS.md` Part 1.1; `docs/LOCKED_DOCS_ADDENDUM.md` §2.2.*
 
-## Table 3.4 — Event-level performance per patient
+## Table 3.3 — Event-level performance per patient
 
 **Values below are transcribed from the figure script's own printed self-check and must be
 regenerated as a file before use** — see the emit task in the figure brief. They are given here so
@@ -118,7 +99,7 @@ that way in the text and in the figure caption.
 *Source: `results/phaseB/tier2/rlg_test/final_eval_seed42.csv` at m50/p2.0, printed by
 `src/figures/plot_event_level.py`. Seizure counts from `docs/VERIFIED_NUMBERS.md` Part 3.*
 
-## Table 3.5 — Results across four independently trained models
+## Table 3.4 — Results across four independently trained models
 
 Validation patients, 13 seizures, at the low false-alarm budget.
 
@@ -144,29 +125,30 @@ arbitrary.
 `results/phaseB/tier2/alternatives/`; `docs/VERIFIED_NUMBERS.md` Parts 1.3 and 6.4. The event
 spread is the sample standard deviation over 0.4783, 0.5306, 0.4898 and 0.4490, which is 0.0338.*
 
-## Table 3.6 — Component ablations and design alternatives
+## Table 3.5 — Component ablations and design alternatives
 
 All rows are measured on the three validation patients and thirteen seizures, at the low
-false-alarm budget, with the final system as the reference. The held-out set was not used for any
+false-alarm budget, with the final system as the reference. The test set was not used for any
 of them.
 
-| Variant | Type | Layer changed | Sensitivity | Precision | F1 | FP / day | Δ F1 | Outcome |
-|---|---|---|---|---|---|---|---|---|
-| Final system | reference | — | 0.846 | 0.333 | 0.478 | 4.6 | 0.000 | reference |
-| Remove the reconstruction readout | ablation | ensemble | 0.923 | 0.333 | 0.490 | 5.0 | +0.012 | within the noise band |
-| Remove the latent readout | ablation | ensemble | 0.692 | 0.257 | 0.375 | 5.4 | −0.103 | clearly worse |
-| Directed connectivity, at the score level | alternative | decision | 0.769 | 0.312 | 0.444 | 4.6 | −0.034 | on the boundary of the noise band |
-| Directed connectivity, at the representation level | alternative | representation | — | — | — | — | — | evaluated at the window tier only; see Table 3.7 |
-| Alternative smoothing, median over 9 windows | alternative | decision | 0.615 | 0.250 | 0.356 | 5.0 | −0.123 | clearly worse |
-| Alternative smoothing, median over 15 windows | alternative | decision | 0.692 | 0.281 | 0.400 | 4.8 | −0.078 | clearly worse |
-| Onset-slope change-point filtering | alternative | decision | 0.846 | 0.324 | 0.468 | 4.8 | −0.010 | within the noise band |
-| Artifact gate, isolated spikes only | alternative | signal | 0.923 | 0.324 | 0.480 | 5.2 | +0.002 | within the noise band |
-| Artifact gate, every window | alternative | signal | 0.000 | 0.000 | undefined | 4.6 | undefined | no detections produced |
+| Lever | Variant | Type | Layer changed | Sensitivity | Precision | F1 | FP / day | Δ F1 | Outcome |
+|---|---|---|---|---|---|---|---|---|---|
+| — | Final system | reference | — | 0.846 | 0.333 | 0.478 | 4.6 | 0.000 | reference |
+| — | Remove the reconstruction readout | ablation | ensemble | 0.923 | 0.333 | 0.490 | 5.0 | +0.012 | within the noise band |
+| — | Remove the latent readout | ablation | ensemble | 0.692 | 0.257 | 0.375 | 5.4 | −0.103 | clearly worse |
+| 1 | Directed connectivity, at the score level | alternative | decision | 0.769 | 0.312 | 0.444 | 4.6 | −0.034 | on the boundary of the noise band |
+| 2 | Directed connectivity, at the representation level | alternative | representation | — | — | — | — | — | evaluated at the window tier only; see §3.5.2 |
+| 3 | Alternative smoothing, median over 9 windows | alternative | decision | 0.615 | 0.250 | 0.356 | 5.0 | −0.123 | clearly worse |
+| 3 | Alternative smoothing, median over 15 windows | alternative | decision | 0.692 | 0.281 | 0.400 | 4.8 | −0.078 | clearly worse |
+| 4 | Onset-slope change-point filtering | alternative | decision | 0.846 | 0.324 | 0.468 | 4.8 | −0.010 | within the noise band |
+| 5 | Re-derived ensemble weighting | alternative | ensemble | — | — | — | — | — | evaluated at the window tier only; see §3.5.4 |
+| 6 | Artifact gate, isolated spikes only | alternative | signal | 0.923 | 0.324 | 0.480 | 5.2 | +0.002 | within the noise band |
+| 6 | Artifact gate, every window | alternative | signal | 0.000 | 0.000 | undefined | 4.6 | undefined | no detections produced |
 
 **Three readings that must not be got wrong.**
 
 Removing the reconstruction readout gains 0.012, which is **below** the 0.034 spread across
-independently trained models and is therefore a tie, not an improvement. On the held-out set at
+independently trained models and is therefore a tie, not an improvement. On the test set at
 the matched cell the same variant loses outright, F1 0.162 against 0.172, and its sensitivity falls
 from 0.645 to 0.579.
 
@@ -177,34 +159,18 @@ conclusion already reached about this lever better than a decisive failure would
 The per-window artifact gate produces no detections at all, because it suppresses the great
 majority of seizure windows. This is a real outcome with a known mechanism, not a missing value.
 
-**Count of alternatives.** Seven were registered; **six were measured**. The seventh, additional
-per-channel time-domain features, was never built and belongs in future work, not in the count of
-falsified alternatives.
+**Count of alternatives.** Seven were registered; **six were measured**, and the lever column numbers
+them one to six: two smoothing widths are one lever, two gate configurations are one lever, and the
+two branch removals are component ablations rather than registered alternatives and are not counted.
+The seventh registered alternative, additional per-channel time-domain features, was never built and
+belongs in future work, not in the count of falsified alternatives. Chapter 4 §4.3 takes its count of
+six from this column.
 
 *Source: `results/phaseB/tier2/alternatives/alternatives_vs_incumbent.csv`;
 `docs/VERIFIED_NUMBERS.md` Part 6.3 and 6.6; `docs/LOCKED_DOCS_ADDENDUM.md` §1.4 and §2.5. The
-held-out comparison for the reconstruction ablation is from `ONESHOT_rlg_vs_s0.csv`.*
+test-set comparison for the reconstruction ablation is from `ONESHOT_rlg_vs_s0.csv`.*
 
-## Table 3.7 — Directed connectivity: per-patient effect at the representation level
-
-Validation patients, window tier.
-
-| Patient | Latent readout, final system | Latent readout, with the added relation | Change |
-|---|---|---|---|
-| chb10 | 0.816 | 0.757 | −0.059 |
-| chb11 | 0.641 | 0.693 | +0.052 |
-| chb22 | 0.736 | 0.873 | **+0.137** |
-| Full system, across patients | 0.928 | 0.909 | −0.019 |
-
-The added relation is not noise: on its own discriminative check it reaches 0.710, 0.674 and 0.888
-against a null near 0.500. It carries signal on every patient and still costs accuracy overall.
-One patient is rescued and one is harmed, and the loss on the second exceeds the gain on the first
-when the readouts are combined. Of nine pre-registered acceptance checks, four passed.
-
-*Source: `results/phaseC/c4full/{stage0_verdict_seed42.json, stage0_lg_variant_seed42.json,
-rlg_lg_diagnostic_seed42.json}`; `docs/VERIFIED_NUMBERS.md` Part 6.4b.*
-
-## Table 3.8 — Synthetic validation criteria and outcomes
+## Table 3.6 — Synthetic validation criteria and outcomes
 
 | Criterion | Expected | Observed | Outcome |
 |---|---|---|---|
@@ -222,7 +188,7 @@ not.
 *Source: `results/attribution_v6/synthetic_sanity.csv` and `synthetic_spread.csv`;
 `docs/ATTRIBUTION_SPEC.md` §9.1; `docs/VERIFIED_NUMBERS.md` Part 7.2.*
 
-## Table 3.9 — Attribution agreement with the draft annotation
+## Table 3.7 — Attribution agreement with the draft annotation
 
 **Provisional throughout.** The annotation these rows are scored against was generated
 automatically and has not been reviewed by a clinician. Every row states a preliminary agreement
@@ -248,7 +214,7 @@ and a patient-level channel prior cannot be told apart.
 *Source: `results/attribution_v6/attribution_summary.csv`; `docs/VERIFIED_NUMBERS.md` Part 7.3;
 wording constraint from `docs/LOCKED_DOCS_ADDENDUM.md` §1.5.*
 
-## Table 3.10 — Within-patient similarity of the draft annotations
+## Table 3.8 — Within-patient similarity of the draft annotations
 
 | Patient | Annotated seizures | Distinct channel sets | Mean similarity |
 |---|---|---|---|
@@ -270,17 +236,7 @@ exceeds its control. Those two facts are the same fact.
 
 ---
 
-## Table 3.11 — Processing time per stage — WAITING
-
-Waits on the application build. Nothing here can be filled by estimation; a timing table with
-invented rows is worse than an absent one.
-
-When the application runs, measure each stage of Table 2.11 on one recording of known length and
-report time per hour of recording, on a named processor.
-
----
-
-## Table 3.12 — Objectives and requirements achieved — WAITING
+## Table 3.9 — Objectives and requirements achieved — WAITING
 
 Written last, from the finished Chapters 2 and 3. Its structure is fixed by the exhibit list: the four
 goals as the first rows, then each of the ten design requirements from Table 1.2, each with the

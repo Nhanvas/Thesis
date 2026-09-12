@@ -1,29 +1,6 @@
 // Small inline icons. Recreated by hand from the UI/ mockups' visual style — not extracted
 // from the locked PNGs (CLAUDE.md: UI/ is read/view-only, never a source of copied assets).
 
-export function LogoIcon({ className = '' }) {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" className={className} aria-hidden="true">
-      <path
-        d="M11 27v-4.2c-2.4-1.6-4-4.4-4-7.6 0-5 4-9 9-9s9 4 9 9c0 1.9-.6 3.6-1.6 5.1-.8 1.2-1.4 1.8-1.4 3.1V27"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M13 27h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M13 23.5h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-      <path
-        d="M16.8 9.5 14 15h2.4l-1 4.5 4.6-6.2h-2.6z"
-        fill="currentColor"
-        stroke="currentColor"
-        strokeWidth="0.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 export function PersonIcon({ className = '' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">

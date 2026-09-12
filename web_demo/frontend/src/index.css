@@ -49,7 +49,10 @@
 /* ===== SZSCAN_DESIGN_v2.md §9 — design tokens, copied verbatim ===== */
 :root {
   /* nền & chrome */
-  --color-bg:              #FFFFFF;
+  /* Page bg measured #F8FAFC from the current UI/A0a, A0b PNGs (checked multiple points
+     in both files) — SZSCAN_DESIGN_v2.md §1 still says #FFFFFF, but CLAUDE.md: PNGs win
+     on anything visible. Flagging for Boti in case the doc is right and these PNGs are stale. */
+  --color-bg:              #F8FAFC;
   --color-surface:         #FFFFFF;
   --color-eeg-canvas:      #FEFBEF;
   --color-footer:          #0F172A;

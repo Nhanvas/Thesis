@@ -3,32 +3,35 @@
 The final caption for every exhibit. Five accounts write chapters in parallel, so captions written
 independently would drift, and the mandatory wording carried by several of them would be lost.
 
+**Revision 2.** Updated after the exhibit set was reduced and four structural changes were made:
+Figure 1.3 and Figure 2.11 were cut, Figure 2.7 was merged into the pipeline figure, and the
+application architecture was split back into two figures. See `docs/EXHIBIT_SET_FINAL.md`.
+
 ## How to use this file
 
-Use the caption text exactly as written. It may be shortened for space, but **the sentences marked
-mandatory may not be cut, softened or paraphrased** — each one exists because leaving it out would
-make the exhibit say something that is not true.
+Use the caption text as written. It may be shortened for space, but **the sentences marked mandatory
+may not be cut, softened or paraphrased** — each exists because leaving it out would make the exhibit
+say something that is not true.
 
-Figure captions go **below** the figure, table captions **above** the table, per the report format.
-Numbering follows the exhibit list. Where a caption names a source, that source is already in the
-reference sheet.
+Figure captions go **below** the figure, table captions **above** the table. The numbers here are the
+numbers as the exhibits currently stand. Renumbering to close the gaps left by the cuts is a separate
+pass, done once across filenames, this file, and the cross-references in the five table files.
 
 ## The mandatory sentences, in one place
 
-So that a reviewer can check them without reading the whole file:
-
-- Every attribution exhibit carries the word **provisional**, and states that the annotation was
-  **generated automatically and has not been clinically reviewed**. Exhibits: Fig 3.11, 3.13, 3.14,
-  3.15, Table 3.9, Table 3.10, Table A.2, Table A.7.
-- Fig 1.1 states that the preictal and postictal regions are **fixed windows, not annotations**.
-- Fig 2.10, 3.4 and 3.10 state that the scores were **recomputed on the continuous recording** and
-  are **not the source of any reported number**.
-- Fig 2.13 states that the **direction of the resulting bias is not established**.
-- Fig 2.5 and Table 2.6 state that the density measurement **characterises the choice rather than
-  having driven it**.
-- Fig 3.8 and Table 3.4 state that chb06's F1 is **undefined, not zero**.
-- Fig 4.1 and Table 4.1 state that the best point on the curve was **located after the held-out set
-  was scored**.
+- Every attribution exhibit carries the word **provisional** and states that the annotation was
+  **generated automatically and has not been clinically reviewed**: Figures 3.11, 3.13, 3.15 and
+  Tables 3.9, 3.10, A.2, A.4.
+- Figure 1.1 states that the preictal and postictal regions are **fixed windows, not annotations**.
+- Figures 3.4 and 3.10 state that the scores were **recomputed on the continuous recording** and are
+  **not the source of any reported number**.
+- Figure 2.13 states that the **direction of the resulting bias is not established**.
+- Table 2.6 states that the density measurement **characterises the choice rather than having driven
+  it**. Figure 2.5 carried this too and was cut, so Table 2.6 is now its only home.
+- Figure 3.8 and Table 3.4 state that chb06's F1 is **undefined, not zero**. Figure 3.7 carried this
+  too and was cut.
+- Table 3.3, Figure 3.6 and Figure 4.1 state that the best point on the curve was **located after the
+  held-out set was scored**.
 
 ---
 
@@ -46,13 +49,10 @@ not annotated states.
 sparsification and on a shared colour scale. Coupling is broadly stronger during the seizure, which
 is the observation the graph representation is built on.
 
-**Figure 1.3.** Overview of the processing pipeline, from the recording to the intervals presented for
-review. No seizure annotation is used at any stage of this path.
-
-**Figure 1.4.** Project timeline over twelve weeks. Drawn from Table 1.3.
-
-**Figure 1.5.** Research framework: each objective with the method that addresses it and the output it
-produces. The four lines are parallel rather than sequential.
+**Figure 1.4.** Research framework. The lower row is the processing path from the corpus to the
+detected events and their channel-level interpretation; the upper row is the theoretical work that
+informs the design and interprets the outcome. No path runs from a result back to the model: the
+operating point is fixed on the validation patients and the held-out set is scored once.
 
 **Table 1.1.** Representative seizure detection approaches. Rates reported per hour in the source are
 converted to per day; both forms are given. Studies differ in corpus, supervision, patient split and
@@ -62,20 +62,16 @@ incomparable with the present work.
 **Table 1.2.** Design requirements and targets. These are design properties rather than accuracy
 thresholds, because the held-out data are scored once.
 
-**Table 1.3.** Project timeline. Drawn as Figure 1.4.
+**Table 1.3.** Project timeline.
 
 ---
 
 # Chapter 2
 
 **Figure 2.1.** The eighteen bipolar derivations used throughout this work, drawn on the international
-10–20 electrode schematic. The four outer chains form the arc pattern known clinically as the double
-banana. Montage per the clinical montage guideline; electrode placement per the corpus documentation.
-
-**Figure 2.2.** Distribution of annotated seizure durations across the corpus, on a logarithmic axis,
-with the held-out subset distinguished. The four-second analysis window is marked: twenty-three of the
-seventy-six held-out seizures are shorter than twenty seconds, and the shortest is barely longer than
-one and a half windows.
+10-20 electrode schematic. Each line connects the two electrodes of one derivation, in the order the
+derivation is named. The four outer chains form the arc pattern known clinically as the double banana.
+Montage per the clinical montage guideline; electrode placement per the corpus documentation.
 
 **Figure 2.3.** One segment of recording before and after preprocessing, patient chb10. Panels (a) and
 (b) show six derivations on a common time axis; the vertical scales differ because the preprocessed
@@ -88,67 +84,46 @@ four-second segment across all derivations; (b) the five log band powers per der
 weighted adjacency before sparsification; (d) the graph after retaining the strongest twenty percent
 of edges, thirty edges of a possible one hundred and fifty-three.
 
-**Figure 2.5.** Adjacency and resulting graph under the two sparsification rules, patient chb11. The
-density printed on each panel is that of the window shown. The fixed threshold leaves the graph almost
-complete and its density varies between patients; the proportional rule holds density constant by
-construction. *Mandatory:* the density comparison was measured after the pipeline was fixed, so it
-characterises the choice rather than having driven it.
+**Figure 2.6.** The complete processing pipeline, from the corpus to the two evaluation tiers. The
+graph autoencoder is trained on background windows only; the latent representation feeds the
+Mahalanobis readout and the two decoders feed the reconstruction readout, while the gamma-band readout
+is computed directly from the signal and does not pass through the model. The decision point is gated
+on the validation patients, and alternatives that fail the gate are reported rather than discarded.
 
-**Figure 2.6.** Architecture of the graph autoencoder. The encoder maps twenty-three input features per
-node to a sixteen-dimensional latent representation; the decoder reconstructs the adjacency by inner
-product and the node features through two fully connected layers. The model has 3,285 trainable
-parameters.
+**Figure 2.8.** Reconstruction error against seizure state. [The Chapter 2 writer describes the axes
+from the figure itself. This exhibit predates the caption sheet and its axes are not described in the
+exhibit record; do not accept a guessed description.]
 
-**Figure 2.7.** Three anomaly readouts from one shared encoder, each standardised against the patient's
-own background before equal-weight fusion. The background distribution is fitted per patient without
-using any annotation.
+**Figure 2.12.** Architecture of the review application. The application recomputes anomaly scores on
+the continuous recording, retaining every window. It never reads the seizure annotations, any timeline
+rebuilt from them, or the pre-split background and seizure arrays, all three of which would make a
+label-free claim false. Figure 2.13 gives the measurement that forces this design.
 
-**Figure 2.8.** Reconstruction error against seizure state. [Caption to be completed by the Chapter 2
-writer from the figure's own content; the exhibit predates this caption sheet and its axes should be
-described directly.]
+**Figure 2.13.** Why a stored score array cannot be replayed on a time axis. Artifact rejection removes
+about half the background windows of chb13 without recording their positions, so the stored array holds
+12,452 scores for 25,224 timeline positions. A reconstructed timeline shifts the surviving scores out
+of their original positions and, once the array is exhausted at about forty percent of the recording,
+fills the remainder by resampling. Across the eight held-out patients 53.9 percent of each
+reconstructed timeline carries a resampled score on average, ranging from 40.0 to 66.9 percent. The
+resampling preserves the marginal distribution of each patient's own background but not its temporal
+autocorrelation. *Mandatory:* the false-alarm rate is measured on these timelines, and the direction of
+the resulting bias is not established.
 
-**Figure 2.9.** Ensemble weight surface on the validation patients. The surface is flat across the
-region explored, which is why equal weighting was adopted rather than an optimised set.
-
-**Figure 2.10.** Change point detection on a fused anomaly score series, patient chb13, recording
-chb13_62, shown as a five-minute window around one annotated seizure. Detected change points are drawn
-as vertical lines and the annotated seizure is shaded. *Mandatory:* scores were recomputed on the
-continuous recording with every window retained, using the study's fitted parameters; they are not the
-source of any reported number.
-
-**Figure 2.11.** Channel attribution: (a) how a per-channel score is formed from the per-node
-reconstruction error; (b) the synthetic injection scheme used to validate it, where the affected
-channels are known exactly. The diffuseness experiment used a different set of injected-channel counts
-from the one shown; see Figure 3.15.
-
-**Figure 2.12.** Architecture of the review application. The paths marked on the right are never read
-at runtime: the application recomputes scores on the continuous recording rather than replaying stored
-ones.
-
-**Figure 2.13.** Why stored scores cannot be replayed on a time axis. Artifact rejection removes
-windows without recording their positions, so the stored array is ordered by segment; rebuilding a
-timeline from it shifts the surviving scores and, once the array is exhausted, fills the remainder by
-resampling. Across the eight held-out patients an average of 53.9 percent of each reconstructed
-timeline carries a resampled score, ranging from 40.0 to 66.9 percent. *Mandatory:* the false-alarm
-rate is measured on these timelines, and the direction of the resulting bias is not established.
-
-**Figure 2.14.** Event-based scoring. A detected interval is matched to an annotated seizure by any
-overlap after a 30 s tolerance before onset and 60 s after offset; detections separated by less than
-90 s are merged, and detections longer than 5 minutes are split. The scenario shown is illustrative and
-reports no result. *Mandatory:* specificity is not defined at event level, because a true-negative event
-has no meaning once a timeline is expressed as events; false alarms per day replaces it.
+**Figure 2.14.** Event-based scoring. (a) A detected interval is matched to an annotated seizure by any
+overlap, after the annotation is extended by 30 s before onset and 60 s after offset; the detection
+shown begins after the seizure has ended and still counts. (b) Detections separated by less than 90 s
+are merged into one interval before scoring. (c) A detection outside the tolerance window is a false
+alarm. Detections longer than five minutes are split, which is not shown. The signal is synthetic and
+illustrative; the scoring depends only on the interval endpoints. *Mandatory:* specificity is not
+defined at event level, because a true-negative event has no meaning once a timeline is expressed as
+events; false alarms per day replaces it.
 
 **Table 2.1.** Candidate public scalp EEG seizure corpora.
-
-**Table 2.2.** Characteristics of the selected corpus. Figures are this project's own parse of the
-recording summary files.
 
 **Table 2.3.** Assignment of patients to the training, validation and held-out sets. Assignment is by
 patient, so no recording from a held-out patient contributes to training or to any tuning decision.
 
 **Table 2.4.** Preprocessing steps and their parameters.
-
-**Table 2.5.** Spectral bands used as node features.
 
 **Table 2.6.** Decision matrix for edge sparsification. *Mandatory:* the separation measurement was
 made after the pipeline was fixed and characterises the choice rather than having driven it.
@@ -157,15 +132,12 @@ made after the pipeline was fixed and characterises the choice rather than havin
 
 **Table 2.8.** Decision matrix for the detection stage.
 
-**Table 2.9.** Design of the synthetic validation grid for channel attribution.
+**Table 2.9.** Design of the synthetic validation grid for channel attribution. The multiplier is
+applied to the chosen channels within the block only; every other channel, and every window outside
+the block, is left unchanged.
 
 **Table 2.10.** Weighted decision matrix for deployment strategy. The weights are an engineering
 judgement rather than a measurement.
-
-**Table 2.11.** Processing stages of the review application. Every window is retained, which is a
-deliberate divergence from the study pipeline.
-
-**Table 2.12.** Reported metrics and their definitions.
 
 ---
 
@@ -173,9 +145,7 @@ deliberate divergence from the study pipeline.
 
 **Figure 3.1.** Separation between background and seizure windows on the held-out patients.
 
-**Figure 3.2.** Distribution of fused anomaly scores by state.
-
-**Figure 3.3.** Receiver-operating and precision–recall curves, per patient and across patients.
+**Figure 3.3.** Receiver-operating and precision-recall curves, per patient and across patients.
 
 **Figure 3.4.** Detection output on one full recording, patient chb13, recording chb13_62. The three
 component scores and the fused score are shown on a shared time axis with detected intervals and
@@ -189,50 +159,36 @@ retained; they are not the source of any reported number.
 operating point and the best point on the curve marked. *Mandatory:* the best point was located after
 the held-out set was scored and is a property of the curve, not a result.
 
-**Figure 3.7.** Event-level performance per patient at the reported operating point. *Mandatory:*
-chb06 produces no detections at this operating point, so its F1 is undefined rather than zero.
-
-**Figure 3.8.** Window-level discrimination against event-level F1, one point per held-out patient,
-with reference lines at the across-patient discrimination and the pooled event F1. *Mandatory:* chb06
-is drawn at zero because its F1 is undefined, not because it scored zero.
-
-**Figure 3.9.** Effect of each design alternative relative to the adopted system, on the validation
-patients, with the seed-to-seed noise band marked. Changes inside that band are not distinguishable
-from the effect of retraining the same model.
+**Figure 3.8.** Window-level discrimination against event-level F1, one point per held-out patient, with
+reference lines at the across-patient discrimination and the pooled event F1. *Mandatory:* chb06 is
+drawn at zero because its F1 is undefined, not because it scored zero.
 
 **Figure 3.10.** One false positive with the concurrent recording, patient chb13, recording chb13_62.
 The detected interval coincides with high-amplitude transient activity visible across all displayed
 derivations. The signal panel shows the raw recording, unfiltered. *Mandatory:* scores were recomputed
 on the continuous recording; they are not the source of any reported number.
 
-**Figure 3.11.** Provisional channel attribution performance against injection strength on the
-synthetic grid, where the affected channels are known exactly. This panel is label-free and does not
-depend on any annotation.
+**Figure 3.11.** Provisional channel attribution performance against injection strength on the synthetic
+grid, where the affected channels are known exactly. This panel is label-free and does not depend on
+any annotation.
 
-**Figure 3.12.** Stability of the channel ranking across four independently trained models.
+**Figure 3.13.** Provisional per-seizure channel ranking. *Mandatory:* scored against a draft annotation
+generated automatically and not clinically reviewed.
 
-**Figure 3.13.** Provisional per-seizure channel ranking. *Mandatory:* scored against a draft
-annotation generated automatically and not clinically reviewed.
+**Figure 3.15.** Provisional diffuseness against the number of annotated channels. The synthetic line is
+U-shaped in the number of injected channels, and on the real annotations the generalized group sits
+lower than the focal group, which is the opposite of the expected direction. The measure is therefore
+reported as a methodological negative and is not used to classify. The synthetic grid used a different
+set of injected-channel counts from the discrimination experiment.
 
-**Figure 3.14.** Provisional agreement with the draft annotation, per patient. *Mandatory:* the
-annotation was generated automatically and has not been clinically reviewed; every value shown is
-provisional.
-
-**Figure 3.15.** Provisional diffuseness against the number of annotated channels. The synthetic line
-is U-shaped in the number of injected channels, and on the real annotations the generalized group
-sits lower than the focal group, which is the opposite of the expected direction. The measure is
-therefore reported as a methodological negative and is not used to classify. The synthetic grid used a
-different set of injected-channel counts from the discrimination experiment.
-
-**Figures 3.16 to 3.18.** [Application screenshots — captions pending the build.]
-
-**Table 3.1.** Graph density under each sparsification rule.
+**Figure 3.16.** [Application screenshot. Caption pending the build: one screen showing the detection
+timeline together with the channel view.]
 
 **Table 3.2.** Window-level discrimination per held-out patient. The across-patient value is the
 unweighted mean.
 
-**Table 3.3.** Event-level detection results at each operating point. *Mandatory:* the best point on
-the curve was located after the held-out set was scored.
+**Table 3.3.** Event-level detection results at each operating point. *Mandatory:* the best point on the
+curve was located after the held-out set was scored.
 
 **Table 3.4.** Event-level performance per held-out patient at the reported operating point.
 *Mandatory:* chb06's F1 is undefined, not zero.
@@ -242,19 +198,15 @@ spreads are the noise floors of this study.
 
 **Table 3.6.** Component ablations and design alternatives, on the validation patients.
 
-**Table 3.7.** Per-patient effect of adding directed connectivity at the representation level.
-
 **Table 3.8.** Synthetic validation criteria and outcomes.
 
-**Table 3.9.** Provisional attribution agreement with the draft annotation. *Mandatory:* the
-annotation was generated automatically by a language model reading rendered segments of the
-recordings, and has not been reviewed by a clinician. The rendering read the recordings only and never
-the model's own output, so the comparison is not circular; the annotations were not produced blind.
+**Table 3.9.** Provisional attribution agreement with the draft annotation. *Mandatory:* the annotation
+was generated automatically by a language model reading rendered segments of the recordings, and has
+not been reviewed by a clinician. The rendering read the recordings only and never the model's own
+output, so the comparison is not circular; the annotations were not produced blind.
 
 **Table 3.10.** Within-patient similarity of the draft annotations. The pooled value is the mean over
-seizure pairs, not over patients.
-
-**Table 3.11.** Processing time per stage. [Pending the application build.]
+seizure pairs, not over patients. Provisional, against the same draft annotation.
 
 **Table 3.12.** Objectives and design requirements, with the outcome achieved for each.
 
@@ -267,8 +219,8 @@ false-alarm axis. Only results scored at event level, on a patient-independent s
 false-alarm rate can be placed on this plane; three published results qualify. *Mandatory:* the best
 point on the curve was located after the held-out set was scored.
 
-**Table 4.1.** Comparison with published work, including this study. Only the first two rows are
-matched to this work on corpus, scoring level, patient split and the reporting of a false-alarm rate.
+**Table 4.1.** Comparison with published work, including this study. Only the first two rows are matched
+to this work on corpus, scoring level, patient split and the reporting of a false-alarm rate.
 
 **Table 4.2.** Computational and deployment cost profile. Two quantities were not measured and are
 marked as such.
@@ -279,26 +231,37 @@ marked as such.
 
 **Table A.1.** Corpus metadata for all twenty-three patients.
 
-**Table A.2.** Channel annotation for every held-out seizure. *Mandatory:* the annotation was
-generated automatically and has not been clinically reviewed; the source column is carried through
-from the annotation file.
+**Table A.2.** Channel annotation for every held-out seizure. *Mandatory:* the annotation was generated
+automatically and has not been clinically reviewed; the source column is carried through from the
+annotation file.
 
-**Table A.3.** Full parameter grid on the held-out set, all 384 cells.
-
-**Table A.4.** Concentration of the top-ranked channel against a random null, per patient.
+**Table A.4.** Concentration of the top-ranked channel against a random null, per patient. Provisional,
+against the same draft annotation.
 
 **Table A.5.** Software and library versions.
 
 **Table A.6.** Index of pre-registrations.
 
-**Table A.7.** Provisional top-ranked channels per seizure. *Mandatory:* scored against a draft
-annotation generated automatically and not clinically reviewed.
-
 ---
 
-# Two captions this file cannot write
+# Content that moved into the prose
 
-**Figure 2.8** predates this caption sheet and its axes are not described anywhere in the exhibit
-record. The Chapter 2 writer should describe it from the figure itself rather than accept a guess.
+Nine figures and nine tables were cut. In every case the content survives elsewhere, and these are the
+statements the text must now carry because the exhibit that carried them is gone.
 
-**Figures 3.16 to 3.18 and Table 3.11** wait on the application build.
+| Cut exhibit | What the prose must now carry |
+|---|---|
+| Figure 2.2 | Held-out seizure durations: minimum 6 s, median 45 s, mean 51.9 s, maximum 205 s, 23 of 76 shorter than 20 s |
+| Figure 2.5 and Table 3.1 | The two densities: 0.921 to 0.973 under the fixed threshold, 0.196 under the proportional rule, and chb17's exception at 0.224 |
+| Figure 2.9 | The weight surface is flat across the region explored |
+| Figure 2.11 | The multiplier is applied to the chosen channels within the block only; every other channel, and every window outside the block, is unchanged |
+| Figure 3.2 | Nothing. Table 3.2 and Figure 3.3 carry it |
+| Figure 3.7 | Nothing. Table 3.4 carries it row for row |
+| Figure 3.9 | Nothing. Table 3.6 carries the effects and the noise band |
+| Figure 3.12 | Channel-ranking agreement across four models: 0.970 plus or minus 0.026 |
+| Figure 3.14 and Table 3.7 | The per-patient values, named in the text |
+| Table 2.2 | The corpus is paediatric; the montage is 18 bipolar derivations at 256 Hz |
+| Table 2.5 | The five bands and their ranges |
+| Table 2.11 and Table 3.11 | The one measured timing figure: about 15 s per hour of recording |
+| Table 2.12 | The matching rule, and why specificity is absent |
+| Table A.3 and Table A.7 | Pointers to the committed files in `tables/csv/` |

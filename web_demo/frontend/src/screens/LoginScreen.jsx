@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogoIcon } from '../components/icons.jsx'
+import logo from '../assets/logo.png'
 import { login } from '../api.js'
 
 // Log in screen, per UI/A0c. Pre-app screen: no header chrome, no footer disclaimer
@@ -29,9 +29,9 @@ export default function LoginScreen({ onLoggedIn }) {
       className="min-h-screen flex flex-col items-center justify-center px-4"
       style={{ background: 'linear-gradient(115deg, #624C8A 0%, #10182B 100%)' }}
     >
-      <div className="flex items-center gap-3 text-white mb-8">
-        <LogoIcon className="w-10 h-10" />
-        <span className="text-3xl font-semibold">SzScan</span>
+      <div className="flex items-center gap-4 text-white mb-8">
+        <img src={logo} alt="SzScan" className="h-20 w-auto" />
+        <span className="text-5xl font-semibold">SzScan</span>
       </div>
 
       <form

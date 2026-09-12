@@ -3,7 +3,9 @@
 // name (e.g. canvas drawing code for the EEG waveform).
 export const tokens = {
   // nền & chrome
-  colorBg: '#FFFFFF',
+  // Measured #F8FAFC from the current UI PNGs — see index.css :root for the note on the
+  // discrepancy with SZSCAN_DESIGN_v2.md §1 (which still says #FFFFFF).
+  colorBg: '#F8FAFC',
   colorSurface: '#FFFFFF',
   colorEegCanvas: '#FEFBEF',
   colorFooter: '#0F172A',

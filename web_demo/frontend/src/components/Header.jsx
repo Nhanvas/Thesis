@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { LogoIcon, LogoutIcon, PersonIcon } from './icons.jsx'
+import { LogoutIcon, PersonIcon } from './icons.jsx'
+import logo from '../assets/logo.png'
 
 // Header chrome + avatar/logout dropdown, per UI/A0b. Used on every screen after Log in.
 export default function Header({ username, onLogout }) {
@@ -15,20 +16,20 @@ export default function Header({ username, onLogout }) {
   }, [])
 
   return (
-    <header className="bg-header-gradient text-white px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <LogoIcon className="w-8 h-8" />
-        <span className="text-xl font-semibold">SzScan</span>
+    <header className="bg-header-gradient text-white px-6 py-6 flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <img src={logo} alt="SzScan" className="h-20 w-auto" />
+        <span className="text-5xl font-semibold">SzScan</span>
       </div>
 
       <div className="relative" ref={rootRef}>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="w-10 h-10 rounded-full bg-brand flex items-center justify-center"
+          className="w-16 h-16 rounded-full bg-brand flex items-center justify-center"
           aria-label="Account menu"
         >
-          <PersonIcon className="w-6 h-6 text-white" />
+          <PersonIcon className="w-10 h-10 text-white" />
         </button>
 
         {open && (

@@ -16,9 +16,9 @@ export default function Header({ username, onLogout }) {
   }, [])
 
   return (
-    <header className="bg-header-gradient text-white px-6 py-6 flex items-center justify-between">
+    <header className="bg-header-gradient text-white px-6 py-5 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <img src={logo} alt="SzScan" className="h-20 w-auto" />
+        <img src={logo} alt="SzScan" className="h-16 w-auto" />
         <span className="text-5xl font-semibold">SzScan</span>
       </div>
 

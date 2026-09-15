@@ -76,9 +76,9 @@ def main():
 
     out_dir = Path(a.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / "fig2_8_reconstruction_inversion.png", bbox_inches="tight")
+    fig.savefig(out_dir / "fig2_5_reconstruction_inversion.png", bbox_inches="tight")
     plt.close(fig)
-    print(f"  [saved] {(out_dir / 'fig2_8_reconstruction_inversion.png').resolve()}")
+    print(f"  [saved] {(out_dir / 'fig2_5_reconstruction_inversion.png').resolve()}")
 
 
 if __name__ == "__main__":

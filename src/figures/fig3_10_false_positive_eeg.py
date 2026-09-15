@@ -37,7 +37,7 @@ EDF_NAME = "chb13_62.edf"
 MIN_MAG_PCT, PEN_MULT = 50, 2.0
 CONTEXT_S = 60.0
 N_CHANNELS = 6
-OUT = ROOT / "figures" / "fig3_10_false_positive_eeg.png"
+OUT = ROOT / "figures" / "fig3_7_false_positive_eeg.png"
 
 
 def main():

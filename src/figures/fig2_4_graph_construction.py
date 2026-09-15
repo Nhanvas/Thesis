@@ -41,7 +41,7 @@ ROOT = Path(_src).parent
 PROC = ROOT / "data" / "processed"
 SUBJ = "chb11"
 WINDOW_IDX = 0
-OUT = ROOT / "figures" / "fig2_4_graph_construction.png"
+OUT = ROOT / "figures" / "fig2_3_graph_construction.png"
 
 
 def main():

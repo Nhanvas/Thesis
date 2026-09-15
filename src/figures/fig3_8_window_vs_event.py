@@ -39,7 +39,7 @@ from palette import INTERICTAL, ICTAL, CHANCE, HEADLINE, apply_rc
 ROOT = Path(_src).parent
 WINDOW_JSON = ROOT / "results" / "phaseB" / "tier2" / "ens_test_tf" / "rlg" / "window_auroc_seed42.json"
 GRID_CSV = ROOT / "results" / "phaseB" / "tier2" / "rlg_test" / "final_eval_seed42.csv"
-OUT = ROOT / "figures" / "fig3_8_window_vs_event.png"
+OUT = ROOT / "figures" / "fig3_6_window_vs_event.png"
 
 HELD_OUT = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
 MACRO_WINDOW_AUROC = 0.805     # docs/VERIFIED_NUMBERS.md Part 1.2, macro across 8 subjects

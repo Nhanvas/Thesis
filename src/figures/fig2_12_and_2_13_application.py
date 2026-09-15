@@ -19,7 +19,7 @@ a column is absent, the script stops rather than drawing an illustration of a
 measurement it does not have.
 
 Source: results/diagnostics/timeline_composition.csv
-Output: figures/fig2_12_application_architecture.png
+Output: figures/fig2_6_application_architecture.png
         figures/fig2_13_timeline_replay.png
 """
 import sys
@@ -152,7 +152,7 @@ for y in (32 + BOX_H / 2, 6 + BOX_H / 2):
 axa.text((X1 + FX) / 2, 25.5, "blocked", ha="center", va="center", fontsize=8,
          style="italic", color=ICTAL, rotation=90, zorder=4)
 
-OUT_A = ROOT / "figures" / "fig2_12_application_architecture.png"
+OUT_A = ROOT / "figures" / "fig2_6_application_architecture.png"
 OUT_A.parent.mkdir(parents=True, exist_ok=True)
 figa.savefig(OUT_A, dpi=300, bbox_inches="tight", facecolor="white")
 print(f"\nwrote {OUT_A}")

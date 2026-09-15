@@ -16,7 +16,7 @@ Drawing a real recording here would invite the question of which recording and
 whether this is a result, and this figure is neither.
 
 Source of parameters: src/szcore_eval.py
-Output: figures/fig2_14_event_scoring.png
+Output: figures/fig2_7_event_scoring.png
 """
 import sys
 from pathlib import Path
@@ -223,7 +223,7 @@ for ax, P in zip(axes, PANELS):
     ax.set_axisbelow(True)
     ax.set_xlabel("Time (s)", fontsize=9, labelpad=2)
 
-OUT = ROOT / "figures" / "fig2_14_event_scoring.png"
+OUT = ROOT / "figures" / "fig2_7_event_scoring.png"
 OUT.parent.mkdir(parents=True, exist_ok=True)
 fig.savefig(OUT, dpi=300, bbox_inches="tight", facecolor="white")
 print(f"\nwrote {OUT}")

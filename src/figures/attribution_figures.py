@@ -15,13 +15,13 @@ Outputs -> figures/ (root, exhibit-numbered) and tables/csv/ for the appendix ta
 per docs/FIGURE_FIXES_R3.md §2 (renamed off the old figures/attribution/ working names so a
 writer looking for the figure by its report number can find it):
 
-    fig3_11_attribution_synthetic.png        LABEL-FREE.  macro-AUROC vs injection strength, VAL + TEST.
+    fig3_8_attribution_synthetic.png        LABEL-FREE.  macro-AUROC vs injection strength, VAL + TEST.
                                           Rubric #6 (validity) and #8. The single strongest visual
                                           exhibit that the machinery is correct: clean null at a=1.0,
                                           monotone rise, ceiling at a=3.0.
     fig3_12_attribution_seed_stability.png  LABEL-FREE.  Channel-ranking agreement across GAE seeds
                                           {42,1,2,3}. Rubric #6.
-    fig3_13_attribution_rank_heatmap.png     LABEL-FREE.  Per-seizure channel RANK (1..18) for all 76
+    fig3_9_attribution_rank_heatmap.png     LABEL-FREE.  Per-seizure channel RANK (1..18) for all 76
                                           TEST seizures, grouped by subject. Rank is scale-free, so
                                           seizures are directly comparable. Rubric #7, #8.
     fig3_14_attribution_persubject_forest.png
@@ -102,7 +102,7 @@ def fig1_synthetic():
         ax.grid(alpha=0.25, lw=0.6)
     axes[0].set_ylabel("macro-AUROC over 200 pseudo-seizures")
     axes[1].legend(fontsize=8, frameon=False, loc="lower right")
-    save(fig, "fig3_11_attribution_synthetic.png")
+    save(fig, "fig3_8_attribution_synthetic.png")
 
 
 # ---------------------------------------------------------------- shared loader
@@ -178,7 +178,7 @@ def fig3_rank_heatmap():
         ax.axvline(b, color="w", lw=0.9, alpha=0.65)
     cb = fig.colorbar(im, ax=ax, fraction=0.030, pad=0.02)
     cb.set_label("channel rank within the seizure  (1 = most anomalous)")
-    save(fig, "fig3_13_attribution_rank_heatmap.png")
+    save(fig, "fig3_9_attribution_rank_heatmap.png")
 
 
 # ---------------------------------------------------------------- fig 4

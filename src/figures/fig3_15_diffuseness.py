@@ -55,7 +55,7 @@ SYNTH_CSV = ROOT / "results" / "attribution_v6" / "synthetic_spread.csv"
 PERSZ_CSV = ROOT / "results" / "attribution_v6" / "attribution_perseizure.csv"
 PERSZ_GEN_CSV = ROOT / "results" / "attribution_v6" / "attribution_perseizure_generalized.csv"
 SUMMARY_CSV = ROOT / "results" / "attribution_v6" / "attribution_summary.csv"
-OUT = ROOT / "figures" / "fig3_15_diffuseness.png"
+OUT = ROOT / "figures" / "fig3_10_diffuseness.png"
 
 EXPECTED_FOCAL, EXPECTED_GENERALIZED, EXPECTED_P = 0.9693, 0.9594, 0.984
 NUMERIC_TICKS = [1, 2, 4, 8, 12, 18]

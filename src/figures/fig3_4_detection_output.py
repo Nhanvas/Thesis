@@ -32,7 +32,7 @@ RAW_DIR = Path("F:/Study/Thesis/Dataset/CHB-MIT")
 SUBJ = "chb13"
 EDF_NAME = "chb13_62.edf"
 MIN_MAG_PCT, PEN_MULT = 50, 2.0   # the reported operating point
-OUT = ROOT / "figures" / "fig3_4_detection_output.png"
+OUT = ROOT / "figures" / "fig3_3_detection_output.png"
 
 
 def main():

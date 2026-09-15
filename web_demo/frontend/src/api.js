@@ -23,3 +23,53 @@ export const logout = () => request('/api/logout', { method: 'POST' })
 export const getSession = () => request('/api/session')
 
 export const listSubjects = () => request('/api/subjects')
+
+export const deleteSubject = (subjectId) =>
+  request(`/api/subjects/${encodeURIComponent(subjectId)}`, { method: 'DELETE' })
+
+// Create New panel — SZSCAN_SPEC_v5.md §5.5. There is only ever one session system-wide
+// (the single-subject-in-flight constraint), so none of these take a session id.
+
+async function uploadRequest(path, options = {}) {
+  // Like request(), but for endpoints that return the toast text in `detail` on a non-2xx
+  // response we want the CALLER to see verbatim (SPEC's exact rejection wording) rather than
+  // a generic "Request failed (409)" fallback.
+  const res = await fetch(path, { credentials: 'include', ...options })
+  const body = res.status === 204 ? null : await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const err = new Error(body?.detail || `Request failed (${res.status})`)
+    err.status = res.status
+    throw err
+  }
+  return body
+}
+
+export const startUpload = (projectId, memo) =>
+  uploadRequest('/api/uploads/current', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, memo }),
+  })
+
+export const getUpload = () => uploadRequest('/api/uploads/current')
+
+export const discardUpload = () => uploadRequest('/api/uploads/current', { method: 'DELETE' })
+
+export const acknowledgeUpload = () =>
+  uploadRequest('/api/uploads/current/acknowledge', { method: 'POST' })
+
+export const addUploadFile = (file) => {
+  const form = new FormData()
+  form.append('file', file, file.name)
+  return uploadRequest('/api/uploads/current/files', { method: 'POST', body: form })
+}
+
+export const removeUploadFile = (filename) =>
+  uploadRequest(`/api/uploads/current/files/${encodeURIComponent(filename)}`, { method: 'DELETE' })
+
+export const processUpload = (projectId, memo) =>
+  uploadRequest('/api/uploads/current/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, memo }),
+  })

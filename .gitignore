@@ -53,5 +53,6 @@ archive/scaffolding/checkpoints/
 web_demo/cache/
 web_demo/backend/.env
 web_demo/backend/szscan.db
+web_demo/backend/uploads/
 web_demo/frontend/node_modules/
 web_demo/frontend/dist/

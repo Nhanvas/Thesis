@@ -81,8 +81,8 @@ wrong key.
 | 1 | Band-pass filter | Fourth-order Butterworth, 0.5–60 Hz, zero-phase, 3 s padding each side | Removes drift below the physiological range and content above the analysis band without phase distortion |
 | 2 | Notch filter | IIR notch at 60 Hz, quality factor 30, zero-phase | Suppresses mains interference, which falls inside the retained band |
 | 3 | Segmentation | 4 s non-overlapping windows, 1024 samples at 256 Hz | Fixes the analysis unit; non-overlapping windows keep successive windows statistically independent |
-| 4 | Artifact rejection | Window discarded if any channel exceeds 5 standard deviations of that channel's interictal distribution | Removes gross movement and electrode artifacts from the background set |
-| 5 | Post-seizure exclusion | 4 h after each annotated seizure end excluded from the background set | Prevents post-ictal activity from being treated as normal background |
+| 4 | Post-seizure exclusion | 4 h after each annotated seizure end excluded from the background set, before any background statistic is computed | Prevents post-ictal activity from being treated as normal background, and from entering the statistics that set step 5 |
+| 5 | Artifact rejection | Window discarded if any channel exceeds 5 standard deviations of that channel's background distribution, estimated from the windows surviving step 4 | Removes gross movement and electrode artifacts from the background set |
 | 6 | Normalisation | Per-patient, per-channel z-score | Removes between-patient amplitude differences so one model serves every patient |
 
 Two properties of this stage matter later. Artifact rejection is applied to the background set
@@ -90,12 +90,18 @@ only; seizure windows are deliberately kept, because rejecting them would remove
 activity the system must detect. And because rejection drops windows, the retained background
 windows no longer sit at their original positions in recording time.
 
-**Writer's trap.** Step 5 governs which windows enter the background set. It is **not** applied to
-the false-alarm denominator, which is total recorded time minus seizure time. A sentence saying a
+**Writer's trap, one.** Step 4 governs which windows enter the background set. It is **not** applied
+to the false-alarm denominator, which is total recorded time minus seizure time. A sentence saying a
 post-seizure buffer was excluded from the false-alarm rate would be wrong.
 
-*Source: `src/dataprep/preprocessing.py` lines 8, 11, 27–28, 52–65, 78–81. Denominator
-reconciliation in `docs/VERIFIED_NUMBERS.md` Part 3.*
+**Writer's trap, two.** The file's opening docstring numbers artifact rejection as *Step 4*. The
+executed order is the reverse: `compute_subject_stats` builds the post-seizure buffer mask and skips
+every ictal or buffered window before accumulating the per-channel mean and standard deviation, and
+the artifact threshold is five times that standard deviation. Numbering this table from the docstring
+puts the two steps the wrong way round, which is what an earlier revision did.
+
+*Source: `src/dataprep/preprocessing.py`, verified 2026-09-12 against `compute_subject_stats` and
+`count_windows`. Denominator reconciliation in `docs/VERIFIED_NUMBERS.md` Part 3.*
 
 ## Table 2.4 — Decision matrix for edge sparsification
 
@@ -195,34 +201,37 @@ not provide. It tests the scoring machinery, not the clinical claim.
 
 ## Table 2.8 — Decision matrix for deployment strategy
 
-Weighted matrix. Scores are 1 to 5, higher is better. **The weights are an engineering judgement and
-Boti sets them** — the values below are a proposal, not a result, and the accompanying paragraph must
-say that the weighting is a judgement rather than a measurement.
+Weighted matrix. Scores are 1 to 5, higher is better. The criteria are the four the outline requires at
+§2.6.1: economic, societal, environmental, and global reach and scalability. **The weights are an
+engineering judgement and Boti sets them.** The accompanying paragraph must say that the weighting is a
+judgement rather than a measurement.
 
 | Criterion | Weight | Cloud service | On-premise server | Bedside device |
 |---|---|---|---|---|
-| Patient data remains within the institution | 0.30 | 1 | 5 | 5 |
-| No specialised hardware required | 0.20 | 4 | 5 | 2 |
-| One installation serves every patient | 0.20 | 5 | 5 | 1 |
-| Cost to a hospital in a low-resource setting | 0.15 | 2 | 4 | 2 |
-| Energy and hardware footprint | 0.10 | 3 | 4 | 4 |
-| Maintenance burden on the institution | 0.05 | 5 | 3 | 2 |
-| **Weighted total** | **1.00** | **2.85** | **4.65** | **3.15** |
+| Economic | 0.30 | 2 | 4 | 3 |
+| Societal | 0.30 | 1 | 5 | 4 |
+| Environmental | 0.20 | 2 | 4 | 3 |
+| Global reach and scalability | 0.20 | 4 | 3 | 2 |
+| **Weighted total** | **1.00** | **2.1** | **4.1** | **3.1** |
 | **Adopted** | | | **✔** | |
 
-Three numbered reasons for the verdict. Inference runs on a general-purpose processor, so no
-specialised hardware is required and an ordinary server suffices. The recordings are paediatric and
-should not leave the hospital network, which rules out the cloud option regardless of its other
-merits. And because no per-patient training is needed, one installation serves every patient, which a
-bedside device cannot match.
+Four numbered reasons for the verdict, one per criterion. Economically, an on-premise server is a
+one-time infrastructure cost with no recurring usage fee, which suits an inference design that needs no
+specialised hardware, whereas a cloud service adds a recurring cost for storing and transferring
+multi-hour recordings. Societally, the recordings are paediatric, and this is the only option under
+which a raw recording never leaves the site that collected it. Environmentally, inference confined to a
+general-purpose processor avoids the continuous power draw a shared cloud accelerator or per-bed
+hardware would add. On global reach, the method is patient-independent, so one installation serves
+every patient a hospital admits; this option scores below the cloud alternative on that one criterion,
+because each hospital still needs its own installation.
 
-The paragraph closes by stating that this is an engineering judgement built from measured properties
-of the system, not a costed procurement analysis, and that the weights would differ at another
+The paragraph closes by stating that this is an engineering judgement built from measured properties of
+the system, not a costed procurement analysis, and that the weights would differ at another
 institution.
 
 **Check the arithmetic before use.** The totals above follow from the weights and scores as given; if
 Boti changes any weight or score, recompute rather than adjusting the total.
 
-*Source: the outline's deployment section; the measured processing cost in Table 4.2; the
-single-model property in Table 1.2 row 3.*
-
+*Source: the criteria set required by `docs/THESIS_OUTLINE_FINAL.md` §2.6.1; the measured processing
+cost in Table 4.2; the single-model property in Table 1.2 row 3. Supersedes the six-criterion version
+carried by earlier revisions of this file, which did not match the outline.*

@@ -1,7 +1,9 @@
-> **PLANNING DOCUMENT — NOT A SOURCE OF TRUTH. Archived 2026-09-16.**
-> Written before the pipeline was built. Two of its statements were taken as fact during the
-> writing phase and both were wrong: the preprocessing step list omits the four-hour post-seizure
-> exclusion entirely, and its subsample ratio was quoted without a source. For preprocessing read
+> **PLANNING DOCUMENT — describes the pipeline as designed, not as built. Archived 2026-09-16.**
+> Useful as a compact overview of the method. It is not a source of truth for any number, any step
+> order, or any constant. One statement in it is known to be wrong: its preprocessing step list omits
+> the four-hour post-seizure exclusion entirely, and that omission was carried into a chapter table
+> before the source was read. Its one-in-ten subsample ratio, by contrast, was later confirmed
+> correct by `STATS_SUBSAMPLE = 10`. For the pipeline as built read Chapter 2 and
 > `src/dataprep/preprocessing.py`; for numbers read `docs/RESULTS_OF_RECORD_phaseB.md` and
 > `docs/VERIFIED_NUMBERS.md`.
 

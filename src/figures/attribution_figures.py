@@ -96,12 +96,11 @@ def fig1_synthetic():
         ax.text(2.55, 0.512, f"permutation null\n{min(nulls):.4f}–{max(nulls):.4f}",
                 fontsize=7.5, color="0.35", ha="center")
         ax.set_xlabel("injection strength  α  (multiplier on reconstruction error)")
-        ax.set_title(f"{panel}" + ("  (pre-registered gate)" if panel == "VAL"
-                                   else "  (confirmatory)"), fontsize=10)
+        ax.set_title({"VAL": "Validation patients", "TEST": "Test patients"}[panel], fontsize=10)
         ax.set_ylim(0.42, 1.02)
         ax.grid(alpha=0.25, lw=0.6)
     axes[0].set_ylabel("macro-AUROC over 200 pseudo-seizures")
-    axes[1].legend(fontsize=8, frameon=False, loc="lower right")
+    axes[1].legend(fontsize=8, frameon=False, loc="center left", bbox_to_anchor=(1.01, 0.5))
     save(fig, "fig3_8_attribution_synthetic.png")
 
 
@@ -150,7 +149,7 @@ def fig2_seed_robustness():
     a2.set_title(f"top-1 channel agreement  (mean {np.mean(agree):.3f})", fontsize=10)
     a2.grid(alpha=0.25, lw=0.6, axis="y")
 
-    save(fig, "fig3_12_attribution_seed_stability.png")
+    save(fig, "archive/fig3_12_attribution_seed_stability.png")
 
 
 # ---------------------------------------------------------------- fig 3
@@ -247,7 +246,7 @@ def fig4_persubject_forest():
     ax.set_xlim(0, 1.05)
     ax.set_xlabel("macro-AUROC over seizures  (bootstrap 95% CI; ◇ = subject-constant control)")
     ax.grid(alpha=0.25, lw=0.6, axis="x")
-    save(fig, "fig3_14_attribution_persubject_forest.png")
+    save(fig, "archive/fig3_14_attribution_persubject_forest.png")
 
 
 # ---------------------------------------------------------------- appendix table

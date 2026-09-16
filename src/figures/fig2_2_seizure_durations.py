@@ -37,7 +37,7 @@ ROOT = Path(_src).parent
 SUMMARY_DIR = ROOT / "data" / "summaries"
 HELD_OUT = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
 ALL_SUBJECTS = [f"chb{i:02d}" for i in range(1, 24)]
-OUT = ROOT / "figures" / "fig2_2_seizure_durations.png"
+OUT = ROOT / "figures" / "archive" / "fig2_2_seizure_durations.png"
 
 
 def all_durations(subj):

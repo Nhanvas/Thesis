@@ -45,7 +45,7 @@ EDF_NAME = "chb13_62.edf"
 MIN_MAG_PCT, PEN_MULT = 50, 2.0   # the reported operating point
 ZOOM_SEIZURE_IDX = 0              # which of chb13_62.edf's three seizures to zoom on
 ZOOM_WINDOW_S = 300.0             # ~5 minutes, centred on that seizure's midpoint
-OUT = ROOT / "figures" / "fig2_10_changepoint_detection.png"
+OUT = ROOT / "figures" / "archive" / "fig2_10_changepoint_detection.png"
 
 
 def main():

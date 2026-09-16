@@ -174,7 +174,7 @@ def plot_e1(df, out_dir):
     ax.grid(alpha=0.25, lw=0.5)
     ax.legend(loc="upper left", fontsize=8, framealpha=0.95)
 
-    _save(fig, out_dir, "fig3_6_operating_curve")
+    _save(fig, out_dir, "fig3_5_operating_curve")
     return pooled
 
 
@@ -243,7 +243,7 @@ def plot_fig3_7(df, out_dir):
     axb.grid(axis="y", alpha=0.2, lw=0.5)
 
     fig.tight_layout()
-    _save(fig, out_dir, "fig3_7_persubject_event")
+    _save(fig, out_dir, "archive/fig3_7_persubject_event")
 
 
 # ----------------------------------------------------------------------------

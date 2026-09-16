@@ -224,7 +224,7 @@ axb.add_patch(FancyArrowPatch((0.5, 1.45 - 0.06), (0.5, y + BAR_H + 0.06),
 axb.text(0.515, (1.45 + y + BAR_H) / 2, "rebuilt using the annotation file",
          fontsize=8, style="italic", color=CHANCE, va="center")
 
-OUT_B = ROOT / "figures" / "fig2_13_timeline_replay.png"
+OUT_B = ROOT / "figures" / "archive" / "fig2_13_timeline_replay.png"
 figb.savefig(OUT_B, dpi=300, bbox_inches="tight", facecolor="white")
 print(f"wrote {OUT_B}")
 

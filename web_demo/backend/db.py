@@ -73,12 +73,20 @@ def _format_duration(seconds: float) -> str:
     return f"{h:02d}:{m:02d}:{s:02d}"
 
 
-def _format_start_date(iso: str | None) -> str | None:
-    """SZSCAN_SPEC_v5.md §5.1: 'YYYY.MM.DD HH:MM:SS'."""
+def _recording_label(n: int, iso: str | None) -> str | None:
+    """SZSCAN_SPEC_v5.md §5.1 (C17, 2026-09): 'Recording N, HH:MM:SS' — never an absolute
+    date. CHB-MIT/PhysioNet applies a fixed per-subject date shift to de-identify
+    recordings, so meas_date's year/date is fabricated (only the time-of-day and the
+    relative ordering/spacing between a subject's own recordings are real) — see the spec
+    footnote under §5.1's table. N is this file's 1-based position when the subject's files
+    are sorted by meas_date ascending (N=1 = earliest); callers pass N, this function only
+    formats. This ordering is display-only and separate from the filename-based sort used
+    for event-offset assignment (SPEC §1.5) — see edf_order.py's own docstring for that
+    same "which file an event belongs to" vs "what position a file displays at" split."""
     if not iso:
         return None
     dt = datetime.fromisoformat(iso)
-    return dt.strftime("%Y.%m.%d %H:%M:%S")
+    return f"Recording {n}, {dt.strftime('%H:%M:%S')}"
 
 
 def _file_status_badge(status: str) -> str:
@@ -152,11 +160,11 @@ def _alert_counts_by_file(conn: sqlite3.Connection) -> dict[int, int]:
     return {row["file_id"]: row["n"] for row in rows}
 
 
-def _file_row(row: sqlite3.Row, alert: int) -> dict:
+def _file_row(row: sqlite3.Row, alert: int, recording_n: int) -> dict:
     return {
         "id": row["id"],
         "filename": row["filename"],
-        "start_date": _format_start_date(row["start_time"]),
+        "start_date": _recording_label(recording_n, row["start_time"]),
         "duration": _format_duration(row["duration_seconds"]),
         "alert": alert,
         "status": _file_status_badge(row["status"]),
@@ -180,7 +188,13 @@ def list_subjects() -> list[dict]:
             "WHERE subject_id = ? ORDER BY start_time",
             (srow["id"],),
         ).fetchall()
-        files = [_file_row(f, alert_by_file.get(f["id"], 0)) for f in file_rows]
+        # file_rows is already sorted by start_time (meas_date) ascending, so its own
+        # position IS the C17 "Recording N" display ordering — a separate concern from
+        # edf_order.py's filename-based sort (SPEC §1.5's event-offset assignment).
+        files = [
+            _file_row(f, alert_by_file.get(f["id"], 0), i + 1)
+            for i, f in enumerate(file_rows)
+        ]
         subject_alert = sum(f["alert"] for f in files)
         starts = [f["start_time"] for f in file_rows if f["start_time"]]
         total_duration = sum(f["duration_seconds"] for f in file_rows)
@@ -188,7 +202,7 @@ def list_subjects() -> list[dict]:
             {
                 "id": srow["id"],
                 "no_files": len(file_rows),
-                "start_date": _format_start_date(min(starts)) if starts else None,
+                "start_date": _recording_label(1, min(starts)) if starts else None,
                 "duration": _format_duration(total_duration) if file_rows else "",
                 "alert": subject_alert,
                 "status": _subject_status([f["status"] for f in files]),

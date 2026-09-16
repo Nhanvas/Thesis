@@ -114,7 +114,7 @@ def main():
     fig.tight_layout()
     out_dir = Path(a.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / "fig2_9_weight_simplex.png", bbox_inches="tight")
+    fig.savefig(out_dir / "archive" / "fig2_9_weight_simplex.png", bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / 'fig2_9_weight_simplex.png').resolve()}")
 

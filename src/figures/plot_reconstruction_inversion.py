@@ -67,7 +67,7 @@ def main():
                label=f"ictal (n={len(ictal)})")
         ax.axvline(np.median(inter), color=INTERICTAL, lw=1.2, ls="--")
         ax.axvline(np.median(ictal), color=ICTAL, lw=1.2, ls="--")
-        ax.set_title(f"{subj} — {tags[subj]}\nreconstruction AUROC = {auroc:.4f}", fontsize=9.5)
+        ax.set_title(f"{subj}: {tags[subj]}", fontsize=9.5)
         ax.set_xlabel("reconstruction-branch z-score")
         ax.legend(fontsize=8)
     axes[0].set_ylabel("density")

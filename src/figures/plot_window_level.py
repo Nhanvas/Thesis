@@ -77,7 +77,7 @@ def plot_fig3_2(data, out_dir):
     axes[0, 0].set_ylabel("fused ensemble score")
     axes[1, 0].set_ylabel("fused ensemble score")
     fig.tight_layout()
-    _save(fig, out_dir, "fig3_2_score_distributions")
+    _save(fig, out_dir, "archive/fig3_2_score_distributions")
 
 
 # ============================================================================
@@ -140,7 +140,7 @@ def plot_fig3_3(data, out_dir, window_auroc_path):
     ax_pr.grid(alpha=0.25, lw=0.5)
 
     fig.tight_layout()
-    _save(fig, out_dir, "fig3_3_roc_pr_curves")
+    _save(fig, out_dir, "fig3_2_roc_pr_curves")
 
 
 def _save(fig, out_dir, name):

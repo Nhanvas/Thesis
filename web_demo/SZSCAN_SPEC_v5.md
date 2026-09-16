@@ -11,7 +11,8 @@ Với các quyết định khoa học (không phải demo), thẩm quyền vẫn
 `docs/RESULTS_OF_RECORD_phaseB.md` > `docs/PROVENANCE.md` > `docs/REPO_MAP.md`.
 
 **Lịch sử:** v5 = v4 + 11 điểm chốt UI (phiên audit 2026-09) + 13 điểm sửa M1–M13 (phiên này) +
-kiến trúc label-free liên tục (mới, dựa trên phép đo — xem §1).
+kiến trúc label-free liên tục (mới, dựa trên phép đo — xem §1) + **C17** (2026-09, sau audit report:
+cột Start date đổi từ ngày tuyệt đối sang `Recording N, HH:MM:SS` — xem §5.1).
 
 ---
 
@@ -112,7 +113,11 @@ Không parse file nào, không đọc summary, không cần module phụ — **v
 là mảng theo segment nên phải dựng bảng tra `global_offset → file`) và đã bị xóa. Tài liệu cũ
 `WEB_DEMO_CODE_MIGRATION_NOTES.md` mô tả nó như module sẵn có — tài liệu đó đã archive, đừng dùng.
 `edf_order.py` thì **vẫn giữ** (`web_demo/backend/edf_order.py`): vấn đề khác hẳn — thứ tự **hiển thị**
-file trên UI theo giờ thật trong header EDF, khác thứ tự **xử lý** theo tên file.
+file trên UI theo giờ thật trong header EDF, khác thứ tự **xử lý** theo tên file. **Lưu ý (2026-09,
+Step 3):** trên thực tế, thứ tự xử lý (§1.5, theo tên file) và thứ tự hiển thị "Recording N" ở §5.1 nay
+đều lấy trực tiếp từ `raw.info['meas_date']` (ngày giờ đầy đủ trong header EDF) thay vì heuristic của
+`edf_order.py` — file đó vẫn còn trong repo, không sửa, nhưng không còn nằm trong luồng gọi thực tế
+nữa, vì `meas_date` giải quyết đúng gốc vấn đề (case chb03_24/25) mà không cần heuristic hoán đổi.
 
 ### 1.6 Divergence có chủ đích khỏi pipeline thesis — ĐÃ ĐƯỢC TÁC GIẢ DUYỆT
 
@@ -241,13 +246,23 @@ dọc bình thường, không phải layout đặc biệt.
 |---|---|
 | ID | Tên subject (vd `chb06`), bấm ▶ mở rộng ra danh sách file .edf con |
 | No. files | Tổng số file .edf của subject |
-| Start date | Ngày giờ bắt đầu của **file đầu tiên**, format `YYYY.MM.DD HH:MM:SS`. **Tự suy ra từ header EDF**, không có ô nhập tay |
+| Start date | **ĐỔI SO VỚI BẢN TRƯỚC — C17, 2026-09.** Hiển thị dạng `Recording N, HH:MM:SS`, **không phải ngày tuyệt đối**. N = vị trí bản ghi trong chuỗi file của subject, sắp theo `meas_date` **tăng dần** (N=1 là bản ghi sớm nhất theo giờ thật trong header EDF — đây cũng là thứ tự mà `edf_order.py`'s heuristic từng nhắm tới, nay đạt được trực tiếp và chính xác hơn nhờ `meas_date` đầy đủ ngày-giờ). HH:MM:SS = giờ trong ngày lúc bắt đầu đúng bản ghi đó, đọc từ `meas_date`. Dòng subject hiển thị **Recording 1** (bản ghi sớm nhất của subject). Dòng file con hiển thị đúng **Recording N** của chính file đó. **Tự suy ra từ header EDF**, không có ô nhập tay, không hiển thị năm/ngày tuyệt đối (xem ghi chú ngay dưới bảng này) |
 | Duration | `HH:MM:SS` nếu < 24 h, `Nd:HH:MM:SS` nếu ≥ 24 h. Subject = tổng duration mọi file; file = end − start của chính nó |
 | Alert | Tổng số event hiện có (xem §5.3) |
 | Status | `View` / `Viewing (x/N)` / `Viewed` (xem §5.2) |
 | Memo | Text tự do do người dùng nhập (giới tính/tuổi/ghi chú). **Không bao giờ được sinh tự động** từ mô hình |
 
 Dòng file con dùng cùng cấu trúc cột, riêng Status không có phân số.
+
+> **Ghi chú ngày tháng (C17):** CHB-MIT (phân phối qua PhysioNet) áp dụng phép dịch chuyển ngày tháng
+> cố định để de-identify bệnh nhân — năm/ngày ghi trong `meas_date` của header EDF **không phải ngày
+> thật**. Phép dịch là **hằng số trong phạm vi một subject**, nên thứ tự các bản ghi, giờ trong ngày mỗi
+> bản ghi bắt đầu, và khoảng cách giữa các bản ghi **vẫn chính xác** — chỉ năm/ngày tuyệt đối là không
+> có ý nghĩa và không nên xuất hiện trên màn hình. Đây là lý do cột này hiển thị `Recording N, HH:MM:SS`
+> thay vì ngày tuyệt đối: giữ đúng ba thứ người xem cần biết, bỏ đúng một thứ bịa. Quyết định này áp
+> dụng đồng nhất cho cả UI Database lẫn mọi nơi khác từng dự định hiển thị ngày tuyệt đối từ `meas_date`
+> — hiện tại không có nơi nào khác làm vậy (§6.2's định dạng thời gian ở màn Analysis vốn đã tương đối,
+> không phải ngày tuyệt đối; §7.3's export cũng chỉ ghi giờ trong ngày, không có năm).
 
 **Trong lúc 1 subject đang xử lý (upload + pipeline + CPD), subject đó KHÔNG xuất hiện trên bảng.** Chỉ
 khi toàn bộ chạy xong, dòng subject + mọi dòng file con mới hiện lên cùng lúc. Subject khác đã có từ

@@ -46,7 +46,7 @@ SUBJ = "chb11"
 STRIDE = 20
 WINDOW_IDX = 0   # same window Fig 2.4 uses
 TASK_E_CSV = ROOT / "results" / "diagnostics" / "density_frobenius_v2_val" / "density_per_subject.csv"
-OUT = ROOT / "figures" / "fig2_5_sparsification_rules.png"
+OUT = ROOT / "figures" / "archive" / "fig2_5_sparsification_rules.png"
 
 
 def raw_combined(window, alpha=DEFAULT_ALPHA, fs=256):

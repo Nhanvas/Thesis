@@ -139,7 +139,7 @@ def main():
 
     # Synthetic line -- numeric axis only, the injected-channel-count axis is meaningful here.
     ax.plot(test_panel.n_injected, test_panel.spread_mean, "-o", color=INTERICTAL,
-           lw=1.4, ms=6, label="Synthetic injection (held-out panel)", zorder=3)
+           lw=1.4, ms=6, label="Synthetic injection (test panel)", zorder=3)
 
     # Real focal points, jittered around their own (integer) channel count.
     ax.scatter(persz.n_ictal_ch + jitter_focal, persz.spread, color=ICTAL, s=26, alpha=0.75,

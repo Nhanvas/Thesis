@@ -3,12 +3,13 @@
 The final caption for every exhibit. Captions written independently would drift, and the mandatory
 wording several of them carry would be lost.
 
-**Revision 5.** One terminology change throughout, on top of the four corrections made in revision 4.
+**Revision 6.** Two corrections carried back from the finished chapters, on top of revision 5's
+terminology change and revision 4's four corrections.
 The numbering settled in revision 3 is unchanged and remains final: figures and tables run
 consecutively within each chapter, in order of first reference. The old-to-new map is at the end of
 this file, together with the commands that rename the image files to match.
 
-Superseded: revisions 2, 3 and 4. The exhibit set itself is `docs/EXHIBIT_SET_FINAL.md`; the
+Superseded: revisions 2, 3, 4 and 5. The exhibit set itself is `docs/EXHIBIT_SET_FINAL.md`; the
 reasoning behind each cut stays in `docs/EXHIBIT_TRIAGE.md` and is not edited.
 
 ## How to use this file
@@ -141,7 +142,9 @@ judgement rather than a measurement.
 
 # Chapter 3
 
-**Figure 3.1.** Separation between background and seizure windows on the test patients.
+**Figure 3.1.** Change in the separation between background and seizure connectivity under the
+proportional rule relative to the fixed threshold, one bar per test patient. (a) relative Frobenius
+distance; (b) cosine distance.
 
 **Figure 3.2.** Receiver-operating and precision-recall curves, per patient and across patients.
 
@@ -249,6 +252,22 @@ provisional.
 **Table A.5.** Software and library versions.
 
 **Table A.6.** Index of pre-registrations.
+
+---
+
+# What changed in revision 6
+
+**Figure 3.1's caption described the wrong quantity.** Revision 5 read "Separation between background
+and seizure windows on the test patients", which invites the reader to expect a distribution of anomaly
+scores. The figure plots the percentage change in connectivity separation between the two
+sparsification rules, on two scale-comparable measures. The caption now says that. Chapter 3 §3.1
+already carries the corrected wording, and the two now match.
+
+**No table carries the directed-connectivity values any more.** The table that held 0.710, 0.674 and
+0.888, the per-patient changes of +0.137, +0.052 and −0.059, and the ensemble fall from 0.928 to 0.909
+was cut in P3. Those values now live only in the prose of Chapter 3 §3.5.2 and Chapter 4 §4.3. Neither
+chapter may cite a table number for them, and an edit to either chapter has to be made in both. This
+note exists so that a later reader looking for the table does not conclude the values were dropped.
 
 ---
 

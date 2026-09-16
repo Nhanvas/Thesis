@@ -15,8 +15,7 @@ supersedes the exhibit list, `FIGURES_TABLES_LIST.md` for what each table must c
 3. No internal shorthand: no lever codes, no file names, no phase names, no branch nicknames in a
    table cell or heading.
 4. A cell whose value has not been read from a file is written `— not measured` and never left
-   blank and never estimated. Table 3.9 is deliberately unfilled for this reason and says so at the
-   top of its block.
+   blank and never estimated. The rows of Table 3.9 that wait on the application say so.
 5. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
 
 This file holds Tables 3.1 through 3.9. Table 3.9 is written last, from the finished chapters.
@@ -72,14 +71,8 @@ mix the two forms.
 
 ## Table 3.3 — Event-level performance per patient
 
-**Values below are transcribed from the figure script's own printed self-check and must be
-regenerated as a file before use** — see the emit task in the figure brief. They are given here so
-the emitted file can be checked against them rather than accepted on trust.
-
-<!-- docs/FIGURE_ROUND6.md §4: the table below is the rendered block from
-     tables/csv/table_3_4_event_level_per_patient.md (docs/FIGURE_ROUND6.md §3), replacing the
-     hand-transcribed table that previously stood here. The numbers are unchanged; this is the
-     file the paragraph above asks for. -->
+The block below is the rendered emitted file, not a hand transcription. It replaced the
+hand-transcribed version that previously stood here, with the numbers unchanged.
 
 | Patient | Seizures | Sensitivity | Precision | F1 | False alarms / day |
 |---|---|---|---|---|---|
@@ -177,13 +170,18 @@ test-set comparison for the reconstruction ablation is from `ONESHOT_rlg_vs_s0.c
 | Negative control: no injection, one channel marked | Discrimination between 0.45 and 0.55 | 0.491 | pass |
 | Upper bound: strongest injection, one channel | Discrimination at least 0.95 | 0.982 | pass |
 | Monotonicity in injection strength, at every number of injected channels | Non-decreasing | Holds at every level | pass |
-| Diffuseness separates many injected channels from one | Diffuseness higher for eighteen channels than for one, p < 0.05 | 0.976 against 0.964, p = 8.9×10⁻¹¹ | pass |
+| Diffuseness separates many injected channels from one | Diffuseness higher for eighteen channels than for one, p < 0.05 | 0.976 against 0.964 | pass |
 | Permutation null across all 50 cells | Centred on 0.50 | Mean stayed within 0.499 to 0.501 | pass |
 | Detection threshold | — | Discrimination reaches 0.696 at a 25 % increase | — |
 
 The fourth criterion was reformulated once, after the version originally registered failed. The
 failure and the reformulation are both reported; the criterion was rewritten, the measurement was
 not.
+
+**The p-value is deliberately absent from row four.** An earlier revision carried
+p = 8.9×10⁻¹¹ for that criterion. That figure has no traced source: `synthetic_spread.csv` carries
+0.976 and 0.964 but no p. The criterion passed on the comparison the row states, so nothing is lost by
+omitting it. Restore it only if the value is found in a committed file.
 
 *Source: `results/attribution_v6/synthetic_sanity.csv` and `synthetic_spread.csv`;
 `docs/ATTRIBUTION_SPEC.md` §9.1; `docs/VERIFIED_NUMBERS.md` Part 7.2.*
@@ -229,6 +227,11 @@ The pooled value is the mean over all within-patient seizure pairs. It is **not*
 patients, which is 0.714, nor the seizure-weighted mean, which is 0.817. State which one is meant
 wherever it appears.
 
+**The rows sum to 35, not 36.** Table 3.7 scores 36 annotated seizures; the five patients above account
+for 35 of them. chb16 contributes a single annotated seizure, which forms no within-patient pair and so
+cannot enter a similarity measure. This is not a missing row. Say it in the text, because a reviewer
+will add the column.
+
 chb18 is the one patient whose annotations vary, and it is also the one patient where attribution
 exceeds its control. Those two facts are the same fact.
 
@@ -236,17 +239,36 @@ exceeds its control. Those two facts are the same fact.
 
 ---
 
-## Table 3.9 — Objectives and requirements achieved — WAITING
+## Table 3.9 — Objectives and requirements achieved
 
-Written last, from the finished Chapters 2 and 3. Its structure is fixed by the exhibit list: the four
-goals as the first rows, then each of the ten design requirements from Table 1.2, each with the
-outcome achieved.
+Written last, from the finished chapters. The version below is the one carried by Chapter 3 and is
+complete apart from the rows that wait on the application. Re-read it once Chapters 4 and 5 are final.
 
-Two rows will have to record partial outcomes, and they should be written plainly rather than softened.
-Goal 3, the channel-level explanation, is validated on synthetic injections but only provisionally
-compared against a draft annotation that has not been clinically reviewed. Goal 4, the application,
-is complete only if the build finishes before the deadline; if it does not, the row records that it
-was designed and specified but not delivered, and the timeline figure drops its corresponding task.
+The ten design-requirement rows must stay **word-identical** to Table 1.2. Check the two against each
+other after any edit to either.
+
+**Table 3.9.** Objectives and design requirements, with the outcome achieved for each.
+
+| Goal | Status | Evidence |
+|---|---|---|
+| 1 (registered). An unsupervised anomaly-scoring framework for multi-channel scalp EEG, combining spatial-temporal features to detect deviations from normal brain connectivity | achieved | Table 3.1, Table 3.2 |
+| 2 (registered). Temporal seizure localization by non-parametric change-point detection on the ensemble score | achieved | Table 3.2, Table 3.3, Figure 3.5 |
+| 3 (beyond registration). Channel-level attribution of the anomaly score | achieved on synthetic ground truth; provisional against a draft annotation | Table 3.6, Table 3.7 |
+| 4 (beyond registration). A demonstration application | `[PENDING BUILD]` | §3.7 |
+
+| Design requirement | Status | Evidence |
+|---|---|---|
+| 1. No seizure annotation during model fitting | achieved | every result in §3.2 to §3.6 is produced without a seizure label from the evaluated patient |
+| 2. No annotation at the decision stage | achieved | Table 3.2 |
+| 3. One model for every patient | achieved | Tables 3.1 to 3.3, one model applied unchanged to all eight test patients |
+| 4. The operating point is fixed before the test data are scored | achieved | Table 3.2, test set scored once |
+| 5. The detection stage does not depend on a fixed score cut | achieved | Tables 3.2 and 3.3; chb06 shows the limit of this property rather than its absence |
+| 6. A channel-level explanation from the same model | achieved on synthetic ground truth; provisional against the draft annotation | Table 3.6, Table 3.7 |
+| 7. Inference on ordinary hospital computing | `[PENDING BUILD]` | §3.7.3 |
+| 8. Faster than reviewing the recording | `[PENDING BUILD]` | §3.7.3 |
+| 9. Recordings stay inside the institution | `[PENDING BUILD]` | §3.7 |
+| 10. Every reported number is traceable | achieved | every value in this chapter is read from a committed result file, named in the source line beneath each table |
 
 A table of objectives where every row reads "achieved" invites the question of what the objectives
-were for.
+were for. Two rows record partial outcomes and four wait on the application; both are written plainly
+rather than softened.

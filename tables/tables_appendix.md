@@ -203,7 +203,7 @@ Part 6.4c.*
 
 | Package | Version | Role |
 |---|---|---|
-| Python | 3.11 | Runtime |
+| Python | 3.11.9 | Runtime |
 | numpy | 2.4.4 | Array computation throughout |
 | scipy | 1.17.1 | Filtering, spectral estimation, statistical tests |
 | pandas | 3.0.3 | Result tables and grid files |
@@ -219,8 +219,9 @@ Part 6.4c.*
 
 The remaining entries of the environment snapshot are transitive dependencies and are not listed.
 
-*Source: `docs/requirements_snapshot.txt`. The Python version is stated by the interpreter path in
-the session log and should be confirmed with `python --version` before the table is final.*
+*Source: `docs/requirements_snapshot.txt`. The Python version was confirmed on 2026-09-16 with
+`python --version`, which returned 3.11.9. The library rows are read from the snapshot and have not
+been re-checked against the running environment.*
 
 ## Table A.6 — Pre-registration index
 

@@ -175,7 +175,7 @@ Outputs to `figures/attribution/`:
 | `PHASE_C_FINAL_HANDOFF.md` · `PHASE_C_CLOSEOUT_provenance.md` · `PHASE_C_FULL_AUDIT.md` | Phase-C closure record. |
 | `PHASE_D_HANDOFF.md` | Future Work design (deliberately not executed). Defense material. |
 | `Thesis_Reference_Sheet.md` | citations for report writing. |
-| `PROPOSED_SOLUTION.md` | original method proposal. |
+| `docs/archive/PROPOSED_SOLUTION.md` | original method proposal. **Archived 2026-09-16, planning document, do not cite as a source.** |
 | `PREREG_TIER2_amendment_A1.md` | **the LSTM-drop decision.** |
 | `PREREG_TIER2_latent_ensemble.md` · `PREREG_C0_connectivity_probe.md` | Tier-2 / Phase-C pre-registrations. |
 | `prereg/PREREG_01…09` | 01 GAE retrain · 02 LSTM (superseded by A1) · 03 weights · 04 FP-budget OP · 05 OP T1 · 06 balanced OP · 07 per-subject FP · 08 window threshold · 09 min event duration. |
@@ -422,7 +422,7 @@ which is `src/figures/attribution_figures.py`). Anything else is a real break.
 |---|---|
 | `F:/Study/Thesis/Dataset/CHB-MIT/` | EDF recordings in `chb03/`, `chb06/`, … |
 | `F:/Study/Thesis/Dataset/CHB-MIT/CHB info/summary/` | `chbNN-summary.md` — onset/offset times. **`.md`, not `.txt`.** |
-| `F:/Study/Thesis/Papers/` · `Reports/` · `Agent/` · `Threshold/` | literature, report drafts, Claude-project doc store, threshold side-analysis |
+| `F:/Study/Thesis/Papers/` · `Reports/` · `Agent/` · `Threshold/` | literature, report drafts, Claude-project doc store, threshold side-analysis. **`Reports/` also holds three documents cited during the writing phase and never tracked: `FIGURES_TABLES_LIST.md`, `CHAPTER_WRITING_BRIEF.md`, `CHAPTER_REVIEW_PROTOCOL.md`. All three describe the exhibit set as it stood before the P3 cuts and are superseded by `docs/EXHIBIT_SET_FINAL.md` revision 3. `THESIS_OUTLINE_FINAL.md` was copied out of `Reports/` into `docs/` on 2026-09-16 because it is cited as authority; the copy in `Reports/` is now the stale one.** |
 
 > The old external `F:/Study/Thesis/Web demo/` folder is **gone** — superseded by in-repo `web_demo/`.
 

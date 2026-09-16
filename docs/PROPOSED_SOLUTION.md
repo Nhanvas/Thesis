@@ -176,7 +176,7 @@ Decoder X:  X̂ = MLP(16 → 32 → 5)                            (Linear, ReLU,
 Loss    :  L = MSE(A, Â) + λ · MSE(X_norm, X̂),   λ = 0.1
 ```
 
-≈ 8.7k parameters. **Node input** (`x ∈ R^{18×23}`) is the concatenation of the normalised adjacency row
+3,285 parameters. **Node input** (`x ∈ R^{18×23}`) is the concatenation of the normalised adjacency row
 and the normalised band powers:
 
 ```

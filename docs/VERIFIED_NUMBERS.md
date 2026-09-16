@@ -370,29 +370,6 @@ budget rule unchanged. Three subjects, 13 seizures, budget target 5 false alarms
 of the reconstruction-free ensemble at the earlier configuration's balanced cell on the held-out
 set, where the F1 is 0.162 at 36.5 false alarms per day.
 
-## 6.3b Onset-slope change-point filtering, across models
-
-**Carried from `docs/RESULTS_OF_RECORD_phaseB.md`, not re-traced in this file's own session.** These
-four values were not read during the verification session of 2026-09-06 and are recorded here only
-because Chapter 4 §4.3 cites them and a reader checking that chapter against this file would otherwise
-not find them. The results of record remains their source and their authority.
-
-| Quantity | Value |
-|---|---|
-| Window-tier separation under the slope filter, seed 42 | 0.918 |
-| Window-tier separation without it, seed 42 | 0.823 |
-| Event-tier F1 gain, seed 42 | +0.023 |
-| Event-tier F1 loss, seeds 1, 2 and 3 | −0.039 to −0.065 |
-| Sensitivity drop, seeds 1, 2 and 3 | −0.133 in each |
-
-The seed-42 gain of 0.023 is **below** the 0.0338 spread of §6.4, so it was never a result on its own
-even before the other three models were run. Under those three the rule is a clear net harm. This is
-the cautionary case the multi-seed acceptance rule exists to catch, and it is the only lever in this
-study whose single-model reading and multi-seed reading point in opposite directions.
-
-To promote these values out of carry-forward status, read them from the results of record and replace
-this banner with the file and line they came from.
-
 ## 6.4 Spread across independently trained models
 
 Same source, same budget, four models of the final system:
@@ -669,6 +646,6 @@ itself has already been corrected.
 | Whether the machine-generated annotation is kept in the body, moved to an appendix, or deferred to a later publication | Decision pending; a fallback that does not depend on the answer is described in Part 7.1 |
 | Training-subject components, which would complete the weight-derivation cross-check | Not committed |
 | Five detection figures rebuilt from the final system | Build task; sources all present |
-| Library versions for the software table | Python confirmed as 3.11.9 on 2026-09-16; the library rows still come from `docs/requirements_snapshot.txt` and have not been re-read |
+| Library versions for the software table | One command, not yet run |
 | Published reference points for the comparison figure, checked against the source papers | Cannot be done without the papers |
 | One docstring line in the training script | One-line edit |

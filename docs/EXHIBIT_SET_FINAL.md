@@ -2,10 +2,11 @@
 
 The authoritative list of what the report contains.
 
-**Revision 2.** Two changes since revision 1: Figure 2.13 was cut after its evidence was found to be
-better served by a table, and the whole exhibit set was renumbered to close the gaps the P3 cuts left
-behind. The numbers in this file are final. `docs/CAPTIONS.md` revision 3 carries the caption for every
-exhibit under these numbers, together with the old-to-new map.
+**Revision 3.** The exhibit set itself is unchanged from revision 2 and remains final: 21 figures plus
+one pending the application, and 29 tables. What changed is that everything revision 2 listed as still
+open has been done, and the section recording it is rewritten to say what was found rather than what
+was pending. `tables/CAPTIONS.md` revision 6 carries the caption for every exhibit under these numbers,
+together with the old-to-new map.
 
 A decision record is not edited after the fact. `docs/EXHIBIT_TRIAGE.md` stays as written; this file
 records what the set became.
@@ -79,36 +80,65 @@ last, from the finished chapters. Table A.3 is new and its body is in this file'
 
 Eleven figures and eleven tables were removed across the triage and P3. The figures are in
 `figures/archive/` with the reason for each in its README; the tables' content, and what the prose must
-now carry in its place, is at the end of `docs/CAPTIONS.md`.
+now carry in its place, is at the end of `tables/CAPTIONS.md`.
 
 Archived, not deleted. A cut can be reversed, and re-running a generator puts its figure back at the
 root of `figures/`.
 
 ---
 
+# Closed since revision 2
+
+Everything revision 2 listed as still open was completed on 2026-09-12 and 2026-09-16, under the tags
+`pre-fix-pass` and `exhibit-fixes-done`.
+
+**The generator output paths are fixed.** Sixteen scripts wrote the old filenames; all sixteen now write
+the new ones. Two more were missed by the first pass because they call `_save(fig, out_dir, name)`
+without the `.png`, and were fixed separately: `plot_event_level.py` line 177 and `plot_window_level.py`
+line 143.
+
+**The generators for cut figures were redirected.** This was not in revision 2's list and it should have
+been. Eight outputs across seven scripts belong to figures cut in P3, and every one of them landed at
+the root of `figures/` on the next run. Three carried a number that now belongs to a different figure:
+`fig2_2_seizure_durations.png`, `fig2_5_sparsification_rules.png` and `fig3_9_alternatives_effect.png`.
+All eight now write into `figures/archive/`. Two that had already escaped, the attribution seed-stability
+and per-subject forest figures, were removed from the root after confirming byte-identical copies in
+`figures/archive/`.
+
+**The five table files are renumbered**, the cut tables are gone, and Tables 1.4 and A.3 are in.
+Table 2.3's two preprocessing steps were also reordered after the source was read: the post-seizure
+exclusion precedes artifact rejection, because the artifact threshold is five times a standard deviation
+computed from windows the exclusion has already removed. Table 2.8 was replaced with the four-criterion
+form the outline requires. Table 3.9 now carries the filled version from Chapter 3.
+
+**The two values are in `docs/VERIFIED_NUMBERS.md`**, as §6.3b, carrying an explicit banner that they
+were carried forward from the results of record rather than re-traced in that file's own session.
+
+**Four figures were corrected and three regenerated.** Figure 2.4 is redrawn by hand with the two
+preprocessing boxes in the executed order and its footer reading "the test set is scored once".
+Figure 2.5 no longer prints its two discrimination values on the panel titles. Figure 3.8 has its legend
+outside the axes, so the permutation-null annotation is readable, and its panels are titled
+"Validation patients" and "Test patients". Figure 3.10's legend reads "test panel".
+
+---
+
 # Still open
 
-**The generator scripts still write the old filenames.** Renaming the images did not change the output
-paths inside `src/figures/`, so re-running any generator recreates a file under its old name beside the
-new one. Fifteen lines need editing, in: `attribution_figures.py` (four), `fig1_1_seizure_phases.py`,
-`fig1_2_connectivity_heatmaps.py`, `fig2_12_and_2_13_application.py` (two, and the second output should
-be dropped since Figure 2.13 is cut), `fig2_14_event_scoring.py`, `fig2_4_graph_construction.py`,
-`fig3_4_detection_output.py`, `fig3_8_window_vs_event.py`, `fig3_10_false_positive_eeg.py`,
-`fig3_15_diffuseness.py`, `plot_event_level.py`, `plot_latency.py`,
-`plot_reconstruction_inversion.py`, `plot_separation.py`, `plot_window_level.py`. The script filenames
-themselves may keep their old numbers; only the output path matters.
+**Figure 3.11 and four rows of Table 3.9** wait on the application build. Table 3.9 is written last from
+the finished chapters in either case.
 
-**The five table files still carry the old numbers.** `tables/tables_ch1.md` through `tables_ch4.md` and
-`tables_appendix.md` need the same renumbering, the cut tables removed, and Tables 1.4 and A.3 added.
-One pass, with the files open.
+**The citation numbers have not been checked against a bibliography.** `[1]` to `[68]` were carried
+forward through every rewrite and no one has verified that a given number resolves to the intended
+source.
 
-**Table 3.9 and Figure 3.11** wait on the application build.
+**Three cross-chapter pairs must be edited together.** The directed-connectivity values now live only
+in the prose of Chapter 3 §3.5.2 and Chapter 4 §4.3, because their table was cut and no exhibit carries
+them. The processing-time sentence appears in Chapter 2 §2.6.2, Chapter 4 §4.7 and `tables_ch4.md`. The
+ten design-requirement rows are word-identical in Table 1.2 and Table 3.9.
 
-**Two values are recorded only in `docs/RESULTS_OF_RECORD_phaseB.md` and not in
-`docs/VERIFIED_NUMBERS.md`:** the slope-filter window separation, 0.918 against 0.823, and its seed-42
-event gain of 0.023 against losses of 0.039 to 0.065 and a sensitivity drop of 0.133 under the other
-three models. Chapter 4 cites them. The results of record is the higher authority, so nothing is wrong;
-adding them to the verified record would save the next reader the search.
+**Two rendering instructions for typesetting.** Table 1.3's marked cells are shaded rather than printed
+as a symbol, with the header row spanning "Period (weeks)". The List of Figures runs to 21 plus
+Figure 3.11 pending; the List of Tables to 29, as 4 / 8 / 9 / 2 / 6.
 
 ---
 
@@ -132,6 +162,6 @@ reconstructed timeline that carries a resampled rather than a measured score.
 *Source: `results/diagnostics/timeline_composition.csv`.*
 
 The substituted fraction averages 53.9% and ranges from 40.0% for chb14 to 66.9% for chb06, which are
-the two figures quoted in the text. The caption is in `docs/CAPTIONS.md` and carries the mandatory
+the two figures quoted in the text. The caption is in `tables/CAPTIONS.md` and carries the mandatory
 sentence: the false-alarm rate is measured on these timelines, and the direction of the resulting bias
 is not established.

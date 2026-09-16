@@ -73,7 +73,7 @@ every result, every conclusion, my (Claude's) reasoning, and Boti's decisions. P
 
 ```
 per-window graphs (wPLI+AEC, top-k20)
-  → Joint GAE (seed 42; encoder 23→64→16 GCN, ~8.7k params)
+  → Joint GAE (seed 42; encoder 23→64→16 GCN, 3,285 params)
   → 3 readouts: zrecon (recon-MSE), zlatent (latent-Mahalanobis, LedoitWolf on graph-mean 16-d Z,
                 per-subject interictal fit — label-free), zgamma (gamma-AEC)
   → per-branch robust-z → EQUAL-weight ensemble (1/3 each)
@@ -177,13 +177,13 @@ earlier was a TUH result, NOT CHB-MIT (must not be cited as a CHB-MIT comparison
 
 ## 5 · PHASE D — THE NEW DIRECTION (hypothesis + plan)
 **Phase C kept two pillars FIXED and only changed things around the latent/score, or added a 2nd graph
-relation to the SAME tiny encoder: (i) input features = 5 band-powers, (ii) encoder = 2-layer GCN ~8.7k
+relation to the SAME tiny encoder: (i) input features = 5 band-powers, (ii) encoder = 2-layer GCN, 3,285 params
 params. Phase D questions the pillars themselves — a genuinely different direction, not another lever around
 the baseline.**
 
 ### 5.1 Core hypothesis
 **H_D: the representational bottleneck is the encoder's capacity (and/or the input feature set), NOT the
-graph-relation type or any post-latent processing.** Evidence motivating it: an ~8.7k-param encoder is tiny
+graph-relation type or any post-latent processing.** Evidence motivating it: an 3,285-param encoder is tiny
 by modern graph-DL standards; C4-full's chb10 harm was explicitly a *shared-capacity* cost (adding a 2nd
 relation to an encoder too small to exploit even one). If true, a higher-capacity / different-architecture
 encoder (or a richer feature set) could lift the representation enough to *transfer* to the event headline —
@@ -236,7 +236,7 @@ data/processed/            (32.9 GB, gitignored but present — the CPU source f
 data/models_retrain/
    gae_joint_seed{42,1,2,3}.pt              rlg GAE checkpoints (zip-dir format; Windows re-zip needs `touch`
                                             to fix pre-1980 timestamps before torch.load)
-   gae_multirel_seed42.pt                   C4-full checkpoint (Phase C; state_dict, ~8.7k params)
+   gae_multirel_seed42.pt                   C4-full checkpoint (Phase C; state_dict, 3,285 params)
 results/phaseB/tier2/ens_val_tf/rlg/        rlg VAL ensemble arrays: ens_seed{S}_{subj}_{inter,ictal}.npy
 results/phaseB/tier2/ens_test_tf/           rlg TEST ens (+components) — DO NOT TOUCH (one-shot)
 results/phaseC/                             all Phase-C outputs (c4full/, artifact_probe/, artifact_gate/)

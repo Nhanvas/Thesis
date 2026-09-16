@@ -1,7 +1,13 @@
 # PROJECT STATUS — single source of truth for "where are we right now"
-**Last updated:** 2026-09-03 (rev. C). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
+**Last updated:** 2026-09-16 (rev. D). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
 `NEXT_TASKS_AND_PLAN.md` (all retired). **On any number conflict, `RESULTS_OF_RECORD_phaseB.md` wins
-over this file.** On artifact identity, `PROVENANCE.md` wins. On paths, `REPO_MAP.md` wins.
+over this file.** On artifact identity, `PROVENANCE.md` wins. On paths, `REPO_MAP.md` wins. On any
+statement that was inferred rather than measured, `VERIFIED_CORRECTIONS.md` wins over this file.
+
+**Changes in rev. D.** The five report chapters and the front matter are written. The parameter count
+and the processing-time figure below were both wrong in rev. C and are corrected. §7 item 1 is rewritten
+because report writing is no longer the open task it describes. Four findings settled during the writing
+phase are recorded in `docs/VERIFIED_CORRECTIONS.md` and summarised in §7a.
 
 > **FIRST COMMAND IN ANY SESSION THAT TOUCHES THE GAE:**
 > ```bash
@@ -65,7 +71,7 @@ Report writing + Web Demo (SzScan) + Defense prep
 
 ```
 per-window graphs (wPLI+AEC, top-k20)
- → Joint GAE (seed 42, canonical; encoder GCNConv 23→64→16, ~8.7k params)
+ → Joint GAE (seed 42, canonical; encoder GCNConv 23→64→16, 3,285 trainable params)
  → 3 readouts: zrecon (recon-MSE), zlatent (latent-Mahalanobis, LedoitWolf on graph-mean 16-d Z,
                per-subject interictal fit, label-free), zgamma (gamma-band AEC anomaly)
  → per-branch robust-z (median/MAD) → EQUAL-weight ensemble (1/3 each)
@@ -188,11 +194,28 @@ label-scored half is reportable as PROVISIONAL with the limitation stated. If th
 
 ## 7 · What's left (priority order)
 
-1. **Report writing** — `docs/THESIS_REPORT_WRITING_GUIDE.md` (structure/style; moved out of
-   `docs/demo/` on 2026-09-03, along with `ATTRIBUTION_REPORT_PACK.md` — both are thesis docs),
-   `RUBRIC_TRACKING.md` (8-criterion checklist + which number goes where), `Report_format.md`.
-   ⚠️ `RUBRIC_TRACKING.md` predates the attribution results — check whether the attribution row needs
-   updating before using it as the checklist.
+1. **Report writing — the five chapters and the front matter are WRITTEN (2026-09-16).** All five were
+   rewritten against `EXHIBIT_SET_FINAL.md` and `CAPTIONS.md` rev 6, in the house style of
+   `PROSE_STYLE_SPEC.md`. The exhibit set is 21 figures plus Figure 3.11 pending the application, and
+   29 tables across 4 / 8 / 9 / 2 / 6. Every cross-chapter number was checked by command.
+
+   What is left on the report:
+
+   - **Typesetting.** Word assembly, the reference list and the citation numbers. **No one has checked
+     `[1]` to `[68]` against a bibliography**; the numbers were carried forward from the earlier drafts.
+   - **Three cross-chapter pairs that must be edited together if either side changes.** The
+     directed-connectivity values, 0.710 / 0.674 / 0.888 and +0.137 / +0.052 / −0.059 and 0.928 to
+     0.909, live only in the prose of Chapter 3 §3.5.2 and Chapter 4 §4.3 because their table was cut.
+     The processing-time sentence appears in Chapter 2 §2.6.2, Chapter 4 §4.7 and `tables_ch4.md`. The
+     ten design-requirement rows are word-identical in Table 1.2 and Table 3.9.
+   - **Waiting on the application.** Figure 3.11, §3.7 in full, and four rows of Table 3.9.
+   - **Goal 1 is quoted verbatim from the registration form**, "spatial-temporal features", in
+     Chapter 1 §1.5, Table 3.9 and Chapter 5. Never reword it; qualify it in a sentence beside it, as
+     §1.5 does.
+
+   Style and checklist docs: `THESIS_REPORT_WRITING_GUIDE.md`, `PROSE_STYLE_SPEC.md`,
+   `RUBRIC_TRACKING.md`, `Report_format.md`. ⚠️ `RUBRIC_TRACKING.md` predates the attribution results
+   and carries the retired 16.9 ms figure at its line 121.
 2. **Web demo (SzScan)** — **spec set rewritten and LOCKED 2026-09-03; build not started.**
    Authority now lives in `web_demo/`: `SZSCAN_SPEC_v5.md` (behaviour/logic/data boundary) >
    `SZSCAN_DESIGN_v2.md` (visual tokens, measured from the locked PNGs) > `DEMO_BUILD_HANDOFF.md`
@@ -210,13 +233,20 @@ label-scored half is reportable as PROVISIONAL with the limitation stated. If th
      timeline *from the ground-truth annotations*, bootstrap-filling buffer and artifact-rejected gaps
      (`src/szcore_eval.py:90, 98–109, 111–113, 120–123`). Positional information was destroyed at
      preprocessing, so **cache-replay of thesis scores is impossible**. The demo recomputes label-free
-     on the continuous recording; measured cost 16.9 ms/window ⇒ ~15 s per hour of EEG on the dev CPU,
-     which makes live inference viable. Three hard guards enforce the label-free claim
+     on the continuous recording; measured end to end at **9.76 s per hour of EEG** on one four-hour
+     recording, CPU only (`web_demo/BUILD_PROGRESS.md` §4), which makes live inference viable. The older
+     figure of 16.9 ms/window ⇒ ~15 s per hour was a component benchmark covering adjacency and band
+     powers only and must not be quoted; the fivefold run-to-run variation on record, 22 to 110 s,
+     belongs to that stage and not to the end-to-end number. Three hard guards enforce the label-free claim
      (`SZSCAN_SPEC_v5.md` §1.2).
    - **An approved methodological divergence.** A new patient has no labels, so the four steps that fit
      on the interictal array (z-score stats, 5 SD artifact threshold, LedoitWolf covariance for
      `zlatent`, per-branch robust-z) fit on **all windows** instead, and artifact rejection is dropped
-     to preserve time alignment. Justified by measured ictal prevalence **0.23 %** (chb06: 45/19871).
+     to preserve time alignment. **Scope decided 2026-09-12: per subject, not per file.** The code
+     carried two `# TODO(step3)` markers fitting per file; the spec intends per subject and Chapter 2
+     §2.6.3 describes it that way. The thesis normalises per subject, so a per-subject fit is the
+     faithful mirror; a per-file fit gives each file its own baseline and loses comparability between
+     the files of one patient. Justified by measured ictal prevalence **0.23 %** (chb06: 45/19871).
      **Consequence: demo numbers will differ from thesis numbers and must not be made to match.**
      ⚠️ **This is to be reported to cô** — it is a methodological choice, not an implementation detail.
 
@@ -228,6 +258,21 @@ label-scored half is reportable as PROVISIONAL with the limitation stated. If th
    program as rigor (`RUBRIC_TRACKING.md` §6); and now, how the attribution chapter reports an
    uninformative control honestly rather than dressing it as a result.
 4. **If labels are frozen** — rerun `attribution_pipeline.py eval`, update spec §9.3 and RoR §10.
+
+## 7a · Findings settled during the writing phase
+
+Full detail with evidence in `docs/VERIFIED_CORRECTIONS.md`. The four that reverse a statement still
+carried elsewhere:
+
+| Finding | What it replaces |
+|---|---|
+| **CAR exists.** `apply_car` at `src/dataprep/graph_construction.py:84`, called inside the adjacency builders. It is a graph-construction step, not a preprocessing step, so the stored signals are not CAR-referenced | An empty grep over `preprocessing.py` and `build_graphs.py` was read as proof CAR did not exist, and two chapter paragraphs were cut on that basis |
+| **Post-seizure exclusion precedes artifact rejection.** `compute_subject_stats` skips ictal and buffered windows before accumulating the mean and standard deviation, and the artifact threshold is five times that standard deviation | A table numbered from the file's own docstring, which calls artifact rejection "Step 4" |
+| **`STATS_SUBSAMPLE = 10`.** The background statistics come from a one-in-ten subsample | First asserted from a planning document, then wrongly withdrawn on seeing Welford's algorithm named |
+| **The weight surface is not flat.** Optimum 0.9405 against 0.9283 at equal weights, gap 0.0122 on a cross-model spread of 0.0025, equal weighting outside the 29 points within tolerance | "Flat weight surface", which has resurfaced five times. Equal weights are still used; justify them as inherited, never as measured |
+
+Do not credit CAR with resistance to volume conduction. That is wPLI's own property by construction;
+AEC is the branch the reference serves.
 
 ## 8 · Integrity rules (binding for report/demo work)
 
@@ -247,7 +292,8 @@ label-scored half is reportable as PROVISIONAL with the limitation stated. If th
 
 1. `python src/verify_provenance.py` — must print PASS.
 2. This file.
-3. `RESULTS_OF_RECORD_phaseB.md` (numbers) and `PROVENANCE.md` (artifact identity).
+3. `RESULTS_OF_RECORD_phaseB.md` (numbers), `PROVENANCE.md` (artifact identity), and
+   `VERIFIED_CORRECTIONS.md` (statements that were inferred and turned out wrong).
 4. Then whichever matches the task: `THESIS_REPORT_WRITING_GUIDE.md` + `RUBRIC_TRACKING.md` (report),
    `ATTRIBUTION_SPEC.md` (attribution), `web_demo/SZSCAN_SPEC_v5.md` (demo — §1 in full before any
    backend reasoning), `PHASE_C_FULL_AUDIT.md`

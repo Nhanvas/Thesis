@@ -1,4 +1,4 @@
-# Running-example recording — Fig 2.10 · Fig 3.4 · Fig 3.10
+# Running-example recording — Fig 3.3 · Fig 3.7 (old numbering: Fig 2.10 cut, Fig 3.4, Fig 3.10)
 
 **Status: resolved. Chosen recording: `chb13/chb13_62.edf`. One file suffices for all
 three figures.**

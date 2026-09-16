@@ -242,7 +242,7 @@ exactly what the directed relation was doing:
   but the ablation showed ΔR2(chb10) = +0.040 (TE itself is mildly *helpful* here) — meaning the harm to
   chb10 is **not caused by the added relation's content**, but by **splitting the encoder's fixed
   capacity across two relations**. This distinction (content vs. capacity) is what became the seed for
-  the Phase-D hypothesis: the bottleneck may be that the ~8.7k-parameter 2-layer GCN encoder is simply
+  the Phase-D hypothesis: the bottleneck may be that the 3,285-parameter 2-layer GCN encoder is simply
   too small to profitably represent *either* one relation well *and* a second — a capacity question,
   not a graph-relation-choice question.
 

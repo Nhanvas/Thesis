@@ -118,7 +118,7 @@ Two different things are both called "the demo". Do not conflate them:
 
 Write the section now and leave these open:
 
-1. End-to-end runtime per file — only the component cost is measured (16.9 ms/window ⇒ ~15 s per hour of
+1. End-to-end runtime per file — end-to-end is measured at 9.76 s per hour of EEG (web_demo/BUILD_PROGRESS.md §4); the retired component cost was 16.9 ms/window ⇒ ~15 s per hour of
    EEG); EDF read, gamma-AEC and GAE forward are not yet included.
 2. How much the demo flags post-ictal segments (`SZSCAN_SPEC_v5.md` §8 **O4b**).
 3. The demo's operating point (§8 **O1** — read from file, never retyped).

@@ -33,7 +33,7 @@ export default function Header({ username, onLogout }) {
         </button>
 
         {open && (
-          <div className="absolute right-0 mt-2 w-56 bg-surface rounded-panel shadow-panel overflow-hidden border border-border">
+          <div className="absolute right-0 mt-2 w-56 z-50 bg-surface rounded-panel shadow-panel overflow-hidden border border-border">
             <div className="bg-brand text-white text-center font-semibold py-3">
               {username}
             </div>

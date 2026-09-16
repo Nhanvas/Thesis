@@ -1,3 +1,10 @@
+> **PLANNING DOCUMENT — NOT A SOURCE OF TRUTH. Archived 2026-09-16.**
+> Written before the pipeline was built. Two of its statements were taken as fact during the
+> writing phase and both were wrong: the preprocessing step list omits the four-hour post-seizure
+> exclusion entirely, and its subsample ratio was quoted without a source. For preprocessing read
+> `src/dataprep/preprocessing.py`; for numbers read `docs/RESULTS_OF_RECORD_phaseB.md` and
+> `docs/VERIFIED_NUMBERS.md`.
+
 # PROPOSED SOLUTION — the locked method (rlg)
 
 **Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and

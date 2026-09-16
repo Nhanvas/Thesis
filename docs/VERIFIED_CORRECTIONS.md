@@ -155,8 +155,9 @@ replaced with that form, matching Chapter 2 §2.6.1.
 
 ## 10 · Outstanding artefacts
 
-Not listed here. Everything still to be edited, redrawn or confirmed is queued in `docs/FIX_QUEUE.md`,
-which is worked through in one pass once all five chapters are written, and deleted when it empties.
+The queue that held them, `docs/FIX_QUEUE.md`, was worked through on 2026-09-12 and 2026-09-16 and
+then deleted, as it was written to be. What it closed is recorded in `docs/EXHIBIT_SET_FINAL.md`
+revision 3 under "Closed since revision 2", and what remains open is in the section after it.
 
 ---
 

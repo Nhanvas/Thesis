@@ -17,16 +17,16 @@ Nothing below needs to be rebuilt, re-verified or re-derived. All of it is commi
 | Twenty-five finished figures | `figures/figNN_MM_slug.png` |
 | Every table for Chapters 1–4 and the appendices | `tables/tables_ch1.md` … `tables_ch4.md`, `tables_appendix.md` |
 | The four emitted data tables | `tables/csv/` |
-| The final caption for every exhibit | `docs/CAPTIONS.md` |
+| The final caption for every exhibit | `tables/CAPTIONS.md` |
 | Drawing specs for the ten hand-drawn figures | `docs/HANDDRAWN_FIGURES_SPEC.md` + `docs/HANDDRAWN_SPEC_ADDENDUM.md` |
 | Rules and per-chapter briefs for the five writing accounts | `docs/CHAPTER_WRITING_BRIEF.md` |
-| What changed since that brief was written | `docs/WRITING_PHASE_ADDENDUM.md` |
+| What changed since that brief was written | `docs/archive/WRITING_PHASE_ADDENDUM.md` |
 | The running-example recording and how it was chosen | `docs/RUNNING_EXAMPLE.md` |
 | Timeline composition across the held-out patients | `results/diagnostics/timeline_composition.csv` |
 | Every round of figure work, in order | `docs/FIGURE_ROUND2.md` … `FIGURE_ROUND9.md` |
 
-**The two documents a new session should read first** are `docs/WRITING_PHASE_ADDENDUM.md` and
-`docs/CAPTIONS.md`. Between them they carry every decision that would otherwise have to be
+**The two documents a new session should read first** are `docs/archive/WRITING_PHASE_ADDENDUM.md` and
+`tables/CAPTIONS.md`. Between them they carry every decision that would otherwise have to be
 reconstructed from a transcript.
 
 ---
@@ -140,7 +140,7 @@ hand-drawn diagrams. The next phase is two jobs that do not depend on each other
 chapter drafts as they arrive, and building the application.
 
 For review, the governing documents are `docs/CHAPTER_REVIEW_PROTOCOL.md`, `docs/RUBRIC_TRACKING.md`,
-and the authority chain in `docs/WRITING_PHASE_ADDENDUM.md` Part A. The single most common failure to
+and the authority chain in `docs/archive/WRITING_PHASE_ADDENDUM.md` Part A. The single most common failure to
 watch for is a chapter quoting a number that is neither in `docs/VERIFIED_NUMBERS.md` nor in its own
 table file.
 

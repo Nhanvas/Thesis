@@ -29,7 +29,7 @@ AUTHORITY ORDER, on any conflict:
   docs/CHAPTER_WRITING_BRIEF.md     register, structure, honesty rules
   docs/THESIS_OUTLINE_FINAL.md      section order
   tables/tables_chN.md              your chapter's tables, already filled
-  docs/CAPTIONS.md                  every caption, already written
+  tables/CAPTIONS.md                  every caption, already written
 
 THE RULE THAT MATTERS MOST: never write a number you have not read from one of the
 files above. Not an estimate, not "approximately", not a rounded value, not a number
@@ -45,7 +45,7 @@ DO NOT invent citations. If a source is not in docs/Thesis_Reference_Sheet.md, s
 rather than supplying one from memory. This has already gone wrong once in this project.
 
 Tables are already written in tables/tables_chN.md — use them as they are rather than
-rebuilding them in prose. Captions are already written in docs/CAPTIONS.md — use the
+rebuilding them in prose. Captions are already written in tables/CAPTIONS.md — use the
 text given, and never cut a sentence marked mandatory.
 
 Ask before making any substantive choice. Propose, wait for approval, then write.
@@ -163,7 +163,7 @@ produced by the 2025 challenge. Attribute it that way or leave it out. *Chapter 
 3.15, and 4.1. They are at the root of `figures/`, named `figNN_MM_slug.png`.
 
 **Ten figures are hand-drawn** and arrive separately: 1.3, 1.4, 1.5, 2.1, 2.6, 2.7, 2.11, 2.12, 2.13,
-2.14. Write the text as though they exist; the caption for each is already in `docs/CAPTIONS.md`.
+2.14. Write the text as though they exist; the caption for each is already in `tables/CAPTIONS.md`.
 
 **Three figures wait on the application:** 3.16, 3.17, 3.18.
 

@@ -80,7 +80,7 @@ def main():
         ax.set_ylabel(label, fontsize=8.5)
 
     axes[3].plot(t_min, result["fused"], color="#4C72B0", lw=0.8, label="Fused score")
-    axes[3].set_ylabel("Fused\nscore")
+    axes[3].set_ylabel("Fused\nscore", fontsize=8.5)
     axes[3].set_xlabel("Time (minutes)")
 
     for ax in axes:

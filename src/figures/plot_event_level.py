@@ -157,11 +157,17 @@ def plot_e1(df, out_dir):
         ax.scatter([r.fp_per_day], [r.sensitivity], s=170, marker=op["marker"],
                   facecolor=op["color"], edgecolor="black", linewidth=1.1, zorder=6,
                   label=op["label"])
-        xytext = (20, 22) if op["key"] == "headline" else (30, -60)
+        if op["key"] == "headline":
+            # Empty region of the plot (no grid point has fp/day > 45 with sensitivity < 0.6
+            # -- see the printed grid) -- keeps the box off the 50-64 FP/day Pareto points
+            # the previous upper-right placement sat on top of.
+            xytext, textcoords = (62, 0.40), "data"
+        else:
+            xytext, textcoords = (30, -60), "offset points"
         ax.annotate(
             f"{op['label']}\nsens={r.sensitivity:.3f}  F1={f1:.3f}  FP/day={r.fp_per_day:.1f}\n"
             f"TP/FN/FP={int(r.tp)}/{int(r.fn)}/{int(r.fp)}",
-            xy=(r.fp_per_day, r.sensitivity), xytext=xytext, textcoords="offset points",
+            xy=(r.fp_per_day, r.sensitivity), xytext=xytext, textcoords=textcoords,
             fontsize=8, color=op["color"],
             bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor=op["color"],
                       linewidth=0.6, alpha=0.95),

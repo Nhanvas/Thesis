@@ -72,15 +72,15 @@ def main():
 
     fig, axes = plt.subplots(4, 1, figsize=(11, 10), sharex=True,
                              gridspec_kw={"height_ratios": [1, 1, 1, 1.3]})
-    comp_names = [("zrecon", "Reconstruction error (standardised)"),
-                 ("zlatent", "Latent Mahalanobis distance (standardised)"),
-                 ("zgamma", "Gamma-band amplitude coupling (standardised)")]
+    comp_names = [("zrecon", "Reconstruction\nerror (z)"),
+                 ("zlatent", "Latent\ndistance (z)"),
+                 ("zgamma", "Gamma-band\ncoupling (z)")]
     for ax, (key, label) in zip(axes[:3], comp_names):
         ax.plot(t_min, result[key], color="#4C72B0", lw=0.7)
         ax.set_ylabel(label, fontsize=8.5)
 
     axes[3].plot(t_min, result["fused"], color="#4C72B0", lw=0.8, label="Fused score")
-    axes[3].set_ylabel("Fused score")
+    axes[3].set_ylabel("Fused\nscore")
     axes[3].set_xlabel("Time (minutes)")
 
     for ax in axes:
@@ -96,8 +96,9 @@ def main():
         ax.grid(alpha=0.2, lw=0.4)
 
     fig.tight_layout()
+    fig.align_ylabels(axes)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=200, bbox_inches="tight")
+    fig.savefig(OUT, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[saved] {OUT.resolve()}")
 

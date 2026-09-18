@@ -106,7 +106,8 @@ def main():
     ax_adj.set_xticklabels(channels, rotation=90, fontsize=6)
     ax_adj.set_yticklabels(channels, fontsize=6)
     ax_adj.set_title("(c)")
-    fig.colorbar(im_c, ax=ax_adj, shrink=0.85, pad=0.02)
+    cb_c = fig.colorbar(im_c, ax=ax_adj, shrink=0.85, pad=0.02)
+    cb_c.set_label("Combined wPLI + AEC weight")
 
     # (d) graph after top-20% sparsification -- SAME node layout as (c). Node labels are
     # placed radially OUTSIDE the node markers (docs/FIGURE_FIXES_R3.md §1: they were
@@ -137,7 +138,7 @@ def main():
     # No figure number / descriptive title on the image (brief §1 rule 5) --
     # subject, window index and edge count are printed to console above.
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=200, bbox_inches="tight")
+    fig.savefig(OUT, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[saved] {OUT.resolve()}")
 

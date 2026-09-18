@@ -154,7 +154,9 @@ annotated seizures shaded. Two of the three annotated seizures are matched and t
 false positives. *Mandatory:* scores were recomputed on the continuous recording with every window
 retained; they are not the source of any reported number.
 
-**Figure 3.4.** Detection latency relative to annotated onset, with the two matching tolerances marked.
+**Figure 3.4.** Detection latency relative to annotated onset for every matched seizure, with the
+pre-onset matching tolerance marked. The post-offset tolerance is measured from seizure end and
+cannot be drawn on this axis.
 
 **Figure 3.5.** Sensitivity against false alarms per day across the parameter grid, with the reported
 operating point and the best point on the curve marked. *Mandatory:* the best point was located after
@@ -173,8 +175,9 @@ on the continuous recording; they are not the source of any reported number.
 the affected channels are known exactly. This panel is label-free: it depends on no annotation, and
 the results shown are not provisional.
 
-**Figure 3.9.** Provisional per-seizure channel ranking. *Mandatory:* scored against a draft annotation
-generated automatically and not clinically reviewed.
+**Figure 3.9.** Per-seizure channel ranking by reconstruction anomaly, one row per annotated seizure
+of the eight test patients; rank 1 is the most anomalous channel within that seizure. Seizure
+intervals come from the corpus annotations; no channel-level annotation is used.
 
 **Figure 3.10.** Provisional diffuseness against the number of annotated channels. The synthetic line is
 U-shaped in the number of injected channels, and on the real annotations the generalized group sits

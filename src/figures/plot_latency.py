@@ -16,6 +16,8 @@ import argparse
 from pathlib import Path
 import sys
 
+HEADLINE_MAG_PCT, HEADLINE_PEN_MULT = 50.0, 2.0
+
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -29,6 +31,7 @@ from palette import DETECTED, CHANCE, apply_rc
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default="results/phaseB/tier2/latency/latency_per_seizure.csv")
+    ap.add_argument("--grid_csv", default="results/phaseB/tier2/rlg_test/final_eval_seed42.csv")
     ap.add_argument("--out_dir", default="figures")
     a = ap.parse_args()
 
@@ -51,14 +54,33 @@ def main():
     if lat.min() != -28.0:
         raise ValueError(f"min={lat.min()}, expected exactly -28 -- stop")
 
+    # docs: the reported operating point is mag50/pen2.0 (RESULTS_OF_RECORD_phaseB.md,
+    # OPERATING_POINTS["val_derived_balanced"] in extract_latency_rlg.py). n above is this
+    # script's own matched-seizure count (matched_latencies' -30s/+60s containment rule,
+    # from a.csv). TP below is the SzCORE-scorer's true-positive count at the SAME
+    # operating point, from the raw grid used to build fig3_5 (plot_event_level.py). They
+    # are two independently computed matches over the same reference/hypothesis intervals
+    # and are not guaranteed to agree -- do not force one to the other.
+    grid = pd.read_csv(a.grid_csv)
+    hd = grid[(np.isclose(grid.mag_pct, HEADLINE_MAG_PCT)) & (np.isclose(grid.pen_mult, HEADLINE_PEN_MULT))]
+    tp_headline = int(hd.tp.sum())
+    print(f"[Fig 3.5] n (matched seizures, {a.csv}, operating_point=val_derived_balanced) = {n}; "
+         f"TP (reported operating point mag{HEADLINE_MAG_PCT:g}/pen{HEADLINE_PEN_MULT:g}, "
+         f"{a.grid_csv}) = {tp_headline}")
+    if n != tp_headline:
+        raise ValueError(
+            f"[Fig 3.5] n={n} (matched seizures per this script's own -30s/+60s containment "
+            f"matcher, from {a.csv}) != TP={tp_headline} (SzCORE-scorer true positives at the "
+            f"same mag{HEADLINE_MAG_PCT:g}/pen{HEADLINE_PEN_MULT:g} operating point, from "
+            f"{a.grid_csv}) -- stop, do not force either value; report both and their sources.")
+
     fig, ax = plt.subplots(figsize=(8, 5.2))
     bin_width = 4  # matches the 4 s window quantisation
     bins = np.arange(lat.min() - bin_width / 2, lat.max() + bin_width, bin_width)
     ax.hist(lat, bins=bins, color=DETECTED, edgecolor="black", linewidth=0.5, alpha=0.85)
 
     ax.axvline(-30, color=CHANCE, ls="--", lw=1.3, label="-30 s before onset (matching tolerance)")
-    ax.axvline(60, color=CHANCE, ls=":", lw=1.3, label="+60 s after seizure end (matching tolerance)")
-    ax.axvline(med, color="black", ls="-", lw=1.3, label=f"median = {med:.0f} s")
+    ax.axvline(med, color="black", ls="-", lw=1.3, label=f"median = {med:.0f} s (n = {n})")
 
     ax.set_xlabel("Latency of detected interval relative to annotated onset (s)")
     ax.set_ylabel("Matched seizures")
@@ -67,7 +89,7 @@ def main():
 
     out_dir = Path(a.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / "fig3_4_detection_latency.png", bbox_inches="tight")
+    fig.savefig(out_dir / "fig3_4_detection_latency.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"  [saved] {(out_dir / 'fig3_4_detection_latency.png').resolve()}")
 

@@ -144,7 +144,7 @@ def plot_e1(df, out_dir):
     fig, ax = plt.subplots(figsize=(6.6, 5.2))
 
     ax.scatter(dominated.fp_per_day, dominated.sensitivity, s=22, color="#b5b5b5",
-              alpha=0.75, zorder=2, label="Dominated grid points (mag% x pen)")
+              alpha=0.75, zorder=2, label="Other grid points (magnitude × penalty)")
 
     ax.plot(frontier.fp_per_day, frontier.sensitivity, "-", color="#404040",
            lw=1.1, zorder=3, alpha=0.85)
@@ -174,7 +174,7 @@ def plot_e1(df, out_dir):
     ax.grid(alpha=0.25, lw=0.5)
     ax.legend(loc="upper left", fontsize=8, framealpha=0.95)
 
-    _save(fig, out_dir, "fig3_5_operating_curve")
+    _save(fig, out_dir, "fig3_5_operating_curve", dpi=300)
     return pooled
 
 
@@ -247,9 +247,9 @@ def plot_fig3_7(df, out_dir):
 
 
 # ----------------------------------------------------------------------------
-def _save(fig, out_dir, name):
+def _save(fig, out_dir, name, dpi=None):
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / f"{name}.png", bbox_inches="tight")
+    fig.savefig(out_dir / f"{name}.png", bbox_inches="tight", dpi=dpi)
     plt.close(fig)
     print(f"  [saved] {(out_dir / (name + '.png')).resolve()}")
 

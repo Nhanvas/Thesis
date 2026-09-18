@@ -236,7 +236,7 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     ax_psd.set_ylim(max(y_bottom, -80.0) - 2, 3)
 
     ax_psd.set_xlabel("Frequency (Hz)")
-    ax_psd.set_ylabel("Power spectral density (dB relative to each trace's own peak)")
+    ax_psd.set_ylabel("Power spectral density\n(dB relative to each trace's own peak)")
     ax_psd.set_title("(c)")
     ax_psd.legend(fontsize=8, loc="upper right", framealpha=1.0)
 
@@ -244,7 +244,7 @@ def build_figure(raw, subject_id, edf_name, start_samp, dur_samp, processed_dir,
     # the subject/file/segment identity is printed to console (below) and
     # belongs in the report's external caption, not baked into the PNG.
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, dpi=200, bbox_inches="tight")
+    fig.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
     return out_path
 

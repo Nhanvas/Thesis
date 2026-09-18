@@ -82,11 +82,11 @@ def main():
         ax.set_yticklabels(channels, fontsize=6)
 
     cbar = fig.colorbar(im1, ax=axes, shrink=0.85, pad=0.02)
-    cbar.set_label("Combined wPLI + AEC adjacency weight (before sparsification)")
+    cbar.set_label("Combined wPLI + AEC weight\n(before sparsification)")
 
     # No figure number / descriptive title on the image (brief §1 rule 5).
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=200, bbox_inches="tight")
+    fig.savefig(OUT, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[saved] {OUT.resolve()}")
 

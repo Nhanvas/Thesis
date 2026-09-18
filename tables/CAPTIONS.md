@@ -154,9 +154,11 @@ annotated seizures shaded. Two of the three annotated seizures are matched and t
 false positives. *Mandatory:* scores were recomputed on the continuous recording with every window
 retained; they are not the source of any reported number.
 
-**Figure 3.4.** Detection latency relative to annotated onset for every matched seizure, with the
-pre-onset matching tolerance marked. The post-offset tolerance is measured from seizure end and
-cannot be drawn on this axis.
+**Figure 3.4.** Detection latency relative to annotated onset for the 48 seizures matched by the
+latency procedure, with the pre-onset matching tolerance marked. The latency match is computed
+separately from the scoring framework's event matcher and counts one more match than the 47 true
+positives at the reported operating point. The post-offset tolerance is measured from seizure end
+and cannot be drawn on this axis.
 
 **Figure 3.5.** Sensitivity against false alarms per day across the parameter grid, with the reported
 operating point and the best point on the curve marked. *Mandatory:* the best point was located after

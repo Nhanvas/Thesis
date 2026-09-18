@@ -27,6 +27,14 @@ export function ChevronRightIcon({ className = '' }) {
   )
 }
 
+export function ChevronLeftIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <path d="M10 3.5 5 8l5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function ChevronDownIcon({ className = '' }) {
   return (
     <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
@@ -118,6 +126,23 @@ export function HalfCircleIcon({ className = '' }) {
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth="1.8" />
       <path d="M12 2.5a9.5 9.5 0 0 1 0 19Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function PlayIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+      <path d="M6 4.5v11l9-5.5-9-5.5Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function PauseIcon({ className = '' }) {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className={className} aria-hidden="true">
+      <rect x="5.5" y="4.5" width="3" height="11" rx="0.8" fill="currentColor" />
+      <rect x="11.5" y="4.5" width="3" height="11" rx="0.8" fill="currentColor" />
     </svg>
   )
 }

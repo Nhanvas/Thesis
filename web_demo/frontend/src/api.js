@@ -73,3 +73,19 @@ export const processUpload = (projectId, memo) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ project_id: projectId, memo }),
   })
+
+// Analysis screen (Step 4, CC_STEP4_PROMPT.md) — Panel EEG + toolbar + scrub.
+
+export const getSubjectDetail = (subjectId) =>
+  request(`/api/subjects/${encodeURIComponent(subjectId)}`)
+
+export const getFile = (fileId) => request(`/api/files/${fileId}`)
+
+export const markFileViewing = (fileId) => request(`/api/files/${fileId}/viewing`, { method: 'POST' })
+
+export const markFileViewed = (fileId) => request(`/api/files/${fileId}/viewed`, { method: 'POST' })
+
+export const getWaveform = (fileId, startSec, endSec, widthPx) =>
+  request(
+    `/api/files/${fileId}/waveform?start_sec=${startSec}&end_sec=${endSec}&width_px=${Math.round(widthPx)}`
+  )

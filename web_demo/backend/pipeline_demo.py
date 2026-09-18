@@ -135,6 +135,10 @@ class PhaseAResult:
     start_time: datetime       # from the EDF header (raw.info['meas_date']) — never user-entered
     file_duration_seconds: float  # true recording length (raw.n_times / sfreq)
     filtered_path: Optional[Path] = None  # set when cache_dir given — see process_file_phase_a
+    raw_path: Optional[Path] = None  # set when cache_dir given — continuous unfiltered windows,
+    # added in Step 4 (CC_STEP4_PROMPT.md) for Panel EEG's raw/filtered dual-view (SPEC §6.4:
+    # "raw is never fully hidden"). Same [n_windows, 18, WIN_SAMPLES] float32 layout as
+    # `filtered`/`filtered_path`, just skipping the bandpass+notch step.
 
 
 def process_file_phase_a(
@@ -192,6 +196,12 @@ def process_file_phase_a(
     filtered = np.ascontiguousarray(
         notched[:, :usable].reshape(N_CH, n_windows, preprocessing.WIN_SAMPLES).transpose(1, 0, 2)
     )
+    # Step 4 (CC_STEP4_PROMPT.md): Panel EEG's raw/filtered dual-view needs the SAME
+    # continuous windowing applied to the untouched signal, not just `filtered` — reuse
+    # `data` (already read above, pre-filter) rather than re-reading the EDF.
+    raw_windows = np.ascontiguousarray(
+        data[:, :usable].reshape(N_CH, n_windows, preprocessing.WIN_SAMPLES).transpose(1, 0, 2)
+    )
     _check()
 
     # Stored as float32 (not float64) purely to keep memory bounded while every file of a
@@ -199,12 +209,16 @@ def process_file_phase_a(
     # would otherwise use ~2x the RAM for no measurable precision benefit at this stage
     # (band powers / adjacency downstream are float32 already).
     filtered = filtered.astype(np.float32)
+    raw_windows = raw_windows.astype(np.float32)
     filtered_path = None
+    raw_path = None
     if cache_dir is not None:
         cache_dir = Path(cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
         filtered_path = cache_dir / f"{Path(edf_path).stem}.filtered.npy"
         np.save(filtered_path, filtered)
+        raw_path = cache_dir / f"{Path(edf_path).stem}.raw.npy"
+        np.save(raw_path, raw_windows)
 
     return PhaseAResult(
         filename=Path(edf_path).name,
@@ -213,6 +227,7 @@ def process_file_phase_a(
         start_time=start_time,
         file_duration_seconds=file_duration_seconds,
         filtered_path=filtered_path,
+        raw_path=raw_path,
     )
 
 

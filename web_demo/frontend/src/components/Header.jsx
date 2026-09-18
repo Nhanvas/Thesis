@@ -3,7 +3,10 @@ import { LogoutIcon, PersonIcon } from './icons.jsx'
 import logo from '../assets/logo.png'
 
 // Header chrome + avatar/logout dropdown, per UI/A0b. Used on every screen after Log in.
-export default function Header({ username, onLogout }) {
+// `center` (Step 4, UI/B1a): the Analysis screen's header controls (subject/file title,
+// Previous/Next, Viewed/Export, file dropdown) render in the same navy bar as the
+// logo/avatar rather than a second header row — DatabaseScreen passes nothing here.
+export default function Header({ username, onLogout, center, onLogoClick }) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
 
@@ -15,14 +18,29 @@ export default function Header({ username, onLogout }) {
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
 
-  return (
-    <header className="bg-header-gradient text-white px-6 py-5 flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <img src={logo} alt="SzScan" className="h-16 w-auto" />
-        <span className="text-5xl font-semibold">SzScan</span>
-      </div>
+  const logoContent = (
+    <>
+      <img src={logo} alt="SzScan" className="h-16 w-auto" />
+      <span className="text-5xl font-semibold">SzScan</span>
+    </>
+  )
 
-      <div className="relative" ref={rootRef}>
+  return (
+    <header className="bg-header-gradient text-white px-6 py-5 flex items-center justify-between gap-4">
+      {/* Not in any mockup — a pragmatic "back to Database" affordance for the Analysis
+          screen (SPEC/UI have no explicit back control there). Flagged in CC_STEP4_REPORT.md
+          for Boti to confirm or replace. */}
+      {onLogoClick ? (
+        <button type="button" onClick={onLogoClick} className="flex items-center gap-4 shrink-0" aria-label="Back to Database">
+          {logoContent}
+        </button>
+      ) : (
+        <div className="flex items-center gap-4 shrink-0">{logoContent}</div>
+      )}
+
+      {center && <div className="flex items-center gap-3 flex-1 min-w-0">{center}</div>}
+
+      <div className="relative shrink-0" ref={rootRef}>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}

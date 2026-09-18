@@ -25,10 +25,15 @@ function StatusBadge({ status }) {
     )
   }
   if (status.startsWith('Viewing')) {
-    const frac = status.replace('Viewing ', '')
+    // Subject-level status carries a "(x/N)" fraction ("Viewing (0/2)"); file-level status
+    // is the bare word ("Viewing", SPEC §5.2 — no fraction at file level). Step 3 only ever
+    // exercised the subject-level form; Step 4 is the first place a FILE actually reaches
+    // 'Viewing', which exposed this rendering the bare word twice ("Viewing Viewing").
+    const frac = status.slice('Viewing'.length).trim()
     return (
       <span className="inline-flex items-center gap-1.5 text-[#B45309]">
-        <HalfCircleIcon className="w-4 h-4" /> Viewing <span className="font-mono text-xs">{frac}</span>
+        <HalfCircleIcon className="w-4 h-4" /> Viewing
+        {frac && <span className="font-mono text-xs">{frac}</span>}
       </span>
     )
   }
@@ -61,7 +66,7 @@ function applySearch(subjects, query) {
   return { rows, noResults: rows.length === 0 }
 }
 
-export default function DatabaseScreen({ username, onLoggedOut }) {
+export default function DatabaseScreen({ username, onLoggedOut, onOpen }) {
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -186,9 +191,13 @@ export default function DatabaseScreen({ username, onLoggedOut }) {
 
   function handleOpenClick() {
     if (!selected) return
-    // SPEC §5.7: Open should select+highlight correctly; the Analysis screen itself is
-    // Step 4+ scope (DEMO_BUILD_HANDOFF.md §6 row 4) — not built yet.
-    showBanner('Opening the Analysis screen isn’t implemented yet (Step 4).')
+    // SPEC §5.7: Open -> Analysis screen for the selected subject/file. Selecting a
+    // subject row (not a specific file) opens that subject's first file (Recording 1 —
+    // same start_time-sorted order as the file dropdown/Previous-Next inside Analysis).
+    const subject = subjects.find((s) => s.id === selected.subjectId)
+    if (!subject || subject.files.length === 0) return
+    const fileId = selected.type === 'file' ? selected.fileId : subject.files[0].id
+    onOpen(selected.subjectId, fileId)
   }
 
   function handleCancelClick() {

@@ -21,6 +21,7 @@ from pydantic import BaseModel
 
 import db
 import upload_manager as um
+import waveform_serving as ws
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
@@ -110,6 +111,147 @@ def subjects(request: Request):
 def delete_subject(subject_id: str, request: Request):
     _require_auth(request)
     db.delete_subject(subject_id)
+    return {"ok": True}
+
+
+# ── Analysis screen (Step 4, CC_STEP4_PROMPT.md): Panel EEG + toolbar + scrub ───────────
+
+@app.get("/api/subjects/{subject_id}")
+def get_subject_detail(subject_id: str, request: Request):
+    _require_auth(request)
+    subject = db.get_subject(subject_id)
+    if subject is None:
+        raise HTTPException(status_code=404, detail="Subject not found.")
+    return subject
+
+
+def _file_detail(file_id: int) -> dict | None:
+    """Shared shape for every file-returning Analysis endpoint (GET + both status-transition
+    POSTs) — all three must carry `channels`/`usable_duration_seconds` since AnalysisScreen
+    calls setFileMeta(...) on whichever response it gets back from any of them."""
+    f = db.get_file(file_id)
+    if f is None:
+        return None
+    raw_path, _ = ws._cache_paths(f["subject_id"], f["filename"], um.UPLOAD_DIR)
+    f["channels"] = ws.CHANNELS
+    f["usable_duration_seconds"] = ws.usable_duration_seconds(raw_path)
+    return f
+
+
+@app.get("/api/files/{file_id}")
+def get_file(file_id: int, request: Request):
+    _require_auth(request)
+    f = _file_detail(file_id)
+    if f is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    return f
+
+
+@app.post("/api/files/{file_id}/viewing")
+def mark_file_viewing(file_id: int, request: Request):
+    """Opening a file's Analysis screen for the first time (SPEC §5.2's 'Viewing (đang xem
+    dở, tiến độ tự lưu)') — only fires View -> Viewing, never touches an already-Viewed
+    file (see db.set_file_status_if)."""
+    _require_auth(request)
+    if db.get_file(file_id) is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    db.set_file_status_if(file_id, "Viewing", only_if_current="View")
+    return _file_detail(file_id)
+
+
+@app.post("/api/files/{file_id}/viewed")
+def mark_file_viewed(file_id: int, request: Request):
+    _require_auth(request)
+    if db.get_file(file_id) is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    db.set_file_status(file_id, "Viewed")
+    return _file_detail(file_id)
+
+
+@app.get("/api/files/{file_id}/waveform")
+def get_waveform(
+    file_id: int,
+    start_sec: float,
+    end_sec: float,
+    width_px: int,
+    request: Request,
+):
+    """Panel EEG's only data endpoint (SPEC §6.4 / DEMO_BUILD_HANDOFF.md §5): one call per
+    visible-window change, returning both raw and filtered decimated envelopes together so
+    a filter-toggle click never needs a second round trip. Amplitude-scale changes are pure
+    frontend and never reach this endpoint at all."""
+    _require_auth(request)
+    f = db.get_file(file_id)
+    if f is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    return ws.get_waveform(f["subject_id"], f["filename"], um.UPLOAD_DIR, start_sec, end_sec, width_px)
+
+
+# ── Mini-timeline + Panel Event (Step 5, CC_STEP5_PROMPT.md §6.3/§6.5) ──────────────────
+
+@app.get("/api/files/{file_id}/timeline")
+def get_timeline(file_id: int, request: Request):
+    """Mini-timeline's score row — read-only, from the Phase-B score cache (see
+    waveform_serving.get_timeline's docstring). Never re-runs any part of the pipeline."""
+    _require_auth(request)
+    f = db.get_file(file_id)
+    if f is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    try:
+        return ws.get_timeline(f["subject_id"], f["filename"], um.UPLOAD_DIR)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/api/files/{file_id}/events")
+def get_file_events(file_id: int, request: Request):
+    _require_auth(request)
+    if db.get_file(file_id) is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    return db.list_events(file_id)
+
+
+class UpdateEventRequest(BaseModel):
+    review_status: str | None = None
+    comment: str | None = None
+
+
+@app.patch("/api/events/{event_id}")
+def update_event(event_id: int, payload: UpdateEventRequest, request: Request):
+    """AI event review (Accept/Reject/Uncertain) and/or comment, per SPEC §6.5. `Unseen`
+    is the unreviewed default, not a value this endpoint can set back to — there is no
+    'un-review' control in the spec'd expand panel (only 3 buttons: Accept/Reject/
+    Uncertain). Human events carry no review_status at all (§6.5: 'Human event tự confirm
+    khi tạo nên không cần review') — only their comment can be updated here."""
+    _require_auth(request)
+    event = db.get_event(event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+    if payload.review_status is not None:
+        if event["source"] != "AI":
+            raise HTTPException(
+                status_code=422, detail="Only AI events carry a review status."
+            )
+        if payload.review_status not in ("Accept", "Reject", "Uncertain"):
+            raise HTTPException(
+                status_code=422,
+                detail="review_status must be one of Accept/Reject/Uncertain.",
+            )
+    db.update_event(event_id, review_status=payload.review_status, comment=payload.comment)
+    return db.get_event(event_id)
+
+
+@app.delete("/api/events/{event_id}")
+def delete_event(event_id: int, request: Request):
+    """Human-added events only (SPEC §6.5's Delete/Edit pair) — AI events can never be
+    deleted, only Rejected (§6.5: 'muốn sửa thì Reject rồi tự tạo event mới')."""
+    _require_auth(request)
+    event = db.get_event(event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+    if event["source"] != "Human":
+        raise HTTPException(status_code=422, detail="Only Human-added events can be deleted.")
+    db.delete_event(event_id)
     return {"ok": True}
 
 

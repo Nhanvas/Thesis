@@ -171,6 +171,36 @@ def _file_row(row: sqlite3.Row, alert: int, recording_n: int) -> dict:
     }
 
 
+def _subject_dict(conn: sqlite3.Connection, srow: sqlite3.Row, alert_by_file: dict[int, int]) -> dict:
+    file_rows = conn.execute(
+        "SELECT id, filename, start_time, duration_seconds, status FROM files "
+        "WHERE subject_id = ? ORDER BY start_time",
+        (srow["id"],),
+    ).fetchall()
+    # file_rows is already sorted by start_time (meas_date) ascending, so its own
+    # position IS the C17 "Recording N" display ordering — a separate concern from
+    # edf_order.py's filename-based sort (SPEC §1.5's event-offset assignment). Step 4
+    # (CC_STEP4_PROMPT.md) reuses this same ordering for Previous/Next and the file
+    # dropdown, rather than inventing a second file order for the Analysis screen.
+    files = [
+        _file_row(f, alert_by_file.get(f["id"], 0), i + 1)
+        for i, f in enumerate(file_rows)
+    ]
+    subject_alert = sum(f["alert"] for f in files)
+    starts = [f["start_time"] for f in file_rows if f["start_time"]]
+    total_duration = sum(f["duration_seconds"] for f in file_rows)
+    return {
+        "id": srow["id"],
+        "no_files": len(file_rows),
+        "start_date": _recording_label(1, min(starts)) if starts else None,
+        "duration": _format_duration(total_duration) if file_rows else "",
+        "alert": subject_alert,
+        "status": _subject_status([f["status"] for f in files]),
+        "memo": srow["memo"],
+        "files": files,
+    }
+
+
 def list_subjects() -> list[dict]:
     """Subjects with derived §5.1 columns, each with its child files embedded (small demo
     dataset — this keeps SZSCAN_SPEC_v5.md §5.4's filename search simple: no separate
@@ -180,42 +210,142 @@ def list_subjects() -> list[dict]:
         "SELECT id, memo FROM subjects ORDER BY created_at"
     ).fetchall()
     alert_by_file = _alert_counts_by_file(conn)
-
-    result = []
-    for srow in subject_rows:
-        file_rows = conn.execute(
-            "SELECT id, filename, start_time, duration_seconds, status FROM files "
-            "WHERE subject_id = ? ORDER BY start_time",
-            (srow["id"],),
-        ).fetchall()
-        # file_rows is already sorted by start_time (meas_date) ascending, so its own
-        # position IS the C17 "Recording N" display ordering — a separate concern from
-        # edf_order.py's filename-based sort (SPEC §1.5's event-offset assignment).
-        files = [
-            _file_row(f, alert_by_file.get(f["id"], 0), i + 1)
-            for i, f in enumerate(file_rows)
-        ]
-        subject_alert = sum(f["alert"] for f in files)
-        starts = [f["start_time"] for f in file_rows if f["start_time"]]
-        total_duration = sum(f["duration_seconds"] for f in file_rows)
-        result.append(
-            {
-                "id": srow["id"],
-                "no_files": len(file_rows),
-                "start_date": _recording_label(1, min(starts)) if starts else None,
-                "duration": _format_duration(total_duration) if file_rows else "",
-                "alert": subject_alert,
-                "status": _subject_status([f["status"] for f in files]),
-                "memo": srow["memo"],
-                "files": files,
-            }
-        )
+    result = [_subject_dict(conn, srow, alert_by_file) for srow in subject_rows]
     conn.close()
     return result
+
+
+def get_subject(subject_id: str) -> dict | None:
+    """Single-subject fetch for the Analysis screen (Step 4, CC_STEP4_PROMPT.md §6.1):
+    header alert count, Previous/Next, file dropdown, Progress x/N — all derived from the
+    same file list/ordering as the Database screen's table (list_subjects above)."""
+    conn = get_connection()
+    srow = conn.execute("SELECT id, memo FROM subjects WHERE id = ?", (subject_id,)).fetchone()
+    if srow is None:
+        conn.close()
+        return None
+    alert_by_file = _alert_counts_by_file(conn)
+    result = _subject_dict(conn, srow, alert_by_file)
+    conn.close()
+    return result
+
+
+def get_file(file_id: int) -> dict | None:
+    """Single-file fetch for the Analysis screen header/toolbar (Step 4). Recording N is
+    this file's own 1-based position among its subject's files sorted by start_time — same
+    ordering _subject_dict uses, computed independently here so a direct file fetch doesn't
+    need the whole subject payload."""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT id, subject_id, filename, start_time, duration_seconds, status "
+        "FROM files WHERE id = ?",
+        (file_id,),
+    ).fetchone()
+    if row is None:
+        conn.close()
+        return None
+    alert_by_file = _alert_counts_by_file(conn)
+    siblings = conn.execute(
+        "SELECT id FROM files WHERE subject_id = ? ORDER BY start_time",
+        (row["subject_id"],),
+    ).fetchall()
+    conn.close()
+    recording_n = next((i + 1 for i, s in enumerate(siblings) if s["id"] == row["id"]), 1)
+    file_dict = _file_row(row, alert_by_file.get(row["id"], 0), recording_n)
+    file_dict["subject_id"] = row["subject_id"]
+    file_dict["start_time"] = row["start_time"]
+    file_dict["duration_seconds"] = row["duration_seconds"]
+    return file_dict
+
+
+def set_file_status(file_id: int, status: str) -> None:
+    conn = get_connection()
+    conn.execute("UPDATE files SET status = ? WHERE id = ?", (status, file_id))
+    conn.commit()
+    conn.close()
+
+
+def set_file_status_if(file_id: int, status: str, only_if_current: str) -> None:
+    """Conditional status transition — used for the View -> Viewing auto-transition
+    (SPEC §5.2) so opening an already-Viewed file's Analysis screen never regresses it."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE files SET status = ? WHERE id = ? AND status = ?",
+        (status, file_id, only_if_current),
+    )
+    conn.commit()
+    conn.close()
 
 
 def delete_subject(subject_id: str) -> None:
     conn = get_connection()
     conn.execute("DELETE FROM subjects WHERE id = ?", (subject_id,))
+    conn.commit()
+    conn.close()
+
+
+# ── Panel Event (Step 5, CC_STEP5_PROMPT.md §6.5) ───────────────────────────────────────
+
+def _event_row(row: sqlite3.Row, index: int) -> dict:
+    """`name` ('Event N') is derived from onset-ascending position at read time, not stored
+    — SPEC §6.6's 'a new event inserts at its correct time position, not appended to the
+    end' is naturally satisfied this way with no renumbering bookkeeping needed later."""
+    return {
+        "id": row["id"],
+        "name": f"Event {index + 1}",
+        "source": row["source"],
+        "onset_sec": row["onset_sec"],
+        "offset_sec": row["offset_sec"],
+        "duration_sec": row["offset_sec"] - row["onset_sec"],
+        "review_status": row["review_status"],
+        "comment": row["comment"],
+    }
+
+
+def list_events(file_id: int) -> list[dict]:
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, source, onset_sec, offset_sec, review_status, comment "
+        "FROM events WHERE file_id = ? ORDER BY onset_sec ASC, id ASC",
+        (file_id,),
+    ).fetchall()
+    conn.close()
+    return [_event_row(r, i) for i, r in enumerate(rows)]
+
+
+def get_event(event_id: int) -> dict | None:
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT id, file_id, source, onset_sec, offset_sec, review_status, comment "
+        "FROM events WHERE id = ?",
+        (event_id,),
+    ).fetchone()
+    if row is None:
+        conn.close()
+        return None
+    # Recompute this event's onset-ordered index within its own file, same rule as
+    # list_events, so a single-event fetch (e.g. after PATCH) carries the same `name`.
+    siblings = conn.execute(
+        "SELECT id FROM events WHERE file_id = ? ORDER BY onset_sec ASC, id ASC",
+        (row["file_id"],),
+    ).fetchall()
+    conn.close()
+    index = next((i for i, s in enumerate(siblings) if s["id"] == row["id"]), 0)
+    return _event_row(row, index)
+
+
+def update_event(event_id: int, review_status: str | None = None, comment: str | None = None) -> None:
+    conn = get_connection()
+    if review_status is not None:
+        conn.execute("UPDATE events SET review_status = ? WHERE id = ?", (review_status, event_id))
+    if comment is not None:
+        conn.execute("UPDATE events SET comment = ? WHERE id = ?", (comment, event_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_event(event_id: int) -> None:
+    conn = get_connection()
+    conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
     conn.commit()
     conn.close()

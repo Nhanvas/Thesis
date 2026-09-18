@@ -55,10 +55,10 @@ def _identify_extra_match(csv_path, grid_csv_path):
     cmp = pd.concat([per_subj_matched.rename("n_matched"), per_subj_tp.rename("tp")], axis=1).fillna(0)
     cmp["diff"] = cmp.n_matched - cmp.tp
     extra = cmp[cmp["diff"] > 0]
-    print(f"[Fig 3.5] per-subject latency-matched vs SzCORE TP: "
+    print(f"[Fig 3.4] per-subject latency-matched vs SzCORE TP: "
          f"{cmp[['n_matched', 'tp']].astype(int).to_dict('index')}")
     if len(extra) != 1:
-        print(f"[Fig 3.5] extra match not uniquely attributable to one subject from committed "
+        print(f"[Fig 3.4] extra match not uniquely attributable to one subject from committed "
              f"aggregates alone: {extra.to_dict('index')} -- stopping identification here.")
         return
     subj = extra.index[0]
@@ -78,7 +78,7 @@ def _identify_extra_match(csv_path, grid_csv_path):
     hyp = Annotation(list(hyp_iv), 1, max(int(total_dur_s), 1))
     s = SE.scoring.EventScoring(ref, hyp, SE.SZ_PARAM)
     if len(s.ref.events) != len(ref_iv):
-        print(f"[Fig 3.5] {subj}: minDurationBetweenEvents merging changed the reference event "
+        print(f"[Fig 3.4] {subj}: minDurationBetweenEvents merging changed the reference event "
              f"count ({len(s.ref.events)} vs {len(ref_iv)} raw) -- cannot align per-seizure, "
              f"stopping identification here.")
         return
@@ -92,7 +92,7 @@ def _identify_extra_match(csv_path, grid_csv_path):
     lat_subj = d[(d.subject == subj) & (d.matched == True)].set_index("ref_onset_s")
     for (r0, r1), szc in zip(ref_iv, szcore_matched):
         if r0 in lat_subj.index and not szc:
-            print(f"[Fig 3.5] extra match identified: subject={subj}, seizure onset={r0:.0f}s "
+            print(f"[Fig 3.4] extra match identified: subject={subj}, seizure onset={r0:.0f}s "
                  f"end={r1:.0f}s, latency-procedure latency_s={lat_subj.loc[r0, 'latency_s']:.0f}s "
                  f"(matched by the latency procedure's h0 <= ref_end + {SE.SZ_PARAM.toleranceEnd:g}s "
                  f"containment rule) but NOT a SzCORE true positive (its extended-tolerance window "
@@ -116,12 +116,13 @@ def main():
     lat = d["latency_s"].values
     med = np.median(lat)
     n_neg = int((lat < 0).sum())
-    print(f"[Fig 3.5] n={n} (brief: 48), median={med:.1f}s (brief: -4s), "
+    print(f"[Fig 3.4] n={n} (brief: 48), median={med:.1f}s (brief: -4s), "
          f"negative={n_neg}/{n} (brief: 25/48), min={lat.min():.1f}s (brief: truncated at -28s)")
     # n == 48, not TP == 47: the latency procedure is a separate implementation from the
-    # SzCORE scoring framework's own matcher and its match count exceeds the true-positive
-    # count by exactly one at every operating point -- a disclosed, expected offset, not a
-    # bug (docs/VERIFIED_NUMBERS.md Part 8, item 1; thesis Chapter 3 SS3.3.1; Chapter 4).
+    # SzCORE scoring framework's own matcher and its match count exceeds it by exactly one
+    # at the reported operating point (the only point checked) -- a disclosed, expected
+    # offset, not a bug (docs/VERIFIED_NUMBERS.md Part 8, item 1; thesis Chapter 3 SS3.3.1;
+    # Chapter 4).
     if n != 48:
         raise ValueError(f"n={n}, expected 48 (latency-procedure match count, "
                          f"docs/VERIFIED_NUMBERS.md Part 8 item 1) -- stop, do not force")

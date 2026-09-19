@@ -1,0 +1,10 @@
+subject,n_seizures,n_generalized,n_focal,mean_nS_focal,distinct_label_sets,mean_jaccard,union_size
+chb03,7,3,4,8.25,2,0.9444,9
+chb06,10,10,0,,0,,0
+chb13,12,1,11,5.45,4,0.5242,10
+chb14,8,0,8,5.75,6,0.6711,10
+chb15,20,0,20,2.3,9,0.4537,10
+chb16,10,0,10,5.5,9,0.6532,9
+chb17,3,0,3,4.33,2,0.5238,7
+chb18,6,0,6,4.83,6,0.3646,11
+POOLED (mean over seizure pairs),76,14,62,4.55,37,0.5144,13

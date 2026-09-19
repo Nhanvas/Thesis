@@ -1,0 +1,29 @@
+item,count
+|S|=1,3
+|S|=2,11
+|S|=3,7
+|S|=4,9
+|S|=5,9
+|S|=6,15
+|S|=7,2
+|S|=8,4
+|S|=9,1
+|S|=10,1
+channel FP1-F7,29
+channel F7-T7,28
+channel T7-P7,45
+channel P7-O1,10
+channel FP1-F3,24
+channel F3-C3,11
+channel C3-P3,0
+channel P3-O1,9
+channel FP2-F4,33
+channel F4-C4,7
+channel C4-P4,0
+channel P4-O2,0
+channel FP2-F8,30
+channel F8-T8,27
+channel T8-P8,28
+channel P8-O2,1
+channel FZ-CZ,0
+channel CZ-PZ,0

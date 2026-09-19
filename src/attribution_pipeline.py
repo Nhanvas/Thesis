@@ -8,7 +8,11 @@ attribution_synthetic_check, attribution_synthetic_spread, attribution_score_lab
 attribution_label_diversity) into one module with sub-commands. Logic is unchanged: outputs are
 byte-identical to the separate scripts.
 
-Governed by docs/ATTRIBUTION_SPEC.md (v2 + Amendment A2, decisions D1-D8).
+Governed by docs/ATTRIBUTION_SPEC.md v4 (Amendments A2, A3, A4).
+2026-09-18 (A4): ground truth is the FINAL human annotation in results/attribution_v7/labels/
+(blind to the model, every ictal channel, supervisor-approved). Label-scored outputs go to
+results/attribution_v7/. The machine-generated dominant-channel draft path is RETIRED and kept only
+for reproducibility of the v3 numbers (labels --source v5, eval/labeldiv --labels v6).
 Framing: XAI for the GAE reconstruction branch. NOT seizure localization, NOT SOZ.
 
 Canonical checkpoint: data/models_retrain/gae_joint_seed42.pt
@@ -25,14 +29,18 @@ SUB-COMMANDS (run from repo ROOT)
   blocks    --edf_root --summary_dir
                                  map ictal rows -> seizures      -> seizure_blocks.csv,
                                                                     ictal_row_to_seizure.csv
-  labels                         convert v5 reader labels        -> labels/ictal_channels_DRAFT.csv
+  labels [--confirm_order]       parse FINAL annotation (.md)    -> attribution_v7/labels/
+                                 ictal_channels_FINAL.csv + parse_log.txt (gate G-L1)
+  labels --source v5             RETIRED draft conversion        -> labels/ictal_channels_DRAFT.csv
   score                          per-seizure 18-ch score+rank    -> attribution_scores.csv
   diag                           seed/bias/C1 diagnostics        -> attribution_diagnostics.csv
   synth                          synthetic sanity, gates G-S1..3 -> synthetic_sanity.csv
   spread                         gate G-S4' (D6.1)               -> synthetic_spread.csv
-  eval                           score vs labels                 -> attribution_summary.csv,
-                                                                    attribution_perseizure.csv
-  labeldiv                       can labels test per-seizure?    -> label_diversity.csv
+  eval                           L1/L2/L3/D7 vs FINAL labels     -> attribution_v7/attribution_{tests,
+                                                                    summary,perseizure}.csv
+  labeldiv                       annotation composition          -> attribution_v7/label_{diversity,
+                                                                    composition}.csv
+  eval / labeldiv --labels v6    RETIRED draft scoring (v3)      -> attribution_v6/...
 
   all                            score -> diag -> synth -> spread -> eval -> labeldiv
                                  (assumes dump/blocks/labels already ran)
@@ -411,7 +419,7 @@ def cmd_blocks(a):
 # ============================================================================
 # 3. labels — deterministic conversion of the v5 reader pass (D2)
 # ============================================================================
-def cmd_labels(a):
+def cmd_labels_v5(a):
     if not V5LAB.is_file():
         die(f"missing {V5LAB}")
     blkf = OUT / "seizure_blocks.csv"
@@ -732,7 +740,7 @@ def cmd_spread(a):
 # ============================================================================
 # 8. eval — score against labels (§4.1/4.3/4.4/4.5 + D5/D7/D8). PROVISIONAL.
 # ============================================================================
-def cmd_eval(a):
+def cmd_eval_draft(a):
     from scipy.stats import mannwhitneyu
     S = load_scores()
     lab = load_labels()
@@ -842,7 +850,7 @@ def _jac(a, b):
     return 1.0 if u == 0 else len(a & b) / u
 
 
-def cmd_labeldiv(a):
+def cmd_labeldiv_draft(a):
     lab = load_labels()
     S = load_scores(seed=42, agg="p95")
     foc = {k: v["chans"] for k, v in lab.items() if v["kind"] == "focal"}
@@ -886,11 +894,426 @@ def cmd_labeldiv(a):
 
 
 # ============================================================================
+# 10. v7 — FINAL annotation (ATTRIBUTION_SPEC v4, Amendment A4)
+#     Human annotation from raw 18-ch EEG, blind to every model output, every ictal channel per
+#     seizure, supervisor-approved. The draft path above (labels --source v5, eval/labeldiv
+#     --labels v6) is RETIRED and kept only so that the v3 results remain reproducible.
+# ============================================================================
+OUT7 = ROOT / "results" / "attribution_v7"
+LAB7 = OUT7 / "labels"
+SRC7 = LAB7 / "source" / "Channel_label_approved.md"
+SRC7_SHA256 = "70eef3150474fe09339bbd0b14224a91e7a318412d9f80a0354d7e3c8267872a"  # LF-normalised
+FINAL7 = LAB7 / "ictal_channels_FINAL.csv"
+LOG7 = LAB7 / "parse_log.txt"
+CONFIRM_TOKEN = "ORDER_CONFIRMED_BY_AUTHOR"
+EXPECTED_PER_SUBJ = {"chb03": 7, "chb06": 10, "chb13": 12, "chb14": 8, "chb15": 20,
+                     "chb16": 10, "chb17": 3, "chb18": 6}
+LABEL_SOURCE7 = "human_blind_supervisor_approved_2026-09"
+
+
+def _sha_lf(path):
+    """SHA-256 of the file with CRLF normalised to LF, so a Git autocrlf checkout cannot break it."""
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def _parse_label_md(path):
+    """Channel_label_approved.md -> ({subject: [(idx, kind, [channels])]}, [log lines])."""
+    import re
+    subj, out, log = None, {}, []
+    for ln, raw in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
+        line = raw.strip()
+        if not line:
+            continue
+        m = re.fullmatch(r"(?i)chb(\d{2})", line)
+        if m:
+            subj = f"chb{m.group(1)}"
+            if subj in out:
+                die(f"line {ln}: subject {subj} appears twice")
+            out[subj] = []
+            continue
+        m = re.fullmatch(r"-\s*\*\*seizure\s+(\d+)\s*:?\s*\*\*\s*:?\s*(.*)", line, flags=re.I)
+        if not m:
+            die(f"line {ln}: unparseable: {raw!r}")
+        if subj is None:
+            die(f"line {ln}: seizure line before any subject header")
+        k, body = int(m.group(1)), m.group(2).strip()
+        if k != len(out[subj]):
+            die(f"line {ln}: {subj} seizure {k} out of order (expected {len(out[subj])})")
+        if body.lower().startswith("diffuse"):
+            if "18" not in body:
+                die(f"line {ln}: 'Diffuse' without '18 channels': {body!r}")
+            out[subj].append((k, "generalized", list(CH)))
+            continue
+        chans = [c.strip().upper() for c in body.split("|") if c.strip()]
+        bad = [c for c in chans if c not in IDX]
+        if bad:
+            die(f"line {ln}: {subj} seizure {k}: unknown channel(s) {bad}")
+        uniq = list(dict.fromkeys(chans))
+        if len(uniq) != len(chans):
+            dups = sorted({c for c in chans if chans.count(c) > 1})
+            log.append(f"DEDUP {subj} seizure {k}: {dups} listed more than once -> kept once")
+        if not uniq:
+            die(f"line {ln}: {subj} seizure {k}: empty channel list")
+        if len(uniq) == NCH:
+            log.append(f"NOTE {subj} seizure {k}: all 18 listed explicitly -> generalized")
+            out[subj].append((k, "generalized", uniq))
+        else:
+            out[subj].append((k, "focal", uniq))
+    return out, log
+
+
+def cmd_labels_md(a):
+    if not SRC7.is_file():
+        die(f"missing {SRC7}")
+    sha = _sha_lf(SRC7)
+    if sha != SRC7_SHA256:
+        die(f"source SHA-256 mismatch:\n  expected {SRC7_SHA256}\n  got      {sha}\n"
+            "The approved label file must not be edited. Restore it from git.")
+    blkf = OUT / "seizure_blocks.csv"
+    if not blkf.is_file():
+        die(f"missing {blkf}")
+    blk = {(r["subject"], int(r["seizure_idx"])): r
+           for r in csv.DictReader(open(blkf)) if r["subject"] in TEST_SUBJ}
+
+    parsed, log = _parse_label_md(SRC7)
+    # gate 1: subjects and per-subject counts
+    if sorted(parsed) != sorted(TEST_SUBJ):
+        die(f"subjects in label file {sorted(parsed)} != TEST {sorted(TEST_SUBJ)}")
+    for s in TEST_SUBJ:
+        nb = sum(1 for k in blk if k[0] == s)
+        if len(parsed[s]) != EXPECTED_PER_SUBJ[s] or nb != EXPECTED_PER_SUBJ[s]:
+            die(f"{s}: labels={len(parsed[s])} blocks={nb} expected={EXPECTED_PER_SUBJ[s]}")
+
+    rows = []
+    for s in TEST_SUBJ:
+        for k, kind, chans in parsed[s]:
+            b = blk[(s, k)]
+            rows.append({"subject": s, "seizure_idx": k, "edf_file": b["edf_file"],
+                         "onset_s": b["onset_s"], "n_ictal": len(chans),
+                         "ictal_channels": "|".join(chans), "focal_generalized": kind,
+                         "label_source": LABEL_SOURCE7})
+    if len(rows) != EXPECTED_TEST_SEIZURES:
+        die(f"expected {EXPECTED_TEST_SEIZURES} rows, got {len(rows)}")
+    write_csv(FINAL7, rows)
+
+    # gate 3 material: the full order table for the author to confirm
+    L = [f"source {SRC7.relative_to(ROOT)}  sha256(LF)={sha}",
+         f"written {FINAL7.relative_to(ROOT)}  {len(rows)} rows",
+         f"created_utc {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}", ""]
+    L += log + ([""] if log else [])
+    L.append(f"{'subject':<8}{'idx':>4}  {'edf_file':<16}{'onset_s':>8}{'dur_s':>7}{'|S|':>5}  channels")
+    for r in rows:
+        b = blk[(r["subject"], r["seizure_idx"])]
+        ch = "GENERALIZED (18)" if r["focal_generalized"] == "generalized" else r["ictal_channels"]
+        L.append(f"{r['subject']:<8}{r['seizure_idx']:>4}  {r['edf_file']:<16}{b['onset_s']:>8}"
+                 f"{b['dur_s']:>7}{r['n_ictal']:>5}  {ch}")
+
+    # gate 4 (diagnostic only): containment of the retired draft's dominant channels
+    L += ["", "DIAGNOSTIC (not pass/fail): retired draft dominant channel(s) contained in the final set",
+          "  shift 0 = same index; shifts -1/+1 are shown only to expose an ordering fault"]
+    dr = LABDIR / "ictal_channels_DRAFT.csv"
+    if dr.is_file():
+        draft = {(r["subject"], int(r["seizure_idx"])): set(c for c in r["ictal_channels"].split("|") if c)
+                 for r in csv.DictReader(open(dr))}
+        fin = {(r["subject"], r["seizure_idx"]): set(r["ictal_channels"].split("|")) for r in rows}
+        for s in TEST_SUBJ:
+            res = []
+            for sh in (-1, 0, 1):
+                hit = tot = 0
+                for (ss, k), d in draft.items():
+                    if ss != s or not d or (s, k + sh) not in fin:
+                        continue
+                    tot += 1
+                    hit += d <= fin[(s, k + sh)]
+                res.append(f"shift {sh:+d}: {hit}/{tot}" if tot else f"shift {sh:+d}: -")
+            L.append(f"  {s:<7} " + "   ".join(res))
+    else:
+        L.append("  draft file not found - skipped")
+
+    prev = LOG7.read_text(encoding="utf-8") if LOG7.is_file() else ""
+    confirmed = CONFIRM_TOKEN in prev
+    if a.confirm_order:
+        L += ["", f"{CONFIRM_TOKEN} {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} "
+                  "(author confirmed the order equals the reading order)"]
+        confirmed = True
+    elif confirmed:
+        L += ["", [x for x in prev.splitlines() if CONFIRM_TOKEN in x][-1]]
+    else:
+        L += ["", "ORDER NOT YET CONFIRMED - check the table above, then rerun with --confirm_order"]
+    LOG7.write_text("\n".join(L) + "\n", encoding="utf-8")
+    print("\n".join(L))
+    print(f"\nwrote {LOG7}")
+
+    nf = sum(r["focal_generalized"] == "focal" for r in rows)
+    print(f"\n{len(rows)} seizures: {nf} focal / {len(rows)-nf} generalized")
+
+
+def load_labels7():
+    """ictal_channels_FINAL.csv -> {(subject, idx): {y, kind, nw, nS, chans}}; refuses if unconfirmed."""
+    if not FINAL7.is_file():
+        die(f"missing {FINAL7} — run: python src/attribution_pipeline.py labels")
+    if not LOG7.is_file() or CONFIRM_TOKEN not in LOG7.read_text(encoding="utf-8"):
+        die("gate G-L1 not passed: index order not confirmed.\n"
+            "  Check the table in results/attribution_v7/labels/parse_log.txt, then run:\n"
+            "  python src/attribution_pipeline.py labels --confirm_order")
+    nw = {(r["subject"], int(r["seizure_idx"])): int(r["n_windows"])
+          for r in csv.DictReader(open(OUT / "seizure_blocks.csv")) if r["subject"] in TEST_SUBJ}
+    lab = {}
+    for r in csv.DictReader(open(FINAL7)):
+        chans = [c for c in r["ictal_channels"].split("|") if c]
+        y = np.zeros(NCH, dtype=int)
+        for c in chans:
+            y[IDX[c]] = 1
+        key = (r["subject"], int(r["seizure_idx"]))
+        lab[key] = {"y": y, "kind": r["focal_generalized"], "nw": nw[key],
+                    "nS": int(r["n_ictal"]), "chans": set(chans)}
+    if len(lab) != EXPECTED_TEST_SEIZURES:
+        die(f"expected {EXPECTED_TEST_SEIZURES} labels, got {len(lab)}")
+    return lab
+
+
+def auroc18_ties(y, s):
+    """AUROC with average ranks for ties (needed for the count-valued anatomical prior)."""
+    from scipy.stats import rankdata
+    p, n = int(y.sum()), NCH - int(y.sum())
+    if p == 0 or n == 0:
+        return np.nan
+    r = rankdata(s)
+    return float((r[y == 1].sum() - p * (p + 1) / 2) / (p * n))
+
+
+def cmd_eval7(a):
+    S = load_scores()
+    lab = load_labels7()
+    rng = np.random.default_rng(SEED)
+    focal = sorted(k for k in lab if lab[k]["kind"] == "focal")
+    gen = sorted(k for k in lab if lab[k]["kind"] == "generalized")
+    prev = np.mean([lab[k]["nS"] for k in focal]) / NCH
+    print(f"focal={len(focal)}  generalized={len(gen)} (excluded: AUROC undefined)  "
+          f"macro prevalence={prev:.4f}\n")
+
+    # ---- L2 anatomical prior: channel frequency over focal seizures of the OTHER subjects
+    def prior(k):
+        v = np.zeros(NCH)
+        for o in focal:
+            if o[0] != k[0]:
+                v += lab[o]["y"]
+        return v
+
+    # ---- D7: mean s over the OTHER focal seizures of the same subject (spec v4 §4.4)
+    def loo(seed, agg, k):
+        others = [S[(seed, agg, *o)] for o in focal if o[0] == k[0] and o != k]
+        return np.mean(others, axis=0) if others else None
+
+    # ---- per-seizure table (seed 42, p95)
+    A_prior = {k: auroc18_ties(lab[k]["y"], prior(k)) for k in focal}
+    swapped = {}
+    for s in sorted({k[0] for k in focal}):
+        ks = [k for k in focal if k[0] == s]
+        for k in ks:
+            oth = [auroc18(lab[k]["y"], S[(42, "p95", *j)]) for j in ks if j != k]
+            swapped[k] = float(np.mean(oth)) if oth else np.nan
+    per = []
+    for k in focal:
+        d, s = lab[k], S[(42, "p95", *k)]
+        c = loo(42, "p95", k)
+        per.append({"subject": k[0], "seizure_idx": k[1], "n_windows": d["nw"], "n_ictal": d["nS"],
+                    "AUROC": round(float(auroc18(d["y"], s)), 4), "AUPRC": round(ap18(d["y"], s), 4),
+                    "prevalence": round(d["nS"] / NCH, 4), "recall_at_S": round(rec_at_S(d["y"], s), 4),
+                    "AUROC_prior": round(A_prior[k], 4),
+                    "AUROC_swapped": round(swapped[k], 4) if np.isfinite(swapped[k]) else None,
+                    "AUROC_ctrl_D7": None if c is None else round(float(auroc18(d["y"], c)), 4)})
+    write_csv(OUT7 / "attribution_perseizure.csv", per)
+
+    # ---- panels (L1 + descriptive)
+    rows = []
+
+    def panel(name, keys, seed=42, agg="p95"):
+        A = np.array([auroc18(lab[k]["y"], S[(seed, agg, *k)]) for k in keys])
+        P = [ap18(lab[k]["y"], S[(seed, agg, *k)]) for k in keys]
+        Rc = [rec_at_S(lab[k]["y"], S[(seed, agg, *k)]) for k in keys]
+        Pr = np.array([A_prior[k] for k in keys])
+        ma, lo, hi = bootstrap_mean(A, rng)
+        mp, plo, phi = bootstrap_mean(P, rng)
+        null = np.empty(NPERM)
+        for t in range(NPERM):
+            null[t] = np.mean([auroc18(lab[k]["y"], rng.permutation(S[(seed, agg, *k)]))
+                               for k in keys])
+        pv = (np.sum(null >= ma) + 1) / (NPERM + 1)
+        pr = float(np.mean([lab[k]["nS"] for k in keys])) / NCH
+        rows.append({"panel": name, "n_seizures": len(keys), "seed": seed, "agg": agg,
+                     "macro_AUROC": round(ma, 4), "AUROC_CI_lo": round(lo, 4), "AUROC_CI_hi": round(hi, 4),
+                     "null_mean": round(float(null.mean()), 4), "p_perm": round(float(pv), 4),
+                     "macro_AUPRC": round(mp, 4), "AUPRC_CI_lo": round(plo, 4), "AUPRC_CI_hi": round(phi, 4),
+                     "macro_prevalence": round(pr, 4), "AUPRC_over_prevalence": round(mp / pr, 2),
+                     "recall_at_S": round(float(np.mean(Rc)), 4),
+                     "macro_AUROC_prior": round(float(Pr.mean()), 4),
+                     "delta_vs_prior": round(float(A.mean() - Pr.mean()), 4)})
+        print(f"  {name:<26} n={len(keys):<3} AUROC={ma:.4f} [{lo:.4f},{hi:.4f}] p={pv:.4f}  "
+              f"AUPRC={mp:.4f} (prev {pr:.3f})  R@S={np.mean(Rc):.4f}  prior={Pr.mean():.4f}")
+
+    print("=== L1 PRIMARY (seed42, p95, all focal) ===")
+    panel("ALL focal (primary)", focal)
+    print("\n=== descriptive panels ===")
+    panel("focal excl. chb15 (D8)", [k for k in focal if k[0] != "chb15"])
+    panel("focal n_win>=3 (D5)", [k for k in focal if lab[k]["nw"] >= 3])
+    panel("ALL focal (mean agg)", focal, agg="mean")
+    for sd in (1, 2, 3):
+        panel(f"ALL focal seed{sd}", focal, seed=sd)
+    print("\n=== per subject ===")
+    for s in TEST_SUBJ:
+        ks = [k for k in focal if k[0] == s]
+        if len(ks) >= 2:
+            panel(f"subject {s}", ks)
+        else:
+            print(f"  subject {s:<18} n={len(ks)}  (no channel metric: "
+                  f"{'all seizures generalized' if not ks else 'single seizure'})")
+    write_csv(OUT7 / "attribution_summary.csv", rows)
+
+    # ---- the three pre-registered tests
+    A = np.array([auroc18(lab[k]["y"], S[(42, "p95", *k)]) for k in focal])
+    Pr = np.array([A_prior[k] for k in focal])
+    l1 = rows[0]
+
+    # L2: paired bootstrap over seizures
+    d_obs = float(A.mean() - Pr.mean())
+    boots = np.empty(NBOOT)
+    for b in range(NBOOT):
+        i = rng.integers(0, len(focal), len(focal))
+        boots[b] = A[i].mean() - Pr[i].mean()
+    l2_lo, l2_hi = float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
+    p_l2 = float((np.sum(boots <= 0) + 1) / (NBOOT + 1))
+
+    # L3: matched vs swapped, permutation of map-to-seizure assignment within subject
+    groups = {}
+    for i, k in enumerate(focal):
+        groups.setdefault(k[0], []).append(i)
+    M = {}
+    for s, idx in groups.items():
+        ks = [focal[i] for i in idx]
+        M[s] = np.array([[auroc18(lab[kk]["y"], S[(42, "p95", *kj)]) for kk in ks] for kj in ks])
+
+    def T_of(perms):
+        diffs = []
+        for s, idx in groups.items():
+            m, n = M[s], len(idx)
+            if n < 2:
+                continue
+            pi = perms[s]
+            col = m.sum(0)
+            for c in range(n):
+                matched = m[pi[c], c]
+                diffs.append(matched - (col[c] - matched) / (n - 1))
+        return float(np.mean(diffs))
+
+    ident = {s: np.arange(len(idx)) for s, idx in groups.items()}
+    T_obs = T_of(ident)
+    Tn = np.array([T_of({s: rng.permutation(len(idx)) for s, idx in groups.items()})
+                   for _ in range(NPERM)])
+    p_l3 = float((np.sum(Tn >= T_obs) + 1) / (NPERM + 1))
+    n_l3 = sum(len(i) for i in groups.values() if len(i) >= 2)
+
+    # Holm over {L2, L3}, interpreted only if L1 passes
+    l1_pass = l1["p_perm"] < 0.05
+    ps = sorted([("L2", p_l2), ("L3", p_l3)], key=lambda x: x[1])
+    holm = {}
+    for r_, (nm, p) in enumerate(ps):
+        holm[nm] = min(1.0, max(p * (2 - r_), holm.get(ps[r_ - 1][0], 0) if r_ else 0))
+    l2_pass = l1_pass and holm["L2"] < 0.05 and l2_lo > 0
+    l3_pass = l1_pass and holm["L3"] < 0.05
+
+    # D7 as registered
+    Cc = [auroc18(lab[k]["y"], loo(42, "p95", k)) for k in focal if loo(42, "p95", k) is not None]
+    d7 = float(A.mean() - np.mean(Cc))
+
+    tests = [
+        {"test": "L1 chance", "n": len(focal), "statistic": "macro_AUROC", "value": l1["macro_AUROC"],
+         "CI_lo": l1["AUROC_CI_lo"], "CI_hi": l1["AUROC_CI_hi"], "reference": l1["null_mean"],
+         "p": l1["p_perm"], "p_holm": None, "pass": l1_pass},
+        {"test": "L2 anatomical prior", "n": len(focal), "statistic": "AUROC - AUROC_prior",
+         "value": round(d_obs, 4), "CI_lo": round(l2_lo, 4), "CI_hi": round(l2_hi, 4),
+         "reference": round(float(Pr.mean()), 4), "p": round(p_l2, 4),
+         "p_holm": round(holm["L2"], 4), "pass": l2_pass},
+        {"test": "L3 matched vs swapped", "n": n_l3, "statistic": "mean(matched - swapped)",
+         "value": round(T_obs, 4), "CI_lo": None, "CI_hi": None,
+         "reference": round(float(Tn.mean()), 4), "p": round(p_l3, 4),
+         "p_holm": round(holm["L3"], 4), "pass": l3_pass},
+        {"test": "D7 subject-constant (as registered)", "n": len(Cc),
+         "statistic": "AUROC - AUROC_ctrl", "value": round(d7, 4), "CI_lo": None, "CI_hi": None,
+         "reference": round(float(np.mean(Cc)), 4), "p": None, "p_holm": None,
+         "pass": d7 > 0},
+    ]
+    write_csv(OUT7 / "attribution_tests.csv", tests)
+
+    print("\n=== PRE-REGISTERED TESTS (spec v4 §4.1-§4.5) ===")
+    for t in tests:
+        print(f"  {t['test']:<36} {t['statistic']:<24} {t['value']:+.4f}  ref={t['reference']}  "
+              f"CI=[{t['CI_lo']},{t['CI_hi']}]  p={t['p']}  p_holm={t['p_holm']}  PASS={t['pass']}")
+    print("\n  per-subject T (descriptive):")
+    for s, idx in groups.items():
+        if len(idx) >= 2:
+            m, n = M[s], len(idx)
+            t_s = np.mean([m[c, c] - (m[:, c].sum() - m[c, c]) / (n - 1) for c in range(n)])
+            print(f"    {s}  n={n:<3} T={t_s:+.4f}")
+    print(f"\n  generalized seizures (no channel metric): {len(gen)} "
+          + str({s: sum(1 for k in gen if k[0] == s) for s in TEST_SUBJ if any(k[0] == s for k in gen)}))
+    print("\nRead the verdict with ATTRIBUTION_SPEC v4 §4.7. Nothing here may be tuned (A4.9).")
+
+
+def cmd_labeldiv7(a):
+    lab = load_labels7()
+    foc = {k: v["chans"] for k, v in lab.items() if v["kind"] == "focal"}
+    rows = []
+    for s in TEST_SUBJ:
+        ks = sorted(k for k in foc if k[0] == s)
+        ng = sum(1 for k, v in lab.items() if k[0] == s and v["kind"] == "generalized")
+        sets = [foc[k] for k in ks]
+        j = (np.mean([_jac(sets[i], sets[m]) for i in range(len(sets)) for m in range(i + 1, len(sets))])
+             if len(sets) >= 2 else np.nan)
+        rows.append({"subject": s, "n_seizures": len(ks) + ng, "n_generalized": ng, "n_focal": len(ks),
+                     "mean_nS_focal": round(float(np.mean([len(x) for x in sets])), 2) if sets else None,
+                     "distinct_label_sets": len({frozenset(x) for x in sets}) if sets else 0,
+                     "mean_jaccard": None if np.isnan(j) else round(float(j), 4),
+                     "union_size": len(set().union(*sets)) if sets else 0})
+    allk = sorted(foc)
+    pairs = [_jac(foc[allk[i]], foc[allk[m]]) for i in range(len(allk)) for m in range(i + 1, len(allk))
+             if allk[i][0] == allk[m][0]]
+    rows.append({"subject": "POOLED (mean over seizure pairs)", "n_seizures": len(lab),
+                 "n_generalized": sum(v["kind"] == "generalized" for v in lab.values()),
+                 "n_focal": len(foc), "mean_nS_focal": round(float(np.mean([len(x) for x in foc.values()])), 2),
+                 "distinct_label_sets": len({frozenset(x) for x in foc.values()}),
+                 "mean_jaccard": round(float(np.mean(pairs)), 4), "union_size": len(set().union(*foc.values()))})
+    write_csv(OUT7 / "label_diversity.csv", rows)
+    for r in rows:
+        print("  " + "  ".join(f"{k}={v}" for k, v in r.items()))
+
+    hist = np.bincount([len(x) for x in foc.values()], minlength=NCH + 1)
+    freq = {c: sum(c in x for x in foc.values()) for c in CH}
+    comp = [{"item": f"|S|={n}", "count": int(hist[n])} for n in range(1, NCH) if hist[n]]
+    comp += [{"item": f"channel {c}", "count": freq[c]} for c in CH]
+    write_csv(OUT7 / "label_composition.csv", comp)
+    print(f"\n  |S| histogram: " + ", ".join(f"{n}:{hist[n]}" for n in range(1, NCH) if hist[n]))
+    print("  channel frequency: " + ", ".join(f"{c} {freq[c]}" for c in sorted(CH, key=lambda c: -freq[c])))
+
+
+def cmd_labels(a):
+    return cmd_labels_v5(a) if a.source == "v5" else cmd_labels_md(a)
+
+
+def cmd_eval(a):
+    return cmd_eval_draft(a) if a.labels == "v6" else cmd_eval7(a)
+
+
+def cmd_labeldiv(a):
+    return cmd_labeldiv_draft(a) if a.labels == "v6" else cmd_labeldiv7(a)
+
+
+# ============================================================================
 # CLI
 # ============================================================================
 def cmd_all(a):
     for name, fn in [("score", cmd_score), ("diag", cmd_diag), ("synth", cmd_synth),
-                     ("spread", cmd_spread), ("eval", cmd_eval), ("labeldiv", cmd_labeldiv)]:
+                     ("spread", cmd_spread), ("eval", cmd_eval7), ("labeldiv", cmd_labeldiv7)]:
         print(f"\n{'#'*90}\n# {name}\n{'#'*90}")
         fn(a)
 
@@ -914,20 +1337,31 @@ def main():
     p.add_argument("--proc_dir", default=str(PROC))
     p.set_defaults(func=cmd_blocks)
 
+    p = sub.add_parser("labels", help="parse the FINAL annotation (default) or the retired v5 draft")
+    p.add_argument("--source", choices=["md", "v5"], default="md")
+    p.add_argument("--confirm_order", action="store_true",
+                   help="record that the author checked the order table (gate G-L1)")
+    p.set_defaults(func=cmd_labels)
+
     for name, fn, helptxt in [
-            ("labels", cmd_labels, "convert v5 reader labels to §3.2 schema (D2)"),
+            ("eval", cmd_eval, "L1/L2/L3/D7 against the FINAL labels (default) or the retired draft"),
+            ("labeldiv", cmd_labeldiv, "annotation composition and within-subject similarity")]:
+        p = sub.add_parser(name, help=helptxt)
+        p.add_argument("--labels", choices=["v7", "v6"], default="v7")
+        p.set_defaults(func=fn)
+
+    for name, fn, helptxt in [
             ("score", cmd_score, "per-seizure 18-channel score + rank"),
             ("diag", cmd_diag, "label-free diagnostics (§4.7 + D4)"),
             ("synth", cmd_synth, "synthetic sanity check, gates G-S1..G-S3 (§4.6)"),
             ("spread", cmd_spread, "gate G-S4' after the D6.1 fix"),
-            ("eval", cmd_eval, "score against labels — PROVISIONAL"),
-            ("labeldiv", cmd_labeldiv, "label diversity: can labels test per-seizure?"),
             ("all", cmd_all, "score -> diag -> synth -> spread -> eval -> labeldiv")]:
         q = sub.add_parser(name, help=helptxt)
         q.set_defaults(func=fn)
 
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
+    OUT7.mkdir(parents=True, exist_ok=True)
     a.func(a)
 
 

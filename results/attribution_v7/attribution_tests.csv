@@ -1,0 +1,5 @@
+test,n,statistic,value,CI_lo,CI_hi,reference,p,p_holm,pass
+L1 chance,62,macro_AUROC,0.5694,0.5097,0.6321,0.5004,0.001,,True
+L2 anatomical prior,62,AUROC - AUROC_prior,-0.1694,-0.2553,-0.0804,0.7387,1.0,1.0,False
+L3 matched vs swapped,62,mean(matched - swapped),0.0064,,,0.0001,0.3377,0.6753,False
+D7 subject-constant (as registered),62,AUROC - AUROC_ctrl,-0.0737,,,0.6431,,,False

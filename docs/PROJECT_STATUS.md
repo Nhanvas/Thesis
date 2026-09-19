@@ -1,5 +1,5 @@
 # PROJECT STATUS — single source of truth for "where are we right now"
-**Last updated:** 2026-09-18 (rev. E). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
+**Last updated:** 2026-09-19 (rev. E2). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
 `NEXT_TASKS_AND_PLAN.md` (all retired). **On any number conflict, `RESULTS_OF_RECORD_phaseB.md` wins
 over this file.** On artifact identity, `PROVENANCE.md` wins. On paths, `REPO_MAP.md` wins. On any
 statement that was inferred rather than measured, `VERIFIED_CORRECTIONS.md` wins over this file.
@@ -64,9 +64,9 @@ Phase C (optimization program)  → 7 pre-registered, VAL-gated levers across de
 Phase D (capacity hypothesis)   → PRE-REGISTERED, NOT EXECUTED. Deliberate time-boxed decision.
    ★ Future Work, not run ★        See PHASE_D_HANDOFF.md.
         ↓
-Attribution study               → Machinery verified label-free (2026-09-01/02, FINAL). Final human
-   ★ RERUN IN PROGRESS ★           annotation approved 2026-09-18; method re-locked (spec v4, A4);
-                                  label-scored results PENDING RUN. See §6.
+Attribution study               → Machinery verified label-free (FINAL). Final blind annotation
+   ★ DONE — pre-registered ★       scored 2026-09-19: L1 weak pass (0.569), L2 FAIL (below the
+     negative at L2/L3            anatomical prior), L3 FAIL. See §6.
         ↓
 ★ CURRENT PHASE ★
 Report writing + Web Demo (SzScan) + Defense prep
@@ -151,7 +151,7 @@ representation-limited subjects (chb06, chb14) sit in the locked TEST set.
   was deleted in the same pass and is genuinely not needed (see §7 item 2). Tag: `repo-deps-fixed`.
   A standing import-scan is recorded in `REPO_MAP.md` §7.7 — run it after any file move.
 
-## 6 · Attribution — label-free half FINAL; label-scored half PENDING RUN on the final annotation
+## 6 · Attribution — FINAL (label-free half 2026-09-02; label-scored half 2026-09-19)
 
 Full detail: **`ATTRIBUTION_SPEC.md` v4** (method locked by Amendment A4, 2026-09-18). Summary in
 `RESULTS_OF_RECORD_phaseB.md` §10. Report material: `ATTRIBUTION_REPORT_PACK.md` v2.
@@ -173,8 +173,14 @@ Within-subject Jaccard 0.5144. Anatomical prior (label-only) macro-AUROC 0.7387.
 **Retired — never quote:** everything scored against the machine-generated draft (0.6497, 0.3095,
 0.7758, 0.8879, −0.1261, 0.2672, +0.3578, p = 0.984). Restore point `git tag attribution-v6-draft`.
 
-**Pending run (spec §4, §9.3):** L1 macro-AUROC vs permutation null → L2 vs the anatomical prior →
-L3 matched vs swapped within subject; D7 reported as registered; Holm over {L2, L3}.
+**Result (spec §9.3, RoR §10.3, tag `attribution-v7-results`):** L1 macro-AUROC **0.5694**
+[0.5097, 0.6321], p = 0.001 — PASS, weak; **0.5011 without chb15**. L2 Δ vs prior **−0.1694**
+[−0.2553, −0.0804] — FAIL, significantly below a fixed anatomical rule. L3 T = +0.0064, p_holm 0.68 —
+FAIL. D7 control higher. Stable across seeds (0.572–0.577) and aggregation (0.585). Per subject: chb15
+0.713 and chb13 0.676 agree; chb16 0.260 and chb18 0.365 are inverted.
+**Reading:** a pre-registered negative. The machinery is sound (synthetic); the reconstruction anomaly
+simply does not sit where a reader sees the discharge. The demo panel stays as a neutral anomaly view
+(title unchanged, UI frozen); the report must not present it as a guide to ictal channels.
 
 **Figures affected:** Figure 3.9 (rank heat map) is regenerated with the final labels overlaid; Figure
 3.10 becomes synthetic-only. Figure 3.8 and Table 3.6 are unchanged. Tables 3.7 and 3.8 are refilled.
@@ -244,10 +250,10 @@ L3 matched vs swapped within subject; D7 reported as registered; Holm over {L2, 
    is competitive (SzCORE Challenge 2025 realistic band 0.32–0.43); how to frame the 7-lever negative
    program as rigor (`RUBRIC_TRACKING.md` §6); and the attribution defense questions prepared in
    `ATTRIBUTION_REPORT_PACK.md` v2 PART 4 §4.3 (self-annotation, generalized exclusion, anatomical prior).
-4. **Attribution rerun on the final annotation — IN PROGRESS (2026-09-18).** Step 2 (docs re-locked) done;
-   step 3 parser + gate G-L1 + `eval` with L2/L3 → `results/attribution_v7/`; step 4 fill spec §9.3,
-   RoR §10.3, `VERIFIED_NUMBERS.md` and the project instructions §7; step 5 rewrite the attribution
-   material of the report per `ATTRIBUTION_REPORT_PACK.md` v2 PART 1. Must finish before report assembly.
+4. **Attribution rerun on the final annotation — results FINAL (2026-09-19).** Remaining: regenerate
+   Figures 3.9 and 3.10; rewrite the attribution material of the report per
+   `ATTRIBUTION_REPORT_PACK.md` v2 PART 1 (Ch.1–5, front matter, Tables 3.7–3.8, captions, Table 3.9
+   rows); then update the project instructions §7 once. Must finish before report assembly.
 
 ## 7a · Findings settled during the writing phase
 

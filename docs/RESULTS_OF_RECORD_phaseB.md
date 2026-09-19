@@ -1,6 +1,6 @@
 # RESULTS_OF_RECORD — PHASE B / TIER-2 (rlg optimized pipeline)
 **Status:** LOCKED (one-shot TEST executed once, as pre-registered in PREREG_TIER2 + Amendment A1).
-**Last verified 2026-09-02. §10 rewritten 2026-09-18 (final channel annotation; label-scored attribution numbers pending).** Before quoting any number here, run `python src/verify_provenance.py`
+**Last verified 2026-09-02. §10 rewritten 2026-09-18 and completed 2026-09-19 (final channel annotation, attribution results FINAL).** Before quoting any number here, run `python src/verify_provenance.py`
 (~20 s): it re-derives the canonical checkpoint identity from the committed TEST components.
 Reconciles into `docs/RESULTS_OF_RECORD.md`. §0 (recon+temp+gamma) remains the historical baseline;
 **rlg (recon+latent+gamma, temporal-free) is the Phase-B optimized pipeline of record.**
@@ -178,7 +178,7 @@ rlg is the performance ceiling for this dataset/split. Every lever — directed 
 
 ---
 
-## 10 · Channel attribution (rewritten 2026-09-18 — final annotation; label-scored results PENDING RUN)
+## 10 · Channel attribution (rewritten 2026-09-18; results FINAL 2026-09-19)
 
 Full specification: **`docs/ATTRIBUTION_SPEC.md` v4** (method locked by Amendment A4 before any
 label-scored number). Attribution is **XAI for the GAE reconstruction branch** — NOT seizure
@@ -211,10 +211,26 @@ channels: chb06 ×10, chb03 ×3, chb13 ×1). Focal by subject: chb03 4 · chb06 
 chb15 20 · chb16 10 · chb17 3 · chb18 6. Pooled within-subject Jaccard **0.5144** (mean over seizure
 pairs). Anatomical prior (LOSO channel frequency, label-only) macro-AUROC **0.7387** — the L2 bar.
 
-### 10.3 Against the annotation — PENDING RUN
-Layout and claim rules: spec §4 and §9.3. L1 (chance), L2 (anatomical prior), L3 (matched vs swapped),
-D7 (subject-constant, as registered). **No label-scored number is locked until this subsection is
-filled from `results/attribution_v7/`.**
+### 10.3 Against the annotation — FINAL (2026-09-19, `git tag attribution-v7-results`)
+62 focal seizures, seed 42, p95. Source `results/attribution_v7/attribution_{tests,summary}.csv`.
+
+| test | value [95% CI] | reference | p (Holm) | verdict |
+|---|---|---|---|---|
+| **L1** macro-AUROC vs chance | **0.5694** [0.5097, 0.6321] | null 0.5004 | 0.001 | **PASS** |
+| **L2** Δ vs anatomical prior | **−0.1694** [−0.2553, −0.0804] | prior 0.7387 | 1.0 | **FAIL** — significantly below |
+| **L3** matched − swapped | **+0.0064** | null 0.0001 | 0.6753 | **FAIL** |
+| D7 Δ vs subject-constant | −0.0737 | control 0.6431 | — | control higher |
+
+Descriptive: excl. chb15 **0.5011** [0.4311, 0.5741], p = 0.49 · n_win ≥ 3: 0.5889 · mean aggregation
+0.5854 · seeds 1/2/3: 0.5755 / 0.5767 / 0.5723 · macro-AUPRC 0.4500 (prevalence 0.253) · R@|S| 0.3202.
+Per subject: chb03 0.4924 · chb13 **0.6763** · chb14 0.5908 · chb15 **0.7127** · chb16 **0.2597** ·
+chb17 0.7082 · chb18 0.3650 · chb06 none (all generalized).
+
+⇒ **The channel-level reconstruction anomaly agrees only weakly with a blind annotation of ictal
+channels, the agreement rests on one patient, it ranks annotated channels significantly worse than a
+fixed anatomical rule, and it carries no seizure-specific information.** A pre-registered negative.
+The label-free machinery (§10.1) is unaffected: the scoring detects injected anomalies correctly; what
+it detects in real seizures is not where the reader sees the discharge.
 
 ### 10.4 Provenance
 Checkpoint as in §7 errata. Row→seizure map `results/attribution_v6/{seizure_blocks.csv,

@@ -538,6 +538,43 @@ hypothesis. Reported as a methodological negative and never used to classify.
 
 ---
 
+# Part 7c · Channel attribution against the final annotation (added 2026-09-19)
+
+Supersedes every label-scored value in Part 7 (7.1, 7.3, 7.4, 7.5, 7.6), which were computed against
+the retired machine-generated draft. Part 7.2 (label-free) stands unchanged.
+
+**Annotation.** `results/attribution_v7/labels/source/Channel_label_approved.md`, SHA-256 (LF)
+`70eef3150474fe09339bbd0b14224a91e7a318412d9f80a0354d7e3c8267872a`. Made by the author from the raw
+18-channel EEG, blind to every model output; approved by the supervisor. Parsed to
+`ictal_channels_FINAL.csv`; order confirmed by the author (gate G-L1, `parse_log.txt`).
+76 seizures = 62 focal + 14 generalized (chb06 ×10, chb03 ×3, chb13 ×1). |S| over focal 1–10,
+mean 4.55, 282 channel marks. Pooled within-subject Jaccard 0.5144 (mean over seizure pairs).
+Source: `label_diversity.csv`, `label_composition.csv`.
+
+**Checks.** `ch_name == CH[ch_idx]` on 10944/10944 rows of `attribution_v6/attribution_scores.csv`.
+`eval --labels v6` reproduced every v6 CSV byte-identically after the code change.
+
+**Tests** — source `results/attribution_v7/attribution_tests.csv`:
+
+| Test | Value | Interval | Reference | p | Holm p | Verdict |
+|---|---|---|---|---|---|---|
+| L1 chance | 0.5694 | [0.5097, 0.6321] | null 0.5004 | 0.001 | — | pass |
+| L2 anatomical prior | −0.1694 | [−0.2553, −0.0804] | prior 0.7387 | 1.0 | 1.0 | fail |
+| L3 matched vs swapped | +0.0064 | — | null 0.0001 | 0.3377 | 0.6753 | fail |
+| D7 subject-constant | −0.0737 | — | control 0.6431 | — | — | control higher |
+
+**Panels** — source `attribution_summary.csv`: excl. chb15 0.5011 [0.4311, 0.5741], p 0.4915 ·
+n_win ≥ 3 (n = 59) 0.5889 · mean aggregation 0.5854 · seeds 1/2/3 0.5755 / 0.5767 / 0.5723 ·
+macro-AUPRC 0.4500 at prevalence 0.2527 · Recall@|S| 0.3202.
+Per subject: chb03 0.4924 (n 4) · chb13 0.6763 (11) · chb14 0.5908 (8) · chb15 0.7127 (20) ·
+chb16 0.2597 (10) · chb17 0.7082 (3) · chb18 0.3650 (6) · chb06 none.
+
+**Exploratory, not yet committed as a file** (ATTRIBUTION_SPEC §9.3b): Spearman between the model's
+mean channel rank and annotation frequency +0.095. Do not quote until it is written by a committed
+script.
+
+---
+
 # Part 7b · External comparators, checked against the source papers
 
 Five source papers were opened on 2026-09-06 and the figures this project relies on were read
@@ -643,7 +680,7 @@ itself has already been corrected.
 
 | Item | Status |
 |---|---|
-| Whether the machine-generated annotation is kept in the body, moved to an appendix, or deferred to a later publication | Decision pending; a fallback that does not depend on the answer is described in Part 7.1 |
+| Whether the machine-generated annotation is kept in the body, moved to an appendix, or deferred to a later publication | **Closed 2026-09-19:** superseded by the final human annotation; see Part 7c |
 | Training-subject components, which would complete the weight-derivation cross-check | Not committed |
 | Five detection figures rebuilt from the final system | Build task; sources all present |
 | Library versions for the software table | One command, not yet run |

@@ -1,5 +1,5 @@
 # ATTRIBUTION — REPORT WRITING PACK (v2, 2026-09-18)
-### Everything needed to write the channel-attribution material. Label-free numbers are final; label-scored numbers are PENDING RUN.
+### Everything needed to write the channel-attribution material. All numbers FINAL (2026-09-19).
 
 **Purpose.** A later session should be able to rewrite the attribution material of Chapters 1–5 and the
 front matter **from this file alone**, without re-deriving a framing decision. Method and claims are
@@ -27,14 +27,16 @@ of PART 2 §2.4.
    0.4990–0.5013 across all 50 cells.
 3. The ranking is stable across GAE random seeds (Spearman 0.970 ± 0.026).
 4. Against a blind, supervisor-approved annotation of every ictal channel in 62 focal test seizures,
-   the ranking reaches macro-AUROC **[L1 PENDING]** (permutation p **[PENDING]**).
+   the ranking is only weakly above chance (macro-AUROC 0.5694 [0.5097, 0.6321], permutation p =
+   0.001), and the agreement rests on one patient: without chb15 it is 0.5011 (p = 0.49).
 5. A rule that ignores the EEG and ranks channels by how often they are ictal in other patients reaches
-   0.7387; the model's margin over that rule is **[L2 PENDING]**.
-6. Within a patient, a seizure's own map fits its own annotation **[L3 PENDING — better / no better]**
-   than a sibling seizure's map does.
+   0.7387; the model is 0.1694 below it (95 % CI −0.2553 to −0.0804).
+6. Within a patient, a seizure's own map fits its own annotation no better than a sibling seizure's map
+   does (mean difference +0.0064, Holm-adjusted p = 0.68).
 
-Sentences 4–6 are written from the §4.7 interpretation table of the spec, **after** the run, choosing
-the row the numbers land in. Never soften a failed row into a passed one.
+**Verdict: a pre-registered negative at L2 and L3.** The scoring machinery detects injected anomalies
+(sentence 2), but the anomaly the model sees in real seizures is not where a reader sees the discharge.
+Never soften this into "above chance, therefore informative".
 
 ---
 
@@ -128,8 +130,14 @@ Focal seizures by patient: chb03 4 · chb06 0 · chb13 11 · chb14 8 · chb15 20
 chb18 6. Pooled within-patient Jaccard 0.5144 (mean over seizure pairs). Frontopolar channels ≈ 41 % of
 labels; five channels never labelled. Anatomical prior macro-AUROC 0.7387.
 
-## 3.3 Against the annotation — PENDING RUN
-Table 3.7 layout: spec §9.3. Fill only from `results/attribution_v7/`.
+## 3.3 Against the annotation — FINAL
+All values: spec §9.3 (copied from `results/attribution_v7/`). Table 3.7 = the four-test table plus the
+per-subject rows. Headline values: L1 0.5694 [0.5097, 0.6321] p 0.001 · L2 −0.1694 [−0.2553, −0.0804]
+· L3 +0.0064 p_holm 0.6753 · D7 −0.0737 · excl. chb15 0.5011 · seeds 0.5755/0.5767/0.5723 · mean agg
+0.5854 · AUPRC 0.4500 at prevalence 0.253. Per subject: chb15 0.7127, chb13 0.6763, chb17 0.7082
+(n = 3), chb14 0.5908, chb03 0.4924, chb18 0.3650, chb16 0.2597.
+Spec §9.3b is exploratory and is **not** quoted with numbers until folded into a committed file; it
+may be described qualitatively in Chapter 4 (patient-specific agreement; chb16 inversion).
 
 ## 3.4 Spread — synthetic negative only
 U-shape in |S| (0.9644 → 0.9441 minimum at |S| = 4 → 0.9755). No real-label result.
@@ -156,12 +164,21 @@ U-shape in |S| (0.9644 → 0.9441 minimum at |S| = 4 → 0.9755). No real-label 
 2. **A quantitative attribution evaluation with four references**: a permutation null, a synthetic upper
    bound, an anatomical prior, and a within-patient specificity test. The prior is the reference most
    attribution studies omit, and on this corpus it is strong (0.7387).
+3. **A cautionary result.** Judged against chance alone, the attribution would have been reported as a
+   success (p = 0.001). Judged against the prior and within patients, it fails. The contribution is the
+   evaluation design and the honest negative, not a working channel explainer.
 
 EEG-CGS remains framing and scale only, never head-to-head.
 
-## 4.2 What the numbers support — PENDING, choose the §4.7 row
-Write one paragraph. The claim ceiling is "concordance with one blind reader". Mention the synthetic
-upper bound beside the real value so a reader can calibrate it.
+## 4.2 What the numbers support
+One paragraph, in this order: (1) the machinery works on synthetic ground truth; (2) on real seizures
+the per-channel reconstruction anomaly agrees only weakly with a blind reader, driven by chb15;
+(3) a fixed anatomical rule does significantly better; (4) no seizure-specific information.
+Interpretation, stated as hypothesis: per-node reconstruction error measures a change in a node's
+connectivity pattern, which need not coincide with where the scalp discharge is visible; the anomaly
+is patient-specific (it matches in chb15 and chb13, is inverted in chb16 and chb18).
+Consequence for the application: the channel panel is a view of model anomaly, not a guide to ictal
+channels, and the report says so where the panel is described.
 
 ## 4.3 Defense questions to prepare (answers already fixed)
 - *"Why exclude the generalized seizures?"* AUROC is undefined with no negative channel; focal-only
@@ -172,6 +189,13 @@ upper bound beside the real value so a reader can calibrate it.
 - *"Couldn't a fixed rule do as well?"* That is exactly L2; the prior is reported.
 - *"Isn't the map just the patient's usual pattern?"* That is L3 (and D7).
 - *"Frontopolar channels are artifact-prone."* Yes; stated as a limitation, not corrected.
+- *"So the attribution failed — why keep the panel in the application?"* It is titled as a
+  reconstruction-anomaly view and never claims localization; the thesis shows exactly how far it can be
+  trusted. Removing it would hide a measured limitation rather than disclose it.
+- *"Could another aggregation or seed rescue it?"* Mean aggregation 0.585 and three other seeds
+  0.572–0.577 were pre-registered sensitivities; none changes the verdict. Nothing was tuned (A4.9).
+- *"Why is chb16 below chance?"* Its annotated temporal channels rank lowest while never-annotated
+  channels rank highest; its seizures last 6–14 s. Exploratory observation, not a claim.
 - *"Why did the labels change?"* The first annotation was machine-generated and recorded only dominant
   channels; the protocol always asked for every ictal channel (spec §3.1, unchanged since v2). The schema
   mismatch was documented as the reason for relabelling on 2026-09-02 (spec v3 §3.3, §9.5), on grounds of
@@ -182,8 +206,10 @@ upper bound beside the real value so a reader can calibrate it.
 Spec §7, items 1–8.
 
 ## 4.5 Future work
-Second independent reader and inter-reader agreement; onset-window aggregation (as SZTrack) as a
-pre-registered alternative; a diffuseness measure monotone in |S|; external corpus with channel labels.
+An attribution designed for channels rather than read off the reconstruction branch (e.g. gradient- or
+perturbation-based attribution on the detection score), pre-registered against the same four
+references; onset-window aggregation (as SZTrack); a second independent reader; an external corpus
+with channel labels.
 
 ---
 
@@ -194,7 +220,8 @@ pre-registered alternative; a diffuseness measure monotone in |S|; external corp
 spread as a classifier · a head-to-head comparison with EEG-CGS · a result for chb06's channels.
 
 **Always write:** blind, single annotator, supervisor-approved · 62 focal / 14 generalized · the prior
-(0.7387) beside the model's AUROC · the synthetic ceiling beside the real value · chb15's 32 % share.
+(0.7387) beside the model's AUROC · the synthetic ceiling beside the real value · chb15's 32 % share and
+the 0.5011 without it · "pre-registered negative" for L2/L3.
 
 **If a number is needed that is not here:** read it from `results/attribution_v7/` (label-scored) or
 `results/attribution_v6/` (label-free). Never estimate, never carry one over from a chat transcript.

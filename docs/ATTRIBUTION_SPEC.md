@@ -1,4 +1,4 @@
-# ATTRIBUTION_SPEC — Channel Attribution (v4, method LOCKED, label-scored results PENDING RUN)
+# ATTRIBUTION_SPEC — Channel Attribution (v4 rev. B, 2026-09-19 — method LOCKED, results FINAL)
 
 > **Single source for the channel-attribution study.** Supersedes v3 rev. B (2026-09-02). Self-contained:
 > a later session can execute or defend this chapter from this file alone.
@@ -10,7 +10,8 @@
 >   machine-generated dominant-channel draft, which is retired and never scored again (§3.5).
 > - **Method is LOCKED by Amendment A4 (§10), written before any label-scored number was produced.**
 > - **Machinery validation (§9.1–§9.2) is label-free, FINAL, and unchanged.**
-> - **Label-scored results (§9.3) are PENDING RUN.** Every number from the retired draft labels
+> - **Label-scored results (§9.3) are FINAL (run 2026-09-19, `git tag attribution-v7-results`).**
+>   Verdict (§4.7): **L1 PASS (weak), L2 FAIL, L3 FAIL.** Every number from the retired draft labels
 >   (0.6497, 0.3095, 0.7758, 0.8879, p = 0.984, …) is **retired** and must not be quoted anywhere.
 >
 > **Framing, non-negotiable:** this is **XAI for the GAE reconstruction branch**. It is NOT seizure
@@ -37,6 +38,11 @@
   measurement, §3.4). An attribution that does not beat it has no triage value beyond that rule.
 - **Verified label-free.** Synthetic null 0.4912, ceiling 0.9818, monotone; seed Spearman 0.970 ± 0.026.
 - **Negative, kept.** Normalised entropy (spread) does not measure localisation (synthetic U-shape).
+- **RESULT (§9.3).** macro-AUROC **0.5694** [0.5097, 0.6321], p = 0.001 over 62 focal seizures —
+  above chance, but **0.1694 below the anatomical prior** (CI [−0.2553, −0.0804]) and with **no
+  seizure-specific information** (L3 p_holm = 0.6753). Without chb15 it is **0.5011** (p = 0.49).
+  The channel-level reconstruction anomaly does not track where a blind reader sees ictal discharge,
+  beyond a patient-specific agreement in a minority of patients.
 
 ---
 
@@ -380,26 +386,68 @@ Spearman = **−0.012**.
 substantial per-seizure variation.
 
 
-### 9.3 Against the final annotation — PENDING RUN
+### 9.3 Against the final annotation — FINAL (2026-09-19)
 
-Nothing in this subsection exists yet. Fill it only from `results/attribution_v7/attribution_summary.csv`
-and `attribution_perseizure.csv` after gate G-L1 passes. Layout fixed in advance:
+Source: `results/attribution_v7/{attribution_tests,attribution_summary,attribution_perseizure}.csv`,
+written by `attribution_pipeline.py eval` after gate G-L1 (order confirmed by the author, logged in
+`labels/parse_log.txt`). Regression: `eval --labels v6` reproduced every v6 CSV byte-identically.
+Channel alignment: `ch_name == CH[ch_idx]` on 10944/10944 rows of `attribution_scores.csv`.
 
-| panel | n | macro-AUROC [95% CI] | p_perm | macro-AUPRC (prev.) | R@\|S\| |
+**Pre-registered tests (seed 42, p95, 62 focal seizures):**
+
+| test | statistic | value [95% CI] | reference | p | p (Holm) | verdict |
+|---|---|---|---|---|---|---|
+| **L1** chance | macro-AUROC | **0.5694** [0.5097, 0.6321] | null 0.5004 | 0.001 | — | **PASS** |
+| **L2** anatomical prior | AUROC − AUROC_prior | **−0.1694** [−0.2553, −0.0804] | prior 0.7387 | 1.0 | 1.0 | **FAIL** (significantly *below*) |
+| **L3** matched vs swapped | mean(matched − swapped) | **+0.0064** | null 0.0001 | 0.3377 | 0.6753 | **FAIL** |
+| D7 subject-constant | AUROC − AUROC_ctrl | −0.0737 | control 0.6431 | — | — | control higher (as registered: no evidence beyond a subject prior) |
+
+**Descriptive panels:**
+
+| panel | n | macro-AUROC [95% CI] | p_perm | macro-AUPRC (prev.) | R@\|S\| | prior |
+|---|---|---|---|---|---|---|
+| **all focal (primary)** | 62 | **0.5694** [0.5097, 0.6321] | 0.001 | 0.4500 (0.253) | 0.3202 | 0.7387 |
+| excl. chb15 (D8) | 42 | 0.5011 [0.4311, 0.5741] | 0.4915 | 0.4458 (0.312) | 0.3188 | 0.8164 |
+| n_windows ≥ 3 (D5) | 59 | 0.5889 [0.5299, 0.6454] | 0.001 | 0.4602 (0.249) | 0.3317 | 0.7328 |
+| mean aggregation | 62 | 0.5854 [0.5197, 0.6506] | 0.001 | 0.4783 | 0.3680 | 0.7387 |
+| seed 1 / 2 / 3 | 62 | 0.5755 / 0.5767 / 0.5723 | ≤ 0.002 | 0.4694 / 0.4663 / 0.4484 | — | 0.7387 |
+
+**Per subject (seed 42, p95):**
+
+| subject | n focal | macro-AUROC [95% CI] | p_perm | prior | T (L3, descriptive) |
 |---|---|---|---|---|---|
-| **L1 — all focal (primary)** | 62 | PENDING | PENDING | PENDING (0.253) | PENDING |
-| excl. chb15 (D8) | 42 | PENDING | PENDING | PENDING | PENDING |
-| n_windows ≥ 3 (D5) | PENDING | PENDING | PENDING | PENDING | PENDING |
-| mean aggregation | 62 | PENDING | PENDING | — | — |
-| seeds 1 / 2 / 3 | 62 | PENDING | — | — | — |
+| chb03 | 4 | 0.4924 [0.4160, 0.5688] | 0.5385 | 0.9032 | −0.0030 |
+| chb06 | 0 | — (10/10 generalized) | — | — | — |
+| chb13 | 11 | **0.6763** [0.5846, 0.7755] | 0.001 | 0.7525 | −0.0105 |
+| chb14 | 8 | 0.5908 [0.4415, 0.7050] | 0.0509 | 0.8074 | +0.0118 |
+| chb15 | 20 | **0.7127** [0.6177, 0.8008] | 0.001 | 0.5757 | +0.0313 |
+| chb16 | 10 | **0.2597** [0.2082, 0.3038] | 1.0 | 0.8458 | −0.0380 |
+| chb17 | 3 | 0.7082 [0.4462, 0.9464] | 0.017 | 0.8313 | +0.1020 |
+| chb18 | 6 | 0.3650 [0.2196, 0.5380] | 0.984 | 0.8309 | −0.0205 |
 
-| test | statistic | value [95% CI] | p (Holm where applicable) | verdict |
-|---|---|---|---|---|
-| L2 anatomical prior | Δ_prior = AUROC(s) − AUROC(prior); prior = 0.7387 | PENDING | — (CI rule) | PENDING |
-| L3 matched vs swapped | T = mean(matched − swapped) | PENDING | PENDING | PENDING |
-| D7 subject-constant | Δ_D7 = AUROC(s) − AUROC(s_LOO) | PENDING | — | reported as registered |
+chb15 is the only subject above its own anatomical prior (0.7127 vs 0.5757). chb16 and chb18 are
+below chance; chb16's ten seizures last 6–14 s (`parse_log.txt`), i.e. only a few 4-s windows each.
 
-Per subject: n, AUROC [CI], prior AUROC, T_subject — PENDING. chb06: no focal seizure, stated.
+**Verdict (§4.7):** row "L1 passes, L2 fails", with L3 failing. Written without softening: the
+anomaly map agrees with the blind annotation only weakly, the agreement rests on one patient, it ranks
+annotated channels significantly **worse** than a fixed anatomical rule, and it carries no
+seizure-specific information.
+
+### 9.3b Exploratory diagnosis — post hoc, NOT a claim (2026-09-19)
+Run once, after the verdict, to explain the failure (rule: record the failure and the diagnosis;
+never re-score). Printed by an inline command, not yet a committed file — fold into the pipeline
+before any of it is quoted as a number in the report.
+- Mean GAE rank per channel over the 62 focal seizures is nearly flat (7.1 for P3-O1 to 12.2 for
+  F4-C4, uniform expectation 9.5), and its Spearman correlation with how often a channel is annotated
+  is **+0.095**: the model's channel preference is essentially unrelated to where the reader sees
+  ictal discharge.
+- The agreement is patient-specific. chb15: model top channels P3-O1, P7-O1, T7-P7 coincide with the
+  annotation (T7-P7 in 20/20, P3-O1 in 11/20). chb16: model top channels P4-O2 and FZ-CZ are never
+  annotated, while the annotated T8-P8 and T7-P7 rank near the bottom — the inversion behind 0.2597.
+- Generalized seizures: highest anomaly on central-parietal channels (C4-P4, C3-P3, F3-C3), lowest on
+  the frontopolar and temporal chains.
+- Reading: per-node reconstruction error reflects a change in each node's connectivity pattern, which
+  need not sit where the scalp discharge is visible. Hypothesis only; not tested.
 
 ### 9.4 Methodological negative — spread does not measure localisation (label-free, final)
 
@@ -482,6 +530,11 @@ The originals remain recoverable at `git tag phase-c-final` and in the commit hi
 - **A4.8 — Index gate G-L1** (§8) must pass before `eval`; its log is committed with the results.
 - **A4.9 — Nothing is tuned on these labels.** No aggregation, threshold, channel subset or panel is
   selected after the scores are seen. A result that fails is reported as it stands.
+- **A4.10 — Operational note, fixed in code before the run (2026-09-19).** Holm needs a p-value for L2:
+  it is the one-sided paired-bootstrap p, (1 + #{Δ* ≤ 0}) / (1 + 1000). L2 passes only if its Holm
+  p < 0.05 **and** its 95 % CI lies above 0. D7 in the per-seizure table uses the other *focal*
+  seizures of the subject (§4.4). The label CSV carries `n_ictal`; `n_windows` is read from
+  `seizure_blocks.csv`.
 
 ---
 

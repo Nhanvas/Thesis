@@ -21,19 +21,19 @@ writer looking for the figure by its report number can find it):
                                           monotone rise, ceiling at a=3.0.
     fig3_12_attribution_seed_stability.png  LABEL-FREE.  Channel-ranking agreement across GAE seeds
                                           {42,1,2,3}. Rubric #6.
-    fig3_9_attribution_rank_heatmap.png     LABEL-FREE.  Per-seizure channel RANK (1..18) for all 76
-                                          TEST seizures, grouped by subject. Rank is scale-free, so
-                                          seizures are directly comparable. Rubric #7, #8.
+    fig3_9_attribution_rank_heatmap.png     Per-seizure channel RANK (1..18) for all 76 TEST seizures,
+                                          grouped by subject, with the FINAL annotation overlaid
+                                          (results/attribution_v7/labels/ictal_channels_FINAL.csv):
+                                          a dot marks each annotated ictal channel of a focal seizure;
+                                          generalized seizures are tagged "(gen.)" and carry no dots.
+                                          Ranks are label-free; the overlay is the only label input.
     fig3_14_attribution_persubject_forest.png
-                                          PROVISIONAL (uses draft labels). Per-subject AUROC with
-                                          bootstrap CI, against the macro and the D7 control. Replaces
-                                          the AUROC-vs-|S| scatter: the on-disk labels give |S| in
-                                          {1,2} only (SPEC §3.3), so a trend over |S| is not
-                                          estimable. Rerun if the labels are frozen.
+                                          RETIRED 2026-09-18 (draft labels, ATTRIBUTION_SPEC v4 §3.5).
+                                          The function is kept for provenance and is not called.
     tables/csv/table_A7_top_channels.csv
                                           LABEL-FREE.  Appendix table: top-3 channels per seizure.
 
-Figures 1-3 and the table never need redoing. Only fig 4 depends on the label freeze.
+Figures 1-2 and the table are label-free. Figure 3.9 reads the FINAL annotation for its overlay.
 """
 import csv
 import sys
@@ -50,6 +50,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 SRC = ROOT / "results" / "attribution_v6"
+FINAL_LABELS = ROOT / "results" / "attribution_v7" / "labels" / "ictal_channels_FINAL.csv"
+EXPECTED_FOCAL, EXPECTED_GEN, EXPECTED_MARKS = 62, 14, 282   # ATTRIBUTION_SPEC v4 §3.4
 OUT = ROOT / "figures"
 TABLE_OUT = ROOT / "tables" / "csv"
 CH = ["FP1-F7", "F7-T7", "T7-P7", "P7-O1", "FP1-F3", "F3-C3", "C3-P3", "P3-O1",
@@ -175,6 +177,27 @@ def fig3_rank_heatmap():
         ax.axhline(b - 0.5, color="w", lw=1.6)
     for b in (3.5, 7.5, 11.5, 15.5):
         ax.axvline(b, color="w", lw=0.9, alpha=0.65)
+    # FINAL annotation overlay (the only label input to this figure)
+    if not FINAL_LABELS.is_file():
+        die(f"missing {FINAL_LABELS} — run: python src/attribution_pipeline.py labels")
+    lab = {(r["subject"], int(r["seizure_idx"])): (r["focal_generalized"],
+                                                   [c for c in r["ictal_channels"].split("|") if c])
+           for r in csv.DictReader(open(FINAL_LABELS))}
+    nf = sum(1 for v in lab.values() if v[0] == "focal")
+    ng = sum(1 for v in lab.values() if v[0] == "generalized")
+    xs, ys = [], []
+    for r, (s, i) in enumerate(order):
+        kind, chans = lab[(s, i)]
+        if kind == "focal":
+            for c in chans:
+                xs.append(CH.index(c)); ys.append(r)
+    print(f"  overlay self-check: focal={nf} generalized={ng} marks={len(xs)} "
+          f"(expected {EXPECTED_FOCAL}/{EXPECTED_GEN}/{EXPECTED_MARKS})")
+    if (nf, ng, len(xs)) != (EXPECTED_FOCAL, EXPECTED_GEN, EXPECTED_MARKS):
+        die("Figure 3.9 overlay self-check failed — stop")
+    ax.scatter(xs, ys, s=9, c="white", edgecolors="black", linewidths=0.4, zorder=3)
+    ax.set_yticklabels([f"{s} sz{i}" + ("  (gen.)" if lab[(s, i)][0] == "generalized" else "")
+                        for s, i in order], fontsize=6)
     cb = fig.colorbar(im, ax=ax, fraction=0.030, pad=0.02)
     cb.set_label("channel rank within the seizure  (1 = most anomalous)")
     save(fig, "fig3_9_attribution_rank_heatmap.png")
@@ -284,7 +307,5 @@ if __name__ == "__main__":
     fig1_synthetic()
     fig2_seed_robustness()
     fig3_rank_heatmap()
-    fig4_persubject_forest()
     table_top3()
-    print("\nDONE. Figures 1-3 and the CSV are LABEL-FREE and final.")
-    print("Figure 4 is PROVISIONAL — rerun after the supervisor freezes the labels.")
+    print("\nDONE. Figure 3.9 overlays the FINAL annotation; the forest figure is retired.")

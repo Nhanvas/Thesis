@@ -1,4 +1,4 @@
-# REPO_MAP — repository structure, post-cleanup, rev. 2026-09-06
+# REPO_MAP — repository structure, post-cleanup, rev. 2026-09-18 (attribution label paths)
 
 > **Before quoting any number or loading any checkpoint, run the session gate:**
 > ```bash
@@ -149,7 +149,7 @@ Outputs to `figures/attribution/`:
 | `attribution_fig1_synthetic.png` | ✅ label-free, final | #6, #8 — machinery-correctness exhibit |
 | `attribution_fig2_seed_robustness.png` | ✅ label-free, final | #6 |
 | `attribution_fig3_rank_heatmap.png` | ✅ label-free, final | #7, #8 — per-seizure channel ranking, 76 × 18 |
-| `attribution_fig4_persubject_forest.png` | ❌ PROVISIONAL (labels) | #7 — rerun if labels are frozen |
+| `attribution_fig4_persubject_forest.png` | ⛔ draft labels, retired 2026-09-18 | not in the report exhibit set |
 | `attribution_top3_channels.csv` | ✅ label-free, final | report appendix |
 
 > `fig_A_three_scores.py` was **deleted 2026-09-02**: it plotted `z_recon / z_temporal / z_gamma`, and
@@ -171,7 +171,7 @@ Outputs to `figures/attribution/`:
 | `report_assets_inventory.txt` · `requirements_snapshot.txt` | Machine-generated: exhibit source inventory, and the library versions behind the software table. |
 | `PROJECT_STATUS.md` | status, deadlines, remaining work. |
 | `RUBRIC_TRACKING.md` | v3 report checklist, 8 criteria / 100 pts. |
-| `ATTRIBUTION_SPEC.md` | v3 — the complete attribution study: problem, method, labels, metrics, results, amendments. |
+| `ATTRIBUTION_SPEC.md` | **v4 (2026-09-18)** — the complete attribution study: final annotation, method locked by A4, results (label-scored part pending run), amendments. |
 | `PHASE_C_FINAL_HANDOFF.md` · `PHASE_C_CLOSEOUT_provenance.md` · `PHASE_C_FULL_AUDIT.md` | Phase-C closure record. |
 | `PHASE_D_HANDOFF.md` | Future Work design (deliberately not executed). Defense material. |
 | `Thesis_Reference_Sheet.md` | citations for report writing. |
@@ -269,8 +269,9 @@ VAL 3: chb10,11,22 · TEST 8 (ONE-SHOT): chb03,06,13,14,15,16,17,18 — 76 seizu
 | `phaseB/tier2/` | **rlg CANONICAL.** `ens_test_tf/components/` = the committed one-shot TEST branch components (`zrecon_*`, `zlatent_*`, `zgamma_*`) — the ground truth for checkpoint verification. `ens_test_tf/{rlg,lg}/` = TEST ensembles · `ens_val_tf/` = VAL · `{rlg,lg,rg,ltg,rltg,baseline_rtg}/` = VAL grids · `{rlg,lg}_test/` = TEST grids · `ONESHOT_rlg_vs_s0.csv` · `G2prime_val.csv` · `FINAL_report.csv`. |
 | `phaseB/` | `E1_ablation_val.csv`, `E2_latent_val.csv`, `S2_S3_negatives.md`. |
 | `phaseC/` | Phase-C negatives: `artifact_gate/`, `artifact_probe/`, `c1/`, `c4full/`, `c4lite/`, `c_onset/`, `reencode/`. |
-| `attribution_v6/` | **attribution results** — see `ATTRIBUTION_SPEC.md` §8 for the file-by-file table. `labels/ictal_channels_DRAFT.csv` is PROVISIONAL **and is dominant-channel, not the §3.2 ictal set** (see §7.6). |
-| `attribution_v5/labels/` | ⚠️ **`labels_*_FINAL.csv` are the reader labels — IRREPLACEABLE, never delete.** The `*_onset.png` / `*_review.png` images are the views that were scored. |
+| `attribution_v6/` | **label-free attribution results, FINAL** (`seizure_blocks.csv`, `ictal_row_to_seizure.csv`, `attribution_scores.csv`, `attribution_diagnostics.csv`, `synthetic_*.csv`). `labels/ictal_channels_DRAFT.csv` and the label-scored CSVs here belong to the **retired** machine-generated draft — keep, never cite (see §7.6). |
+| `attribution_v7/` | **final channel annotation and every label-scored attribution result** (created 2026-09-18). `labels/source/Channel_label_approved.md` + `SHA256.txt` = the supervisor-approved ground truth — **IRREPLACEABLE, never delete.** `labels/ictal_channels_FINAL.csv` is parsed from it. |
+| `attribution_v5/labels/` | ⚠️ **`labels_*_FINAL.csv` = source of the retired machine-generated draft — provenance, IRREPLACEABLE, never delete.** Not the ground truth (that is `attribution_v7/labels/`). |
 | `label_material/` | labelling inputs: `seizure_segments/` (76 per-seizure renderings + meta + raw npy) and a README pointing at the label files. |
 | `retrain_v3p1/` | §0 baseline grids and operating points (pre-Tier-2). Historical comparison only. |
 | `phaseB/tier2/weights_rlg/` | Weight surface for the final branch set: 231-point grid plus the exact equal-weight row, and a summary. Written 2026-09-06. |
@@ -329,19 +330,17 @@ describe the wrong model.
 **Identify checkpoints by measurement, never by filename or by the constants 0.8676 / 0.836** — those
 are §0 values that still appear in old docs and old code comments. Run `src/verify_provenance.py`.
 
-### 7.6 The label file is not the schema the spec asks for
-`results/attribution_v6/labels/ictal_channels_DRAFT.csv` records **dominant channel(s), 1–2 per seizure**
-(40 DIFFUSE / 25 one-channel / 11 two-channel). `ATTRIBUTION_SPEC.md` §3.2 asks for every channel with
-clear ictal discharge.
-
-**And the annotation is machine-generated.** Its `label_source` column reads, for all 76 rows, that it
-came from an automated pass. It was not produced by a human reader and has not been reviewed by the
-supervising clinician. No chapter may describe it as expert, as a reader's, or as clinical validation —
-see `docs/LOCKED_DOCS_ADDENDUM.md` §1.5 for the wording that replaces it. The upstream file is
-`results/attribution_v5/labels/labels_ALL_FINAL.csv`; "DRAFT" in the v6 filename refers to the format
-conversion, not to a lower-quality version. Any label-scored attribution number therefore answers a
-narrower question than the spec poses, and the near-constant labels make the D7 control uninformative.
-Detail: `ATTRIBUTION_SPEC.md` §3.3 and §9.3.
+### 7.6 Two label files exist; only one is ground truth (rewritten 2026-09-18)
+- **Ground truth:** `results/attribution_v7/labels/ictal_channels_FINAL.csv`, parsed from
+  `labels/source/Channel_label_approved.md` — human annotation from raw EEG, blind to every model
+  output, every ictal channel per seizure, approved by the supervisor. 62 focal + 14 generalized.
+- **Retired:** `results/attribution_v6/labels/ictal_channels_DRAFT.csv` (from
+  `attribution_v5/labels/labels_ALL_FINAL.csv`) — machine-generated, 1–2 dominant channels. Every CSV
+  scored against it (`attribution_v6/{attribution_perseizure,attribution_summary,label_diversity}.csv`)
+  is retired too.
+- **Trap:** both files have "FINAL" somewhere in their lineage, and v6 directories look complete. A
+  label-scored number is valid only if it was read from `attribution_v7/`. Detail:
+  `ATTRIBUTION_SPEC.md` v4 §3 and §11; `VERIFIED_CORRECTIONS.md` §12.
 
 ### 7.7 Two canonical modules were archived while still imported (fixed 2026-09-03)
 The 2026-09-01/02 cleanup moved `evaluation_protocol.py` → `archive/src_superseded/utils/` and

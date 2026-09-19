@@ -1,61 +1,64 @@
-# ATTRIBUTION_SPEC — Channel Attribution (v3, EXECUTED)
+# ATTRIBUTION_SPEC — Channel Attribution (v4, method LOCKED, label-scored results PENDING RUN)
 
-> **Single source for the channel-attribution study.** Supersedes v2 (Vietnamese) and, before it, the
-> dominant-channel + MAP@K framework. Self-contained: a later session can execute or defend this
-> chapter from this file alone, without re-deriving context.
+> **Single source for the channel-attribution study.** Supersedes v3 rev. B (2026-09-02). Self-contained:
+> a later session can execute or defend this chapter from this file alone.
 >
-> **Status 2026-09-02 (rev. B):** problem / method / metrics **LOCKED**. Machinery validation **COMPLETE and
-> label-free** (not provisional). Results against labels are **PROVISIONAL** and, more importantly,
-> **answer a narrower question than §3.2 specifies** — the label file on disk is a *dominant-channel*
-> annotation (1–2 channels per seizure), not the full ictal-channel set. See §3.3 and §9.3.
+> **Status 2026-09-18 (v4):**
+> - **Ground truth is FINAL.** A human annotation of every TEST seizure, made from the raw 18-channel EEG
+>   **blind to every model output**, listing every channel with clear ictal discharge (§3). Reviewed and
+>   approved by the supervisor, who also fixed this labelling protocol. It replaces the earlier
+>   machine-generated dominant-channel draft, which is retired and never scored again (§3.5).
+> - **Method is LOCKED by Amendment A4 (§10), written before any label-scored number was produced.**
+> - **Machinery validation (§9.1–§9.2) is label-free, FINAL, and unchanged.**
+> - **Label-scored results (§9.3) are PENDING RUN.** Every number from the retired draft labels
+>   (0.6497, 0.3095, 0.7758, 0.8879, p = 0.984, …) is **retired** and must not be quoted anywhere.
 >
 > **Framing, non-negotiable:** this is **XAI for the GAE reconstruction branch**. It is NOT seizure
-> localization, NOT SOZ identification, NOT onset-channel detection.
+> localization, NOT SOZ identification, NOT onset-channel detection. Agreement with one reader is
+> **concordance**, never accuracy.
 
 ---
 
 ## 0. TL;DR
 
-- **Question.** For each seizure the GAE produces 18 per-channel anomaly scores. Do the channels a
-  reader marked as ictal score higher than the ones they did not? → per-channel binary classification.
+- **Question.** For each seizure the GAE produces 18 per-channel anomaly scores. Do the channels the
+  reader marked as ictal score higher than the ones they did not — and higher than a fixed anatomical
+  rule would place them?
 - **Score.** Per-node GAE reconstruction error → robust-z against the subject's own interictal
-  baseline → one vector `s ∈ ℝ¹⁸` per seizure. No retraining, no new model.
-- **Headline metrics.** macro-AUROC + macro-AUPRC across seizures, bootstrap CI, permutation null.
-- **Verified.** The scoring machinery is provably correct: synthetic injection with exact ground truth
-  gives a clean null (0.4912) and a clean ceiling (0.9818), monotone in between.
-- **Measured.** macro-AUROC 0.6497 [0.5663, 0.7390], p_perm = 0.001, on the 36 seizures that carry a
-  channel annotation.
-- **Caveat that governs the whole chapter.** Those annotations name **1–2 dominant channels**, not the
-  ictal-channel set §3.2 asks for (mean |S| = 1.31; 25 seizures with 1 channel, 11 with 2, 40 with none).
-  The question actually scored is *"does the GAE rank the reader's lead channel first?"* — the retired
-  dominant-channel framing, not per-channel binary classification.
-- **Blocked.** Those labels are near-constant within a subject (Jaccard 0.8879) — a mechanical
-  consequence of naming 1–2 channels from one anatomical focus. Per-seizure attribution therefore
-  cannot be separated from a subject-level channel prior.
-- **Negative.** The spread (entropy) metric for focal-vs-generalized does not work. Reported honestly.
+  baseline → p95 over the seizure's windows → one vector `s ∈ ℝ¹⁸` per seizure. Unchanged since v3.
+- **Ground truth.** 76 seizures: **62 focal** (1–10 ictal channels, mean |S| = 4.55, prevalence 0.253)
+  and **14 generalized** (all 18 channels ictal). AUROC is undefined when every channel is positive, so
+  the 14 are excluded from every channel metric by construction, not by choice.
+- **Three pre-registered claims, tested in order.**
+  L1 above chance (permutation null) → L2 above an anatomical prior (LOSO channel frequency) →
+  L3 seizure-specific (matched vs swapped within subject).
+- **Why L2 is mandatory.** A rule that never looks at the EEG — rank channels by how often they are
+  ictal in *other* patients — already reaches macro-AUROC **0.7387** on these labels (label-only
+  measurement, §3.4). An attribution that does not beat it has no triage value beyond that rule.
+- **Verified label-free.** Synthetic null 0.4912, ceiling 0.9818, monotone; seed Spearman 0.970 ± 0.026.
+- **Negative, kept.** Normalised entropy (spread) does not measure localisation (synthetic U-shape).
 
 ---
 
 ## 1. PROBLEM (locked)
 
-For **every one of the 76 TEST seizures** (see D3 — not conditioned on detector success), rank the 18
-bipolar scalp channels by GAE anomaly and test whether that ranking separates reader-marked ictal
-channels from the rest.
+For the **62 focal TEST seizures** (all 76 are scored; the 14 generalized ones have no defined channel
+metric, §3.4), rank the 18 bipolar scalp channels by GAE anomaly and test whether that ranking
+separates reader-marked ictal channels from the rest. Not conditioned on detector success (D3).
 
 Framing is **post-hoc review support** — indicating which channels carry an ictal-looking pattern so a
-clinician can review faster. It is not surgical localization.
+reviewer can look there first. It is not surgical localization.
 
 **Comparator framework:** EEG-CGS (Ho & Armanfard, AAAI 2023) — unsupervised GNN-autoencoder anomalous
-**channel** detection, scored per channel against dataset channel labels. We differ in three ways:
-(a) the score is the plain reconstruction-z of our detector's GAE, with no contrastive head;
-(b) the dataset is CHB-MIT, which has **no** channel labels, so we construct them;
-(c) labels come from a reading pass, not from a pre-annotated corpus.
+**channel** detection. We differ in three ways: (a) the score is the plain reconstruction-z of our
+detector's GAE, with no contrastive head; (b) CHB-MIT has **no** channel labels, so we construct them;
+(c) the labels come from one blind reading pass, not a pre-annotated corpus. Framing and scale only,
+never a head-to-head comparison.
 
-**Scientific contribution.** CHB-MIT provides onset/offset **times** only. Most interpretability work on
-CHB-MIT validates qualitatively ("the saliency looks like the known focus"). This study contributes
-(i) a channel-level ictal annotation set over CHB-MIT and (ii) a **quantitative** per-channel attribution
-evaluation with a permutation null and a synthetic upper bound — alongside EEG-CGS (quantitative but on
-pre-labelled TUSZ) and SZTrack/DeepSOZ (supervised localization against clinical SOZ).
+**Scientific contribution.** CHB-MIT provides onset/offset **times** only. This study contributes
+(i) a blind, supervisor-approved, channel-level ictal annotation of the 76 CHB-MIT test seizures and
+(ii) a **quantitative** per-channel attribution evaluation with a permutation null, a synthetic upper
+bound, an anatomical-prior baseline and a within-patient specificity test.
 
 ---
 
@@ -91,187 +94,220 @@ HEMI = L×8, R×8, M×2
 selected on the 8 TEST subjects. Aggregation (p95) is pre-registered. Operating-point thresholds, if
 used, are fixed on VAL.
 
+
 ---
 
 ## 3. LABELS
 
-### 3.1 Convention
+### 3.1 Convention (unchanged since v2, fixed by the supervisor)
 For each seizure, list every channel carrying a **clear, strong** ictal discharge (rhythmic evolution,
 sharp-and-slow, evolving low-voltage fast) at any point in the seizure.
 - **Counts:** genuine rhythmic ictal evolution, even if it joins late.
 - **Does not automatically count:** attenuation/suppression only, artifact, or a single coincident
-  transient → `uncertain` or omitted.
-- No seizure may be 18/18, otherwise AUROC is undefined.
-- `early_ictal` is optional metadata for lateralisation. **It is not SOZ.**
+  transient → omitted.
+- A seizure whose discharge involves all 18 channels is recorded as **generalized** ("Diffuse (18
+  channels)"). It carries no channel contrast, so it is excluded from every channel metric (§3.4).
+- **Not SOZ, not onset.** The convention covers involvement at any time, which matches the p95
+  aggregation of §2 (peak involvement over the whole seizure).
 
-### 3.2 Schema — `results/attribution_v6/labels/ictal_channels_FINAL.csv`
+### 3.2 Schema — `results/attribution_v7/labels/ictal_channels_FINAL.csv`
 ```
-subject, seizure_idx, onset_s, ictal_channels, uncertain_channels, flags, focal_generalized
+subject, seizure_idx, edf_file, onset_s, n_ictal, ictal_channels, focal_generalized, label_source
 ```
-`ictal_channels` uses `|` as separator in the current DRAFT file. `uncertain_channels` and
-`flags: artifact:*` channels are masked out of both `y` and `s` before scoring.
+`ictal_channels` uses `|` as separator, channel names exactly as §2. `label_source` =
+`human_blind_supervisor_approved_2026-09`. `uncertain_channels` and `flags` columns of v3 are dropped:
+the final annotation uses neither, so no masking is applied.
 
-### 3.3 Current label file — DRAFT, PROVISIONAL, and NOT the §3.2 schema
+### 3.3 The final annotation — provenance
+- **Source file:** `Channel label.md` (Markdown, one block per subject, one line per seizure), copied
+  verbatim to `results/attribution_v7/labels/source/Channel_label_approved.md` with its SHA-256 in
+  `results/attribution_v7/labels/source/SHA256.txt`. The source is never edited; the parser corrects
+  in code and logs every correction.
+- **Reader and blinding:** annotated by the thesis author from the raw 18-channel EEG of each seizure,
+  **without viewing any model output** (no score, rank, heat map or top-channel table). Reviewed and
+  approved by the supervisor as the ground truth of record.
+- **Known source defect, handled by the parser:** chb15 seizure 0 lists `P7-O1` twice → de-duplicated
+  (set semantics), |S| = 4. Logged.
+- **Index alignment:** `seizure k` of subject X is the k-th seizure of X in `seizure_blocks.csv` order.
+  Verified by gate G-L1 (§8) before any scoring.
 
-`results/attribution_v6/labels/ictal_channels_DRAFT.csv`, produced by
-`python src/attribution_pipeline.py labels`. It is a **deterministic, verbatim conversion** of
-`results/attribution_v5/labels/labels_ALL_FINAL.csv` (the v5 reader pass): the channel set is copied
-unchanged, and an empty entry whose note reads DIFFUSE becomes `generalized`. No new labelling was
-performed and nothing was reconstructed from memory or chat history.
-
-Alignment gate: all 76 rows matched `seizure_blocks.csv` on (`edf_file`, `onset_s`).
-
-> ⚠️ **SCHEMA MISMATCH — read this before interpreting any label-scored number.**
-> The source column in the v5 file is named **`dominant_ch`**. The reader recorded the *leading*
-> channel(s), not every channel carrying ictal discharge. Measured distribution over 76 seizures:
->
-> | channels labelled | 0 (DIFFUSE) | 1 | 2 |
-> |---|---|---|---|
-> | seizures | 40 | 25 | 11 |
->
-> Mean |S| over the 36 labelled seizures = **1.31** (prevalence 0.073). No seizure has more than 2.
->
-> This is **not** the §3.2 ictal-set schema. The AI-draft described in earlier versions of this spec
-> (~13 channels per seizure for chb03, etc.) **never existed on disk** — it was a plan, not a file, and
-> was correctly never reconstructed from memory.
->
-> **Consequence.** Everything scored against this file answers *"does the GAE rank the reader's
-> dominant channel first?"* — the framing this spec formally **retired** in §10. AUROC remains
-> well-defined (1–2 positives against 16–17 negatives) and the numbers in §9.3 are correct, but they
-> do not answer the §3.2 question. Say so wherever they appear.
-
-**Composition: 36 with a dominant channel / 40 DIFFUSE.** Per subject — the AUROC-eligible set:
+### 3.4 Composition (label-only measurement, 2026-09-18, to be reproduced by `labels` / `labeldiv`)
 
 | subject | chb03 | chb06 | chb13 | chb14 | chb15 | chb16 | chb17 | chb18 | total |
 |---|---|---|---|---|---|---|---|---|---|
-| labelled seizures | 6 | **0** | **0** | 3 | **20** | 1 | 3 | 3 | **36** |
+| seizures | 7 | 10 | 12 | 8 | 20 | 10 | 3 | 6 | **76** |
+| generalized (18/18) | 3 | **10** | 1 | 0 | 0 | 0 | 0 | 0 | **14** |
+| focal (scored) | 4 | **0** | 11 | 8 | 20 | 10 | 3 | 6 | **62** |
 
-### 3.4 focal vs generalized
-`generalized` when the reader recorded no localisable lead channel (DIFFUSE), else `focal`. The v2 rule
-"generalized if |S| ≥ 12" was never reachable: no seizure has |S| ≥ 3 under the current schema.
-Note that "focal" here means *a lead channel was identifiable*, not *the seizure was anatomically
-focal* — under a §3.2-conformant relabelling many of these seizures would carry large channel sets.
+- |S| over the 62 focal seizures: 1–10, mean **4.55**, macro prevalence **0.253**.
+  Counts by |S|: 1→3, 2→11, 3→7, 4→9, 5→9, 6→15, 7→2, 8→4, 9→1, 10→1.
+- **chb06 contributes no focal seizure** (all ten generalized) and is absent from every channel metric.
+  **chb15 supplies 20 of 62 (32 %).**
+- **Within-subject label similarity:** pooled pairwise Jaccard **0.5144** (mean over seizure pairs,
+  the same definition as the retired 0.8879). Per subject: chb03 0.944 · chb13 0.524 · chb14 0.671 ·
+  chb15 0.454 · chb16 0.653 · chb17 0.524 · chb18 0.365.
+- **Channel frequency across the 62 focal seizures:** T7-P7 45 · FP2-F4 33 · FP2-F8 30 · FP1-F7 29 ·
+  F7-T7 28 · T8-P8 28 · F8-T8 27 · FP1-F3 24 · F3-C3 11 · P7-O1 10 · P3-O1 9 · F4-C4 7 · P8-O2 1 ·
+  **C3-P3, C4-P4, P4-O2, FZ-CZ, CZ-PZ: 0.** The four frontopolar channels carry ≈ 41 % of all labels.
+- **Anatomical prior (L2 baseline), label-only:** macro-AUROC **0.7387**, macro-AUPRC 0.5065.
+- **Oracle within-subject label prior** (other seizures' *labels*, same subject, leave-one-out):
+  macro-AUROC 0.925. Not a baseline — it uses labels — but it shows the labels are still strongly
+  patient-consistent, which is why D7 alone cannot settle the per-seizure question (§4.4).
+
+Generalized ≡ the reader recorded all 18 channels. Focal ≡ any proper subset. This replaces the v3
+definition ("no localisable lead channel"), which belonged to the retired draft.
+
+### 3.5 Retired: the machine-generated dominant-channel draft
+`results/attribution_v6/labels/ictal_channels_DRAFT.csv` (from `attribution_v5/labels/labels_ALL_FINAL.csv`)
+was an automatically generated annotation of 1–2 **dominant** channels per seizure (40 DIFFUSE / 25 /
+11), never reviewed by a human reader. It answered a narrower question than §3.1 and is **retired**:
+it is not scored, and none of its numbers appear in the report. It stays on disk as provenance
+(`attribution_v5/labels/labels_*_FINAL.csv` remains irreplaceable — never delete). The report states
+the history in one sentence (§7 of the report pack); it does not report the old numbers.
 
 ---
 
-## 4. METRICS (locked)
+## 4. METRICS (locked by A4)
 
-Per seizure: `y ∈ {0,1}¹⁸`, `s ∈ ℝ¹⁸`. Mask `uncertain` and `flags: artifact:*` from both.
+Per focal seizure: `y ∈ {0,1}¹⁸`, `s ∈ ℝ¹⁸` (seed 42, p95). No masking.
 
-### 4.1 PRIMARY — threshold-free
-macro-AUROC and macro-AUPRC **averaged across seizures** (never pooled over channel×seizure — z scales
-differ per seizure). Chance = 0.5 and prevalence respectively. Mean ± bootstrap CI (1000 resamples over
-seizures).
+### 4.1 L1 — PRIMARY: does the ranking beat chance?
+macro-AUROC **averaged across the 62 focal seizures** (never pooled over channel × seizure — z scales
+differ per seizure). 95 % CI: percentile bootstrap over seizures, 1000 resamples, RNG 42.
+**Null:** permute `s` across channels within each seizure, keep `y`; 1000 iterations; p = (1 + #{null ≥
+obs}) / 1001. **Claim if p < 0.05.**
 
-### 4.2 Operating point (secondary, for the EEG-CGS comparison)
-τ fixed on VAL pseudo-seizure blocks at Specificity = 0.90, then applied unchanged. Comparator bar
-(EEG-CGS Table 4, TUSZ, unsupervised): Precision 0.70 · F1 0.55 · Sensitivity 0.43 · Specificity 0.78 —
-for scale only, not a like-for-like comparison. **Not yet computed:** blocked behind label freeze, since
-an operating point on near-constant labels would not mean anything (§9.3).
+### 4.2 L2 — does it beat an anatomical prior?
+For seizure k of subject u: `prior_c` = number of focal seizures of the **other seven TEST subjects**
+whose label contains channel c (leave-one-subject-out; label-only; ties by average rank).
+Statistic Δ_prior = macro-AUROC(s) − macro-AUROC(prior) over the same 62 seizures.
+95 % CI by **paired** bootstrap over seizures (1000, RNG 42). **Claim if the CI excludes 0 and Δ > 0.**
+Precedent: the "center" baseline of the pointing game (Zhang et al., IJCV 2018) — an attribution map is
+judged against a map that ignores the input.
 
-### 4.3 Ranking (secondary) — Recall@|S| and MAP.
+### 4.3 L3 — is the map specific to the seizure?
+Within each subject with ≥ 2 focal seizures (all seven with focal seizures qualify):
+`matched_k = AUROC(s_k, y_k)`, `swapped_k = mean_{j≠k, same subject} AUROC(s_j, y_k)`.
+Statistic T = mean over the 62 seizures of (matched_k − swapped_k).
+**Null:** within each subject, randomly permute which score vector is paired with which label vector;
+recompute T; 1000 iterations; one-sided p. **Claim if p < 0.05.**
+Why this test and not D7 alone: `swapped` uses single other seizures, so it has no noise-averaging
+advantage; it asks directly whether seizure k's map fits seizure k's label better than a sibling
+seizure's map does. Seizures of one subject with identical labels make T conservative, not liberal.
 
-### 4.4 Null (mandatory)
-Permute `s` across channels within each seizure, keeping `y`; 1000 iterations; report null mean and
-p-value. This is stronger evidence than comparing to 0.5.
+### 4.4 D7 — subject-constant control (pre-registered 2026-09-01, reported as registered)
+`s_LOO` = mean `s` over the other focal seizures of the same subject; scored with the same metrics.
+Δ_D7 = AUROC(s) − AUROC(s_LOO). Registered reading: Δ_D7 ≤ 0 ⇒ no evidence of seizure-specific
+information beyond a subject-level channel prior. **A4 addition:** the v3 exemption (control
+"uninformative") is **not** re-used — Jaccard is now 0.514, below the §9.5 target of 0.6. If D7 and L3
+disagree, both are reported, and the per-seizure claim follows L3, because averaging still favours the
+control while labels remain patient-consistent (oracle 0.925, §3.4).
 
-### 4.5 Stratification (mandatory)
-By focal/generalized; per subject with **chb06 excluded from the headline**; AUROC vs |S| scatter.
-For generalized seizures, localization is not forced — the intended measure was `spread`
-(normalised entropy of `s`). **See §9.4: this measure does not work.**
+### 4.5 Multiplicity
+L1 is the gatekeeper. L2 and L3 are interpreted only if L1 passes, with **Holm** correction over
+{L2, L3} at α = 0.05. Everything else in §4.6 is descriptive.
 
-### 4.6 Synthetic sanity check — run before any real label is scored.
+### 4.6 Secondary / descriptive (no claims)
+macro-AUPRC with macro prevalence (0.253) and their ratio; Recall@|S|; per-subject table (n, AUROC, CI,
+prior AUROC); panel without chb15 (D8); panel without seizures of < 3 windows (D5); mean
+aggregation; seeds 1/2/3 (D4).
 
-### 4.7 Secondary internal validity
-C1 consistency (within- vs across-subject ranking similarity) and lateralisation index. The old
-eigencentrality-convergence framework is retired.
+### 4.7 Pre-registered interpretation
+
+| outcome | sentence the report uses |
+|---|---|
+| L1 fails | Channel-level reconstruction anomaly does not track reader-marked ictal channels. Reported as a negative. |
+| L1 passes, L2 fails | The anomaly map concentrates on ictal channels **at the level of an anatomical prior**; no triage value beyond "look at the temporal and frontopolar chains first" is shown. |
+| L1, L2 pass, L3 fails | The map carries **patient-level** information beyond the anatomical prior, but no evidence of seizure-specific information. |
+| L1, L2, L3 pass | The map carries seizure-specific channel information beyond both the prior and the patient's own pattern. Strongest claim available; still concordance, not accuracy. |
+| L1, L3 pass, L2 fails | Seizure-specific information exists, but on average the map does not rank channels better than the anatomical prior. Both stated. |
+
+### 4.8 Dropped in v4 (with reason)
+- **Operating point τ / EEG-CGS P-F1-Sens-Spec (v3 §4.2).** VAL has no channel labels, and the
+  comparison is not like-for-like anyway. EEG-CGS stays as framing only.
+- **Spread on real labels (v3 §4.5).** The synthetic grid already shows the measure is invalid (§9.4).
+  Only the label-free synthetic negative is reported; Figure 3.10 becomes synthetic-only.
+- **Any measure for the 14 generalized seizures.** None is defined; they are counted and shown on the
+  rank heat map, nothing more. Precedent: SZTrack evaluated localization on focal patients only and
+  excluded patients with indeterminate onset (Craley et al., PLOS One 2022).
+- **MAP, C1 consistency, lateralisation index** — not needed for any claim.
+
+### 4.9 Synthetic sanity check — done (§9.1). Not rerun: it does not depend on labels.
 
 ---
 
 ## 5. WEB DEMO (SzScan) tie-in
-Per seizure: timeline (WHEN, from PELT) + 18-channel heat map (WHERE, from `s`). Guardrails from
-`web_demo/SZSCAN_SPEC_v5.md`: PROVISIONAL, no real-time claim, no SOZ claim, 8 TEST subjects only,
-precomputed. Given §9.3, the demo must label the channel view **"channels with ictal-like reconstruction
-anomaly"** and must not imply per-seizure localisation.
+Per detected event: 18-channel view from `s`, titled **`Channel-level reconstruction anomaly — Event N`**
+(decided 2026-09-03). No attribution metric appears in the UI; no SOZ or localization claim. The §9.3
+result decides only the wording of the thesis, not the UI.
 
 ---
 
 ## 6. COMPARATORS
-- **EEG-CGS** — Ho & Armanfard, AAAI 2023. Framework and metrics follow this paper. Bar 0.70/0.55/0.43/0.78.
-- **SZTrack** — Craley et al., PLOS One 2022. Channel-wise CNN+BLSTM, scalp seizure tracking.
-- **DeepSOZ** — MICCAI 2023. Supervised transformer + attention-MIL SOZ localization.
-- **Wong et al.**, BSPC 2025 — channel-annotated DL + DeepSHAP (Sen 0.59).
-- **Grattarola et al.**, ESWA 2022 — attention-GNN iEEG, AP@K vs SOZ.
-- **Tang et al.**, ICLR 2022 — self-supervised DCRNN on TUSZ, occlusion localization.
-- **AR2 (Le et al.)** — inter-reader agreement on onset localization is low (ICC 0.15–0.26): the basis
-  for framing this as concordance/plausibility rather than accuracy.
+- **EEG-CGS** — Ho & Armanfard, AAAI 2023. Framework and scale only. Bar 0.70/0.55/0.43/0.78 (TUSZ).
+- **SZTrack** — Craley et al., PLOS One 2022. Scalp, channel-wise; localization evaluated on focal
+  patients only (generalized epilepsy and indeterminate-onset patients excluded); localization clipped
+  to −15…+30 s around onset to reduce eye and muscle confounds.
+- **Pointing game** — Zhang et al., IJCV 2018 (ECCV 2016): the attribution-vs-center-baseline precedent
+  for L2. Rebuffi et al., CVPR 2020 report Grad-CAM below the center baseline at most layers.
+- **DeepSOZ** — MICCAI 2023. Supervised SOZ localization (framing only).
+- **Wong et al.**, BSPC 2025 · **Grattarola et al.**, ESWA 2022 · **Tang et al.**, ICLR 2022 — framing.
+- **Le et al. (AR2)** — low inter-reader agreement on onset localization (ICC 0.15–0.26): the basis for
+  "concordance, not accuracy".
 - **CHB-MIT** (Shoeb) — onset/offset times only, no channel or SOZ labels.
 
-> Citations are from the project's reference sheet, not from a live search. Verify each before the report.
+> EEG-CGS, SZTrack and the pointing-game papers were checked against the source on 2026-09-18. Verify
+> the rest before citing.
 
 ---
 
 ## 7. LIMITATIONS
-1. Labels are an AI draft, not blind, not supervisor-frozen. Authority rests with the supervisor.
-2. Inter-reader agreement on localization is low → concordance, never "accuracy".
-3. CHB-MIT has no channel/SOZ ground truth; these labels annotate scalp involvement.
-4. chb06 (and partly chb16) are signal-limited: noisy background, symmetric spread. chb06 contributes
-   0 focal seizures and is excluded from the headline.
-5. p95 aggregation and τ are pre-registered choices; sensitivity with mean aggregation is reported.
-6. **chb15 supplies 20 of 36 focal seizures (56%).** No headline over the focal set is a balanced
-   8-subject result.
-7. **The label file uses a narrower schema than §3.2** — 1–2 dominant channels, not the ictal-channel
-   set (§3.3). Every label-scored number answers the dominant-channel question, not per-channel binary
-   classification. This is the single most important caveat in the chapter.
-8. **The labels cannot test per-seizure attribution at all** (§9.3) — a mechanical consequence of #7.
-9. The spread metric for focal/generalized is a methodological negative (§9.4).
+1. **One reader.** Blind to the model and approved by the supervisor, but a single read; inter-reader
+   agreement on localization is low → concordance, never accuracy.
+2. **Scalp involvement, not SOZ.** CHB-MIT has no channel or SOZ ground truth.
+3. **Frontopolar channels carry ≈ 41 % of labels** and are the most artifact-prone; ictal windows are
+   not artifact-rejected (by design, detection pipeline). Reader and model may both respond to
+   eye/muscle activity there. Not corrected; stated.
+4. **Five channels are never labelled** (C3-P3, C4-P4, P4-O2, FZ-CZ, CZ-PZ). Part of any AUROC comes
+   from ranking these low — exactly what L2 controls for.
+5. **chb06 is untested** (all generalized); chb15 supplies 32 % of the focal set.
+6. p95 aggregation is pre-registered; mean aggregation is reported as sensitivity.
+7. The spread metric is a methodological negative (§9.4).
+8. Reconstruction anomaly relative to interictal is not the same as ictal activity; artifact and state
+   changes also raise it.
 
 ---
 
 ## 8. EXECUTION — how to reproduce
 
-All steps are sub-commands of the single module `src/attribution_pipeline.py`.
-
 ```bash
-python src/verify_provenance.py                     # MANDATORY session gate, ~20 s, must print PASS
-python src/attribution_pipeline.py dump --seed 42   # and --seed 1 / 2 / 3
-python src/attribution_pipeline.py blocks \
-    --edf_root    "F:/Study/Thesis/Dataset/CHB-MIT" \
-    --summary_dir "F:/Study/Thesis/Dataset/CHB-MIT/CHB info/summary"
-python src/attribution_pipeline.py labels
-python src/attribution_pipeline.py all              # score, diag, synth, spread, eval, labeldiv
+python src/verify_provenance.py                          # MANDATORY session gate, must print PASS
+python src/attribution_pipeline.py labels --source md    # parser + gate G-L1 → results/attribution_v7/labels/
+python src/attribution_pipeline.py eval  --labels v7     # L1/L2/L3/D7 + descriptive → results/attribution_v7/
+python src/attribution_pipeline.py labeldiv --labels v7  # composition + Jaccard → results/attribution_v7/
+python src/figures/attribution_figures.py                # regenerates Fig 3.9 (labels overlaid), Fig 3.10 (synthetic only)
 ```
+Exact flags are fixed when the code is delivered (step 3). **Not rerun:** `dump`, `blocks`, `score`,
+`diag`, `synth`, `spread` — label-free, outputs in `results/attribution_v6/` are final.
 
-Outputs, all in `results/attribution_v6/`:
+**Gate G-L1 (index alignment), must pass before `eval`:**
+1. per-subject seizure counts equal `seizure_blocks.csv` (7/10/12/8/20/10/3/6) — hard stop otherwise;
+2. every channel name is one of the 18 in §2 — hard stop otherwise;
+3. the parser prints all 76 rows as (subject, idx, edf_file, onset_s, duration_s, |S|, channels), and
+   the author confirms that the order is the order in which the seizures were read (chronological, as
+   in the CHB-MIT summary files). **This confirmation is the gate**; it is recorded in `parse_log.txt`;
+4. diagnostic only, not pass/fail: containment of the retired draft's dominant channel(s) in the final
+   set at the same index, over the 36 seizures where the draft named one. The two annotations are
+   independent, so a miss is not an error; a subject where containment is near zero *and* a shifted
+   index fits much better would indicate an ordering fault and is investigated before `eval`.
 
-| file | content |
-|---|---|
-| `seizure_blocks.csv` | 89 seizures (76 TEST + 13 VAL): edf, onset, offset, n_windows, row range |
-| `ictal_row_to_seizure.csv` | 1420 rows: exact ictal-array row → seizure map |
-| `labels/ictal_channels_DRAFT.csv` | 76 labels, §3.2 schema, PROVISIONAL |
-| `attribution_scores.csv` | 10944 rows = 4 seeds × 76 seizures × 2 aggregations × 18 channels |
-| `attribution_diagnostics.csv` | per-subject top-1 concentration vs random null |
-| `synthetic_sanity.csv` | 50 cells × 2 panels: G-S1/G-S2/G-S3 |
-| `synthetic_spread.csv` | G-S4' after the D6.1 construction fix |
-| `attribution_perseizure.csv` | per-seizure AUROC / AUPRC / Recall@\|S\| / spread / control |
-| `attribution_summary.csv` | all panels with CIs, control, null, p-values |
-| `label_diversity.csv` | within-subject label Jaccard — the limitation evidence |
+**Outputs (`results/attribution_v7/`):** `labels/ictal_channels_FINAL.csv` · `labels/source/` ·
+`labels/parse_log.txt` · `attribution_perseizure.csv` (per seizure: AUROC, AUPRC, R@|S|, prior AUROC,
+matched, swapped, D7 control) · `attribution_summary.csv` (all panels, CIs, p-values) ·
+`label_diversity.csv`.
 
-**Report figures** — `python src/figures/attribution_figures.py` → `figures/attribution/`.
-Reads the committed CSVs only; recomputes nothing, so a figure cannot disagree with the tables above.
-
-| output | label-free? |
-|---|---|
-| `attribution_fig1_synthetic.png` — macro-AUROC vs α, VAL + TEST | ✅ final |
-| `attribution_fig2_seed_robustness.png` — ranking agreement across GAE seeds | ✅ final |
-| `attribution_fig3_rank_heatmap.png` — per-seizure channel rank, 76 × 18 | ✅ final |
-| `attribution_fig4_per_subject_forest.png` — per-subject AUROC ± CI vs macro and control | ❌ PROVISIONAL |
-| `attribution_top3_channels.csv` — appendix, top-3 channels per seizure | ✅ final |
-
-**Window-count sanity (must match).** Ictal windows per subject:
-chb03 106 · chb06 45 · chb13 144 · chb14 49 · chb15 515 · chb16 28 · chb17 74 · chb18 83 (TEST = 1044);
-chb10 117 · chb11 204 · chb22 55 (VAL = 376). Total 1420.
-TEST windows per seizure: min 2, p25 5, median 12, max 52; 3 seizures have < 3 windows.
+**Window-count sanity (unchanged).** chb03 106 · chb06 45 · chb13 144 · chb14 49 · chb15 515 · chb16 28 ·
+chb17 74 · chb18 83 (TEST = 1044).
 
 ---
 
@@ -281,8 +317,7 @@ TEST windows per seizure: min 2, p25 5, median 12, max 52; 3 seizures have < 3 w
 > sha256 `dea06cb533df1c7d0520ae21c4cbb1b8a938297f937366bc9915b040726ea108`, bias fingerprint 1.1597,
 > chb13 recon AUROC 0.8319, verified corr = 1.0000000 on 16/16 committed TEST zrecon arrays.
 > **Never identify this checkpoint by filename or by the constants 0.8676 / 0.836** — those are the
-> pre-rebuild §0 model, quarantined in `archive/pre_rebuild_s0/`, which correlates 0.987–0.999 with the
-> canonical output and is therefore close enough to pass a careless check and be wrong.
+> pre-rebuild §0 model.
 
 ### 9.1 Machinery validation — label-free, NOT provisional
 
@@ -309,7 +344,11 @@ TEST panel (confirmatory, nothing selected on it) reproduces this within ~0.03 a
 | G-S1 negative control | α=1.0, \|S\|=1 → AUROC ∈ [0.45, 0.55] | 0.4912 | **PASS** |
 | G-S2 upper bound | α=3.0, \|S\|=1 → AUROC ≥ 0.95 | 0.9818 | **PASS** |
 | G-S3 monotone in α | at every \|S\| | holds | **PASS** |
-| G-S4' spread (after D6.1) | spread(\|S\|=18) > spread(\|S\|=1), p < 0.05 | 0.9755 vs 0.9644, p = 8.9e-11 | **PASS** |
+| G-S4' spread (after D6.1) | spread(\|S\|=18) > spread(\|S\|=1), p < 0.05 | 0.9755 vs 0.9644 (see note) | **PASS** |
+
+> **Note on G-S4′.** A p-value of 8.9e-11 once accompanied this row. It has no traced source in a
+> committed file and was removed on 2026-09-12 (`VERIFIED_CORRECTIONS.md`, Table 3.6). The criterion
+> passes on the comparison the row states. Do not quote the p-value.
 
 **Permutation null mean stayed within 0.4990–0.5013 across all 50 cells.** The machinery invents no
 signal. Sensitivity: a +25 % reconstruction-error increase is already detected at AUROC ≈ 0.70.
@@ -340,94 +379,43 @@ Spearman = **−0.012**.
 (3000 sampled pairs), Δ = +0.277. Rankings are subject-typical but **not** degenerate — 0.265 leaves
 substantial per-seizure variation.
 
-### 9.3 Against real labels — PROVISIONAL, and narrower than intended
 
-> **Read §3.3 first.** These labels are dominant-channel (1–2 per seizure, mean 1.31), not the §3.2
-> ictal set. The question actually scored is "does the GAE rank the reader's leading channel first?".
+### 9.3 Against the final annotation — PENDING RUN
 
-36 labelled seizures, seed 42, p95 aggregation. Δ = macro-AUROC − subject-constant control (D7).
+Nothing in this subsection exists yet. Fill it only from `results/attribution_v7/attribution_summary.csv`
+and `attribution_perseizure.csv` after gate G-L1 passes. Layout fixed in advance:
 
-| panel | n | macro-AUROC [95% CI] | AUPRC | R@\|S\| | control | Δ | p_perm |
-|---|---|---|---|---|---|---|---|
-| **all labelled (primary)** | 36 | **0.6497** [0.5663, 0.7390] | 0.3095 | 0.1389 | 0.7758 | −0.1261 | 0.0010 |
-| excl. chb15 (D8) | 16 | 0.6267 [0.4912, 0.7545] | 0.3432 | 0.2188 | 0.6248 | +0.0020 | 0.0380 |
-| chb15 only (D8) | 20 | 0.6681 [0.5368, 0.7934] | 0.2826 | 0.0750 | 0.8967 | −0.2286 | 0.0040 |
-| n_windows ≥ 3 (D5) | 36 | 0.6497 [0.5478, 0.7384] | 0.3095 | 0.1389 | 0.7758 | −0.1261 | 0.0020 |
-| mean aggregation | 36 | 0.6733 [0.5755, 0.7634] | 0.3856 | 0.1944 | 0.7887 | −0.1154 | 0.0010 |
-| seed 1 / 2 / 3 | 36 | 0.6600 / 0.6491 / 0.6515 | — | — | — | −0.101 … −0.122 | ≤ 0.003 |
+| panel | n | macro-AUROC [95% CI] | p_perm | macro-AUPRC (prev.) | R@\|S\| |
+|---|---|---|---|---|---|
+| **L1 — all focal (primary)** | 62 | PENDING | PENDING | PENDING (0.253) | PENDING |
+| excl. chb15 (D8) | 42 | PENDING | PENDING | PENDING | PENDING |
+| n_windows ≥ 3 (D5) | PENDING | PENDING | PENDING | PENDING | PENDING |
+| mean aggregation | 62 | PENDING | PENDING | — | — |
+| seeds 1 / 2 / 3 | 62 | PENDING | — | — | — |
 
-D5 note: all 36 labelled seizures have ≥ 3 windows, so the secondary panel coincides with the primary.
-
-Per subject:
-
-| subject | n | macro-AUROC [95% CI] | AUPRC | control | Δ | p_perm |
-|---|---|---|---|---|---|---|
-| chb03 | 6 | 0.8333 [0.6956, 0.9706] | 0.5840 | 1.0000 | −0.1667 | 0.0020 |
-| chb14 | 3 | **0.2672** [0.1562, 0.4688] | 0.1565 | 0.3229 | −0.0558 | 0.9391 |
-| chb15 | 20 | 0.6681 [0.5323, 0.7840] | 0.2826 | 0.8967 | −0.2286 | 0.0030 |
-| chb16 | 1 | 0.4688 (no CI) | — | — | — | — |
-| chb17 | 3 | 0.6042 [0.4062, 0.7812] | 0.2168 | 0.6250 | −0.0208 | 0.2358 |
-| chb18 | 3 | 0.6483 [0.4062, 0.8824] | 0.2407 | 0.2904 | +0.3578 | 0.1838 |
-
-**What is established.** Ranking the reader's dominant channel is above chance — AUROC 0.6497 with
-p_perm = 0.001, AUPRC 0.3095 against a prevalence of 0.073 (4.2×), stable across four GAE seeds and
-both aggregations. chb14 sits **below** chance (0.2672, p = 0.94).
-
-**What is NOT established, and why.** The subject-constant control (0.7758) beats the per-seizure score
-(0.6497), Δ = −0.126. That reads as "no per-seizure information", but the labels cannot support the
-reading:
-
-| subject | n labelled | distinct label sets | mean Jaccard | union size |
+| test | statistic | value [95% CI] | p (Holm where applicable) | verdict |
 |---|---|---|---|---|
-| chb03 | 6 | 2 | 0.8333 | 2 |
-| chb14 | 3 | 2 | 0.6667 | 2 |
-| chb15 | 20 | **2** | 0.9053 | 2 |
-| chb16 | 1 | — | — | 2 |
-| chb17 | 3 | **1** | **1.0000** | 2 |
-| chb18 | 3 | 3 | 0.1667 | 4 |
+| L2 anatomical prior | Δ_prior = AUROC(s) − AUROC(prior); prior = 0.7387 | PENDING | — (CI rule) | PENDING |
+| L3 matched vs swapped | T = mean(matched − swapped) | PENDING | PENDING | PENDING |
+| D7 subject-constant | Δ_D7 = AUROC(s) − AUROC(s_LOO) | PENDING | — | reported as registered |
 
-**Pooled within-subject Jaccard = 0.8879.** This is now mechanistically explained rather than
-surprising: a 1–2 channel dominant label drawn from a patient's fixed anatomical focus is **almost
-forced** to be constant within a subject. With `y` near-constant, averaging 19 other seizures wins on
-noise reduction alone, whatever the per-seizure score contains. Corroborating: corr(y − ȳ, s − s̄) on
-chb15 = **+0.089**, with only 2 distinct label sets across 20 seizures.
+Per subject: n, AUROC [CI], prior AUROC, T_subject — PENDING. chb06: no focal seizure, stated.
 
-⇒ **With these labels, per-seizure attribution and a subject-level channel prior are not
-distinguishable, and the §3.2 question is not tested at all.** State both; report neither reading as
-the finding.
+### 9.4 Methodological negative — spread does not measure localisation (label-free, final)
 
-Figure 3 (`figures/attribution/attribution_fig3_rank_heatmap.png`) makes the subject-level prior
-visible directly: the P3-O1 column is near-continuously top-ranked across all 20 chb15 seizures.
+`§4.5` of v2/v3 proposed normalised entropy of `s` as a focal-vs-generalized measure. On synthetic
+injections it is **U-shaped in |S|** — 0.9644 (\|S\|=1) → 0.9567 → **0.9441 (\|S\|=4, minimum)** →
+0.9503 (\|S\|=12) → 0.9755 (\|S\|=18) — and the α = 1.0 no-injection cell has the highest spread of all
+(0.978). Entropy measures **uniformity**, not localisation, so a flat map ("nothing anomalous") and a
+diffuse map ("everything anomalous") look alike. G-S4′ passes only because it compares the two
+extremes. **Do not use spread for focal/generalized.** The v3 real-label comparison (p = 0.984) was
+computed on the retired draft and is retired with it; it is not rerun (§4.8).
 
-### 9.4 Methodological negative — spread does not measure localisation
-
-`§4.5` proposed normalised entropy of `s` as the focal-vs-generalized measure. It fails twice:
-
-- **Synthetic:** spread is **U-shaped in |S|** — 0.9644 (\|S\|=1) → 0.9567 → **0.9441 (\|S\|=4, minimum)**
-  → 0.9503 (\|S\|=12) → 0.9755 (\|S\|=18). The α=1.0 no-injection cell has the highest spread of all
-  (0.978). Entropy measures **uniformity**, not localisation: one high channel among 17 flat ones is
-  still fairly uniform, whereas four high channels are maximally bimodal.
-- **Real labels:** focal 0.9693 > generalized 0.9594, one-sided p = **0.984** — opposite to the hypothesis.
-
-G-S4' passes only because it compares the two extremes (all-18 vs 1). For real seizures with
-|S| ∈ [3, 12] the measure is not monotone and cannot classify. **Do not use spread for
-focal/generalized.** Report as a methodological negative; the generalized branch of §4.5 needs a
-different measure.
-
-### 9.5 What to request from the supervisor (evidence-backed)
-
-1. **The §3.2 schema, not dominant channels.** The current file lists 1–2 leading channels
-   (mean |S| = 1.31, never more than 2). §3.2 asks for **every** channel carrying clear ictal
-   discharge. This is the single change that would let the intended question be answered.
-2. **Labels that differ between seizures of the same patient** — target within-subject Jaccard < 0.6.
-   The current file is at 0.8879, which is a direct consequence of item 1.
-3. **A verdict for chb06 and chb13.** Both are currently 100 % DIFFUSE and contribute **0** labelled
-   seizures, so neither enters any headline. Either label them under §3.2 or confirm they are
-   genuinely non-localisable on scalp.
-4. **Acknowledgement of chb15 dominance** — it supplies 20 of 36 labelled seizures.
-
-Until item 1 is met, the attribution chapter reports the label-free half as the result and the
-label-scored half as a PROVISIONAL, narrower secondary analysis.
+### 9.5 The v3 supervisor requests — resolved by the final annotation
+1. §3.2 schema, every ictal channel → **done** (mean |S| 4.55 vs 1.31).
+2. Within-subject Jaccard < 0.6 → **met** (0.5144 vs 0.8879).
+3. Verdict for chb06 and chb13 → chb06 generalized 10/10; chb13 focal 11/12.
+4. chb15 dominance → reduced from 56 % to 32 %; D8 panel kept.
 
 ---
 
@@ -475,23 +463,47 @@ The nine scripts written on 2026-09-01 were merged into `src/attribution_pipelin
 sub-commands. Verified byte-identical outputs on all 7 result CSVs before the old scripts were removed.
 The originals remain recoverable at `git tag phase-c-final` and in the commit history.
 
+
+### A4 (2026-09-18) — final annotation and v4 method. Written before any label-scored number.
+- **A4.1 — Ground truth.** The supervisor-approved human annotation (§3.3) replaces the retired
+  machine-generated draft. The draft is not scored again (§3.5). Scored set: the 62 focal seizures;
+  the 14 generalized seizures have undefined AUROC and are excluded by construction (§3.4).
+- **A4.2 — Added L2 (anatomical prior, LOSO).** Motivated by a label-only measurement made before any
+  score was read: the prior alone reaches 0.7387. Claim rule: paired-bootstrap CI of Δ_prior excludes 0.
+- **A4.3 — Added L3 (matched vs swapped within subject).** Motivated by the label-only oracle (0.925):
+  labels remain patient-consistent, so D7 can still win by averaging. L3 has no averaging advantage.
+- **A4.4 — D7 reading.** Reported exactly as registered in A2 D7; the v3 exemption is not re-used. If
+  D7 and L3 disagree, both are reported; the per-seizure claim follows L3 (§4.4).
+- **A4.5 — Multiplicity.** L1 gatekeeper; Holm over {L2, L3} at 0.05 (§4.5).
+- **A4.6 — Dropped:** operating point / EEG-CGS P-F1 comparison; spread on real labels; any measure for
+  generalized seizures; MAP, C1, lateralisation (§4.8).
+- **A4.7 — Unchanged:** score, p95 aggregation, robust-z baseline, seed-42 primary, D3, D4, D5, D8,
+  synthetic gates, permutation null (1000), bootstrap (1000), RNG 42.
+- **A4.8 — Index gate G-L1** (§8) must pass before `eval`; its log is committed with the results.
+- **A4.9 — Nothing is tuned on these labels.** No aggregation, threshold, channel subset or panel is
+  selected after the scores are seen. A result that fails is reported as it stands.
+
 ---
 
-## 11. FILE OPERATIONS — state as of 2026-09-02
+## 11. FILE OPERATIONS — state as of 2026-09-18
 
 **Canonical:**
-- `src/attribution_pipeline.py` — the only attribution code.
-- `src/verify_provenance.py` — session gate; regenerates `docs/PROVENANCE.md`.
-- `src/labeling/label_eeg_pilot.py` — the EEG viewer that renders labelling images.
-- `results/attribution_v6/` — all results.
-- `results/attribution_v5/labels/labels_*_FINAL.csv` — **the reader labels. Irreplaceable. Never delete.**
+- `src/attribution_pipeline.py` — the only attribution code (v7 label path added in step 3).
+- `src/verify_provenance.py` — session gate.
+- `results/attribution_v6/` — **label-free** results, final (`seizure_blocks.csv`,
+  `ictal_row_to_seizure.csv`, `attribution_scores.csv`, `attribution_diagnostics.csv`,
+  `synthetic_sanity.csv`, `synthetic_spread.csv`).
+- `results/attribution_v7/` — final annotation and every label-scored result.
+- `results/attribution_v5/labels/labels_*_FINAL.csv` — the retired draft's source. **Irreplaceable
+  provenance. Never delete.**
 
-**Archived (do not cite, do not run):**
-- `archive/src_superseded/attribution_v5/` — the dominant-channel/MAP@K era scripts.
-- `archive/attribution_superseded/attribution_c{1,2,3}.py` — the retired eigencentrality framework.
-- `archive/pre_rebuild_s0/` — §0 model and its per-node dumps. Correlates 0.987–0.999 with canonical
-  output; see the README there.
-- `results/history_superseded/` — pre-rebuild attribution outputs.
+**Superseded (keep, do not cite):** `results/attribution_v6/labels/ictal_channels_DRAFT.csv`,
+`results/attribution_v6/{attribution_perseizure,attribution_summary,label_diversity}.csv` — scored
+against the retired draft. Restore point for the v3 state: `git tag attribution-v6-draft`.
 
-**Retired numbers — never quote:** the dominant-channel MAP@K figures 0.262 / 0.303 belong to a
-different problem formulation.
+**Archived (do not cite, do not run):** `archive/src_superseded/attribution_v5/` ·
+`archive/attribution_superseded/attribution_c{1,2,3}.py` · `archive/pre_rebuild_s0/` ·
+`results/history_superseded/`.
+
+**Retired numbers — never quote:** 0.6497 · 0.3095 · 0.7758 · 0.8879 · −0.1261 · 0.6267 · 0.6681 ·
+0.2672 · +0.3578 · p = 0.984 (draft labels) · 0.262 / 0.303 (MAP@K era) · p = 8.9e-11 (untraced).

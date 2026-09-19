@@ -1,8 +1,13 @@
 # PROJECT STATUS — single source of truth for "where are we right now"
-**Last updated:** 2026-09-16 (rev. D). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
+**Last updated:** 2026-09-18 (rev. E). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
 `NEXT_TASKS_AND_PLAN.md` (all retired). **On any number conflict, `RESULTS_OF_RECORD_phaseB.md` wins
 over this file.** On artifact identity, `PROVENANCE.md` wins. On paths, `REPO_MAP.md` wins. On any
 statement that was inferred rather than measured, `VERIFIED_CORRECTIONS.md` wins over this file.
+
+**Changes in rev. E (2026-09-18).** The channel annotation is FINAL: a human, model-blind,
+supervisor-approved annotation of every ictal channel replaces the machine-generated dominant-channel
+draft. The attribution method is re-locked as `ATTRIBUTION_SPEC.md` v4 (Amendment A4), every
+draft-label number is retired, and the label-scored rerun is in progress (§6, §7 item 4).
 
 **Changes in rev. D.** The five report chapters and the front matter are written. The parameter count
 and the processing-time figure below were both wrong in rev. C and are corrected. §7 item 1 is rewritten
@@ -59,9 +64,9 @@ Phase C (optimization program)  → 7 pre-registered, VAL-gated levers across de
 Phase D (capacity hypothesis)   → PRE-REGISTERED, NOT EXECUTED. Deliberate time-boxed decision.
    ★ Future Work, not run ★        See PHASE_D_HANDOFF.md.
         ↓
-Attribution study               → EXECUTED 2026-09-01/02. Machinery verified label-free; results
-   ★ DONE (provisional) ★          against labels are PROVISIONAL and blocked by a LABEL limitation,
-                                  not by the method. See §6.
+Attribution study               → Machinery verified label-free (2026-09-01/02, FINAL). Final human
+   ★ RERUN IN PROGRESS ★           annotation approved 2026-09-18; method re-locked (spec v4, A4);
+                                  label-scored results PENDING RUN. See §6.
         ↓
 ★ CURRENT PHASE ★
 Report writing + Web Demo (SzScan) + Defense prep
@@ -146,51 +151,33 @@ representation-limited subjects (chb06, chb14) sit in the locked TEST set.
   was deleted in the same pass and is genuinely not needed (see §7 item 2). Tag: `repo-deps-fixed`.
   A standing import-scan is recorded in `REPO_MAP.md` §7.7 — run it after any file move.
 
-## 6 · Attribution — EXECUTED, results PROVISIONAL
+## 6 · Attribution — label-free half FINAL; label-scored half PENDING RUN on the final annotation
 
-Full detail: **`ATTRIBUTION_SPEC.md` v3**. Summary in `RESULTS_OF_RECORD_phaseB.md` §10.
-Framing: **XAI for the GAE reconstruction branch — not localization, not SOZ.**
+Full detail: **`ATTRIBUTION_SPEC.md` v4** (method locked by Amendment A4, 2026-09-18). Summary in
+`RESULTS_OF_RECORD_phaseB.md` §10. Report material: `ATTRIBUTION_REPORT_PACK.md` v2.
+Framing: **XAI for the GAE reconstruction branch — not localization, not SOZ; concordance, not accuracy.**
 
-**Done, and not provisional (label-free):**
+**Done, final, label-free (unchanged):**
 - Machinery verified by synthetic injection with exact ground truth. Gates G-S1/G-S2/G-S3 and G-S4′
   all PASS; permutation-null mean stayed in **0.4990–0.5013 across all 50 cells**; a +25 % anomaly is
-  detected at AUROC ≈ 0.70.
+  detected at AUROC ≈ 0.70. No p-value on G-S4′ (8.9e-11 is untraced).
 - GAE-seed robustness: channel-ranking Spearman **0.970 ± 0.026** across seeds {42,1,2,3}.
-- No global channel bias (across-subject ranking correlation −0.012). Three subjects
-  (chb13/chb15/chb16) show top-1 concentration above a random null.
+- No global channel bias (across-subject ranking correlation −0.012).
+- Spread (normalised entropy) is U-shaped in |S|: a methodological negative, synthetic only.
 
-**Done, and provisional (label-scored) — but narrower than the spec intended:**
-- ⚠️ **Label-schema caveat.** The label file records the reader's **dominant channel(s), 1–2 per
-  seizure** (40 DIFFUSE / 25 one-channel / 11 two-channel; mean |S| = 1.31), **not** the full ictal-set
-  schema of `ATTRIBUTION_SPEC.md` §3.2. So the scored question is "does the GAE rank the reader's
-  leading channel first?" — the framing the spec had retired. Numbers are correct; the question is
-  narrower. State this wherever they appear.
-- macro-AUROC **0.6497 [0.5663, 0.7390]**, macro-AUPRC 0.3095 (4.2× the 0.073 prevalence),
-  p_perm = 0.001, over the 36 labelled seizures. Stable across seeds and aggregations.
+**Ground truth — FINAL (2026-09-18).** Annotated by the author from the raw 18-channel EEG, **blind to
+every model output**, listing every channel with clear ictal discharge; protocol and result approved by
+the supervisor. 62 focal seizures (|S| 1–10, mean 4.55) + 14 generalized (chb06 ×10, chb03 ×3, chb13 ×1).
+Within-subject Jaccard 0.5144. Anatomical prior (label-only) macro-AUROC 0.7387.
 
-**Two honest negatives that go in the report:**
-1. **The D7 control is uninformative** — within-subject label Jaccard is **0.8879**. A 1–2 channel
-   dominant label from a patient's fixed focus is almost forced to be constant, so the
-   subject-constant control wins by noise-averaging alone. With these labels, per-seizure attribution
-   and a subject-level channel prior **cannot be distinguished**, and the §3.2 question is not tested.
-   This is a limitation of the LABELS, not a finding about the method.
-2. **The spread metric does not work** — normalised entropy is U-shaped in |S| (synthetic) and points
-   the wrong way on real labels (focal 0.9693 > generalized 0.9594, p = 0.984). A methodological
-   negative.
+**Retired — never quote:** everything scored against the machine-generated draft (0.6497, 0.3095,
+0.7758, 0.8879, −0.1261, 0.2672, +0.3578, p = 0.984). Restore point `git tag attribution-v6-draft`.
 
-**Report figures — DONE, `figures/attribution/`** (generated by `src/figures/attribution_figures.py`,
-which reads the committed CSVs and recomputes nothing):
-`attribution_fig1_synthetic.png` · `fig2_seed_robustness.png` · `fig3_rank_heatmap.png` (all three
-LABEL-FREE and final) · `fig4_persubject_forest.png` (PROVISIONAL) · `attribution_top3_channels.csv`.
+**Pending run (spec §4, §9.3):** L1 macro-AUROC vs permutation null → L2 vs the anatomical prior →
+L3 matched vs swapped within subject; D7 reported as registered; Holm over {L2, L3}.
 
-**Blocked on the supervisor** (four evidence-backed requests in `ATTRIBUTION_SPEC.md` §9.5): §3.2-
-conformant labels listing every ictal channel rather than 1–2 lead channels (**primary**); within-patient
-variation (target Jaccard < 0.6); channel sets for chb06/chb13 or confirmation they are truly
-generalized; acknowledgement that chb15 supplies 20 of 36 annotated seizures.
-
-**Not blocking the report.** The label-free half is a complete, defensible result on its own, and the
-label-scored half is reportable as PROVISIONAL with the limitation stated. If the freeze arrives, rerun
-`python src/attribution_pipeline.py eval` and replace §9.3 of the spec — nothing else changes.
+**Figures affected:** Figure 3.9 (rank heat map) is regenerated with the final labels overlaid; Figure
+3.10 becomes synthetic-only. Figure 3.8 and Table 3.6 are unchanged. Tables 3.7 and 3.8 are refilled.
 
 ## 7 · What's left (priority order)
 
@@ -255,9 +242,12 @@ label-scored half is reportable as PROVISIONAL with the limitation stated. If th
    "read the value from the source file", not decisions.
 3. **Defense prep** — Q&A anchors: why Phase D wasn't run (`PHASE_D_HANDOFF.md` §3); why 0.361/0.426 F1
    is competitive (SzCORE Challenge 2025 realistic band 0.32–0.43); how to frame the 7-lever negative
-   program as rigor (`RUBRIC_TRACKING.md` §6); and now, how the attribution chapter reports an
-   uninformative control honestly rather than dressing it as a result.
-4. **If labels are frozen** — rerun `attribution_pipeline.py eval`, update spec §9.3 and RoR §10.
+   program as rigor (`RUBRIC_TRACKING.md` §6); and the attribution defense questions prepared in
+   `ATTRIBUTION_REPORT_PACK.md` v2 PART 4 §4.3 (self-annotation, generalized exclusion, anatomical prior).
+4. **Attribution rerun on the final annotation — IN PROGRESS (2026-09-18).** Step 2 (docs re-locked) done;
+   step 3 parser + gate G-L1 + `eval` with L2/L3 → `results/attribution_v7/`; step 4 fill spec §9.3,
+   RoR §10.3, `VERIFIED_NUMBERS.md` and the project instructions §7; step 5 rewrite the attribution
+   material of the report per `ATTRIBUTION_REPORT_PACK.md` v2 PART 1. Must finish before report assembly.
 
 ## 7a · Findings settled during the writing phase
 

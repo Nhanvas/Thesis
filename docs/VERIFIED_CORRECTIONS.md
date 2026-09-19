@@ -166,3 +166,30 @@ revision 3 under "Closed since revision 2", and what remains open is in the sect
 Four of the ten entries above were caused by the same thing: a statement inferred from a filename, a
 docstring, a planning document or an empty grep, rather than read from the code that runs. The command
 that settles a question is almost always one line. Prefer the command.
+
+---
+
+## 12 · The channel annotation is final, human and blind; the draft-label results are retired (2026-09-18)
+
+**Wrong statements, now retired:** "attribution against labels is provisional"; "the labels are
+dominant-channel, 1–2 per seizure"; "the D7 control is uninformative because within-subject Jaccard is
+0.8879"; "chb06 and chb13 contribute no labelled seizure"; every number scored against the draft
+(0.6497, 0.3095, 0.7758, 0.8879, −0.1261, 0.2672, +0.3578, p = 0.984).
+
+**Evidence.** The final annotation (`results/attribution_v7/labels/source/Channel_label_approved.md`)
+was made by the author from the raw 18-channel EEG, blind to every model output, listing every channel
+with clear ictal discharge, and was approved by the supervisor. Parsed from that file on 2026-09-18:
+76 seizures, 62 focal (|S| 1–10, mean 4.55) and 14 generalized (all 18 channels), within-subject
+pairwise Jaccard 0.5144. The draft it replaces was machine-generated (`VERIFIED_NUMBERS.md` Part 7.1).
+
+**What follows.**
+- Method re-locked as `ATTRIBUTION_SPEC.md` v4, Amendment A4, before any label-scored number.
+- The 14 generalized seizures are excluded from channel metrics by construction: AUROC is undefined
+  when every channel is positive.
+- A fixed anatomical prior already reaches macro-AUROC 0.7387 on these labels, so beating chance is no
+  longer enough; the claim ladder is L1 chance → L2 prior → L3 within-patient specificity.
+- **Do not describe the final annotation as provisional, draft, or machine-generated**, and do not
+  reuse the D7 "uninformative" exemption: its precondition (Jaccard ≥ 0.6) no longer holds.
+- Report text written before 2026-09-18 (Chapters 1–5, front matter, `tables/CAPTIONS.md`,
+  `tables/tables_ch3.md`, `RUBRIC_TRACKING.md`) still carries the retired framing until step 5 of the
+  rerun rewrites it. Where those files disagree with this entry, this entry wins.

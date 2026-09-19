@@ -1,6 +1,6 @@
 # RESULTS_OF_RECORD — PHASE B / TIER-2 (rlg optimized pipeline)
 **Status:** LOCKED (one-shot TEST executed once, as pre-registered in PREREG_TIER2 + Amendment A1).
-**Last verified 2026-09-02.** Before quoting any number here, run `python src/verify_provenance.py`
+**Last verified 2026-09-02. §10 rewritten 2026-09-18 (final channel annotation; label-scored attribution numbers pending).** Before quoting any number here, run `python src/verify_provenance.py`
 (~20 s): it re-derives the canonical checkpoint identity from the committed TEST components.
 Reconciles into `docs/RESULTS_OF_RECORD.md`. §0 (recon+temp+gamma) remains the historical baseline;
 **rlg (recon+latent+gamma, temporal-free) is the Phase-B optimized pipeline of record.**
@@ -178,79 +178,47 @@ rlg is the performance ceiling for this dataset/split. Every lever — directed 
 
 ---
 
-## 10 · Channel attribution — PROVISIONAL (added 2026-09-02)
+## 10 · Channel attribution (rewritten 2026-09-18 — final annotation; label-scored results PENDING RUN)
 
-Full specification and results: **`docs/ATTRIBUTION_SPEC.md` (v3, rev. B)**. Summarised here so that no number
-in this file has to be looked up elsewhere. Attribution is **XAI for the GAE reconstruction branch** —
-NOT seizure localization, NOT SOZ. It does not affect §1–§9: it reads the same canonical checkpoint and
-changes nothing in the detection pipeline.
+Full specification: **`docs/ATTRIBUTION_SPEC.md` v4** (method locked by Amendment A4 before any
+label-scored number). Attribution is **XAI for the GAE reconstruction branch** — NOT seizure
+localization, NOT SOZ. It reads the same canonical checkpoint and changes nothing in §1–§9.
 
-**Status: PROVISIONAL, and narrower than specified.** The label file on disk is a **dominant-channel**
-annotation — 1–2 channels per seizure (mean |S| = 1.31; 25 seizures with 1, 11 with 2, 40 DIFFUSE, none
-above 2) — not the full ictal-channel set the spec asks for. Every label-scored number therefore answers
-*"is the reader's lead channel ranked highly?"*, i.e. the retired dominant-channel question, not
-per-channel binary classification. Machinery validation (§10.1) is label-free and is NOT provisional.
+**Ground truth — FINAL.** Human annotation of all 76 TEST seizures from the raw 18-channel EEG, **blind
+to every model output**, listing every channel with clear ictal discharge; protocol and annotation
+approved by the supervisor. Stored in `results/attribution_v7/labels/`. The earlier machine-generated
+dominant-channel draft is **retired**: every number scored against it (0.6497, 0.3095, 0.7758, 0.8879,
+−0.1261, 0.6267, 0.6681, 0.2672, +0.3578, p = 0.984) is withdrawn from this file and must not be quoted.
+It remains recoverable at `git tag attribution-v6-draft`.
 
-### 10.1 Machinery validation (label-free — report-worthy as-is)
+### 10.1 Machinery validation — label-free, FINAL
 Synthetic per-channel anomaly injection into interictal per-node error, exact ground truth, 5 α × 5 |S|
-grid × 200 replicates, on VAL (gate) and TEST (confirmatory). Pre-registered gates G-S1/G-S2/G-S3
-**PASS**; permutation-null mean stayed in **0.4990–0.5013 across all 50 cells**.
+grid × 200 replicates, on VAL (gate) and TEST (confirmatory). Pre-registered gates G-S1/G-S2/G-S3 and
+G-S4′ **PASS**; permutation-null mean stayed in **0.4990–0.5013 across all 50 cells**.
 
 | α (injection strength) | 1.0 | 1.25 | 1.5 | 2.0 | 3.0 |
 |---|---|---|---|---|---|
 | macro-AUROC, VAL, \|S\|=1 | **0.4912** | 0.6962 | 0.8247 | 0.9547 | 0.9818 |
 
 GAE-seed robustness (4 seeds): channel-ranking Spearman **0.970 ± 0.026**; top-1 agreement 0.873.
+Spread (normalised entropy) is U-shaped in |S| (0.9644 → 0.9441 at |S| = 4 → 0.9755 at |S| = 18): a
+methodological negative, never used to classify. No p-value is attached to G-S4′ (the former 8.9e-11
+has no traced source).
 
-### 10.2 Real labels — PROVISIONAL and narrower than the spec intended
-**Schema caveat.** The label file records the reader's **dominant channel(s) — 1–2 per seizure**
-(distribution over 76: 40 DIFFUSE / 25 one-channel / 11 two-channel; mean |S| = 1.31, prevalence
-0.073). It is **not** the full ictal-set schema of `ATTRIBUTION_SPEC.md` §3.2. Every number below
-answers "does the GAE rank the reader's leading channel first?", which is the framing the spec had
-formally retired.
+### 10.2 Annotation composition — label-only (measured 2026-09-18; to be reproduced by the pipeline)
+76 seizures = **62 focal** (|S| 1–10, mean 4.55, prevalence 0.253) + **14 generalized** (all 18
+channels: chb06 ×10, chb03 ×3, chb13 ×1). Focal by subject: chb03 4 · chb06 0 · chb13 11 · chb14 8 ·
+chb15 20 · chb16 10 · chb17 3 · chb18 6. Pooled within-subject Jaccard **0.5144** (mean over seizure
+pairs). Anatomical prior (LOSO channel frequency, label-only) macro-AUROC **0.7387** — the L2 bar.
 
-36 labelled seizures, seed 42, p95 aggregation:
+### 10.3 Against the annotation — PENDING RUN
+Layout and claim rules: spec §4 and §9.3. L1 (chance), L2 (anatomical prior), L3 (matched vs swapped),
+D7 (subject-constant, as registered). **No label-scored number is locked until this subsection is
+filled from `results/attribution_v7/`.**
 
-| panel | n | macro-AUROC [95% CI] | macro-AUPRC | subject-const. control | Δ | p_perm |
-|---|---|---|---|---|---|---|
-| all labelled | 36 | **0.6497** [0.5663, 0.7390] | 0.3095 | 0.7758 | −0.1261 | 0.0010 |
-| excl. chb15 | 16 | 0.6267 [0.4912, 0.7545] | 0.3432 | 0.6248 | +0.0020 | 0.0380 |
-| chb15 only | 20 | 0.6681 [0.5368, 0.7934] | 0.2826 | 0.8967 | −0.2286 | 0.0040 |
-
-Above chance (AUPRC 0.3095 = 4.2× the 0.073 prevalence, p_perm = 0.001), stable across seeds
-(0.6491–0.6600) and aggregations (mean-agg 0.6733).
-
-### 10.3 The decisive limitation — the D7 control is UNINFORMATIVE
-A subject-constant control (mean score of the *other* seizures of the same patient) scores **higher**
-than the per-seizure score. That is not evidence that attribution carries no per-seizure information:
-within-subject label **Jaccard = 0.8879** (chb17 = 1.0000; chb15 = 2 distinct label sets across 20
-seizures). A 1–2 channel dominant label drawn from a patient's fixed focus is almost forced to be
-constant, so the control wins by noise-averaging alone. Corroborating: corr(y − ȳ, s − s̄) on
-chb15 = **+0.089**.
-
-⇒ **With the current labels, per-seizure attribution and a subject-level channel prior cannot be
-distinguished, and the intended per-channel-binary question is not tested at all.** This is a
-limitation of the LABELS, not a finding about the method.
-
-### 10.4 Methodological negative — the spread metric does not work
-`ATTRIBUTION_SPEC.md` §4.5 proposed normalised entropy of `s` as a focal-vs-generalized measure. It
-fails in both directions: synthetic spread is **U-shaped in |S|** (0.9644 → 0.9567 → **0.9441** at
-|S|=4 → 0.9503 → 0.9755), and on real labels focal 0.9693 > generalized 0.9594 (one-sided p = 0.984,
-opposite to the hypothesis). Entropy measures uniformity, not localisation. Reported as a
-methodological negative; usable only for the extreme contrast (all-channel vs 1–2 channel), where it
-does separate (p = 8.9e-11).
-
-### 10.5 What to ask the supervisor (evidence-backed)
-1. Labels under the **§3.2 ictal-set schema** — every channel with clear ictal discharge, not only the
-   leading one. This is the change that unblocks the intended analysis.
-2. Labels that differ **between seizures of the same patient** (target within-subject Jaccard < 0.6).
-3. A verdict for chb06 and chb13 — both are 100 % DIFFUSE and contribute 0 labelled seizures.
-4. chb15 supplies 20 of 36 labelled seizures; any headline is one-subject dominated.
-
-### 10.6 Provenance
+### 10.4 Provenance
 Checkpoint as in §7 errata. Row→seizure map `results/attribution_v6/{seizure_blocks.csv,
 ictal_row_to_seizure.csv}` — 76/76 TEST seizures matched exactly on (edf_file, onset_s).
-Code: `src/attribution_pipeline.py` (one module, sub-commands; outputs verified byte-identical to the
-nine scripts it replaced). Results: `results/attribution_v6/`.
-Figures: `src/figures/attribution_figures.py` → `figures/attribution/` (reads the committed CSVs only,
-recomputes nothing, so a figure can never disagree with these tables).
+Code: `src/attribution_pipeline.py`. Label-free results: `results/attribution_v6/`. Final annotation and
+label-scored results: `results/attribution_v7/`. Figures: `src/figures/attribution_figures.py` (reads
+committed CSVs only).

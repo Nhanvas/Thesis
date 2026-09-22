@@ -67,7 +67,7 @@ Twenty-nine, of which two wait on the application or on the finished chapters.
 |---|---|
 | 1 | 1.1 comparison · 1.2 requirements · 1.3 timeline grid · 1.4 weekly task detail |
 | 2 | 2.1 corpora · 2.2 patient split · 2.3 preprocessing · 2.4 sparsification matrix · 2.5 model configuration · 2.6 detection matrix · 2.7 synthetic grid · 2.8 deployment matrix |
-| 3 | 3.1 window discrimination · 3.2 operating points · 3.3 per-patient event · 3.4 four models · 3.5 alternatives · 3.6 synthetic criteria · 3.7 attribution agreement · 3.8 annotation similarity · 3.9 objectives and requirements |
+| 3 | 3.1 window discrimination · 3.2 operating points · 3.3 per-patient event · 3.4 four models · 3.5 alternatives · 3.6 synthetic criteria · 3.7 annotation similarity · 3.8 attribution agreement · 3.9 objectives and requirements |
 | 4 | 4.1 comparison · 4.2 cost profile |
 | Appendix | A.1 corpus metadata · A.2 channel annotation · A.3 timeline composition · A.4 channel concentration · A.5 software versions · A.6 pre-registration index |
 

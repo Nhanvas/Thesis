@@ -1,6 +1,6 @@
 # Tables Pack — Appendices
 
-Revision 2 (2026-09-22). Every appendix table, filled from committed sources, in document order. Each
+Revision 3 (2026-09-22). Every appendix table, filled from committed sources, in document order. Each
 block ends with a `Source:` line naming the file the values were read from.
 
 Authority: `docs/RESULTS_OF_RECORD_phaseB.md` and `docs/VERIFIED_NUMBERS.md` for every number,
@@ -9,15 +9,15 @@ captions.
 
 Changes from revision 1: Table A.2 rebuilt from the final annotation (the machine-generated draft is
 retired); Table A.3 source wording corrected; Table A.4 interpretation tied to the final result; Table
-A.5 versions confirmed against the running environment; Table A.6 rewritten from the documents
-themselves, with the attribution specification added.
+A.5 versions confirmed against the running environment. Revision 3 cuts Table A.6 (pre-registration
+index): the report presents results, not the internal process that produced them.
 
 ## Rules applied throughout
 
 1. Three decimals for discrimination, sensitivity, precision and F1; one decimal for false alarms
    per day.
 2. No internal shorthand in a table cell or heading: no lever codes, no phase names, no branch
-   nicknames. Document titles in Table A.6 are the one exception, because they are file identifiers.
+   nicknames, no document names.
 3. A cell whose value has not been read from a file is written `— not measured`, never left blank and
    never estimated.
 4. Patient identifiers keep the corpus form (chb03, chb06, …) so the tables agree with the figures.
@@ -225,32 +225,3 @@ The remaining entries of the environment snapshot are transitive dependencies an
 *Source: `docs/requirements_snapshot.txt`. Every row, including the Python version, was confirmed
 against the running environment on 2026-09-22 (`python --version` and `importlib.metadata`); all
 thirteen agree with the snapshot.*
-
-## Table A.6 — Pre-registration index
-
-| Document | Question fixed before the measurement | Bearing on this report |
-|---|---|---|
-| PREREG_01 GAE joint retrain | Rebuilding the training of the graph autoencoder, with acceptance criteria against the retained checkpoint | The trained model of Table 2.5 and §2.3.2 |
-| PREREG_02 LSTM temporal | A recurrent temporal score for the ensemble | Withdrawn by the amendment below; not part of the reported system |
-| PREREG_03 Weights final | Ensemble weights derived on non-test data, with a tie-break toward equal weights, for an earlier ensemble that included the recurrent score | Superseded with the recurrent score; the reported system keeps equal weights, inherited and not re-derived (§2.3.5) |
-| PREREG_04 FP-budget operating point | A per-patient rule choosing the setting whose false-alarm rate is nearest a budget, never reading sensitivity | Used on the validation patients to compare training seeds and design alternatives (Tables 3.4 and 3.5) |
-| PREREG_05 Operating point T1 | An operating point that maximizes F1 on the validation patients | Its objective was replaced by that of PREREG_06 (§4.8) |
-| PREREG_06 Balanced operating point | The setting at which pooled sensitivity and precision are closest to equal on the validation patients | The reported operating point, row 3 of Table 3.2 (§2.4.3) |
-| PREREG_07 Per-subject FP budget | Per-patient budgets of 5, 10 and 20 false alarms per day, each spent in full | Not re-run on the final system (§4.9) |
-| PREREG_08 Window threshold | Window-level precision, recall and F1 at a threshold fixed on the validation patients | Not re-run on the final system (§4.9); the discrimination of Table 3.1 uses no threshold |
-| PREREG_09 Minimum event duration | A minimum detected-event duration derived on the validation patients | Not re-run on the final system (§4.9) |
-| PREREG_TIER2 Latent ensemble | Whether the latent-distance score improves event-level detection over the earlier configuration, with weights, rule and scorer held fixed | The three-score design, and rows 1 and 2 of Table 3.2 |
-| PREREG_TIER2 Amendment A1 | Removal of the recurrent score for lack of reproducibility, decided before any test result of the new system was seen | §2.3.5 and §4.8 |
-| PREREG_C0 Connectivity probe | Whether directed connectivity separates chb06 better than symmetric connectivity | Opened the directed-connectivity alternatives of Table 3.5 |
-| ATTRIBUTION_SPEC v4, Amendment A4 | The annotation protocol, the synthetic criteria, the three comparisons with their correction for two tests, and the aggregation, fixed before any score against the annotation | Table 3.6 and Table 3.8, §2.5 and §2.7.4 |
-| **[CONFIRM — document]** | The remaining design alternatives of Table 3.5, each with a pass criterion fixed before its validation run | Table 3.5 |
-
-Each document fixed its hypothesis, its criterion and its stopping condition before the measurement it
-governs. Two departures are recorded. The objective of PREREG_05 was replaced by that of PREREG_06 after
-the result of PREREG_05 on the earlier configuration's test set had been seen; the replacement rule was
-then fixed before the final system was scored (§4.8). And one synthetic criterion of Table 3.6 was
-rewritten after its first version failed, as stated with that table.
-
-*Source: `docs/prereg/PREREG_01` to `PREREG_09`, `docs/PREREG_TIER2_latent_ensemble.md`,
-`docs/PREREG_TIER2_amendment_A1.md`, `docs/PREREG_C0_connectivity_probe.md`,
-`docs/ATTRIBUTION_SPEC.md` (v4 rev. B, §10 Amendment A4); read 2026-09-22.*

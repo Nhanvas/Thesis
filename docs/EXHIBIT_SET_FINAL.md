@@ -3,7 +3,7 @@
 The authoritative list of what the report contains.
 
 **Revision 3.** The exhibit set itself is unchanged from revision 2 and remains final: 21 figures plus
-one pending the application, and 29 tables. What changed is that everything revision 2 listed as still
+one pending the application, and 29 tables (28 since 2026-09-22, when Table A.6 was cut). What changed is that everything revision 2 listed as still
 open has been done, and the section recording it is rewritten to say what was found rather than what
 was pending. `tables/CAPTIONS.md` revision 6 carries the caption for every exhibit under these numbers,
 together with the old-to-new map.
@@ -69,7 +69,7 @@ Twenty-nine, of which two wait on the application or on the finished chapters.
 | 2 | 2.1 corpora · 2.2 patient split · 2.3 preprocessing · 2.4 sparsification matrix · 2.5 model configuration · 2.6 detection matrix · 2.7 synthetic grid · 2.8 deployment matrix |
 | 3 | 3.1 window discrimination · 3.2 operating points · 3.3 per-patient event · 3.4 four models · 3.5 alternatives · 3.6 synthetic criteria · 3.7 annotation similarity · 3.8 attribution agreement · 3.9 objectives and requirements |
 | 4 | 4.1 comparison · 4.2 cost profile |
-| Appendix | A.1 corpus metadata · A.2 channel annotation · A.3 timeline composition · A.4 channel concentration · A.5 software versions · A.6 pre-registration index |
+| Appendix | A.1 corpus metadata · A.2 channel annotation · A.3 timeline composition · A.4 channel concentration · A.5 software versions |
 
 Table 2.1's two non-corpus rows are filled from the Siena and TUH source papers. Table 3.9 is written
 last, from the finished chapters. Table A.3 is new and its body is in this file's last section.
@@ -138,7 +138,7 @@ ten design-requirement rows are word-identical in Table 1.2 and Table 3.9.
 
 **Two rendering instructions for typesetting.** Table 1.3's marked cells are shaded rather than printed
 as a symbol, with the header row spanning "Period (weeks)". The List of Figures runs to 21 plus
-Figure 3.11 pending; the List of Tables to 29, as 4 / 8 / 9 / 2 / 6.
+Figure 3.11 pending; the List of Tables to 28, as 4 / 8 / 9 / 2 / 5 (Table A.6, the pre-registration index, was cut 2026-09-22: the report presents results, not the project's internal process).
 
 ---
 

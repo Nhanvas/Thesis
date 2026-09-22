@@ -1,6 +1,6 @@
 # Captions — every figure and table
 
-**Revision 7 (2026-09-22).** Every body caption below is copied verbatim from the finished chapters
+**Revision 8 (2026-09-22).** Every body caption below is copied verbatim from the finished chapters
 (`Chapter_1` … `Chapter_4`, v2, 2026-09-21), so a caption here cannot disagree with the report. The
 appendix captions are new in this revision and match `tables/tables_appendix.md` revision 2.
 
@@ -9,10 +9,11 @@ describe the final, human, model-blind, supervisor-approved annotation and its r
 describes the 48 latency matches and the single tolerance line; Tables 1.1 and 4.1 carry the corrected
 comparator rows; the Table A.2 caption no longer describes a machine-generated annotation; the Table
 A.3 caption attributes the missing windows to preprocessing, not to artifact rejection alone.
-Revisions 2 to 6 are superseded and remain in the git history.
+Revision 8 also swaps Tables 3.7 and 3.8 into order of first reference, cuts Table A.6, and
+removes internal process wording from the Table 3.4 caption. Revisions 2 to 7 are superseded and remain in the git history.
 
 Numbering is unchanged from `docs/EXHIBIT_SET_FINAL.md` revision 3: 21 figures plus Figure 3.11
-pending, and 29 tables (4 / 8 / 9 / 2 / 6). Figure captions go below the figure, table captions above
+pending, and 28 tables (4 / 8 / 9 / 2 / 5). Figure captions go below the figure, table captions above
 the table.
 
 **Figure 3.11** is pending the web application and has no caption yet.
@@ -76,7 +77,7 @@ readout is unaffected by the reversal, which is why the two are combined.
 
 **Figure 2.6.** Architecture of the review application. The application recomputes anomaly scores on
 the continuous recording, retaining every window. It never reads the seizure annotations, any timeline
-rebuilt from them, or the pre-split background and seizure arrays, all three of which would make a
+reconstructed from them, or the pre-split background and seizure arrays, all three of which would make a
 label-free claim false. Table A.3 gives the measurement that forces this design.
 
 **Figure 2.7.** Event-based scoring. (a) A detected interval is matched to an annotated seizure by any
@@ -197,8 +198,8 @@ located after the test set was scored.*
 **Table 3.3.** Event-level performance per test patient at the reported operating point. *chb06's F1 is
 undefined, not zero.*
 
-**Table 3.4.** Results across four independently trained models on the validation patients. The two
-spreads are the noise floors of this study.
+**Table 3.4.** Results across four independently trained models on the validation patients. A difference smaller than
+the spread is not treated as real.
 
 **Table 3.5.** Component ablations and design alternatives, on the validation patients.
 
@@ -248,5 +249,3 @@ not established.*
 Computed from the model's own channel rankings; it uses no annotation.
 
 **Table A.5.** Software and library versions.
-
-**Table A.6.** Index of pre-registrations, with the part of this report each one bears on.

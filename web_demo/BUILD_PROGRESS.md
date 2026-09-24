@@ -17,15 +17,30 @@ still the real spec. This is just "what happened and what exists," for continuit
 | 0 — repo scaffold, Tailwind tokens, `test_guards.py` PASS | **DONE** | see §3 below |
 | 1 — `pipeline_demo.py` (`process_file`) + CLI, real timing | **DONE** | see §4 below |
 | 2 — Log in + empty Database + footer | **DONE** | took 4 fix rounds past the initial build — see §5 below |
-| 3 — Create new → upload → Process → subject appears in table | **DONE** | took **6** fix rounds past the initial build — see §6 below, read it before starting Step 4 |
-| 4-9 | not started | |
+| 3 — Create new → upload → Process → subject appears in table | **DONE** | took **6** fix rounds past the initial build — see §6 below |
+| 4 — Analysis screen: Panel EEG + toolbar + scrub, no events yet | **DONE** | see §7 below — **this file's own "update every step" convention was skipped for Step 4 at the time**; §7 is a brief retroactive note, not a full account. `CC_STEP4_REPORT.md`/`CC_STEP4_FIX_REPORT.md` in the repo have the real detail if it's ever needed |
+| 5 — Mini-timeline + Event Panel + 3-panel sync | **DONE** | took **7** fix rounds past the initial build, the most of any step so far — see §8 below, **read it before starting Step 6** |
+| 6 — Select Range: manual event creation | **DONE** | initial build + **2** UI fix rounds (all visual, requested by Boti after live use) — see §9 below |
+| 7-9 | not started | |
 
-**Where to resume:** start Step 4 per `DEMO_BUILD_HANDOFF.md §6` row 4 — Analysis screen: Panel EEG +
-toolbar + scrub, no events yet, compare against `UI/B1a`, `B1b`, `B1d`. No open blockers carried over
-from Step 3. Five real subjects already exist in the DB from Step 3 testing and are kept
-deliberately for Step 4 to use without re-uploading: `chb06` (1 file), `chb13` (2 files), `chb15`
-(2 files), `chb14` (6 files), `chb16` (12 files) — the last three are short-duration EDFs built from
-real `chb15` headers/data (see §6.2 round 5), not full-length recordings.
+**Where to resume:** start Step 7 per `DEMO_BUILD_HANDOFF.md §6` row 7 — Channel Attribution Panel,
+compare against `UI/B2a`; behaviour in `SZSCAN_SPEC_v5.md §6.7`, scientific wording limits in
+`THESIS_CONTEXT_FOR_DEMO.md §5` (title `Channel-level reconstruction anomaly — Event N`, teal scale,
+connecting lines not dots, no attribution metric on screen, works for Human events too). **First thing
+to check before drafting the prompt:** whether `pipeline_demo.py`'s cache already stores per-window,
+per-channel reconstruction scores (`gae_joint.score_windows(..., per_node=True)`); if it only stores the
+ensemble score, producing them is new backend work and the main risk of the step. No open blockers
+carried over from Step 6. Three small optional/recommended items are in §12.
+
+**Test-data state left in the DB (end of Step 6):** `chb13` (2 real files, `chb13_02.edf` /
+`chb13_03.edf`, each exactly 1 hour) and short synthetic test files under `chb14`/`chb15`/`chb16` built
+from real `chb15` clips in Step 3. `chb13_03.edf` now holds 4 real AI events (from the CPD run) plus 3
+manually drawn Human events; `chb13_02.edf` has no AI events and 2 Human events — full list in §9.5.
+**Correction to this file's Step 3 entry (still valid):** `chb06_01.edf` has a real `.npy` cache (~4 h)
+but **zero rows** in the `subjects`/`files` tables — it was never uploaded through the real Create-New
+flow and does not appear in the running app. **Correction to §8.6:** the AI events' review states on
+`chb13_03.edf` were already Reject/Reject/Uncertain/Reject at Step 6 pre-flight, not
+Accept/Reject/Uncertain/Unseen — see §9.5.
 
 ---
 
@@ -33,83 +48,110 @@ real `chb15` headers/data (see §6.2 round 5), not full-length recordings.
 
 ```
 web_demo/
-├── CLAUDE.md                    (pre-existing)
-├── SZSCAN_SPEC_v5.md            (pre-existing, amended 2026-09 — C17, see §6.2 round 5)
-├── SZSCAN_DESIGN_v2.md          (pre-existing)
-├── DEMO_BUILD_HANDOFF.md        (pre-existing)
-├── THESIS_CONTEXT_FOR_DEMO.md   (pre-existing)
-├── PROJECT2_SETUP.md            (pre-existing, shared with Project #1)
+├── CLAUDE.md                    (pre-existing, already English)
+├── SZSCAN_SPEC_v5.md            (translated to English in Step 5 — see §8.6; includes C18)
+├── SZSCAN_DESIGN_v2.md          (translated to English in Step 5 — see §8.6)
+├── DEMO_BUILD_HANDOFF.md        (translated to English in Step 5 — see §8.6)
+├── THESIS_CONTEXT_FOR_DEMO.md   (pre-existing, already English, untouched)
+├── PROJECT2_SETUP.md            (pre-existing, shared with Project #1, still Vietnamese — out of
+│                                  scope for the Step 5 translation pass)
 ├── UI/                          (pre-existing, locked PNGs + Logo.png — still clean, never modified)
 ├── BUILD_PROGRESS.md            this file
-├── CC_STEP0_PROMPT.md           Step 0 build prompt
-├── CC_STEP1_PROMPT.md           Step 1 build prompt
-├── CC_STEP1_FILTER_OPT_PROMPT.md   Step 1 follow-up: filter-cost optimization
-├── CC_STEP2_PROMPT.md           Step 2 initial build prompt
-├── CC_STEP2_FIX_PROMPT.md       Step 2 fix round 1 (logo + header, first attempt)
-├── CC_STEP2_FIX2_PROMPT.md      Step 2 fix round 2 (numeric header target + logo re-check)
-├── CC_STEP2_FIX3_PROMPT.md      Step 2 fix round 3 (LoginScreen logo source + favicon) — closed it out
-├── CC_STEP2_FIX3_REPORT.md      Claude Code's written report for round 3
-├── CC_STEP3_PROMPT.md           Step 3 initial build prompt
-├── CC_STEP3_REPORT.md           Step 3 initial build report
-├── CC_STEP3_FIX_PROMPT.md       Step 3 fix round 1 (panel auto-close + overlay layout)
-├── CC_STEP3_FIX_REPORT.md       report for round 1
-├── CC_STEP3_FIX2_PROMPT.md      Step 3 fix round 2 (PROCESS never enables)
-├── CC_STEP3_FIX2_REPORT.md      report for round 2
-├── CC_STEP3_FIX3_PROMPT.md      Step 3 fix round 3 (unlock Project ID/Memo until PROCESS)
-├── CC_STEP3_FIX3_REPORT.md      report for round 3
-├── CC_STEP3_FIX4_PROMPT.md      Step 3 fix round 4 (minimize/restore bug + 2 author decisions + font check)
-├── CC_STEP3_FIX4_REPORT.md      report for round 4
-├── CC_STEP3_FIX5_PROMPT.md      Step 3 fix round 5 (A1/A2 leftover verification + C17 implementation)
-├── CC_STEP3_FIX5_REPORT.md      report for round 5
-├── CC_STEP3_FIX6_PROMPT.md      Step 3 fix round 6 (logout dropdown z-index bug) — closed Step 3 out
-├── CC_STEP3_FIX6_REPORT.md      report for round 6 — most recent Step 3 state
+├── spec_docs_diff.md            `git diff` output from the Step 5 English-translation replacement
+│                                  (informational, can be deleted once reviewed)
+├── CC_STEP0_PROMPT.md … CC_STEP3_FIX6_PROMPT.md/_REPORT.md   (Steps 0–3, see §3–§6)
+├── CC_STEP4_PROMPT.md, CC_STEP4_REPORT.md, CC_STEP4_FIX_PROMPT.md, CC_STEP4_FIX_REPORT.md
+│                                  Step 4 — see §7 (not retroactively expanded in this file)
+├── CC_STEP5_PROMPT.md           Step 5 initial build prompt
+├── CC_STEP5_REPORT.md           Step 5 initial build report (resumed pass, notranslate fix)
+├── CC_STEP5_FIX_PROMPT.md / _FIX_REPORT.md            fix round 1
+├── CC_STEP5_FIX2_PROMPT.md / _FIX2_REPORT.md          fix round 2
+├── CC_STEP5_FIX3_PROMPT.md / _FIX3_REPORT.md          fix round 3 (+ _SCREENSHOTS/)
+├── CC_STEP5_FIX4_PROMPT.md / _FIX4_REPORT.md          fix round 4 (+ _SCREENSHOTS/)
+├── CC_STEP5_FIX5_PROMPT.md / _FIX5_REPORT.md          fix round 5 (+ _SCREENSHOTS/)
+├── CC_STEP5_FIX6_PROMPT.md / _FIX6_REPORT.md          fix round 6 (+ _SCREENSHOTS/)
+├── CC_STEP5_FIX7_PROMPT.md / _FIX7_REPORT.md          fix round 7 (+ _SCREENSHOTS/)
+├── CC_STEP6_PROMPT.md / _REPORT.md                    Step 6 initial build (+ CC_STEP6_SCREENSHOTS/)
+├── CC_STEP6_FIX_PROMPT.md / _FIX_REPORT.md            Step 6 fix round 1 (+ _SCREENSHOTS/)
+├── CC_STEP6_FIX2_PROMPT.md / _FIX2_REPORT.md          Step 6 fix round 2 (+ _SCREENSHOTS/)
 ├── backend/
 │   ├── .env                     real dev credentials, gitignored (see §5.1)
 │   ├── .env.example
-│   ├── main.py                  FastAPI app — auth + /api/subjects + upload/process endpoints
-│   ├── pipeline_demo.py         process_file() (Step 1) + Phase A/B split (Step 3)
+│   ├── main.py                  FastAPI app — auth + /api/subjects + upload/process + waveform
+│   │                             endpoints. `get_waveform(file_id, start_sec, end_sec, width_px,
+│   │                             request)` has no filter-state parameter by design (Step 5 fix
+│   │                             round 5/6 — see §8.2). Step 6: `POST /api/files/{id}/events`
+│   │                             (create Human event); `PATCH /api/events/{id}` now also takes
+│   │                             `onset_sec`/`offset_sec` (Human events only)
+│   ├── pipeline_demo.py         process_file() (Step 1) + Phase A/B split (Step 3). Writes one
+│   │                             combined `{stem}.filtered.npy` per file (bandpass+notch applied
+│   │                             together at cache time) — no separable filter stages
 │   ├── upload_manager.py        UploadSession, session_id-keyed draft storage, ready_to_process
-│   │                             gating (upload-completion only, round 2), start_process() w/
-│   │                             allowlist validation at click-time (round 3), _finalize_draft_dir
-│   ├── pipeline_worker.py       Phase B / Process run as a genuine subprocess (works around a
-│   │                             uvicorn-hosting-context hang — see CC_STEP3_REPORT.md)
-│   ├── db.py                    SQLite schema for subjects/files/events; `_recording_label()`
-│   │                             renders "Start date" as `Recording N, HH:MM:SS` (C17, round 5) —
-│   │                             N from `meas_date`-ascending order, separate from and non-
-│   │                             disruptive to filename-based event-offset assignment (SPEC §1.5)
+│   │                             gating, start_process() w/ allowlist validation
+│   ├── pipeline_worker.py       Phase B / Process run as a genuine subprocess
+│   ├── waveform_serving.py      decimated-window serving for Panel EEG (raw+filtered, per
+│   │                             `DEMO_BUILD_HANDOFF.md §5`); `usable_duration_seconds()` —
+│   │                             floors to whole 4 s windows, drops any trailing partial window
+│   ├── db.py                    SQLite schema; `_recording_label()` for "Recording N" (C17). Step 6:
+│   │                             `create_event()`, `update_event_times()`; `Event N` names are
+│   │                             derived at read time from onset order, never stored (§9.2)
 │   ├── export_txt.py            still a stub (Step 8 scope)
 │   └── tests/
-│       └── test_guards.py       all 4 guards, reconfirmed PASS after every Step 3 round (6/6)
+│       └── test_guards.py       all 4 guards, reconfirmed PASS (4/4) after every Step 5 and Step 6
+│                                  round
 └── frontend/                    Vite + React + Tailwind
     ├── src/screens/LoginScreen.jsx      Step 2
-    ├── src/screens/DatabaseScreen.jsx   Step 2 (empty state) + Step 3 (real rows, search,
-    │                                     delete, overlay-panel host, keeps CreateNewPanel
-    │                                     mounted across minimize per round 4)
-    ├── src/screens/CreateNewPanel.jsx   Step 3 — upload UI, 6 fix rounds, see §6.2
-    ├── src/components/Header.jsx        Step 2, fixed in Step 3 round 6 (avatar dropdown z-index —
-    │                                     pre-existing bug, only became visible after round 1's
-    │                                     layout change; see §6.2)
-    ├── src/components/icons.jsx         Step 3 — upload/status icons
-    ├── src/components/ConfirmDialog.jsx Step 3 — reused for both subject-delete and
-    │                                     draft-discard confirmations
-    ├── src/api.js                       Step 3 — upload/process/search/delete endpoints
+    ├── src/screens/DatabaseScreen.jsx   Step 2 + Step 3
+    ├── src/screens/CreateNewPanel.jsx   Step 3
+    ├── src/screens/AnalysisScreen.jsx   Step 4 (EEG Panel/toolbar/scrub) + Step 5 (heaviest-edited
+    │                                     file this step — playback window-advance, amplitude
+    │                                     options, filter defaults, scrub-bar file-wide sync,
+    │                                     mini-timeline/Event-Panel/EEG-Panel row-grouping layout —
+    │                                     see §8.2–§8.5); Step 6 added the Select Range state
+    │                                     machine (`selectRangeActive`/`markingOnsetSec`/
+    │                                     `editingEventId`) and moved the header title next to Previous
+    ├── src/components/Header.jsx        Step 2, fixed in Step 3 round 6; Step 6 fix round 1 shrank
+    │                                     wordmark (`text-4xl`) and avatar (`w-14 h-14`); shared by
+    │                                     Database + Analysis (Login has its own layout)
+    ├── src/components/EegPanel.jsx      Step 4; touched in Step 5 for the channel-bleed clip fix
+    │                                     and the raw/filtered default-opacity bug (§8.2); Step 6:
+    │                                     onset marker, live preview rectangle, block label colour
+    ├── src/components/MiniTimeline.jsx  Step 5 — score line + Detections row, view-only, playhead
+    │                                     synced one-way from Panel EEG. `DOMAIN_SEC` hardcoded to
+    │                                     3600 (known limitation, see §8.7 — no allowlisted file
+    │                                     currently exceeds 1h so pan/zoom is untested)
+    ├── src/components/PanelEvent.jsx    Step 5 — two-tier filter, AI/Human expand, primary sync
+    │                                     source. `HumanExpand` first exercised live in Step 6
+    ├── src/eventStyle.js                Step 5 — shared `blockStyle()`/dimOpacity helpers, used by
+    │                                     both MiniTimeline and EegPanel's Event Time strip; Step 6
+    │                                     fix round 1: solid full-opacity blocks, no hatch,
+    │                                     `blockLabelColor()` (§9.3)
+    ├── src/components/icons.jsx         Step 3
+    ├── src/components/ConfirmDialog.jsx Step 3
+    ├── src/api.js                       Step 3 + Step 5 (waveform fetch, never filter-aware — §8.2)
+    ├── src/time.js                      Step 5 (time-format helpers)
     ├── src/assets/logo.png              Step 2
     ├── public/favicon.png                Step 2
-    └── (design-tokens.js, tailwind.config.js, etc. — unchanged since Step 0)
+    └── (design-tokens.js, tailwind.config.js, index.css — Step 6 fix round 1 added
+         `--color-uncertain: #FFE262` and `--color-uncertain-text: #D97706`; otherwise unchanged
+         since Step 0)
 ```
 
 Outside `web_demo/`, untouched by any of this: `tables/tables_ch2.md`, `docs/VERIFIED_CORRECTIONS.md`,
 `docs/EXHIBIT_SET_FINAL.md`, `docs/PROJECT_STATUS.md`, `docs/RUBRIC_TRACKING.md`,
-`docs/VERIFIED_NUMBERS.md`, `src/figures/*.py` — all confirmed Project #1 / report-writing artifacts
-edited by the author directly, unrelated to the demo build. `check_t8p8.py` (unrelated pre-existing
-MNE debugging script at repo root) also untouched.
+`docs/VERIFIED_NUMBERS.md`, `src/figures/*.py`, `figures/*.png`, `rank_readout.py`,
+`results/attribution_v7/*` — all confirmed by Boti directly as his own Project #1 / report-writing
+work in a separate, concurrent session, unrelated to the demo build. `bme11/` (repo root) is also
+Boti's own, unrelated, untouched by any web_demo work. `check_t8p8.py` also untouched.
 
-**Git hygiene reminder (from Step 2, still holds):** commit `web_demo/` changes and `docs/`/`src/figures/`
-changes separately, never in the same `git add .`.
+**Git hygiene reminder (from Step 2, still holds):** commit `web_demo/` changes and `docs/`/`src/figures/`/
+`figures/`/`rank_readout.py`/`results/` changes separately, never in the same `git add .`.
 
 ---
 
 ## 3 · Step 0 — detail
+
+*(unchanged from the prior version of this file — see below)*
 
 **Scope:** repo scaffold (`backend/`, `frontend/`, `cache/`), Tailwind tokens from
 `SZSCAN_DESIGN_v2.md §9`, `test_guards.py` with the four hard guards.
@@ -141,7 +183,7 @@ three stray root-level copies.
 
 **Lesson carried forward:** always ask for the *raw* console output of `pytest ... -v`, run directly
 by Boti, not a summary from Claude Code. Standing verification method for every step since — and it
-paid off repeatedly in Step 3 (see §6).
+paid off repeatedly in Step 3 and Step 5 (see §6, §8).
 
 **Final verified state:** `pytest web_demo/backend/tests/test_guards.py -v` → 4 passed (raw
 console, confirmed by Boti). `git status` clean.
@@ -150,257 +192,308 @@ console, confirmed by Boti). `git status` clean.
 
 ## 4 · Step 1 — detail
 
-**Scope:** `pipeline_demo.py`'s `process_file()` only — SPEC §1.3 stage 1. `process_subject()` /
-PELT / operating point explicitly NOT in scope (later step).
-
-**Implementation reviewed in full against `SZSCAN_SPEC_v5.md §1.3`** — checkpoint sha256 verified
-before load, 18-channel select, window+filter with no artifact rejection (per §1.6a), z-score
-per-channel (file-level at the time — later resolved in Step 3, see §6.1), adjacency via
-manual `apply_car → wpli/aec → combine → topk` (not `build_adjacency()`, which is fixed-threshold),
-band powers, GAE forward batched, `zlatent` via `LedoitWolf` (same file-vs-subject caveat, also
-resolved in Step 3), `zgamma` via continuous call to `compute_gamma_scores_batch`, robust-z per
-branch, ensemble via `build_ensemble_subset(..., subset=CANDIDATES["rlg"])`.
-
-**Timing — final measured:** **9.76 s/hour of EEG** on `chb06_01.edf` (CPU-only), after fixing
-`filter_window()` to filter the whole continuous recording once instead of per-window. Noted
-variance across runs (22-110s on the adjacency+band-power stage on identical code, same file) —
-attributed to background load on the dev machine, not a code bug. Not re-investigated further.
-
-**Guard check:** 4 passed (raw console) right after implementation.
+*(unchanged — see the prior version of this file for the full account: `process_file()` only,
+9.76 s/hour final measured timing on `chb06_01.edf`, guard check 4/4 passed.)*
 
 ---
 
 ## 5 · Step 2 — detail
 
-**Scope:** Log in + empty Database + footer, per `DEMO_BUILD_HANDOFF.md §6` row 2 and
-`SZSCAN_SPEC_v5.md §4`/`§5.1`. Explicitly out of scope: Create New panel, upload, Process, search
-filtering, Delete/Open row actions — all Step 3.
-
-**Initial build (`CC_STEP2_PROMPT.md`):** backend session auth (`.env`-sourced credentials, session
-cookie, login/logout endpoints), `db.py` schema (no seed data), frontend Login + Database screens.
-Dev credentials generated: `ADMIN_USER=AdminSzScan` / `ADMIN_PASS=tvEb7KbacjHD` (still current,
-Boti has not rotated them — fine for a local dev-only demo, SPEC §4 confirms this isn't a real
-security mechanism).
-
-**Backend verified correct throughout, no issues at any point:** curl-based auth flow checked in the
-initial report, later reconfirmed via actual browser use — real backend log shows
-`POST /api/login → 200`, `GET /api/subjects → 200`, `POST /api/logout → 200`, subsequent
-`POST /api/login → 200` again. One transient `Request failed (502)` during the fix rounds, caused
-by the backend terminal having been closed/killed while the frontend dev server was being
-restarted — not a code bug, resolved by restarting `uvicorn`.
-
-### 5.1 What matched the mockup on the first try
-
-Header gradient colors, footer bar (exact copy, exact background), page background, brand violet
-button, Database empty-state wording (`No data`), 7-column table structure, avatar dropdown with
-`Log out` (`UI/A0b`) — all correct from the initial build visually, no rework needed at the time.
-**Caveat added in Step 3 round 6:** "visually correct" here meant pixel-matched against the mockup,
-not functionally click-tested — the dropdown's `Log out` button turned out to be unclickable
-(z-index bug) the whole time, only discovered and fixed in Step 3. See §6.2 round 6.
-
-### 5.2 What didn't match, and took 4 rounds to close out
-
-| # | Issue | Root cause | Fixed in |
-|---|---|---|---|
-| 1 | Column headers missing literal `\|` before "No. files"/"Status" | The mockup renders `\| No. files` / `\| Status` as actual pixel/text content — invisible in the SPEC's prose table, only visible by reading the PNG directly | round 1 |
-| 2 | Header undersized (measured 10.8% of viewport height vs mockup's 12.9%) | Guessed from visual inspection alone, no way to self-verify | round 1 (undershot) |
-| 3 | Header oversized (15.7%) after round 1's fix | Same cause — blind guessing, overcorrected | round 2, fixed with a **precise numeric target** (measured 12.9% target, computed exact Tailwind class change: `py-6→py-5`, `h-20→h-16`, 128px→104px) instead of another visual guess — converged correctly |
-| 4 | Header/Login logo showing a generic placeholder icon, not the real logo | See §5.3 — this was the expensive one | rounds 1-3 |
-| 5 | Favicon invisible on light browser tabs | `Logo.png` is solid white with transparent background — fine on the purple header, illegible as a tab icon | round 3 (added a colored `favicon.png`, not spec-required, quick polish) |
-
-### 5.3 The logo saga — read this before trusting any future "file exists" check
-
-This took 3 fix rounds and is the clearest lesson from Step 2, worth internalizing for every future
-step:
-
-1. **Round 1** (`CC_STEP2_FIX_PROMPT.md`) asked Claude Code to copy `UI/Logo.png` into the frontend
-   and wire it in. It silently didn't happen — `git diff` showed zero changes to any logo-related
-   file. Root cause, found later: `web_demo/frontend/src/assets/logo.png` **already existed** —
-   Claude Code's very first Step 2 build had generated its own placeholder icon at exactly that
-   filename before `Logo.png` was ever provided. Every later "does the logo file exist" check came
-   back "yes" — because a file existed, just the *wrong one*. **A file-existence check is not a
-   content-correctness check.**
-2. **Round 2** (Cursor Agent, free tier) was tried specifically because it has a built-in browser +
-   screenshot tool (`browser_take_screenshot`) that Claude Code's CLI session lacked at the time — a
-   legitimate capability-based tool choice, not habit. It hit its free usage limit mid-task and made
-   **zero** file changes. Lesson: Cursor's free tier is not reliable for a multi-step agentic task.
-   (Superseded in Step 3 by Claude Code's own `claude-in-chrome` skill, connected to Boti's real
-   browser — no usage-limit issue, and this is what actually caught 5 of Step 3's 6 bugs.)
-3. Manually diagnosed with `cp` + `cmp` (byte-level file comparison) instead of trusting further
-   AI self-reports — confirmed the asset file itself was now correct, but the **Log in screen**
-   still rendered the old icon.
-4. **Round 3** (`CC_STEP2_FIX3_PROMPT.md`) investigated properly (`grep` first, report findings
-   before editing) and found `LoginScreen.jsx` had *already* been fixed to use the correct asset —
-   but that fix had been swept into an unrelated Project #1 commit and was never visually
-   re-verified after. Final pixel-crop comparison against the actual `Logo.png` file confirmed both
-   the Database header and Log in screen now render the correct mark.
-
-**Process lesson also adopted from this saga:** starting with round 3, prompts ask Claude Code to
-write its final report to a `.md` file instead of printing to the terminal. **Used without exception
-ever since.**
-
-### 5.4 Screenshot-comparison methodology note
-
-Comparing "header as % of screenshot height" across rounds produced one confusing measurement
-that turned out to be an artifact of one screenshot including the full browser chrome
-(tabs/address bar/bookmarks) while earlier ones didn't. **When pixel-comparing future screenshots
-against mockups, always first identify and exclude browser chrome, or use a chrome-independent
-ratio (e.g. header height ÷ avatar diameter) instead of raw % of image height.**
-
-### 5.5 Final verified state
-
-- `pytest web_demo/backend/tests/test_guards.py -v` → 4 passed (raw console, confirmed by Boti).
-- Logo on both Database header and Log in screen pixel-confirmed identical to `web_demo/UI/Logo.png`.
-- Favicon confirmed visible/legible in the browser tab.
-- Nothing under `web_demo/UI/` ever showed as modified — held up across every round since.
+*(unchanged — see the prior version of this file: Log in + empty Database + footer, 4 fix rounds,
+the logo saga (§5.3, 3 fix rounds — "a file-existence check is not a content-correctness check"),
+final verified state confirmed.)*
 
 ---
 
 ## 6 · Step 3 — detail
 
-**Scope:** Create New panel, file upload with validation, two-stage pipeline execution
-(Phase A/B on upload, Process → PELT), minimize-to-toast, single-subject concurrency lock, Delete
-(subject-level only), Search, Database table showing real rows. Per `DEMO_BUILD_HANDOFF.md §6` row 3
-and `SZSCAN_SPEC_v5.md §1.5, §1.6, §2, §5.1, §5.4-5.7, §8`. Out of scope, still: Analysis screen
-(Open is a deliberate stub, resolved in Step 4 — see §6.3), Panel Event, mini-timeline, attribution,
-Select Range, Export.
+*(unchanged — see the prior version of this file: Create New panel, upload, two-stage Phase A/B
+pipeline, minimize-to-toast, concurrency lock, Delete, Search — 6 fix rounds, all found by live
+`claude-in-chrome` browser testing, none by curl. Operating point O1 demonstrated working:
+`chb06`, `pen_mult=2.0` → 28.76 events/day against the 40/day balanced target.)*
 
-**Took 6 fix rounds past the initial build — every bug found was found by live browser testing,
-none were caught by Claude Code's own automated/curl checks.** This is the single biggest lesson
-from Step 3: curl proves an endpoint responds correctly; it cannot catch a panel that closes itself
-on scroll, a layout that visually pushes instead of overlays, a button wired to the wrong state, an
-edit that silently reverts on remount, or a dropdown painted invisibly behind another element.
-Round 1 onward used `claude-in-chrome` (Claude Code's browser-control skill, connected to Boti's real
-Chrome) for verification — this materially improved report quality (several rounds' reports show
-direct state proof, e.g. a backend JSON snapshot captured mid-test showing
-`phase_b_done: false, ready_to_process: true`, or `document.elementFromPoint()` proving which DOM
-element actually painted on top — not just narrated claims).
+---
 
-### 6.1 Initial build — architectural decisions made
+## 7 · Step 4 — detail (brief — this file's own convention was skipped at the time)
 
-- **Phase A / Phase B split**, resolving the tension between SPEC §5.5 ("stage 1 starts per file on
-  upload, before siblings may exist") and §1.6a ("z-score/LedoitWolf fit on the whole subject").
-  Phase A (per file, on upload completion): 18-channel read, filter, window — flips the file's icon
-  to ✕. Phase B (once, when every file is uploaded): concatenate raw windows subject-wide, fit
-  z-score mean/std + `LedoitWolf`, then run CAR→adjacency→band-powers→GAE→zrecon/zlatent/zgamma→
-  robust-z→ensemble **per file** using those subject-wide stats. Resolves both `# TODO(step3)`
-  markers carried over from Step 1.
-- **Operating point (O1):** `BUDGETS["balanced"]=40.0` read from `fp_budget_operating_point.py` at
-  runtime, never hardcoded. Demo-time calibration: grid-search `pen_mult` per subject on the
-  concatenated global score timeline, pick whichever value's resulting event-rate (events/24h) is
-  closest to 40/day. Confirmed non-degenerate (no subject produced 0 events). Example from round 2
-  fix testing: `chb06`, 3 files, `pen_mult=2.0` → 28.76 events/day. Full original grid + single-file
-  calibration numbers are in `CC_STEP3_REPORT.md`.
-- **Project ID = subject ID directly**, validated against the 8-subject allowlist. Initially bound
-  at session creation; **revised in round 3** to be re-validated and bound only at the moment
-  PROCESS is clicked, so the field could stay editable throughout (see round 3 below).
-- **Event → file assignment** via cumulative offset per SPEC §1.5 — no `edf_index` module invented.
-- **File ordering / "Start date" column** uses `raw.info['meas_date']` (the real EDF header
-  datetime) directly, **not** `edf_order.py`'s summary-text heuristic — confirmed present and valid
-  for all 8 allowlisted subjects (spot-checked one file per subject, 2026-09-13, none `None`).
-  `edf_order.py` stays in the repo completely unmodified but is genuinely unused (confirmed via
-  `grep -rn "meas_date" web_demo/backend/*.py`) — `meas_date` solves the chb03_24/25 cross-midnight
-  ordering problem without the heuristic. **Round 5 later reused this exact `meas_date` ordering for
-  C17's display — see below.**
-- **Infra note:** the GAE/PELT pipeline was found to hang at 0% CPU when run from a thread or a
-  `ProcessPoolExecutor` inside the `uvicorn` process on this specific dev machine — reproducible
-  only in that hosting context. Worked around by running Phase B and Process as a genuine separate
-  `subprocess.Popen` (`web_demo/backend/pipeline_worker.py`).
+**This section is a retroactive placeholder, not a full account.** Step 4 (Analysis screen: Panel
+EEG + toolbar + scrub, no events yet, per `DEMO_BUILD_HANDOFF.md §6` row 4) was completed and
+closed before Step 5 began — `CC_STEP5_PROMPT.md`'s own prerequisite line confirms
+`CC_STEP4_REPORT.md` + `CC_STEP4_FIX_REPORT.md` existed and were closed, with `chb13`/`chb16` reset
+to a clean `View` state at the end of the Step 4 fix round. This file was not updated at that time
+to summarize what happened, breaking its own stated convention ("update it at the end of every
+future step") — noted here so it isn't repeated.
 
-### 6.2 Six fix rounds
+**What's inferable from Step 5's own reports about what Step 4 built** (not a substitute for
+reading `CC_STEP4_REPORT.md`/`CC_STEP4_FIX_REPORT.md` directly if the detail is ever needed):
+18-channel canvas rendering, the `lff`/`hff`/`60` filter toggle buttons, the original 6-level
+5/7/10/15/20/30 µV amplitude dropdown, the `⊲▷ [X] hr` window-length control, the bottom scrub bar
+with playback speed dropdown, and drag-to-seek. Several latent defects in this code were only
+caught during Step 5's live testing — a near-black/illegible canvas rendering bug (channel
+cross-bleed, fixed in Step 5 fix round 1), a default state that showed already-filtered data
+instead of raw (fixed in Step 5 fix round 4), and a hard-stop-at-window-boundary bug in playback
+(fixed in Step 5 fix round 3) — suggesting Step 4's own closure may not have exercised every
+control as thoroughly as its guard-test-green state implied. Worth keeping in mind for Step 6
+onward: a green guard test and a working demo are not the same claim.
 
-| Round | Bug / decision | Root cause / resolution |
+---
+
+## 8 · Step 5 — detail
+
+**Scope:** Mini-timeline (score line + Detections row), Event Panel (two-tier filter, AI/Human
+expand, Accept/Reject/Uncertain + Save), 3-panel sync (Event Panel as primary control source, per
+`SZSCAN_SPEC_v5.md §6.5`), the dimming rule. Per `DEMO_BUILD_HANDOFF.md §6` row 5 and
+`SZSCAN_SPEC_v5.md §6.3`/`§6.5`. Out of scope, still: Select Range's actual event-creation behavior
+(Step 6), Channel Attribution panel (Step 7), Export (Step 8).
+
+**Took 7 fix rounds past the initial build — the most of any step so far**, and for the first time
+a real product decision (the amplitude-token range) got revised mid-step based on build-time
+measurement rather than being knowable in advance. `claude-in-chrome` connectivity was unreliable
+for much of this step (a stale account-pairing issue after a Claude-account switch, see
+`learnings.md`) — Claude Code fell back to Playwright for round 2 and reconnected successfully from
+round 3 onward.
+
+### 8.1 Initial build (resumed pass) — one real bug found
+
+Session resumed mid-step after the Chrome extension had to be reinstalled. Found and fixed one bug
+not related to the app's own logic: **Chrome's own page-translate feature crashed React** on the
+Database screen (`NotFoundError` on `insertBefore`, triggered by `lang="vi"` auto-translate
+rewriting live DOM text nodes out from under React's reconciler). Fixed with
+`<meta name="google" content="notranslate">`. Verified the 10-item checklist from
+`CC_STEP5_PROMPT.md` otherwise passed (mini-timeline rendering against real stored events, per-file
+P1–P99 auto-scale, view-only + one-way playhead sync, two-tier filter + `x`/`x/y` count format,
+click-to-sync across all 3 panels, Alert-count-updates-on-save, the dimming rule verified via
+**computed style**, not eyeballing, wording checks). The backfill script run earlier in the step
+(to fill missing per-file score arrays, Phase A+B only) was **not** written up in this pass — had
+to be requested separately, see round 1.
+
+### 8.2 Seven fix rounds
+
+| Round | Bug / finding | Root cause / resolution |
 |---|---|---|
-| 1 | Panel auto-closed after a few seconds / on scroll | Session-polling `useEffect` misread expected 404s (no backend session yet) as "the session disappeared," closing the panel. Fixed: poll gated on `hasSession`, not `panelMode`. |
-| 1 | Panel pushed/resized the Database table instead of overlaying it | `main` was a shared-width flex row (table `flex-1` + panel `w-[420px] shrink-0`) — a real layout partner, not an overlay. Fixed: panel changed to `absolute top-0 right-0 bottom-0` anchored to `main`'s right edge (`z-30`); table reverted to plain full-width block flow. **This layout change is what indirectly exposed round 6's pre-existing Header bug** — see below. |
-| 2 | PROCESS button never enabled once every file showed ✕ | `upload_manager.py`'s `ready_to_process` incorrectly required `phase_b_done` — an internal computation-ordering concern that SPEC §5.5 never says should gate the *button*. Fixed: gate is upload-completion only; clicking PROCESS itself waits for Phase B behind the existing full-panel loading state before running PELT. Traced and explicitly ruled out as a round-1 regression. |
-| 3 | *(author decision, not a bug)* Unlock Project ID/Memo for editing at any time, not just pre-upload | Upload storage was keyed by the literal Project ID text — a moving target once editable. Fixed: session keyed by an internal immutable `session_id`; files land in `_draft_{session_id}/`, only relocated to `uploads/{project_id}/` once PROCESS validates the (possibly-edited) ID against the allowlist **and** Phase B has fully finished. Verified with both a rejection and a subsequent successful correction. |
-| 4 | Minimize → restore silently reverted any Project-ID/Memo edits back to the session's original value | `CreateNewPanel` was fully unmounted on minimize, destroying local React state; restoring remounted a fresh instance whose one-shot hydration effect fired again and overwrote the edit. Fixed: `CreateNewPanel` now stays mounted for the panel's entire open/minimized lifetime; a `hidden` prop toggles visibility instead of unmounting. |
-| 4 | *(author decision, reversing an earlier explicit agreement)* Add a confirmation dialog to × | Reused `ConfirmDialog.jsx`. Wording: *"Discard this draft? Any uploaded files and progress will be lost."* Shown only when there's real content to lose (non-empty Project ID/Memo, or ≥1 file) — a completely blank panel still closes instantly. |
-| 4 | *(author decision)* Remove the progress bar from the Processing / Upload-Complete states | `SZSCAN_DESIGN_v2.md §8`'s "no fake %" rule already argued against an animated bar with no real signal behind it; author chose outright removal over a real (coarse, file-count-based) alternative. **`UI/A2a`/`A2b` mockups do show a bar — this is a deliberate, recorded departure from the mockup.** |
-| 4 | Font mismatch flagged by author on the Processing panel | Investigated, not reproduced: `getComputedStyle()` confirmed `Inter, sans-serif` was already correctly applied via inheritance. No code change made. |
-| 5 | *(verification, no bug found)* Malformed/wrong-channel upload rejection (A1) | Confirmed already correct — `pipeline_demo.py` raises `UnsupportedEdfError`, caught and surfaced verbatim as `File rejected — unsupported format or channel configuration.`. Proved live with a genuinely corrupted EDF (truncated real header), not just a renamed text file. |
-| 5 | *(verification, no bug found)* Single-subject concurrency lock (A2) | Confirmed already correct — `upload_manager.py`'s single module-level `_current` slot blocks a second `start_session` with the exact `UI/A1d` message. Proved live with a real DOM click timed via JS against a confirmed `processing: true` backend state, since the short test recordings process too fast for screenshot-paced clicking to reliably land in the window. |
-| 5 | *(author decision, C17)* "Start date" column changed from absolute date to `Recording N, HH:MM:SS` | CHB-MIT/PhysioNet applies a fixed per-patient date shift for de-identification — ordering, time-of-day, and spacing between recordings stay meaningful within one subject, but the absolute year (e.g. 2075) has no meaning and is a real risk of an awkward defense-day question. Fixed in `db.py` only: N computed by sorting each subject's files on `meas_date` ascending (display-only ordering) — confirmed **separate from and non-disruptive to** the filename-based event-offset assignment (SPEC §1.5). Proved against a genuine ordering mismatch: `chb03_24.edf`/`chb03_25.edf`, where filename order and `meas_date` order disagree — `chb03_24` correctly showed **Recording 2** despite its lower filename number. `SZSCAN_SPEC_v5.md §5.1` amended accordingly by the author, with a footnote explaining the PhysioNet date-shift reasoning. |
-| 6 | Avatar dropdown's "Log out" button rendered hidden/unclickable | Pre-existing `Header.jsx` bug (present since Step 2, never actually click-tested before — only visually mockup-compared), only became *visible* after round 1's layout change gave `main` a `position: relative` stacking context. With both the dropdown and `main`'s subtree at `z-index: auto`, CSS paints by DOM order — `main` comes after `<Header>` in the JSX tree, so it painted on top wherever the two overlapped on screen. Confirmed identical failure on a completely fresh page load (Create New never opened), ruling out `CreateNewPanel` as the cause. Fixed with one line: explicit `z-50` on the dropdown. |
+| 1 | Backfill write-up missing; EEG canvas near-black/illegible | Backfill confirmed: never called `cpd_pipeline_v14`/PELT, wrote `{stem}.score.npy` correctly, lengths verified. Canvas: channel cross-bleed from an unclamped `drawSeries` (an amplitude spike in one channel row bled into neighboring rows); clip fix applied, verified via pixel-sampled before/after (bleed-fraction dropped from ~95%+ uniform to 1.5–31.6% per row, i.e. real per-channel variation restored). Window-length control and filter toggle were **already working** — confirmed via network payloads, just masked visually by the canvas bug. Panel Event's column height fixed to span the full EEG Panel height (`items-start` → `items-stretch`, dropped a hardcoded `maxHeight`). |
+| 2 | Scrub bar didn't move Panel EEG when dragged; inline error persisted | Every pixel of a drag fired its own request, stacking against ~0.8–1.3 s/request backend latency — fixed with a 120 ms debounce (verified: 30 requests → 1). Error message left on screen forever after an invalid Save — fixed to clear on status selection/event switch. Gathered amplitude data (not yet acted on): `chb13` median 110.6 µV/peak 1820.8 µV, `chb06` median 105.9 µV/peak 1248.0 µV. Verified Alert-count "02" was arithmetically correct (2/4 events already Rejected), not a bug. Confirmed the Reject-block diagonal hatch is spec-mandated (`SZSCAN_DESIGN_v2.md §2`), not a bug — left untouched. |
+| 3 | Playback froze at the window's `end_sec` and never advanced further | Root cause read directly from the existing code (an unconditional `setPlaying(false)` at the boundary). Fixed: when more file remains, shift `windowStartSec` to `end_sec` and let the existing debounced-fetch effect load the next segment; when truly at file end, stop cleanly (verified separately). Verified with 3 timestamped screenshots showing the time-axis genuinely advancing. Implemented the first amplitude-token extension (12 values, 5–500 µV) and confirmed 250 µV produces a legible, connected waveform on the same window round 2 measured — confirming the scale-mismatch diagnosis. |
+| 4 | (verification) Do the low µV levels serve a purpose? Is the default view raw or already-filtered? | Even the file's **calmest** segment (found via the model's own ensemble score, not by eye) still measured ~102 µV median spread — no meaningfully calmer regime exists in this file, undercutting the low levels' original justification. **Real bug found:** all three filter toggles defaulted to `true` on page load, so the *filtered* series was drawn prominent from the very first render — confirmed via a live network response (raw ≠ filtered, both genuinely present) and a **pixel-level canvas sample** (`#0F172A` filtered-token color present at load, before any user interaction). Fixed the default to all-`false`; re-verified the base canvas samples raw's `#64748B` token at load. Progressive-filter screenshots showed `(a)` off vs. `(b)/(c)/(d)` on as visibly different, but `(b)/(c)/(d)` appeared identical to a **sparse** (1-in-97-byte) fingerprint — flagged as needing a more rigorous check, not fully trusted yet. |
+| 5 | (verification) Re-check the window-length control and the filter-toggle "identical" claim properly | Window-length (`⊲▷ [X] hr`): confirmed **not** a bug — every option ≥ 1 hour collapses correctly to the same `[0, duration]` request because every currently-loaded file is ≤ 1 hour; genuinely different requests confirmed below that boundary (`30 min` ≠ `1 min` ≠ `24 hr`'s full-file clamp). Filter-toggle identity re-checked with a **full-byte** canvas diff (2,322,864/2,322,864 bytes, window pinned fixed, zero `/waveform` requests fired during the sequence) — confirmed `(a)` differs from `(b)/(c)/(d)` by 37.36% of pixels (the real raw→filtered switch), and `(b)`/`(c)`/`(d)` are **exactly** identical, 0 differing bytes — architecturally so, since the backend route (`get_waveform`) has no filter parameter at all and `pipeline_demo.py` caches exactly one combined `{stem}.filtered.npy` per file (bandpass+notch applied together, not separable). |
+| 6 | Finalize + implement the amplitude list; is the ≤1h file cap genuine?; fix the mini-timeline/Event-Panel row-grouping layout bug | Amplitude: Boti decided floor = 75 µV → `AMPLITUDE_OPTIONS = [500, 250, 150, 100, 75]`, `SZSCAN_SPEC_v5.md §6.4`/C18 updated to match; `DEFAULT_AMPLITUDE_UV` also moved to 75 (flagged as a judgment call, not explicitly requested). File duration: read the **raw EDF header directly** (bypassing all caches) for `chb13_02/03.edf` (confirmed genuinely, exactly 3600.000 s each) and `chb06_01.edf` (confirmed genuinely ~14427 s / ~4 hours) — corrected round 5's framing from "every file is ≤1h" (true only for the subjects happening to be loaded) to the accurate statement. Layout: read `UI/B2a`/`B1a` first, found the actual bug — `<MiniTimeline>` was nested inside the same flex row as `<PanelEvent>`, narrowing it — moved `<MiniTimeline>` to its own full-width row above the EEG-Panel/Event-Panel pair, verified with a literal mockup-vs-live side-by-side screenshot. |
+| 7 | Black vertical bar on `chb15_01_short.edf`; Play failure on the same file; scrub bar not synced to file-wide position | Black bar: read raw `.npy` directly — no NaN/zero-run, smooth (not step-discontinuous) ramps, and the **same kind of large broadband excursion (smaller magnitude) confirmed present in the genuinely real files** (`chb13_02/03.edf`, `chb06_01.edf`) — concluded genuine extreme-amplitude data (likely movement/muscle artifact, common in pediatric scalp EEG), not a bug; nothing changed. Play freeze: every reproduced freeze traced to the **automation tab being backgrounded** (`document.hidden`, zero `requestAnimationFrame` calls) — proved the underlying logic correct via a forced non-throttled scheduler; could not get a clean repro and said so plainly rather than claiming an unverified fix — **Boti's own live re-check afterward confirmed it runs fine**, closing this as environment-specific to the automation session, not a real bug. Scrub sync: real gap — the bottom scrub bar's `<input max>` was clamped to `maxStart` (the window's own reachable range) instead of `usable_duration_seconds` (the whole file), so its handle didn't reflect true file-wide position. Fixed (one line, the `max` attribute only); verified via DOM `value`/`max` at 3 positions — including one reached by clicking an Event Panel row — matching the `window_start/duration` formula exactly, not approximately. |
 
-### 6.3 Verified by Boti himself, live in a real browser (not just Claude Code's own checks)
+### 8.3 Also decided this step (not bug fixes)
 
-- Full create → upload → Process → subject-appears-in-table cycle, multiple times, multiple real
-  allowlisted subjects, with 1 file and with multiple files.
-- Minimize/restore preserves in-progress edits, both with and without files already uploaded.
-- × discard confirmation — correct wording, only appears when there's real content to lose.
-- Progress bar gone from both Processing and Upload-Complete states.
-- Search (partial match, button-triggered, not per-keystroke) — filters correctly, `No results
-  for '...'` on miss.
-- Delete — subject-level confirmation dialog works and actually deletes; selecting a **child file
-  row** and clicking Delete correctly does nothing (per SPEC §5.6).
-- Open — correctly shows the "isn't implemented yet (Step 4)" stub (now to be replaced by a real
-  Analysis screen in Step 4).
-- Allowlist enforcement at PROCESS-click time — confirmed with multiple different invalid IDs
-  rejected with the exact toast, and correction-then-retry succeeding each time. **This rejection
-  behavior is intentional, not a bug.**
-- `Recording N, HH:MM:SS` (C17) renders correctly across multiple real subjects, no absolute year
-  anywhere.
-- Avatar → Log out → back to Login screen — works end-to-end.
+- **The whole locked spec doc set moved from Vietnamese to English**, for Claude Code to parse more
+  reliably (Boti's decision, 2026-09-21). `SZSCAN_SPEC_v5.md`, `SZSCAN_DESIGN_v2.md`, and
+  `DEMO_BUILD_HANDOFF.md` were fully translated — content-faithful, no meaning changes.
+  `CLAUDE.md`/`THESIS_CONTEXT_FOR_DEMO.md` were already English. `PROJECT2_SETUP.md` stays
+  Vietnamese (out of scope). **Any future edit to these three files should be written in English.**
+- **C18** (`SZSCAN_SPEC_v5.md §6.4`): the Panel EEG amplitude-token list, revised twice this step —
+  first extended (round 3, 5→500 µV, 12 values) once real data showed the original 5–30 µV list was
+  far below the signal's real range, then pruned (round 6, down to 5 values: `500/250/150/100/75`)
+  once round 4's calm-segment measurement showed the low end never actually served its stated
+  purpose. Locked-but-revisable, per the note already written into C18 itself.
 
-### 6.4 Final verified state
+### 8.4 Verified by Boti himself, live in a real browser
 
-- `pytest web_demo/backend/tests/test_guards.py -v` → 4 passed (raw console, confirmed by Boti,
-  independently, after **every one** of the 6 fix rounds).
-- `git status` clean outside `web_demo/` except pre-existing, confirmed-unrelated Project #1 /
-  report-writing edits (`docs/*.md`, `src/figures/*.py`, `tables/tables_ch2.md`) — all explicitly
-  confirmed by the author as his own work in a different project, not touched by any Step 3 round.
-- Nothing under `web_demo/UI/` ever showed as modified across any round.
-- Five real subjects deliberately left in the DB for Step 4 to reuse without re-uploading: `chb06`,
-  `chb13`, `chb15`, `chb14`, `chb16` (see §1's "where to resume" note).
+- Play button working correctly on `chb13_03.edf`, both mid-step and again after round 7's scrub fix.
+- Scrub bar, Panel EEG, and mini-timeline confirmed in sync by his own eye after round 7.
+- Play on `chb15_01_short.edf` specifically re-tested by him after round 7 and confirmed fine (this
+  is what closed round 7's one open item — the freeze only reproduced inside the automation
+  session's backgrounded tab, never in his own normal usage).
+- The amplitude legibility judgment call itself (150 µV and below "doesn't look like EEG anymore,"
+  100 µV "minimum") — his own live viewing, which is what triggered round 6's final token-list
+  decision.
+- The mini-timeline/Event-Panel/EEG-Panel layout, before and after round 6's fix — confirmed
+  "positions are more correct now" (some minor polish still deferred, by his own choice, to a later
+  pass once functionality is fully solid — not a Step 5 blocker).
 
----
+### 8.5 Known limitations / carried forward, not blocking Step 6
 
-## 7 · Integrity incident (from Step 1) — status: resolved, cause still unconfirmed
+- `MiniTimeline.jsx`'s `DOMAIN_SEC` is still hardcoded to 3600 — no currently-loaded file exceeds 1
+  hour, so the pan/zoom case for a longer file (e.g. `chb06`, ~4 hours, if it's ever uploaded
+  through the real flow) has never been exercised.
+- The three filter buttons (`lff`/`hff`/`60`) are independently clickable but **not** independently
+  wired to different data — `pipeline_demo.py` only ever caches one combined bandpass+notch series.
+  Whether to invest in separately cacheable filter stages so the buttons become individually
+  meaningful is an open product decision for Boti, raised in rounds 4/5, not acted on.
+- `chb06` has a real, correct `.npy` cache on disk from ad hoc measurement scripts but has never
+  been uploaded through the actual Create-New flow — it has no DB rows and does not appear in the
+  app. If a real ~4-hour file is wanted for testing the window-length control's larger options or
+  the mini-timeline's untested pan/zoom case, `chb06` would need a real upload, not just its
+  existing cache.
+- `HumanExpand` (the User-added event detail view in Panel Event) is implemented per spec but has
+  never been exercised live — no Human event can exist until Step 6 (Select Range) is built.
 
-During the Step 1 filter-optimization work, `web_demo/UI/Annotaiton (format_ ID-summary.txt).png`
-(a locked mockup) was modified (`git diff --stat` showed `Bin 103048 -> 103996 bytes`). Reverted via
-`git checkout`, confirmed clean at the time.
+### 8.6 Test-state note
 
-**Root cause never confirmed.** No further leads. **Not re-investigating further** — but the
-mitigation (explicit "never write to UI/, copy to scratch first" instruction in every prompt since)
-has held up cleanly across Step 2's 4 rounds and Step 3's 6 rounds with zero recurrence, which is the
-practically important outcome even without a root cause.
+`chb13_03.edf` was left, across the initial pass, with: Event 1 = Accept, Event 2 = Reject,
+Event 3 = Uncertain, Event 4 = Unseen — unchanged through all 7 fix rounds (every round explicitly
+confirmed no Save/Accept/Reject/Select Range action was taken during its own live verification).
+`chb13`'s subject row currently reads Alert `2` (2 of 4 events Rejected as of round 5's live
+testing — up from round 1's `3`). Same precedent as Step 3/4's test-state notes — reset yourself if
+you'd rather start Step 6 from a clean slate.
 
----
-
-## 8 · Report material for Project #1 (per `PROJECT2_SETUP.md §9.2(D)`)
-
-End-to-end runtime measured = **9.76 s/hour of EEG** (Step 1, with the noted run-to-run variance
-caveat, not re-measured since).
-
-**Operating point (O1) is now implemented and demonstrated working** — a real, label-free,
-per-subject FP-budget calibration example exists (`chb06`, `pen_mult=2.0` → 28.76 events/day against
-the 40/day balanced target; full grid in `CC_STEP3_REPORT.md`).
-
-Still open: **O4b** (post-ictal flagging extent — needs Analysis-screen-level visual review of events
-against known seizure timing, Step 4+) and a **formally cataloged set of app screenshots** for report
-use — real screenshots exist informally from Steps 2–3's testing but haven't been organized/captioned
-for direct report inclusion yet.
-
-Note: C17 (the `Recording N` display decision, §6.2 round 5) is a pure demo-UX/display decision — it
-does not touch the model, pipeline, or any scientific result, so it does **not** need to be routed to
-the advisor per `PROJECT2_SETUP.md §9.2(C)` (that channel is for divergences from the thesis
-*method*, which this isn't).
+> **Correction (2026-09-24):** Step 6's pre-flight found these four AI events already at
+> Reject/Reject/Uncertain/Reject, so the Accept/Reject/Uncertain/Unseen state recorded above was stale
+> by the time Step 6 started. See §9.5 for the state at the end of Step 6.
 
 ---
 
-## 9 · Open items before / going into Step 4
+## 9 · Step 6 — detail
 
-- [ ] Commit hygiene: keep splitting `web_demo/` commits from `docs/`/`tables/`/`src/figures/`
-      commits going forward.
-- [ ] Organize existing screenshots (Login, Database, Create New flow) for report use — no new
-      screenshots needed, just cataloging (see §8).
-- [ ] Step 4 itself: prompt being drafted next. Scope per `DEMO_BUILD_HANDOFF.md §6` row 4 —
-      Analysis screen: Panel EEG + toolbar + scrub, **no events yet** (mini-timeline/Panel
-      Event/attribution are Step 5+). Compare against `UI/B1a`, `B1b`, `B1d`. This step is
-      canvas-rendering-heavy with real technical subtlety (18.6M points/file, must not ship to the
-      browser undecimated — see `DEMO_BUILD_HANDOFF.md §5`). Given Step 3 took 6 rounds specifically
-      because visual/interactive bugs don't show up in curl tests, use `claude-in-chrome` from round
-      1 of Step 4 onward.
+**Scope:** Select Range — manual event creation on Panel EEG (`SZSCAN_SPEC_v5.md §6.6` plus the
+User-added-event bullet of §6.5). Initial build + **2 fix rounds**, all visual adjustments Boti requested
+after using the running app; the initial build itself needed no behaviour fixes. Boti tested Select Range
+live and confirmed it works and matches the spec (2026-09-24). Guards 4/4 green after every round;
+nothing outside `web_demo/` changed. Reports: `CC_STEP6_REPORT.md`, `CC_STEP6_FIX_REPORT.md`,
+`CC_STEP6_FIX2_REPORT.md`.
+
+### 9.1 Initial build
+
+- **Backend:** `db.create_event()` (always `source='Human'`, `review_status=NULL` — a Human event has no
+  review-status axis at all), `db.update_event_times()`, `POST /api/files/{file_id}/events` (sorts the two
+  points, 422 on non-positive duration), `PATCH /api/events/{id}` extended with optional
+  `onset_sec`/`offset_sec` (Human events only; 422 on an AI event or on only one of the pair). `DELETE`
+  already existed from Step 5.
+- **Frontend:** Select Range state machine in `AnalysisScreen.jsx`; `api.js` `createEvent`; onset marker
+  (reuses the violet playhead visual) and live preview rectangle (Human blue, 35 %, dashed border) in the
+  Event Time row; `PanelEvent.jsx` `HumanExpand` exercised live for the first time.
+- **Verified live through `claude-in-chrome`, all 16 items:** marking mode, onset marker, live preview,
+  offset lock, onset/offset/duration read back and matching the clicks to sub-second precision,
+  chronological insert-in-place (survived a full page reload), person icon and no review controls, blue
+  mini-timeline block, Alert +1 in both the Analysis header and the Database, expand fields, Delete
+  (Alert −1, block gone), Edit, cancel mid-mark, right-to-left drag, 3-panel sync for a Human event.
+
+### 9.2 Three spec gaps the implementation filled (not written in SPEC v5)
+
+1. **Edit** re-enters the Select Range marking mode scoped to that event: two clicks overwrite its
+   onset/offset (same DB id); Delete/Edit are replaced by a hint while the redraw is in progress. This
+   mirrors the AI "Reject and redraw" asymmetry of §6.5.
+2. **Cancel** = click the `Select Range` toolbar button again while only the onset has been set; no
+   partial event is ever written. The button label reads `Click onset…` / `Click offset…` while active.
+3. **Numbering:** `Event N` is derived at read time from onset order (`onset_sec ASC, id ASC`) and never
+   stored, so inserting a Human event renumbers every later event, consistently in the Event Panel, the
+   Event Time row and the mini-timeline. This deliberately does not copy `UI/B3c`, whose sample data is not
+   fully chronological (its Event 4 stays last) — read as un-resorted sample data, not a rule. Boti has
+   used the running app but has not separately reviewed this reading.
+
+These three are decisions, not just implementation detail — see §12 about recording them in the spec.
+
+### 9.3 Fix round 1 — Boti's requests after live use
+
+- **Header.** Button group moved next to the file dropdown; wordmark `text-5xl` → `text-4xl`, avatar
+  `w-16` → `w-14`; logo mark left alone. Measured as fractions of header height against the 1440 px-wide
+  mockups (wordmark 0.346 → 0.260, target 0.265; avatar 0.639 → 0.538, target 0.508). `UI/B1a`/`B2a`
+  show **no avatar** (the file dropdown fills that corner); the avatar was sized from `UI/A0a`/`A0c` and
+  applied to the shared `Header.jsx`, so Analysis also shows it — a flagged extrapolation that Boti
+  accepted. `LoginScreen.jsx` does not use `Header.jsx`.
+- **Event blocks.** `blockStyle()` in `eventStyle.js`: Accept/Reject/Uncertain opacity 0.75/0.55/0.75 →
+  1, Reject hatch removed. One shared function feeds both the mini-timeline and the Event Time strip; the
+  mockups show solid blocks on both. `SZSCAN_DESIGN_v2.md` principle 3 ("never colour alone") is
+  explicitly relaxed for these blocks by the author's decision — status text remains on Event Panel rows.
+  Dimming (0.4) and the violet selected outline were verified unchanged.
+- **Uncertain colour** `#D97706` → `#FFE262` (`--color-uncertain`), with `--color-uncertain-text:
+  #D97706` added for text. A real bug surfaced on the way: the white `Event N` label inside the Event
+  Time strip block was invisible on yellow; fixed with `blockLabelColor()`. Measured contrast: yellow
+  fill vs dark-amber text 2.47, yellow vs the cream canvas 1.24, and `--color-uncertain-bg #FFFBEB` vs
+  white ≈ 1.0 (pre-existing, untouched, effectively invisible). Boti judged the new colour clear enough
+  live.
+- `SZSCAN_DESIGN_v2.md` §2/§9/§10 updated by Claude Code with minimal edits.
+- **Not verified live:** the Accept fill colour. No Accept-status event exists in the DB and the app has
+  no way back to Unseen, so Claude Code did not create one; Accept goes through the same code path as
+  Reject/Uncertain (code-level confirmation only).
+
+### 9.4 Fix round 2
+
+- The header title `<ID> (<N> alerts to check)` moved into the right-hand cluster, directly left of
+  `Previous`, matching the mockup. Boti considered removing it as redundant with the file dropdown and
+  decided to **keep** it. `N` still tracks the live Alert (a disposable event: +1 on create, back on
+  delete).
+- Header checked at 1280 px and 1920 px: no overlap, wrap or truncation. **The dev/demo machine's screen
+  is 1366×768**, so those widths were simulated by forcing the CSS box width (the header layout does not
+  depend on `window.innerWidth`), not by real windows.
+- `web_demo/UI/uncertain_pill_zoom.png`, a scratch file Claude Code had created inside the locked `UI/`
+  folder in round 1, was moved to `CC_STEP6_FIX_SCREENSHOTS/`. Rule going forward: scratch files never go
+  into `UI/`.
+
+### 9.5 Test-state note (end of Step 6)
+
+- `chb13_03.edf` (file id 11), in onset order: AI Reject (80 s) · **Human 1153.4–2323.7 s** (Boti's own) ·
+  AI Reject (2420 s) · **Human 2561.2–2620.9 s** (Step 6 fixture, id 76) · AI Uncertain (2800 s) · AI
+  Reject (3440 s) · **Human 3473.9–3571.4 s** (Boti's own) — 7 events, Alert 4. The four AI events come
+  from the real CPD run; the three Human events were drawn with Select Range.
+- `chb13_02.edf` (file id 10): no AI events; 2 Human events (19.4–41.8 s and 1372.3–1416.8 s), Boti's own
+  — Alert 2. Subject `chb13` Alert 6.
+- No Accept-status event exists anywhere in the DB; Unseen AI events exist on other test files. Every
+  disposable event the three rounds created for their own regression tests was deleted.
+
+---
+
+## 10 · Integrity incident (from Step 1) — status: resolved, cause still unconfirmed
+
+*(unchanged — see the prior version of this file: `UI/Annotaiton (format_ ID-summary.txt).png` was
+modified during Step 1 filter-optimization work, reverted via `git checkout`, root cause never
+confirmed, zero recurrence since across Steps 2, 3, 5 and 6 — the only Step 6 file-hygiene slip was a scratch
+PNG left in `UI/`, §9.4.)*
+
+---
+
+## 11 · Report material for Project #1 (per `PROJECT2_SETUP.md §9.2(D)`)
+
+End-to-end runtime measured = **9.76 s/hour of EEG** (Step 1, not re-measured since).
+
+**Operating point (O1)** demonstrated working since Step 3 (`chb06`, `pen_mult=2.0` →
+28.76 events/day against the 40/day balanced target).
+
+**New from Step 5, worth noting for the report's design/methodology discussion:**
+- The amplitude-token revision (C18) is itself a small case study in build-time measurement
+  correcting a pre-registered UI assumption — the original 5–30 µV list was chosen before real data
+  existed to check it against, and real per-channel envelope measurements (from `chb13`/`chb06`,
+  converging across three independent measurement rounds: subject-level, a busy window, and the
+  file's own model-identified calmest window) showed it was off by roughly an order of magnitude.
+  Relevant to rubric criterion #4 (*Design considers impacts*) as a concrete example of the
+  build-and-measure loop this project has used throughout.
+- The raw-vs-filtered default bug (round 4) is a small but real instance of exactly the kind of
+  integrity property this project cares about generally: the demo briefly, by default, showed
+  processed data while implying it was showing raw data — caught and fixed before it reached any
+  real review session.
+
+**New from Step 6, worth noting for the report's design discussion:**
+- The Uncertain colour change came from live use, not from the mockups: after the demo Boti saw the
+  amber sink into the background and read too close to Reject red, and chose `#FFE262`. Checking it
+  live also exposed a second-order defect (white label invisible on yellow) that a colour-token swap
+  alone would have shipped — a small example of the build-and-verify loop.
+- Dropping the Reject hatch to match the mockups is a recorded trade-off: it relaxes the "never colour
+  alone" principle on the timeline blocks, decided by the author, with the text badge kept on the
+  Event Panel rows.
+- Event numbering is derived from onset order at read time (never stored), which keeps three views
+  consistent by construction and lines up with the export's requirement that `Event N` matches the UI.
+
+Still open: **O4b** (post-ictal flagging extent — still needs Analysis-screen-level visual review
+against known seizure timing, unchanged since Step 3/4) and the **cataloged screenshot set** for
+report use (Step 5's `CC_STEP5_FIX*_SCREENSHOTS/` folders now hold a substantial number of real,
+captioned screenshots — worth reviewing for reuse before generating new ones for the report).
+
+---
+
+## 12 · Open items before / going into Step 7
+
+- [ ] Commit hygiene: keep splitting `web_demo/` commits from `docs/`/`tables/`/`src/figures/`/
+      `figures/`/`rank_readout.py`/`results/` commits going forward.
+- [ ] Recommended: record the three Step 6 gap-fill decisions (§9.2: Edit, Cancel, chronological
+      `Event N` numbering) in `SZSCAN_SPEC_v5.md §6.5/§6.6` as a short dated note in the style of C17/C18,
+      so the spec does not drift from the running app. Written in English.
+- [ ] Optional: verify the Accept fill (`#16A34A`) live once, on a disposable synthetic test file — it is
+      the only status colour never seen live after the solid-block change (§9.3). Accepting is not
+      reversible back to Unseen, so do it on a throw-away file, not on `chb13`.
+- [ ] Before any real demo run or defense: decide whether the Human test events in `chb13_02`/`chb13_03`
+      (§9.5) stay as sample data or are deleted so the Alert counts start from the AI events only.
+- [ ] Decide whether to invest backend effort in separable filter stages (bandpass-only vs.
+      bandpass+notch) so the three filter buttons become independently meaningful — currently
+      clickable but not independently wired (see §8.5). Not blocking Step 7.
+- [ ] If a real, longer (~4h) file is wanted to test the window-length control's larger options or
+      the mini-timeline's untested pan/zoom case, upload `chb06` through the real Create-New flow —
+      its cache already exists but was never attached to a real subject/file record.
+- [ ] Low priority: `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3); the
+      pale row highlight of an expanded Uncertain event barely shows. Left as-is.
+- [ ] Step 7 itself: prompt to be drafted at the start of the next chat, after the "check whether per-node
+      reconstruction scores are already cached" question in §1 is answered.

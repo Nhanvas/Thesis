@@ -1,171 +1,178 @@
-# DEMO_BUILD_HANDOFF.md — kế hoạch build SzScan
+# DEMO_BUILD_HANDOFF.md — SzScan build plan
 
-**Trạng thái: KHÓA để bắt đầu code.** File này gom stack, cấu trúc thư mục, quy trình làm việc và cách xử
-lý code cũ. Hấp thu hoàn toàn `WEB_DEMO_CODE_MIGRATION_NOTES.md` (→ `docs/archive/demo_v4/`).
+**Status: LOCKED to start coding.** This file collects the stack, folder structure, working process, and
+how to handle legacy code. Fully absorbs `WEB_DEMO_CODE_MIGRATION_NOTES.md` (→ `docs/archive/demo_v4/`).
 
-Hành vi/logic: `SZSCAN_SPEC_v5.md`. Thị giác: `SZSCAN_DESIGN_v2.md`. Ảnh chốt: `UI/`.
+Behavior/logic: `SZSCAN_SPEC_v5.md`. Visuals: `SZSCAN_DESIGN_v2.md`. Locked mockups: `UI/`.
 
 ---
 
-## 1 · Stack — tất cả miễn phí
+## 1 · Stack — all free
 
-| Lớp | Chọn | Lý do |
+| Layer | Choice | Reason |
 |---|---|---|
-| Backend | **Python + FastAPI** | Bắt buộc Python: inference thật dùng torch/torch_geometric, không viết lại bằng JS được. FastAPI nhẹ, ít boilerplate |
-| Lưu review | **SQLite** (1 file `.db`) | Có sẵn trong Python, không cần cài gì, đủ cho demo 1 người dùng |
-| Frontend | **React + Vite + Tailwind** | Token trong `SZSCAN_DESIGN_v2.md §9` map thẳng sang Tailwind config, gần như copy-paste |
-| Vẽ waveform | **Canvas tự viết** | Thư viện chart thông thường (recharts…) giật khi vẽ 18 kênh × hàng nghìn điểm. Phải render tay |
-| Font | Inter + IBM Plex Mono | Google Fonts, miễn phí. **Tải về đóng gói cùng app**, không load qua CDN (bảo vệ có thể không có mạng) |
-| Chạy lúc bảo vệ | 1 lệnh khởi động, chạy hoàn toàn local, **không cần internet** | Loại rủi ro mạng/deploy |
+| Backend | **Python + FastAPI** | Python is mandatory: real inference uses torch/torch_geometric, can't be rewritten in JS. FastAPI is lightweight, low boilerplate |
+| Review storage | **SQLite** (1 `.db` file) | Built into Python, nothing to install, enough for a single-user demo |
+| Frontend | **React + Vite + Tailwind** | Tokens in `SZSCAN_DESIGN_v2.md §9` map straight onto the Tailwind config, almost copy-paste |
+| Waveform rendering | **Hand-written Canvas** | Ordinary chart libraries (recharts…) stutter when drawing 18 channels × thousands of points. Must render by hand |
+| Font | Inter + IBM Plex Mono | Google Fonts, free. **Downloaded and bundled with the app**, not loaded via CDN (the defense venue may have no internet) |
+| Running at the defense | 1 start command, runs entirely locally, **no internet needed** | Eliminates network/deploy risk |
 
-**Không dùng Figma MCP.** File `.fig` có layer thật, nhưng Dev Mode MCP thuộc gói trả phí và không cần
-thiết: toàn bộ hex/spacing đã được đo trực tiếp từ PNG và ghi trong `SZSCAN_DESIGN_v2.md`. Nếu về sau cần
-thêm số đo, hai đường miễn phí: đọc pixel từ PNG, hoặc mở Figma bấm Inspect chép tay.
+**No Figma MCP.** The `.fig` file has real layers, but Dev Mode MCP is a paid tier and isn't needed: every
+hex/spacing value has already been measured directly from the PNGs and recorded in `SZSCAN_DESIGN_v2.md`.
+If more measurements are needed later, two free routes: read pixels from the PNG, or open Figma and copy
+values by hand via Inspect.
 
-**Máy chạy demo = máy dev.** Không cần đóng gói portable/installer.
+**The demo machine = the dev machine.** No need to package a portable build/installer.
 
 ---
 
-## 2 · Cấu trúc thư mục
+## 2 · Folder structure
 
-Dùng **chung repo** `F:/Study/Thesis/Code` — vì demo tái sử dụng đúng các module single-source
-(`cpd_pipeline_v14.py`, `ensemble_recipe.py`, `gae_joint.py`, `edf_index.py`, `edf_order.py`) mà không
-được copy/nhân bản. Đây cũng là 1 sản phẩm hoàn chỉnh nên nên nằm cùng chỗ.
+Uses the **same repo**, `F:/Study/Thesis/Code` — because the demo reuses the exact single-source modules
+(`cpd_pipeline_v14.py`, `ensemble_recipe.py`, `gae_joint.py`, `edf_index.py`, `edf_order.py`), which must
+not be copied/duplicated. This is also a complete product in its own right, so it should live in the same
+place.
 
 ```
 web_demo/
-├── CLAUDE.md                  # rule cho Claude Code (đọc trước khi code)
-├── SZSCAN_SPEC_v5.md          # hành vi/logic/ranh giới dữ liệu
-├── SZSCAN_DESIGN_v2.md        # token thị giác
-├── DEMO_BUILD_HANDOFF.md      # file này
-├── PROJECT2_SETUP.md          # cách dựng Claude project #2 + danh sách file upload
-├── UI/                        # PNG bản chốt + UI (figma).fig  ← THAM CHIẾU BẮT BUỘC
-├── backend/                   # Claude Code tạo
+├── CLAUDE.md                  # rules for Claude Code (read before coding)
+├── SZSCAN_SPEC_v5.md          # behavior/logic/data boundaries
+├── SZSCAN_DESIGN_v2.md        # visual tokens
+├── DEMO_BUILD_HANDOFF.md      # this file
+├── PROJECT2_SETUP.md          # how to set up Claude project #2 + upload file list
+├── UI/                        # locked PNGs + UI (figma).fig  ← MANDATORY REFERENCE
+├── backend/                   # created by Claude Code
 │   ├── main.py                # FastAPI app
-│   ├── pipeline_demo.py       # ★ đường label-free liên tục (code MỚI, xem §4)
-│   ├── db.py                  # SQLite schema + truy vấn
-│   ├── export_txt.py          # sinh file export theo SPEC §7
-│   ├── .env.example           # ADMIN_USER / ADMIN_PASS (file .env thật KHÔNG commit)
+│   ├── pipeline_demo.py       # ★ continuous label-free path (NEW code, see §4)
+│   ├── db.py                  # SQLite schema + queries
+│   ├── export_txt.py          # generates the export file per SPEC §7
+│   ├── .env.example           # ADMIN_USER / ADMIN_PASS (the real .env file is NOT committed)
 │   └── tests/
-│       └── test_guards.py     # ★ test liêm chính, xem CLAUDE.md
-├── frontend/                  # Claude Code tạo
-└── cache/                     # output pipeline demo tính sẵn (gitignore)
+│       └── test_guards.py     # ★ integrity tests, see CLAUDE.md
+├── frontend/                  # created by Claude Code
+└── cache/                     # precomputed demo-pipeline output (gitignored)
 ```
 
-`web_demo/backend/` và `web_demo/frontend/` **không tồn tại** cho tới khi bắt đầu code — Claude Code tạo.
+`web_demo/backend/` and `web_demo/frontend/` **do not exist** until coding starts — Claude Code creates
+them.
 
 ---
 
-## 3 · Xử lý code cũ
+## 3 · Handling legacy code
 
-| File | Hành động | Lý do |
+| File | Action | Reason |
 |---|---|---|
-| `edf_index.py` | **KHÔNG tồn tại, KHÔNG cần viết lại** | Thuộc kiến trúc v3 và đã bị xóa khỏi repo. Kiến trúc v5 suy offset từng file theo cấu tạo — xem `SZSCAN_SPEC_v5.md` §1.5. Tài liệu cũ `WEB_DEMO_CODE_MIGRATION_NOTES.md` mô tả nó như module sẵn có; tài liệu đó đã archive |
-| `web_demo/backend/edf_order.py` | **Giữ nguyên hoàn toàn** | Vấn đề độc lập: thứ tự **hiển thị** file trên UI (theo giờ thật trong header EDF) khác thứ tự **xử lý** (theo TÊN FILE — quy ước khóa để khớp kết quả thesis). Có case lệch thật như `chb03_24/25`. Chuyển từ `docs/demo/` sang đây 2026-09-03; demo-only, không dùng chung với thesis |
-| `src/cpd_pipeline_v14.py`, `ensemble_recipe.py`, `szcore_eval.py`, `retrain/gae_joint.py` | **Chỉ đọc, không sửa** | Single-source dùng chung với thesis |
-| `src/szcore_eval.build_timeline_masked()` | **CẤM gọi từ demo** | Cần ground-truth — xem `SZSCAN_SPEC_v5.md` §1.2 |
+| `edf_index.py` | **Does NOT exist, does NOT need to be rewritten** | Belonged to the v3 architecture and has been deleted from the repo. The v5 architecture derives each file's offset by construction — see `SZSCAN_SPEC_v5.md` §1.5. The old `WEB_DEMO_CODE_MIGRATION_NOTES.md` describes it as an available module; that document has been archived |
+| `web_demo/backend/edf_order.py` | **Keep entirely unchanged** | Independent concern: the **display** order of files in the UI (by the real time in the EDF header) differs from the **processing** order (by FILE NAME — the locked convention needed to match the thesis results). There are real mismatch cases like `chb03_24/25`. Moved from `docs/demo/` to here on 2026-09-03; demo-only, not shared with the thesis |
+| `src/cpd_pipeline_v14.py`, `ensemble_recipe.py`, `szcore_eval.py`, `retrain/gae_joint.py` | **Read-only, do not edit** | Single-source, shared with the thesis |
+| `src/szcore_eval.build_timeline_masked()` | **FORBIDDEN to call from the demo** | Requires ground truth — see `SZSCAN_SPEC_v5.md` §1.2 |
 
-Đừng gộp hai vấn đề: "event này thuộc file nào" (offset tích lũy, `SZSCAN_SPEC_v5.md` §1.5) và
-"file này hiện ở vị trí thứ mấy trên UI" (`edf_order.py`).
+Don't conflate the two concerns: "which file does this event belong to" (cumulative offset,
+`SZSCAN_SPEC_v5.md` §1.5) and "what position does this file show at in the UI" (`edf_order.py`).
 
-⚠️ **Trước khi lấy tham số từ `src/retrain/fp_budget_operating_point.py`**, kiểm tra chuỗi import chạy
-được — `evaluation_protocol.py` và `stat_validation.py` từng bị archive nhầm và mới khôi phục về `src/`
-ngày 2026-09-03 (tag `repo-deps-fixed`, chi tiết `docs/REPO_MAP.md` §7.7).
+⚠️ **Before pulling parameters from `src/retrain/fp_budget_operating_point.py`**, check that the import
+chain actually runs — `evaluation_protocol.py` and `stat_validation.py` were mistakenly archived once and
+were only restored to `src/` on 2026-09-03 (tag `repo-deps-fixed`, details in `docs/REPO_MAP.md` §7.7).
 
 ---
 
-## 4 · `pipeline_demo.py` — phần code mới, là lõi của demo
+## 4 · `pipeline_demo.py` — the new code, the core of the demo
 
-Chưa có module nào trong repo làm việc này. Đây là **anh em song sinh label-free** của đường thesis,
-**không được ghi đè** bất kỳ module nào trong `src/`.
+No module in the repo does this yet. This is the **label-free twin** of the thesis path, and it must
+**never overwrite** any module in `src/`.
 
 ```
-# giai đoạn 1 — chạy ngay khi 1 file upload xong
-def process_file(edf_path) -> np.ndarray:      # ensemble score liên tục theo thời gian
-    đọc 18 kênh chuẩn (bỏ EKG/EOG/Ref)
+# stage 1 — runs as soon as 1 file finishes uploading
+def process_file(edf_path) -> np.ndarray:      # continuous ensemble score over time
+    read the 18 standard channels (drop EKG/EOG/Ref)
     bandpass 0.5–60 + notch 60
-    cắt window 4 s, KHÔNG bỏ window nào        # ⇒ t_giây = idx * 4, ánh xạ 1-1
-    z-score per-channel, stats fit trên TOÀN BỘ window của subject
+    cut into 4 s windows, do NOT drop any window     # ⇒ t_seconds = idx * 4, exact 1-1 mapping
+    z-score per-channel, stats fit on the subject's ENTIRE set of windows
     CAR → wPLI + AEC → top-k 20% → node feat [adj-row 18 | band-power 5]
     GAE seed42 forward → zrecon, Z
-    zlatent = Mahalanobis(Z, LedoitWolf fit trên TOÀN BỘ Z)
-    zgamma  = gamma-AEC (bản liên tục — xem O5 trong SPEC §8)
-    robust-z từng nhánh → ensemble equal 1/3
-    return score            # dài đúng bằng số window của file
+    zlatent = Mahalanobis(Z, LedoitWolf fit on the ENTIRE Z)
+    zgamma  = gamma-AEC (continuous version — see O5 in SPEC §8)
+    robust-z per branch → equal-weight 1/3 ensemble
+    return score            # length exactly equals the file's window count
 
-# giai đoạn 2 — chạy khi bấm "Process"
+# stage 2 — runs when "Process" is clicked
 def process_subject(files) -> dict[file -> list[Event]]:
-    files_sorted = sort theo TÊN FILE          # KHÔNG phải thứ tự hiển thị
+    files_sorted = sort by FILE NAME          # NOT display order
     global_score = concat([score[f] for f in files_sorted])
     events_global = cpd_pipeline_v14.detect_events(global_score, ...)   # label-free
-    op = operating point FP-budget (đọc tham số từ file, xem SPEC §8 O1)
-    offsets = cộng dồn len(score[f]) theo files_sorted     # không cần module tra cứu
+    op = FP-budget operating point (read the parameter from file, see SPEC §8 O1)
+    offsets = cumulative sum of len(score[f]) over files_sorted     # no lookup module needed
     for ev in events_global:
-        file = f sao cho offsets[f] <= ev.onset_win < offsets[f] + len(score[f])
-        gán ev vào danh sách event của file đó, onset cục bộ = ev.onset_win - offsets[file]
+        file = f such that offsets[f] <= ev.onset_win < offsets[f] + len(score[f])
+        assign ev to that file's event list, local onset = ev.onset_win - offsets[file]
 ```
 
-**Bốn chỗ fit khác pipeline thesis** — đã ghi và biện minh trong `SZSCAN_SPEC_v5.md §1.6`. Đọc trước khi
-viết, đừng suy luận lại từ đầu.
+**Four places where fitting differs from the thesis pipeline** — recorded and justified in
+`SZSCAN_SPEC_v5.md §1.6`. Read before writing, don't re-derive it from scratch.
 
 ---
 
-## 5 · Waveform — lưu ý kỹ thuật quan trọng
+## 5 · Waveform — important technical note
 
-18 kênh × 256 Hz × 1 giờ = **16.6 triệu điểm/file**. Không gửi thẳng xuống trình duyệt.
+18 channels × 256 Hz × 1 hour = **16.6 million points/file**. Do not send this straight to the browser.
 
-- Backend phục vụ waveform theo **cửa sổ thời gian đang xem**, đã **decimate** xuống ~2–4 điểm/pixel
-  (min/max envelope, không phải lấy mẫu thưa — lấy mẫu thưa làm mất gai nhọn, mà gai nhọn chính là thứ
-  bác sĩ cần thấy).
-- Đổi độ dài cửa sổ (`⊲▷ [X] hr`) → gọi lại backend với mức decimate khác.
-- Đổi biên độ (`⇕ [X] uV`) → **thuần frontend**, chỉ scale lại, không gọi backend.
-- Bật/tắt filter → backend trả **cả 2 chuỗi** (raw + filtered) trong 1 lần gọi, frontend tự chồng lớp.
+- The backend serves the waveform for the **currently viewed time window**, **decimated** down to
+  ~2–4 points/pixel (min/max envelope, not naive subsampling — subsampling would lose sharp spikes, and
+  spikes are exactly what the clinician needs to see).
+- Changing the window length (`⊲▷ [X] hr`) → calls the backend again with a different decimation level.
+- Changing the amplitude (`⇕ [X] uV`) → **frontend-only**, just rescales, no backend call.
+- Toggling the filter → the backend returns **both series** (raw + filtered) in one call, the frontend
+  layers them itself.
 
 ---
 
-## 6 · Thứ tự build — dựng xong màn nào chốt màn đó
+## 6 · Build order — lock each screen once it's built
 
-| # | Bước | Xong khi |
+| # | Step | Done when |
 |---|---|---|
-| 0 | Khung repo, token Tailwind từ `SZSCAN_DESIGN_v2.md §9`, `test_guards.py` chạy PASS | test xanh |
-| 1 | `pipeline_demo.py` + CLI chạy 1 file → in ra độ dài score. **Đo thời gian thật** | khớp ước tính ~15 s/giờ |
-| 2 | Log in + Database rỗng + footer | so với `UI/A0c`, `A0a` |
-| 3 | Create new → upload → Process → subject hiện lên bảng | so với `UI/A1a–A2b`, `A4a` |
-| 4 | Analysis: Panel EEG + toolbar + scrub (chưa có event) | so với `UI/B1a`, `B1b`, `B1d` |
-| 5 | Mini-timeline + Panel Event + đồng bộ 3 panel | so với `UI/B2a–B2d` |
-| 6 | Select Range tạo event thủ công | so với `UI/B3a–B3c` |
-| 7 | Panel Attribution | so với `UI/B2a` |
-| 8 | Export `.txt` | so với `UI/Annotaiton (format_ ID-summary.txt).png` |
-| 9 | Dựng cache 8 subject + chọn subject cho kịch bản upload live | có số đo |
+| 0 | Repo scaffold, Tailwind tokens from `SZSCAN_DESIGN_v2.md §9`, `test_guards.py` passing | tests green |
+| 1 | `pipeline_demo.py` + CLI runs on 1 file → prints the score length. **Measure real timing** | matches the ~15 s/hour estimate |
+| 2 | Log in + empty Database + footer | compare against `UI/A0c`, `A0a` |
+| 3 | Create new → upload → Process → subject appears in the table | compare against `UI/A1a–A2b`, `A4a` |
+| 4 | Analysis: EEG Panel + toolbar + scrub (no events yet) | compare against `UI/B1a`, `B1b`, `B1d` |
+| 5 | Mini-timeline + Event Panel + 3-panel sync | compare against `UI/B2a–B2d` |
+| 6 | Select Range creates a manual event | compare against `UI/B3a–B3c` |
+| 7 | Attribution Panel | compare against `UI/B2a` |
+| 8 | Export `.txt` | compare against `UI/Annotaiton (format_ ID-summary.txt).png` |
+| 9 | Build cache for 8 subjects + pick the subject for the live-upload scenario | have the measurements |
 
-**Bước 1 phải xong trước bước 2.** Nếu pipeline label-free ra kết quả vô lý (vd không có event nào ở mọi
-subject), phải phát hiện lúc này — không phải sau khi đã dựng 8 màn giao diện.
-
----
-
-## 7 · Quy trình làm việc với Claude Code
-
-**Tự chạy trong phạm vi 1 bước, dừng giữa các bước.** Trong 1 bước ở §6, Claude Code tự làm hết các việc
-nhỏ (tạo file, sửa, chạy thử, tự sửa lỗi) không hỏi từng dòng. Xong 1 bước thì **dừng**, để Boti mở app
-thật so với ảnh mock rồi mới sang bước kế.
-
-Lý do chọn nhịp này: chạy tự do hết cả app rồi mới xem thì 1 hiểu nhầm nhỏ ở đầu sẽ lặp xuyên suốt 9 bước;
-hỏi xin phép từng bước nhỏ thì quá chậm, phí sức tự động hóa. Mức tự chủ này chỉnh được nếu thấy chưa hợp.
-
-**Boti giữ quyền quyết định cuối** ở mọi lựa chọn thực chất, đúng như quy ước của cả project.
+**Step 1 must finish before step 2.** If the label-free pipeline produces nonsensical results (e.g. zero
+events for every subject), it must be caught now — not after 8 UI screens have already been built.
 
 ---
 
-## 8 · Rủi ro đã biết
+## 7 · Working process with Claude Code
 
-| Rủi ro | Xử lý |
+**Run autonomously within one step, stop between steps.** Within one step from §6, Claude Code does all
+the small work itself (creating files, editing, test-running, fixing its own errors) without asking
+line-by-line. Once a step is done, **stop**, so Boti can open the real app and compare it against the
+mockups before moving to the next step.
+
+Reason for this pace: running the whole app freely and only reviewing it at the end means one small
+early misunderstanding repeats across all 9 steps; asking permission at every small step is too slow and
+wastes the point of automation. This level of autonomy is adjustable if it doesn't feel right.
+
+**Boti holds final decision-making authority** on every substantive choice, per the project's overall
+convention.
+
+---
+
+## 8 · Known risks
+
+| Risk | Handling |
 |---|---|
-| Pipeline label-free ra kết quả khác xa thesis (quá nhiều/quá ít event) | Phát hiện ở **bước 1**, trước khi dựng UI. Nếu lệch quá mức, điều chỉnh **operating point** (label-free, hợp lệ) — **không** đụng mô hình, **không** dùng nhãn để chỉnh |
-| Bước Process 17 file mất ~6 phút lúc demo trực tiếp | Chọn subject ít file cho kịch bản live; cache sẵn phần còn lại |
-| Hội đồng hỏi vì sao số demo khác report | Câu trả lời soạn sẵn trong `SZSCAN_SPEC_v5.md §1.6` |
-| Vô tình rò ground-truth vào demo | `test_guards.py` chặn ở CI/local, xem `CLAUDE.md` |
-| Thời gian: report 15/10, IELTS 09/10 | **Report là ưu tiên 1.** Nếu phải cắt, cắt theo thứ tự ngược từ bước 8 → 6. Bốn bước 0–5 là bản demo tối thiểu vẫn bảo vệ được |
+| Label-free pipeline produces results far from the thesis (too many/too few events) | Caught at **step 1**, before building the UI. If the deviation is too large, adjust the **operating point** (label-free, legitimate) — **do not** touch the model, **do not** use labels to adjust |
+| Processing 17 files takes ~6 minutes during a live demo | Pick a subject with few files for the live scenario; pre-cache the rest |
+| Committee asks why the demo's numbers differ from the report | Prepared answer in `SZSCAN_SPEC_v5.md §1.6` |
+| Ground truth accidentally leaks into the demo | `test_guards.py` blocks it in CI/local, see `CLAUDE.md` |
+| Timeline: report due 15 Oct, IELTS 09 Oct | **The report is priority 1.** If something must be cut, cut backward from step 8 → 6. Steps 0–5 are the minimum demo that's still defensible |
 
 ---
 
-*Hết DEMO_BUILD_HANDOFF.md.*
+*End of DEMO_BUILD_HANDOFF.md.*

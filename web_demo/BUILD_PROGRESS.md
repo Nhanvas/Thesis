@@ -21,26 +21,51 @@ still the real spec. This is just "what happened and what exists," for continuit
 | 4 — Analysis screen: Panel EEG + toolbar + scrub, no events yet | **DONE** | see §7 below — **this file's own "update every step" convention was skipped for Step 4 at the time**; §7 is a brief retroactive note, not a full account. `CC_STEP4_REPORT.md`/`CC_STEP4_FIX_REPORT.md` in the repo have the real detail if it's ever needed |
 | 5 — Mini-timeline + Event Panel + 3-panel sync | **DONE** | took **7** fix rounds past the initial build, the most of any step so far — see §8 below, **read it before starting Step 6** |
 | 6 — Select Range: manual event creation | **DONE** | initial build + **2** UI fix rounds (all visual, requested by Boti after live use) — see §9 below |
-| 7-9 | not started | |
+| 7 — Channel Attribution Panel | **PROMPT READY** | `CC_STEP7_PROMPT.md` drafted at the end of the Step 6 chat — see §1 "Where to resume" |
+| 8-9 | not started | |
 
-**Where to resume:** start Step 7 per `DEMO_BUILD_HANDOFF.md §6` row 7 — Channel Attribution Panel,
-compare against `UI/B2a`; behaviour in `SZSCAN_SPEC_v5.md §6.7`, scientific wording limits in
-`THESIS_CONTEXT_FOR_DEMO.md §5` (title `Channel-level reconstruction anomaly — Event N`, teal scale,
-connecting lines not dots, no attribution metric on screen, works for Human events too). **First thing
-to check before drafting the prompt:** whether `pipeline_demo.py`'s cache already stores per-window,
-per-channel reconstruction scores (`gae_joint.score_windows(..., per_node=True)`); if it only stores the
-ensemble score, producing them is new backend work and the main risk of the step. No open blockers
-carried over from Step 6. Three small optional/recommended items are in §12.
+**Where to resume:** Step 7 (Channel Attribution Panel) — **the prompt is already written:
+`web_demo/CC_STEP7_PROMPT.md`.** Boti runs it in Claude Code with the trigger line, then brings
+`CC_STEP7_REPORT.md` (+ raw `pytest` / `git status` output) to a NEW chat for review. Nothing needs to be
+decided or asked before running it. The prompt bundles, in order:
+
+- **Pre-step A** — provenance dump of the `chb13` events table (which events are CPD/`AI`, which are
+  hand-drawn/`Human`), then deletion of the 5 Human test events (Boti's decision, 2026-09-24).
+- **Pre-step B** — one authorized, irreversible Accept on an Unseen AI event of a *synthetic* test file, to
+  finally see the Accept fill (`#16A34A`) live (§9.3 open item).
+- **Step 7 proper** — Part 1 per-window per-channel reconstruction scores (new backend work: the cache
+  holds only the ensemble score; new `{stem}.pernode.npy`, backfill for existing files, consistency gate
+  before any UI), Part 2 attribution definition + endpoints + persisted per-channel Accept/Reject,
+  Part 3 the panel (`UI/B2a`), Part 4 live verification, Part 5 SPEC note C20.
+
+SPEC note **C19** (the three Step 6 gap-fill decisions, §9.2, plus the kept header title) was **recorded in
+`SZSCAN_SPEC_v5.md` during the Step 6 chat** (2026-09-24, approved by Boti) and is no longer part of the
+prompt.
+
+Two things the prompt deliberately leaves as **PROVISIONAL DEFAULTS for Boti to confirm in the review
+chat** (only if `docs/ATTRIBUTION_SPEC.md §9` / thesis code does not define them): aggregation across an
+event's windows = per-channel mean; score shown = the aggregated raw per-node reconstruction score.
+
+**Deliberately deferred — not needed for Step 7, do not raise them before it:** the filter-stage decision
+(§12), a real ~4 h `chb06` upload, and removing the synthetic test subjects. All three belong to Step 9
+(cache build for the 8 subjects) / pre-defense cleanup.
 
 **Test-data state left in the DB (end of Step 6):** `chb13` (2 real files, `chb13_02.edf` /
 `chb13_03.edf`, each exactly 1 hour) and short synthetic test files under `chb14`/`chb15`/`chb16` built
-from real `chb15` clips in Step 3. `chb13_03.edf` now holds 4 real AI events (from the CPD run) plus 3
-manually drawn Human events; `chb13_02.edf` has no AI events and 2 Human events — full list in §9.5.
-**Correction to this file's Step 3 entry (still valid):** `chb06_01.edf` has a real `.npy` cache (~4 h)
-but **zero rows** in the `subjects`/`files` tables — it was never uploaded through the real Create-New
-flow and does not appear in the running app. **Correction to §8.6:** the AI events' review states on
-`chb13_03.edf` were already Reject/Reject/Uncertain/Reject at Step 6 pre-flight, not
-Accept/Reject/Uncertain/Unseen — see §9.5.
+from real `chb15` clips in Step 3. `chb13_03.edf` holds 4 real AI events (from the CPD run, ids 46–49,
+review states Reject/Reject/Uncertain/Reject) plus 3 manually drawn Human events; `chb13_02.edf` has no AI
+events and 2 Human events — full list in §9.5. **Step 7's Pre-step A deletes those 5 Human events**, so
+after Step 7 the `chb13` Alert should read 1. **Correction to this file's Step 3 entry (still valid):**
+`chb06_01.edf` has a real `.npy` cache (~4 h) but **zero rows** in the `subjects`/`files` tables — it was
+never uploaded through the real Create-New flow and does not appear in the running app. **Correction to
+§8.6:** the AI events' review states on `chb13_03.edf` were already Reject/Reject/Uncertain/Reject at Step 6
+pre-flight, not Accept/Reject/Uncertain/Unseen — see §9.5.
+
+**Trigger line for Claude Code (English):**
+`Read web_demo/CC_STEP7_PROMPT.md in full and execute it exactly as written, in the order given. Use
+claude-in-chrome for all live verification from the start; if it is not connected, stop and tell me. Do
+not run any git add/commit/push. Write the report to web_demo/CC_STEP7_REPORT.md, then stop. Do not
+start Step 8.`
 
 ---
 
@@ -376,7 +401,8 @@ nothing outside `web_demo/` changed. Reports: `CC_STEP6_REPORT.md`, `CC_STEP6_FI
    fully chronological (its Event 4 stays last) — read as un-resorted sample data, not a rule. Boti has
    used the running app but has not separately reviewed this reading.
 
-These three are decisions, not just implementation detail — see §12 about recording them in the spec.
+These three (plus the kept header title, §9.4) are decisions, not just implementation detail. They are
+recorded in `SZSCAN_SPEC_v5.md` as **C19** (2026-09-24), approved by Boti.
 
 ### 9.3 Fix round 1 — Boti's requests after live use
 
@@ -475,25 +501,44 @@ captioned screenshots — worth reviewing for reuse before generating new ones f
 
 ---
 
-## 12 · Open items before / going into Step 7
+## 12 · Open items going into Step 7
+
+**Handled inside `CC_STEP7_PROMPT.md` (nothing to do by hand):**
+
+- [x→Step 7] Delete the Human test events in `chb13_02`/`chb13_03` — Pre-step A.
+- [x→Step 7] Verify the Accept fill `#16A34A` live once, on a synthetic file — Pre-step B.
+- [x→Step 7] Record the attribution definition actually implemented in the spec (C20) — Part 5.
+
+**Done in the Step 6 chat:** SPEC note C19 (Step 6 gap-fill decisions + kept header title).
+
+**Deferred on purpose (decide at Step 9 / pre-defense, not before Step 7):**
+
+- [ ] **Filter stages.** The three toolbar buttons (`lff` / `hff` / `60`) are clickable but all gate the same
+      single cached bandpass+notch series (§8.5), which sits badly with the anti-staging principle
+      (`SZSCAN_SPEC_v5.md §0`: a button that reflects nothing real). The real pipeline has two operations
+      (one 0.5–60 Hz bandpass, one 60 Hz notch), so "separable" `lff`/`hff` would mean applying
+      high-pass / low-pass filters that are *not* in the pipeline. Options for Boti: (a) keep as is,
+      (b) collapse to the two real stages, (c) separate stages with new filters. Needs a decision, not
+      code, until then.
+- [ ] Synthetic test subjects under `chb14`/`chb15`/`chb16` were built from `chb15` clips — they are not real
+      subject data and must be removed before any demo run so no subject row shows synthetic data under a
+      real subject's name.
+- [ ] A real ~4 h file (`chb06`) through the real Create-New flow, if the window-length control's larger
+      options and the mini-timeline's pan/zoom (`DOMAIN_SEC` hardcoded to 3600) are to be tested. Its
+      cache exists but was never attached to a real subject/file record.
+
+**Low priority / known:**
+
+- [ ] **Keep the Claude project's uploaded copies in sync with the repo.** After Step 6 the project's copies
+      of `SZSCAN_SPEC_v5.md` (still showed the 12-value amplitude list of C18 round 3), `SZSCAN_DESIGN_v2.md`
+      (still showed Uncertain `#D97706`) and `BUILD_PROGRESS.md` were older than the repo's. Re-upload the
+      repo versions after every step; the repo is the source of truth.
 
 - [ ] Commit hygiene: keep splitting `web_demo/` commits from `docs/`/`tables/`/`src/figures/`/
-      `figures/`/`rank_readout.py`/`results/` commits going forward.
-- [ ] Recommended: record the three Step 6 gap-fill decisions (§9.2: Edit, Cancel, chronological
-      `Event N` numbering) in `SZSCAN_SPEC_v5.md §6.5/§6.6` as a short dated note in the style of C17/C18,
-      so the spec does not drift from the running app. Written in English.
-- [ ] Optional: verify the Accept fill (`#16A34A`) live once, on a disposable synthetic test file — it is
-      the only status colour never seen live after the solid-block change (§9.3). Accepting is not
-      reversible back to Unseen, so do it on a throw-away file, not on `chb13`.
-- [ ] Before any real demo run or defense: decide whether the Human test events in `chb13_02`/`chb13_03`
-      (§9.5) stay as sample data or are deleted so the Alert counts start from the AI events only.
-- [ ] Decide whether to invest backend effort in separable filter stages (bandpass-only vs.
-      bandpass+notch) so the three filter buttons become independently meaningful — currently
-      clickable but not independently wired (see §8.5). Not blocking Step 7.
-- [ ] If a real, longer (~4h) file is wanted to test the window-length control's larger options or
-      the mini-timeline's untested pan/zoom case, upload `chb06` through the real Create-New flow —
-      its cache already exists but was never attached to a real subject/file record.
-- [ ] Low priority: `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3); the
-      pale row highlight of an expanded Uncertain event barely shows. Left as-is.
-- [ ] Step 7 itself: prompt to be drafted at the start of the next chat, after the "check whether per-node
-      reconstruction scores are already cached" question in §1 is answered.
+      `figures/`/`rank_readout.py`/`results/` commits.
+- [ ] `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3); the pale row
+      highlight of an expanded Uncertain event barely shows. Left as-is.
+- [ ] `UI/B1a`/`B2a` show no avatar while the shared `Header.jsx` renders one on Analysis (§9.3) — a
+      flagged extrapolation Boti accepted.
+- [ ] Step 8 (Export) will read rank/channel/score/status of each event's attribution from what Step 7
+      persists (`attribution_status` table + the attribution endpoint).

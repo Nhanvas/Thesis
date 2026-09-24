@@ -15,7 +15,9 @@ For scientific decisions (not demo ones), authority remains
 session) + continuous label-free architecture (new, measurement-based — see §1) + **C17** (2026-09,
 after the audit report: the Start date column changed from an absolute date to `Recording N,
 HH:MM:SS` — see §5.1) + **C18** (2026-09-21, after Step 5 fix round 2: the Panel EEG amplitude scale
-extended per real measured data — see §6.4).
+extended per real measured data — see §6.4) + **C19** (2026-09-24, after Step 6: five Select Range /
+header behaviours the spec did not describe are recorded — see the note after §6.6; the same pass also
+corrects a stale `edf_index.locate_range()` reference in §5.5).
 
 ---
 
@@ -345,8 +347,9 @@ Right-side overlay panel (`UI/A1a`):
    time-indexed ensemble score array for the file.
 2. **Clicking Process:** concatenates every file's ensemble score, **in exact FILE NAME order**, into
    one continuous timeline → runs PELT **exactly once** over the whole timeline (the algorithm needs
-   enough background to estimate stably, no splitting into separate short-file runs) → uses
-   `edf_index.locate_range()` to assign each global event back to its correct file by time position.
+   enough background to estimate stably, no splitting into separate short-file runs) → assigns
+   each global event back to its correct file by cumulative offset (§1.5 — no lookup module is needed;
+   `edf_index` does not exist).
 3. While running: a full-panel loading state (spinner + a simple progress bar, **not** distinguishing
    the 2 sub-stages, **no** fake %).
 4. Done → the Database shows the new subject + every child file, Status = `View`.
@@ -504,6 +507,29 @@ waveform.
 *Note when reading the mockup:* the gray in `UI/B3a` is the **Unseen** label, not a dimming effect from
 being in event-creation mode.
 
+> **Step 6 gap-fill note (C19, 2026-09-24):** Step 6 implemented five behaviours that §6.1/§6.5/§6.6 did
+> not describe. All were verified live in the running app and approved by the author.
+>
+> 1. **Edit** on a User-added event re-enters the Select Range marking mode scoped to that event: two
+>    clicks on the EEG grid overwrite its onset/offset, and the event keeps its identity (same id). While
+>    the redraw is in progress the expanded row's `Delete` / `Edit` buttons are replaced by a one-line
+>    hint. This mirrors the AI "Reject and redraw" asymmetry of §6.5: a User-added event is fully
+>    editable, an AI event's range is not.
+> 2. **Cancel** while marking = click the `Select Range` toolbar button again after the onset click. No
+>    partial event is ever written. The button label reads `Click onset…` / `Click offset…` while marking
+>    is active. The same button cancels an in-progress Edit redraw.
+> 3. **Direction-agnostic drag:** if the second click lands before the first, the two points are sorted so
+>    that onset < offset. A non-positive duration is never stored.
+> 4. **Numbering:** `Event N` is derived at read time from onset order (`onset ASC`, ties by id) and is
+>    never stored. Inserting a User-added event therefore renumbers every later event, consistently in the
+>    Event Panel, the Event Time row, the mini-timeline and (Step 8) the export, where `Event N` must match
+>    the UI. `UI/B3c`'s sample data is not fully chronological (its Event 4 stays last); it is read as
+>    un-resorted sample data, not as a rule.
+> 5. **Header layout (§6.1):** the title `<ID> (<N> alerts to check)` sits directly to the left of
+>    `Previous`, forming one right-hand cluster `[title] [Previous] [Next] | [Viewed] [Export]
+>    [file dropdown]` as in `UI/B1a`/`B2a`. The author considered removing the title as redundant with the
+>    file dropdown and decided to keep it.
+
 ### 6.7 Channel Attribution Panel
 
 **Mandatory framing — this is a scientific constraint, not a UI choice.** Per
@@ -602,7 +628,6 @@ for human reading.
 | O4 | **Which subject to use for the live-upload scenario** — chosen by real file count, measured while building the cache | measure |
 | O4b | **The extent of post-ictal flagging** (§1.6b) — observed at step 1, decide whether to call it out separately in the defense slides. No adjusting the model, no adjusting the threshold to "fix" it | observe |
 | O5 | **Gamma-AEC in the continuous path** — `dataprep/compute_gamma_aec.py` currently runs on the already-split array; a continuous version is needed | write new code in `pipeline_demo.py` |
-
 | O6 | **`evaluation_protocol.py` and `stat_validation.py` were just restored to `src/`** (2026-09-03, tag `repo-deps-fixed`) after being mistakenly archived while still being imported. `fp_budget_operating_point.py` depends on this chain — verify the `import` runs before pulling parameters for O1 | 1 command |
 
 None of these items block starting to build the frontend.

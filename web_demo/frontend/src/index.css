@@ -74,7 +74,12 @@
   /* review status */
   --color-accept:          #16A34A;  --color-accept-bg:    #F0FDF4;
   --color-reject:          #DC2626;  --color-reject-bg:    #FEF2F2;
-  --color-uncertain:       #D97706;  --color-uncertain-bg: #FFFBEB;
+  /* CC_STEP6_FIX_PROMPT.md item 4 (Boti's decision): the old amber read too close to
+     Reject red and sank into the background — changed to a brighter yellow. That yellow
+     is illegible as text/thin-stroke on a light background, so the old amber value is kept
+     under a separate token for exactly those uses (see eventStyle.js / PanelEvent.jsx). */
+  --color-uncertain:       #FFE262;  --color-uncertain-bg: #FFFBEB;
+  --color-uncertain-text:  #D97706;
   --color-unseen:          #94A3B8;
 
   /* EEG */

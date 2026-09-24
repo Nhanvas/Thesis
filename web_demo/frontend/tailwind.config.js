@@ -27,6 +27,7 @@ export default {
         'reject-bg': 'var(--color-reject-bg)',
         uncertain: 'var(--color-uncertain)',
         'uncertain-bg': 'var(--color-uncertain-bg)',
+        'uncertain-text': 'var(--color-uncertain-text)',
         unseen: 'var(--color-unseen)',
 
         'eeg-raw': 'var(--color-eeg-raw)',

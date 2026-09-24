@@ -21,7 +21,10 @@ export default function Header({ username, onLogout, center, onLogoClick }) {
   const logoContent = (
     <>
       <img src={logo} alt="SzScan" className="h-16 w-auto" />
-      <span className="text-5xl font-semibold">SzScan</span>
+      {/* CC_STEP6_FIX_PROMPT.md item 2: text-5xl (48px) measured ~35% of header height
+          live vs. the mockup's own wordmark at ~27% (UI/A0a, A0c, B1a, B2a all agree,
+          pixel-measured) — text-4xl (36px) lands the ink height within ~1pt of that. */}
+      <span className="text-4xl font-semibold">SzScan</span>
     </>
   )
 
@@ -44,10 +47,14 @@ export default function Header({ username, onLogout, center, onLogoClick }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="w-16 h-16 rounded-full bg-brand flex items-center justify-center"
+          // CC_STEP6_FIX_PROMPT.md item 2: w-16/h-16 (64px) measured ~62% of header height
+          // live vs. ~51% in UI/A0a's own avatar (the only mockup that shows one — B1a/B2a
+          // don't render an avatar at all, see the report) — w-14/h-14 (56px) is the
+          // nearest standard Tailwind step to the measured target (~53px).
+          className="w-14 h-14 rounded-full bg-brand flex items-center justify-center"
           aria-label="Account menu"
         >
-          <PersonIcon className="w-10 h-10 text-white" />
+          <PersonIcon className="w-9 h-9 text-white" />
         </button>
 
         {open && (

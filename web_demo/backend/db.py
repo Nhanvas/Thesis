@@ -344,8 +344,39 @@ def update_event(event_id: int, review_status: str | None = None, comment: str |
     conn.close()
 
 
+def update_event_times(event_id: int, onset_sec: float, offset_sec: float) -> None:
+    """Edit (SPEC §6.6/§6.5) — redrawing a Human event's onset/offset via Select Range-style
+    marking. Never called for an AI event (main.py enforces that; an AI event's onset/offset
+    is immutable per §6.5 — Reject-and-redraw is its only path)."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE events SET onset_sec = ?, offset_sec = ? WHERE id = ?",
+        (onset_sec, offset_sec, event_id),
+    )
+    conn.commit()
+    conn.close()
+
+
 def delete_event(event_id: int) -> None:
     conn = get_connection()
     conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
     conn.commit()
     conn.close()
+
+
+# ── Select Range (Step 6, CC_STEP6_PROMPT.md §6.6) ──────────────────────────────────────
+
+def create_event(file_id: int, onset_sec: float, offset_sec: float) -> int:
+    """The only way a Human event comes into existence. Always `review_status=NULL` — a
+    Human event self-confirms on creation and carries no review-status axis at all (SPEC
+    §6.5), unlike an AI event's 'Unseen' default."""
+    conn = get_connection()
+    cur = conn.execute(
+        "INSERT INTO events (file_id, source, onset_sec, offset_sec, review_status, comment) "
+        "VALUES (?, 'Human', ?, ?, NULL, '')",
+        (file_id, onset_sec, offset_sec),
+    )
+    conn.commit()
+    event_id = cur.lastrowid
+    conn.close()
+    return event_id

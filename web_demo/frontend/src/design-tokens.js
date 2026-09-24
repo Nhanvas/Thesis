@@ -29,8 +29,10 @@ export const tokens = {
   colorAcceptBg: '#F0FDF4',
   colorReject: '#DC2626',
   colorRejectBg: '#FEF2F2',
-  colorUncertain: '#D97706',
+  colorUncertain: '#FFE262',
   colorUncertainBg: '#FFFBEB',
+  colorUncertainText: '#D97706', // CC_STEP6_FIX_PROMPT.md item 4: the pre-fix amber, kept
+  // for text/thin-stroke use only — colorUncertain itself is now too light to read as text.
   colorUnseen: '#94A3B8',
 
   // EEG

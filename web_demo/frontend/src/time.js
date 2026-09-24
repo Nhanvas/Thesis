@@ -19,6 +19,13 @@ export function formatFileTime(startIso, offsetSec, fileDurationSec) {
   return `${hh}:${mm}:${ss}`
 }
 
+// Same §6.2 rule as formatFileTime, with the trailing ":SS" dropped — for the mini-
+// timeline's column-boundary ticks (MiniTimeline.jsx), which always land on exact 10-min
+// marks (seconds are always :00, so showing them is redundant clutter, not information).
+export function formatFileTimeMinutes(startIso, offsetSec, fileDurationSec) {
+  return formatFileTime(startIso, offsetSec, fileDurationSec).replace(/:\d{2}$/, '')
+}
+
 // mm:ss (or hh:mm:ss past an hour) for compact scrub-bar / duration labels that are
 // durations, not wall-clock times (never uses the dN prefix — that's only for §6.2's
 // file-level clock axis).

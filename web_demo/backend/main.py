@@ -211,9 +211,32 @@ def get_file_events(file_id: int, request: Request):
     return db.list_events(file_id)
 
 
+class CreateEventRequest(BaseModel):
+    onset_sec: float
+    offset_sec: float
+
+
+@app.post("/api/files/{file_id}/events")
+def create_event(file_id: int, payload: CreateEventRequest, request: Request):
+    """Select Range (Step 6, SPEC §6.6) — the only way a Human event is created. The two
+    clicks that produced onset_sec/offset_sec may land in either order (right-to-left drag,
+    item 13) — sorted here so a reversed drag still yields onset < offset rather than being
+    rejected or stored negative."""
+    _require_auth(request)
+    if db.get_file(file_id) is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    onset, offset = sorted((payload.onset_sec, payload.offset_sec))
+    if offset <= onset:
+        raise HTTPException(status_code=422, detail="Event must have a positive duration.")
+    event_id = db.create_event(file_id, onset, offset)
+    return db.get_event(event_id)
+
+
 class UpdateEventRequest(BaseModel):
     review_status: str | None = None
     comment: str | None = None
+    onset_sec: float | None = None
+    offset_sec: float | None = None
 
 
 @app.patch("/api/events/{event_id}")
@@ -222,7 +245,8 @@ def update_event(event_id: int, payload: UpdateEventRequest, request: Request):
     is the unreviewed default, not a value this endpoint can set back to — there is no
     'un-review' control in the spec'd expand panel (only 3 buttons: Accept/Reject/
     Uncertain). Human events carry no review_status at all (§6.5: 'Human event tự confirm
-    khi tạo nên không cần review') — only their comment can be updated here."""
+    khi tạo nên không cần review') — only their comment, and (Step 6, Edit) their
+    onset/offset, can be updated here."""
     _require_auth(request)
     event = db.get_event(event_id)
     if event is None:
@@ -237,6 +261,22 @@ def update_event(event_id: int, payload: UpdateEventRequest, request: Request):
                 status_code=422,
                 detail="review_status must be one of Accept/Reject/Uncertain.",
             )
+    if payload.onset_sec is not None or payload.offset_sec is not None:
+        # Edit (SPEC §6.6's reading, CC_STEP6_PROMPT.md item 11): re-drawing a Human
+        # event's range via the same 2-click Select Range flow. An AI event's onset/offset
+        # is immutable (§6.5) — Reject-and-redraw is its only path.
+        if event["source"] != "Human":
+            raise HTTPException(
+                status_code=422, detail="Only Human-added events can have their onset/offset edited."
+            )
+        if payload.onset_sec is None or payload.offset_sec is None:
+            raise HTTPException(
+                status_code=422, detail="Both onset_sec and offset_sec are required to edit a range."
+            )
+        onset, offset = sorted((payload.onset_sec, payload.offset_sec))
+        if offset <= onset:
+            raise HTTPException(status_code=422, detail="Event must have a positive duration.")
+        db.update_event_times(event_id, onset, offset)
     db.update_event(event_id, review_status=payload.review_status, comment=payload.comment)
     return db.get_event(event_id)
 

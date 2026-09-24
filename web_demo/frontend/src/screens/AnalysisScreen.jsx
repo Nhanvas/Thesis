@@ -2,19 +2,26 @@ import { useEffect, useRef, useState } from 'react'
 import Header from '../components/Header.jsx'
 import Footer from '../components/Footer.jsx'
 import EegPanel from '../components/EegPanel.jsx'
+import MiniTimeline from '../components/MiniTimeline.jsx'
+import PanelEvent from '../components/PanelEvent.jsx'
 import { ChevronDownIcon, PlayIcon, PauseIcon } from '../components/icons.jsx'
 import {
   getFile,
   getSubjectDetail,
   getWaveform,
+  getTimeline,
+  getFileEvents,
+  updateEvent,
+  deleteEvent,
+  createEvent,
   markFileViewed,
   markFileViewing,
 } from '../api.js'
 
-// Analysis screen — Panel EEG + toolbar + scrub (Step 4, CC_STEP4_PROMPT.md). Mini-timeline,
-// Panel Event, and Channel Attribution are Step 5+ scope and deliberately not rendered here
-// (see the report's scope-boundary section) — this screen is Panel EEG's full-width column
-// only, not the two-column B1a layout that panel eventually shares the page with.
+// Analysis screen — Panel EEG + toolbar + scrub (Step 4) plus, as of Step 5
+// (CC_STEP5_PROMPT.md), the mini-timeline and Panel Event columns. Channel Attribution is
+// still Step 7+ scope and deliberately not rendered here — same "don't reserve blank space"
+// precedent as Step 4's report: the right column holds only what actually exists yet.
 
 // SPEC §6.4's popover value lists (`UI/B1b`, `UI/B1d`) — fixed UI copy, not derived from a
 // pipeline source file (these are display *increments* for a frontend-only zoom/scale
@@ -43,12 +50,22 @@ const WINDOW_OPTIONS = [
 // `1 min` is the shortest entry in DURATION_OPTIONS (no `30 s` preset exists to pick instead).
 const DEFAULT_WINDOW_SEC = 1 * 60
 
-const AMPLITUDE_OPTIONS = [30, 20, 15, 10, 7, 5]
-// SPEC §6.4 lists 5/7/10/15/20/30 µV as the available preset levels, not a mandated default
-// (confirmed — no default is specified there or anywhere else in SPEC). 7 µV was previously
-// just the list's mid-entry; at real scalp EEG amplitude it saturates the row height almost
-// everywhere (see CC_STEP4_FIX_REPORT.md items 1/2). 20 µV chosen per Boti's direction.
-const DEFAULT_AMPLITUDE_UV = 20
+// SPEC §6.4 / C18 (2026-09-21, floor decided in Step 5 fix round 6): 500/250/150/100/75 µV.
+// Round 2 first extended the old 5/7/10/15/20/30 max-30 list once measured data
+// (CC_STEP5_FIX2_REPORT.md §3) showed real per-channel amplitude running median ~106–111 µV,
+// peaks ~1200–1800 µV, far past the old range. Round 4 (CC_STEP5_FIX4_REPORT.md §1) then
+// measured the file's own calmest segment and found the 6 old small levels never earn their
+// place even there (median spread ~102 µV, same regime as a busy window) — Boti decided the
+// final floor at 75 µV; 50/30/20/15/10/7/5 µV are dropped entirely, not kept for a flat/
+// interictal case that this data doesn't actually have.
+const AMPLITUDE_OPTIONS = [500, 250, 150, 100, 75]
+// Not a mandated default (confirmed — none is specified in SPEC). 20 µV (chosen per
+// CC_STEP4_FIX_REPORT.md items 1/2) no longer exists once the floor moved to 75 µV in round 6
+// (CC_STEP5_FIX6_PROMPT.md item 1) — the default must be one of AMPLITUDE_OPTIONS' own values.
+// Set to the new floor, 75 µV, as the closest analog to the old default's role (smallest
+// available option); this is a judgment call to keep the default valid, not something Boti was
+// explicitly asked about — flagged in CC_STEP5_FIX6_REPORT.md for override if he wants otherwise.
+const DEFAULT_AMPLITUDE_UV = 75
 
 const SPEED_OPTIONS = [8, 4, 2, 1]
 
@@ -97,13 +114,47 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
   const [windowSec, setWindowSec] = useState(DEFAULT_WINDOW_SEC)
   const [windowStartSec, setWindowStartSec] = useState(0)
   const [amplitudeUv, setAmplitudeUv] = useState(DEFAULT_AMPLITUDE_UV)
-  const [filters, setFilters] = useState({ lff: true, hff: true, notch: true })
+  // CC_STEP5_FIX4_PROMPT.md item 2: default must be genuinely raw. All three OFF on a fresh
+  // load — SPEC §6.4 ("when on, the filtered wave is highlighted, raw recedes") and DESIGN
+  // §3's raw/filtered tokens both describe an on/off toggle from a raw baseline, not three
+  // filters defaulting to already-applied. A prior default of all-true meant the very first
+  // thing shown was already-filtered data drawn prominent (EegPanel's `anyFilterOn` gate),
+  // with raw merely the dimmed background — the opposite of CLAUDE.md's "everything shown
+  // must be data that genuinely went into the computation" as the *default*, unannounced
+  // view.
+  const [filters, setFilters] = useState({ lff: false, hff: false, notch: false })
   const [speed, setSpeed] = useState(1)
   const [playing, setPlaying] = useState(false)
   const [playheadSec, setPlayheadSec] = useState(null)
   const [waveform, setWaveform] = useState(null)
   const [widthPx, setWidthPx] = useState(0)
   const [openPopover, setOpenPopover] = useState(null) // 'duration'|'amplitude'|'speed'|'files'|null
+
+  // Step 5 (CC_STEP5_PROMPT.md): mini-timeline's score row + both panels' shared event list.
+  const [timeline, setTimeline] = useState(null) // {score, window_sec} | null
+  const [events, setEvents] = useState([])
+  const [selectedEventId, setSelectedEventId] = useState(null)
+  // Step 6 (CC_STEP6_PROMPT.md §6.6, Select Range): marking-mode state. `editingEventId`
+  // non-null means this mark's two clicks will PATCH that Human event's range instead of
+  // creating a new one (the Edit reading — see the report). `markingOnsetSec` is the first
+  // click; the second click (in EegPanel's onGridClick handler below) completes the mark.
+  const [selectRangeActive, setSelectRangeActive] = useState(false)
+  const [markingOnsetSec, setMarkingOnsetSec] = useState(null)
+  const [editingEventId, setEditingEventId] = useState(null)
+  // Live-updated mirror of selectedEventId for handleSaveEvent's async catch below (item 4):
+  // a slow save's error must not land after the user has already switched to another event.
+  const selectedEventIdRef = useRef(selectedEventId)
+  useEffect(() => {
+    selectedEventIdRef.current = selectedEventId
+  }, [selectedEventId])
+  // Mirror of fileMeta for the playback tick below (CC_STEP5_FIX3_PROMPT.md item 1): read
+  // without adding fileMeta to the playback effect's deps, which would reset the rAF loop's
+  // lastTs (and briefly stutter playback) on every unrelated fileMeta refresh (e.g. alert
+  // count changes from a save elsewhere).
+  const fileMetaRef = useRef(fileMeta)
+  useEffect(() => {
+    fileMetaRef.current = fileMeta
+  }, [fileMeta])
 
   const anyFilterOn = filters.lff || filters.hff || filters.notch
   const waveformReqId = useRef(0)
@@ -141,6 +192,12 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
     setPlaying(false)
     setWindowStartSec(0)
     setPlayheadSec(null)
+    setTimeline(null)
+    setEvents([])
+    setSelectedEventId(null)
+    setSelectRangeActive(false)
+    setMarkingOnsetSec(null)
+    setEditingEventId(null)
 
     getFile(currentFileId)
       .then((f) => {
@@ -148,6 +205,17 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
         setFileMeta(f)
         setPlayheadSec(0)
       })
+      .catch((err) => !cancelled && setError(err.message))
+
+    // Mini-timeline's score row — read-only cache, never re-runs the pipeline (SPEC §6.3 /
+    // CC_STEP5_REPORT.md's backfill note). A 404 here means this file's score array was
+    // never persisted; degrade to "no score line" rather than blocking the whole screen.
+    getTimeline(currentFileId)
+      .then((t) => !cancelled && setTimeline(t))
+      .catch(() => !cancelled && setTimeline(null))
+
+    getFileEvents(currentFileId)
+      .then((evs) => !cancelled && setEvents(evs))
       .catch((err) => !cancelled && setError(err.message))
 
     markFileViewing(currentFileId)
@@ -159,9 +227,130 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
     }
   }, [currentFileId, subjectId])
 
+  // Panel Event is the primary control source (SPEC §6.5): clicking a row jumps Panel EEG
+  // to that event's onset (with a little pre-roll so the onset isn't flush against the
+  // window's left edge) and moves the playhead there — the mini-timeline's own playhead
+  // updates for free since it's driven by this same `playheadSec` state, one-way from here.
+  function handleToggleEvent(eventId) {
+    // CC_STEP5_FIX2_PROMPT.md item 4: a stale validation error (e.g. "review_status must be
+    // one of Accept/Reject/Uncertain.") from a previous save must not survive switching to a
+    // different event.
+    setError('')
+    if (eventId === selectedEventId) {
+      setSelectedEventId(null)
+      return
+    }
+    setSelectedEventId(eventId)
+    const ev = events.find((e) => e.id === eventId)
+    if (!ev || !fileMeta) return
+    setPlaying(false)
+    const preRoll = windowSec * 0.1
+    const start = clamp(ev.onset_sec - preRoll, 0, Math.max(0, fileMeta.usable_duration_seconds - windowSec))
+    setWindowStartSec(start)
+    setPlayheadSec(ev.onset_sec)
+  }
+
+  async function refreshEventsAndAlert() {
+    const [evs] = await Promise.all([
+      getFileEvents(currentFileId),
+      getFile(currentFileId).then(setFileMeta),
+      getSubjectDetail(subjectId).then(setSubject),
+    ])
+    setEvents(evs)
+  }
+
+  async function handleSaveEvent(eventId, payload) {
+    // Clear any stale error up front — a successful save must not leave a previous attempt's
+    // validation message on screen (CC_STEP5_FIX2_PROMPT.md item 4). If this attempt also
+    // fails, the catch below immediately replaces it with the new message — unless the user
+    // has since switched to a different event, in which case a slow, now-irrelevant error
+    // must not reappear on top of whatever they've moved on to.
+    setError('')
+    await updateEvent(eventId, payload).catch((err) => {
+      if (selectedEventIdRef.current === eventId) setError(err.message)
+      throw err
+    })
+    await refreshEventsAndAlert().catch((err) => {
+      if (selectedEventIdRef.current === eventId) setError(err.message)
+    })
+  }
+
+  async function handleDeleteEvent(eventId) {
+    await deleteEvent(eventId).catch((err) => {
+      setError(err.message)
+      throw err
+    })
+    if (selectedEventId === eventId) setSelectedEventId(null)
+    await refreshEventsAndAlert().catch((err) => setError(err.message))
+  }
+
+  // Select Range (CC_STEP6_PROMPT.md §6.6). Clicking the toolbar button toggles marking
+  // mode on; clicking it again mid-mark cancels cleanly (item 12 — no explicit cancel
+  // affordance in the mockups, so this reuses the same toggle rather than adding a second
+  // control) — no partial event is ever created from a cancelled mark, since creation only
+  // happens after both clicks land, in handleGridClick below.
+  function handleToggleSelectRange() {
+    if (selectRangeActive) {
+      setSelectRangeActive(false)
+      setMarkingOnsetSec(null)
+      setEditingEventId(null)
+      return
+    }
+    setPlaying(false)
+    setSelectRangeActive(true)
+  }
+
+  // Edit (item 11's reading): re-enter Select Range-style marking, scoped to overwrite this
+  // Human event's range instead of creating a new one, once both clicks land.
+  function handleEditEvent(ev) {
+    setPlaying(false)
+    setEditingEventId(ev.id)
+    setMarkingOnsetSec(null)
+    setSelectRangeActive(true)
+  }
+
+  // The single click target for Panel EEG's grid: a plain seek outside marking mode, or the
+  // onset/offset click of a Select Range mark. Direction-agnostic (item 13) — sorts the two
+  // points regardless of click order, so a right-to-left drag still yields onset < offset.
+  async function handleGridClick(sec) {
+    if (!selectRangeActive) {
+      handleSeek(sec)
+      return
+    }
+    if (markingOnsetSec == null) {
+      setMarkingOnsetSec(sec)
+      return
+    }
+    const onset = Math.min(markingOnsetSec, sec)
+    const offset = Math.max(markingOnsetSec, sec)
+    const targetEventId = editingEventId
+    setSelectRangeActive(false)
+    setMarkingOnsetSec(null)
+    setEditingEventId(null)
+    setError('')
+    try {
+      const saved = targetEventId != null
+        ? await updateEvent(targetEventId, { onset_sec: onset, offset_sec: offset })
+        : await createEvent(currentFileId, onset, offset)
+      await refreshEventsAndAlert()
+      // Matches UI/B3c: the just-created (or just-redrawn) event lands expanded, showing
+      // its own Onset/Offset/Duration + Delete/Edit immediately, not collapsed in the list.
+      setSelectedEventId(saved.id)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   // Waveform fetch — the only backend call Panel EEG makes (SPEC §6.4 / HANDOFF §5).
   // Amplitude and filter-toggle changes are deliberately NOT in this dependency list: both
   // are pure frontend re-renders of data already on hand (see EegPanel).
+  // Debounced (CC_STEP5_FIX2_PROMPT.md item 1): dragging the bottom scrub bar fires an
+  // onChange — and therefore a windowStartSec update — on every pixel of mouse movement.
+  // Without this, each of those fired its own fetch immediately; live testing showed the
+  // resulting flood of in-flight requests (confirmed via network log: dozens per drag)
+  // made Panel EEG's displayed window lag several seconds behind the slider, which is what
+  // reads as "dragging doesn't move it" during a normal drag-and-look test. Only the
+  // position the drag actually settles on now triggers a fetch.
   useEffect(() => {
     if (!fileMeta || !widthPx) return
     const maxStart = Math.max(0, fileMeta.usable_duration_seconds - windowSec)
@@ -171,20 +360,27 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
       return
     }
     const endSec = Math.min(clampedStart + windowSec, fileMeta.usable_duration_seconds)
-    const reqId = ++waveformReqId.current
-    getWaveform(currentFileId, clampedStart, endSec, widthPx)
-      .then((wf) => {
-        if (reqId === waveformReqId.current) setWaveform(wf)
-      })
-      .catch((err) => {
-        if (reqId === waveformReqId.current) setError(err.message)
-      })
+    const timer = setTimeout(() => {
+      const reqId = ++waveformReqId.current
+      getWaveform(currentFileId, clampedStart, endSec, widthPx)
+        .then((wf) => {
+          if (reqId === waveformReqId.current) setWaveform(wf)
+        })
+        .catch((err) => {
+          if (reqId === waveformReqId.current) setError(err.message)
+        })
+    }, 120)
+    return () => clearTimeout(timer)
   }, [fileMeta, currentFileId, windowSec, windowStartSec, widthPx])
 
   // Playback — advances the playhead in real time (scaled by `speed`) purely client-side;
-  // no backend call, since the whole current window's data is already loaded. Stops at the
-  // loaded window's own end rather than paging into the next window (Step 4 scope: panning
-  // is manual via the scrub controls below).
+  // no backend call for the playhead itself. CC_STEP5_FIX3_PROMPT.md item 1: once the
+  // playhead reaches the right edge of the currently loaded window, the window itself must
+  // advance (shift forward + fetch the next segment, HANDOFF §5's decimated-window-fetch
+  // architecture) rather than freezing playback at that boundary. Advancing windowStartSec
+  // here re-triggers the waveform-fetch effect above; this effect's own `waveform` dependency
+  // then restarts the rAF loop (lastTs reset to null) once the new segment lands, so dt isn't
+  // computed across the fetch gap.
   const playRef = useRef({ raf: null, lastTs: null })
   useEffect(() => {
     if (!playing || !waveform) return undefined
@@ -195,7 +391,15 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
           if (prev == null) return prev
           const next = prev + dt * speed
           if (next >= waveform.end_sec) {
-            setPlaying(false)
+            const usableDuration = fileMetaRef.current?.usable_duration_seconds ?? waveform.end_sec
+            const atRecordingEnd = waveform.end_sec >= usableDuration - 1e-6
+            if (atRecordingEnd) {
+              setPlaying(false)
+              return waveform.end_sec
+            }
+            // More recording ahead: shift the displayed window to start exactly where this
+            // one ended, so playback continues into it instead of stopping at the boundary.
+            setWindowStartSec(waveform.end_sec)
             return waveform.end_sec
           }
           return next
@@ -310,40 +514,47 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
 
   const headerCenter = (
     <>
-      <span className="font-mono text-sm truncate">{headerTitle}</span>
-      <button
-        type="button"
-        onClick={handlePrev}
-        disabled={fileIndex <= 0}
-        className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-40 shrink-0"
-      >
-        &laquo; Previous
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        disabled={fileIndex < 0 || fileIndex >= totalCount - 1}
-        className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-40 shrink-0"
-      >
-        Next &raquo;
-      </button>
-      <span className="w-px h-6 bg-white/30 shrink-0" />
-      <button
-        type="button"
-        onClick={handleViewed}
-        className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium shrink-0"
-      >
-        Viewed
-      </button>
-      <button
-        type="button"
-        onClick={handleExportClick}
-        disabled={!exportEnabled}
-        className="bg-white/70 text-text-muted rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-50 shrink-0"
-      >
-        &#8681; Export
-      </button>
-      <div className="relative ml-auto shrink-0" data-popover>
+      {/* CC_STEP6_FIX2_PROMPT.md item 1: UI/B1a and B2a put the title itself inside the
+          right-hand cluster, immediately left of Previous — not flush against the logo.
+          `ml-auto` now sits on this whole cluster (title included) so flexible space opens
+          up between the logo group and here, with the title, Previous/Next, divider,
+          Viewed/Export, and (below) the file dropdown all packed together on the right. */}
+      <div className="flex items-center gap-3 ml-auto shrink-0">
+        <span className="font-mono text-sm truncate">{headerTitle}</span>
+        <button
+          type="button"
+          onClick={handlePrev}
+          disabled={fileIndex <= 0}
+          className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-40 shrink-0"
+        >
+          &laquo; Previous
+        </button>
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={fileIndex < 0 || fileIndex >= totalCount - 1}
+          className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-40 shrink-0"
+        >
+          Next &raquo;
+        </button>
+        <span className="w-px h-6 bg-white/30 shrink-0" />
+        <button
+          type="button"
+          onClick={handleViewed}
+          className="bg-white text-text rounded-control px-3 py-1.5 text-xs font-medium shrink-0"
+        >
+          Viewed
+        </button>
+        <button
+          type="button"
+          onClick={handleExportClick}
+          disabled={!exportEnabled}
+          className="bg-white/70 text-text-muted rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-50 shrink-0"
+        >
+          &#8681; Export
+        </button>
+      </div>
+      <div className="relative shrink-0" data-popover>
         <button
           type="button"
           onClick={() => setOpenPopover((p) => (p === 'files' ? null : 'files'))}
@@ -396,6 +607,17 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
         {banner && <div className="mb-3 text-sm text-text bg-[#FFFBEB] border border-[#FDE68A] rounded-control px-3 py-2">{banner}</div>}
         {error && <div className="mb-3 text-sm text-reject bg-reject-bg border border-reject rounded-control px-3 py-2">{error}</div>}
 
+        <MiniTimeline
+          fileMeta={fileMeta}
+          score={timeline?.score ?? null}
+          scoreWindowSec={timeline?.window_sec ?? null}
+          events={events}
+          playheadSec={playheadSec}
+          selectedEventId={selectedEventId}
+        />
+
+        <div className="flex gap-4 items-stretch mt-4">
+        <div className="flex-1 min-w-0">
         <div className="border border-border bg-surface">
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border flex-wrap">
             <h2 className="text-lg font-semibold mr-2 shrink-0">Seizure detection</h2>
@@ -456,11 +678,18 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
 
             <button
               type="button"
-              disabled
-              title="Select Range — event creation lands in Step 6"
-              className="border border-border rounded-control px-3 py-1.5 text-sm font-mono opacity-40 cursor-not-allowed"
+              onClick={handleToggleSelectRange}
+              title={selectRangeActive ? 'Click to cancel' : undefined}
+              className={`border rounded-control px-3 py-1.5 text-sm font-mono ${
+                selectRangeActive ? 'bg-brand text-white border-brand' : 'border-border'
+              }`}
             >
-              &#8926;&#8927; Select Range
+              &#8926;&#8927;{' '}
+              {selectRangeActive
+                ? markingOnsetSec == null
+                  ? 'Click onset…'
+                  : 'Click offset…'
+                : 'Select Range'}
             </button>
 
             <div className="flex items-center gap-2 ml-auto">
@@ -478,8 +707,12 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
               anyFilterOn={anyFilterOn}
               playheadSec={playheadSec}
               fileMeta={fileMeta}
-              onSeek={handleSeek}
+              onGridClick={handleGridClick}
               onWidthChange={setWidthPx}
+              selectRangeActive={selectRangeActive}
+              markingOnsetSec={markingOnsetSec}
+              events={events}
+              selectedEventId={selectedEventId}
             />
           </div>
 
@@ -493,7 +726,23 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
             <input
               type="range"
               min={0}
-              max={Math.max(maxStart, 0.001)}
+              // CC_STEP5_FIX7_PROMPT.md item 3: the handle's position must read as
+              // window_start_sec / file_duration_sec along the FULL file timeline, not
+              // window_start_sec / (file_duration_sec - windowSec). A native range input's
+              // rendered thumb fraction is (value-min)/(max-min) — with `value` already
+              // correctly tracking windowStartSec (drag/Play/event-click all set it, unchanged
+              // here), `max` must be the file's total duration for that fraction to match the
+              // spec'd formula. Using maxStart here (the old behavior) made the handle read
+              // 100% whenever the window was merely at its LAST reachable position, not at the
+              // file's actual end — increasingly wrong the larger windowSec is relative to the
+              // file (negligible for a 1 min window on a 1 hr file, ~10 percentage points off
+              // for a 1 min window on this file's 10 min chb15_01_short.edf). windowStartSec
+              // itself still never legitimately exceeds maxStart (the waveform-fetch effect
+              // above clamps it), so this only ever leaves unreachable track space on the
+              // right when windowSec is a non-trivial fraction of the file — the correct,
+              // physically-expected behavior for a "where does the window sit in the whole
+              // file" indicator, not a regression of round 2's drag-to-seek.
+              max={Math.max(fileMeta.usable_duration_seconds, 0.001)}
               step={0.1}
               value={windowStartSec}
               onChange={handleSlider}
@@ -543,6 +792,22 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
               )}
             </div>
           </div>
+        </div>
+        </div>
+
+        <div className="w-[340px] shrink-0 flex flex-col">
+          <PanelEvent
+            events={events}
+            fileMeta={fileMeta}
+            selectedEventId={selectedEventId}
+            editingEventId={editingEventId}
+            onToggleEvent={handleToggleEvent}
+            onSaveEvent={handleSaveEvent}
+            onDeleteEvent={handleDeleteEvent}
+            onEditEvent={handleEditEvent}
+            onClearError={() => setError('')}
+          />
+        </div>
         </div>
       </main>
 

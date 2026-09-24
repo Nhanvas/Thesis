@@ -89,3 +89,22 @@ export const getWaveform = (fileId, startSec, endSec, widthPx) =>
   request(
     `/api/files/${fileId}/waveform?start_sec=${startSec}&end_sec=${endSec}&width_px=${Math.round(widthPx)}`
   )
+
+// Mini-timeline + Panel Event (Step 5, CC_STEP5_PROMPT.md).
+
+export const getTimeline = (fileId) => request(`/api/files/${fileId}/timeline`)
+
+export const getFileEvents = (fileId) => request(`/api/files/${fileId}/events`)
+
+export const updateEvent = (eventId, payload) =>
+  request(`/api/events/${eventId}`, { method: 'PATCH', body: JSON.stringify(payload) })
+
+export const deleteEvent = (eventId) => request(`/api/events/${eventId}`, { method: 'DELETE' })
+
+// Select Range (Step 6, CC_STEP6_PROMPT.md §6.6).
+
+export const createEvent = (fileId, onsetSec, offsetSec) =>
+  request(`/api/files/${fileId}/events`, {
+    method: 'POST',
+    body: JSON.stringify({ onset_sec: onsetSec, offset_sec: offsetSec }),
+  })

@@ -101,9 +101,11 @@ observe and document, not to tune.
 The channel attribution panel is **XAI for the GAE reconstruction branch**. It shows which channels the
 autoencoder reconstructs worst during a flagged event.
 
-**It is not localization. It is not seizure onset zone.** The label-scored evaluation is
-**PROVISIONAL**, and the labels it was scored against record only the reader's dominant channel or two
-per seizure, not the full ictal channel set — so the numbers answer a narrower question than intended.
+**It is not localization. It is not seizure onset zone.** The label-scored evaluation is **closed**
+(2026-09-25): labels were produced by blind human readers, the evaluation was approved, and the result
+is negative — it does not support a localization/SOZ reading. The labels recorded only the reader's
+dominant channel or two per seizure, not the full ictal channel set, so the evaluation answered a
+narrower question than intended.
 
 Consequences the UI must respect:
 - Panel title: `Channel-level reconstruction anomaly — Event N`.

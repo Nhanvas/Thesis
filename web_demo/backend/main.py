@@ -19,6 +19,7 @@ from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import attribution as attr
 import db
 import upload_manager as um
 import waveform_serving as ws
@@ -279,6 +280,44 @@ def update_event(event_id: int, payload: UpdateEventRequest, request: Request):
         db.update_event_times(event_id, onset, offset)
     db.update_event(event_id, review_status=payload.review_status, comment=payload.comment)
     return db.get_event(event_id)
+
+
+# ── Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md §2.2) ────────────────────────
+
+@app.get("/api/events/{event_id}/attribution")
+def get_event_attribution(event_id: int, request: Request):
+    """Works for AI and Human events identically — computed fresh from the per-node cache
+    on every call (never cached in the DB), so an edited Human event's range change is
+    reflected immediately."""
+    _require_auth(request)
+    event = db.get_event(event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+    f = db.get_file(event["file_id"])
+    if f is None:
+        raise HTTPException(status_code=404, detail="File not found.")
+    return attr.get_event_attribution(event, f, um.UPLOAD_DIR)
+
+
+class AttributionStatusRequest(BaseModel):
+    statuses: dict[str, str]  # {channel: 'Accept'|'Reject'}
+
+
+@app.put("/api/events/{event_id}/attribution-status")
+def put_event_attribution_status(event_id: int, payload: AttributionStatusRequest, request: Request):
+    """Save (§2.2) — replaces the stored per-channel status set with exactly what the panel
+    shows. `Clear all` is just this endpoint called with an empty `statuses` dict once Save
+    is pressed (SPEC's Save-persists pattern, same as the AI event review)."""
+    _require_auth(request)
+    if db.get_event(event_id) is None:
+        raise HTTPException(status_code=404, detail="Event not found.")
+    for ch, status in payload.statuses.items():
+        if ch not in attr.CHANNELS:
+            raise HTTPException(status_code=422, detail=f"Unknown channel: {ch}")
+        if status not in ("Accept", "Reject"):
+            raise HTTPException(status_code=422, detail="status must be Accept or Reject.")
+    db.set_attribution_status(event_id, payload.statuses)
+    return {"ok": True}
 
 
 @app.delete("/api/events/{event_id}")

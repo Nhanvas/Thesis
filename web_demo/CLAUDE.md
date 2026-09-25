@@ -88,7 +88,13 @@ when you were wrong.
 - Windows, Git Bash, Cursor. Repo root `F:/Study/Thesis/Code`, branch `main`.
 - Dataset outside the repo: `F:/Study/Thesis/Dataset/CHB-MIT/` — EDFs in `chbNN/`, summaries in
   `CHB info/summary/chbNN-summary.md` (**`.md`, not `.txt`**).
-- CPU only, no GPU locally. Measured cost: ~16.9 ms per 4 s window ⇒ ~15 s per hour of EEG.
+- CPU only, no GPU locally. Measured cost, end-to-end (open → filter → adjacency → GAE → gamma →
+  ensemble): **9.76 s per hour of EEG**, measured on a real 4-hour recording (`chb06_01.edf`), Step 1
+  (`BUILD_PROGRESS.md`). Run-to-run variation was about **5×** on identical code/file (22–110 s observed
+  on the adjacency + band-power stage alone) — attributed to dev-machine background load, not a code
+  bug; keep this caveat when quoting the figure. (`build_adjacency` 13.2 ms/window + `compute_band_
+  powers` 3.7 ms/window = 16.9 ms/window, `SZSCAN_SPEC_v5.md §1.7`, is a **component-level** measurement
+  of those two stages only — not the end-to-end figure, and not a substitute for it.)
 - `rm` in Git Bash does not use the Recycle Bin. `ls`/`du` before any `rm -rf`.
 - Admin credentials go in `backend/.env` (gitignored), never in frontend code.
 - Bundle fonts locally; the defense machine may have no internet.

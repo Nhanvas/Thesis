@@ -17,7 +17,12 @@ after the audit report: the Start date column changed from an absolute date to `
 HH:MM:SS` — see §5.1) + **C18** (2026-09-21, after Step 5 fix round 2: the Panel EEG amplitude scale
 extended per real measured data — see §6.4) + **C19** (2026-09-24, after Step 6: five Select Range /
 header behaviours the spec did not describe are recorded — see the note after §6.6; the same pass also
-corrects a stale `edf_index.locate_range()` reference in §5.5).
+corrects a stale `edf_index.locate_range()` reference in §5.5) + **C20** (2026-09-24, after Step 7: the
+Channel Attribution Panel's window/aggregation/score definition, gradient mapping and per-channel
+status persistence are recorded — see the note after §6.7) + **C21** (2026-09-25, after Step 7 fix
+round 2: C20 items 2-3's PROVISIONAL aggregation/score closed to the final p95-|robust-z| formula
+against a persisted whole-subject baseline, and §1.6 restructured into 3 numbered divergence items —
+see the note after §6.7 and §1.6).
 
 ---
 
@@ -131,11 +136,15 @@ unmodified, but is no longer in the actual call path, because `meas_date` solves
 
 ### 1.6 Deliberate divergence from the thesis pipeline — APPROVED BY THE AUTHOR
 
-There are **two divergence groups**, sharing the same root cause: a new patient has no labels.
+There are **three divergence items**, matching the thesis report's own enumeration, sharing the same
+root cause: a new patient has no labels. *(Restructured from two lettered groups into these three
+numbered items in Step 7 fix round 2, 2026-09-25, C21 — the same facts and evidence, re-grouped, not
+rewritten.)*
 
-#### (a) Four steps that fit on the "interictal array"
+#### 1. Normalization statistics, covariance, and robust-z fit on the whole recording, with no artifact rejection
 
-A new patient has no such array. The demo fits all four on the subject's **entire set of windows**:
+A new patient has no interictal array. The demo fits all of the following on the subject's **entire set
+of windows** instead:
 
 | Step | Thesis fits on | Demo fits on |
 |---|---|---|
@@ -143,6 +152,7 @@ A new patient has no such array. The demo fits all four on the subject's **entir
 | 5 SD artifact threshold | interictal | **dropped entirely** (no window discarded — time position must be preserved) |
 | `LedoitWolf().fit(Zi)` for `zlatent` | interictal's latent | the entire window set's latent |
 | ~~robust-z median/MAD per branch~~ | **entire window set** | **entire window set** — *not a divergence* |
+| Channel Attribution Panel's robust-z baseline (`med`/`mad`, C20/C21) | interictal (`{subj}_interictal_pernode.npy`) | whole-subject (every window of every file belonging to the subject, from `.pernode.npy`) |
 
 **robust-z is not a divergence.** `retrain_io.robust_z(raw_i, raw_c)` lines 56–60 already fit median/MAD
 on `np.concatenate([raw_i, raw_c])` — i.e. the entire window set. The demo does exactly what the thesis
@@ -161,13 +171,16 @@ Criterion set before running: PASS if Spearman ≥ 0.98 **and** |ΔAUROC| ≤ 0.
 | chb13 | 0.6493 | 0.6408 | **0.9999** | 12452 / 144 |
 
 → **PASS.** Changing how LedoitWolf is fit barely changes `zlatent` (rank order is nearly identical,
-ΔAUROC 0.0015 / 0.0085). Divergence (a) is measurement-harmless.
+ΔAUROC 0.0015 / 0.0085). Item 1 is measurement-harmless (for the `zlatent` component measured).
 
 ⚠️ This measurement **only** covers `zlatent`. The other three — z-score stats, dropping artifact
-filtering, and **the post-ictal segment (b)** — need continuous preprocessing straight from the EDF, so
-they can only be observed at build step 1.
+filtering, and **item 2 below** — need continuous preprocessing straight from the EDF, so they can only
+be observed at build step 1. The Channel Attribution Panel's baseline row (added C20/C21) has not been
+separately re-measured against this AUROC/Spearman check — it is grouped into item 1 because it is the
+same statistical operation (median/MAD baseline fit on the entire window set instead of interictal-only),
+not because it was part of the 2026-09-03 measurement.
 
-#### (b) The post-ictal segment isn't excluded — a source of divergence LARGER than group (a)
+#### 2. No post-ictal buffer exclusion
 
 `preprocessing.py` excludes **4 hours after every seizure** from the thesis's interictal array
 (`BUFFER_H`). The demo doesn't know where a seizure is, so it **can't exclude anything** — the entire
@@ -177,7 +190,7 @@ Post-ictal EEG is genuinely abnormal (focal slowing, amplitude suppression, alte
 connectivity). The demo is quite likely to **flag those segments**, while the thesis never scored them
 at all.
 
-In magnitude, this is a much larger source of difference than group (a): 4 hours × the number of
+In magnitude, this is a much larger source of difference than item 1: 4 hours × the number of
 seizures, compared with 0.23% of windows for ictal.
 
 **This is not a bug.** Within the post-hoc review triage framing, surfacing the post-ictal segment for a
@@ -187,7 +200,24 @@ be:
    *purely a human sanity check by eye, absolutely no labels going into the code*);
 2. **stated out loud at the defense**, not left for the committee to discover on its own.
 
-**Mandatory consequences to record (for both (a) and (b)):**
+#### 3. Background statistics for the PELT penalty and the CPD threshold, estimated on the whole recording
+
+`src/cpd_pipeline_v14.py` fits the PELT penalty's variance and the change-point magnitude threshold from
+a background sample — the interictal segment, when a label mask is available (see that file's own
+header: penalty variance "from the interictal/background" and a magnitude "threshold calibrated from
+background CP magnitudes"). The demo has no such mask, so both statistics are estimated from **the
+whole recording** instead — the same file's header states this explicitly for the label-free case
+("PELT variance and the magnitude threshold from the WHOLE recording"). §1.5's PELT step already notes
+the practical side of this ("the algorithm needs enough background to estimate stably, no splitting
+into separate short-file runs"); this item records the statistical side — it is the same
+"interictal-only, in the thesis, becomes whole-recording, in the demo" pattern as item 1, applied to
+Stage 2's PELT/threshold calibration instead of Phase B's per-window normalization. Kept as its own
+item, matching the thesis report's own separate enumeration, rather than folded into item 1.
+
+Not separately measured against an AUROC/Spearman-style criterion the way item 1's `zlatent` row was —
+flagged here as a gap, not silently treated as harmless.
+
+**Mandatory consequences to record (for all three items):**
 - **The demo's numbers WILL differ from the thesis's numbers.** They must never be forced to match,
   never adjusted to match.
 - The demo **does not** display any evaluation metric (sensitivity, FP/day, AUROC, operating-point
@@ -534,7 +564,9 @@ being in event-creation mode.
 
 **Mandatory framing — this is a scientific constraint, not a UI choice.** Per
 `docs/ATTRIBUTION_SPEC.md`, this is **XAI for the GAE's reconstruction branch**. It is **NOT**
-localization and **NOT** SOZ. The label-scored result is currently **PROVISIONAL**.
+localization and **NOT** SOZ. The label-scored evaluation is **closed** (2026-09-25): blind
+human-reader labels, approved, result negative (does not support a localization/SOZ reading).
+This does not change the panel's own wording above, which stays exactly as written.
 
 - **Panel title:** `Channel-level reconstruction anomaly — Event N`
   *(revised from "Channel contribute to ..." in the mockup — the old phrasing implies a causal/
@@ -555,6 +587,49 @@ localization and **NOT** SOZ. The label-scored result is currently **PROVISIONAL
 - **Empty state:** no event selected yet → placeholder `Select an event to view attribution`, never
   auto-shows the first event.
 - **Never** shows an attribution evaluation metric (AUROC, confidence interval, p-value) on the UI.
+
+> **Step 7 gap-fill note (C20, 2026-09-24):** the panel's definition, mapping and persistence, none of
+> which §6.7 spelled out:
+>
+> 1. **Windows of an event:** the windows whose 4 s span `[4i, 4i+4)` overlap `[onset_sec, offset_sec]`
+>    — the same overlap rule `src/attribution_pipeline.py`'s `_blocks_for_subject` uses for the thesis's
+>    labeled seizures, applied here directly from the event's own onset/offset (AI or Human) instead of
+>    a label-derived array. Always at least the window containing the onset; clamped to the file's
+>    per-node array length.
+> 2. **Aggregation across those windows** and **3. the score shown per channel** — **CLOSED, no
+>    longer PROVISIONAL (Step 7 fix round 2, 2026-09-25):** `score = percentile(|z|, 95, axis=0)`,
+>    where `z = (window - med) / mad` is a per-channel, per-window robust z-score of the event's
+>    own `.pernode.npy` windows against a **whole-subject baseline** — `med`/`mad` computed **once
+>    per subject** (median/MAD over every window of every file belonging to that subject, from
+>    `.pernode.npy`; no 1.4826 factor). This is the exact same formula as
+>    `src/attribution_pipeline.py`'s `cmd_score` (lines ~514–520); the only difference is baseline
+>    scope (whole-subject recording here vs. interictal-only there) — **the same divergence already
+>    recorded in §1.6 item 1, not a new one.** Rank = position by the unrounded score, highest
+>    first; unaffected by status. Displayed to 2 decimal places (`AttributionPanel.jsx`).
+> 4. **`{stem}.pernode.npy`** (`[n_windows, 18]` float32, channel order = `preprocessing.COMMON_
+>    CHANNELS`) is computed in Phase B's per-file model-scoring step (a second, independent
+>    `gae_joint.joint_score(..., per_node=True)` call alongside the existing scalar `zrecon_raw` call,
+>    same inputs) and cached at `uploads/{subject_id}/{stem}.pernode.npy`, next to `.filtered.npy`/
+>    `.raw.npy`/`.score.npy`. **`{subject_id}/pernode_baseline.npy`** (stacked `[2, 18]` float32 —
+>    row 0 median, row 1 MAD) is the item 2-3 baseline above, computed **once per subject in the
+>    same Phase B run** (subject-wide, same rule as the z-score/LedoitWolf stats §1.6 item 1 already
+>    describes) and persisted next to it — **never recomputed on a read.** Attribution itself
+>    (the per-event score/rank) is still computed fresh on every `GET /api/events/{id}/attribution`
+>    call from these two cached arrays, never cached in the DB, so an edited Human event's range
+>    change is reflected immediately; if a subject's baseline file doesn't exist yet (not
+>    backfilled), the endpoint returns the same `{"available": false, ...}` shape as a missing
+>    `.pernode.npy` file rather than computing the baseline on the fly.
+> 5. **Gradient mapping:** each channel's score is min–max scaled across that event's own 18 scores (all
+>    equal → low end) and read off `linear-gradient(to right, --color-attr-low, --color-attr-mid,
+>    --color-attr-high)` (`SZSCAN_DESIGN_v2.md` §4) as a continuous 3-stop interpolation, not a
+>    3-bucket/discrete mapping.
+> 6. **Per-channel status** (`attribution_status(event_id, channel, status)`, `Accept`/`Reject` only) is
+>    stored per event **keyed by channel name**, so redrawing a Human event's range keeps its channel
+>    judgments. `PUT .../attribution-status` replaces the full stored set — the same Save-persists
+>    pattern as AI event review (§6.5): `Clear all` only clears the panel's own local selection, nothing
+>    is deleted server-side until `Save` is pressed with the now-empty set. Deleting an event explicitly
+>    deletes its `attribution_status` rows (not left to the FK pragma alone). No attribution status ever
+>    changes Alert or the event's own review status.
 
 ---
 
@@ -626,7 +701,7 @@ for human reading.
 | O2 | **PELT parameters** (penalty, model, min_size) — take them exactly from `src/cpd_pipeline_v14.py`, don't re-choose them | read the file |
 | ~~O3~~ | ~~what the demo's robust-z fits on~~ — **CLOSED 2026-09-03**: `retrain_io.robust_z` already fits on the entire window set (lines 56–60). Not a divergence, nothing to handle | closed |
 | O4 | **Which subject to use for the live-upload scenario** — chosen by real file count, measured while building the cache | measure |
-| O4b | **The extent of post-ictal flagging** (§1.6b) — observed at step 1, decide whether to call it out separately in the defense slides. No adjusting the model, no adjusting the threshold to "fix" it | observe |
+| O4b | **The extent of post-ictal flagging** (§1.6 item 2) — observed at step 1, decide whether to call it out separately in the defense slides. No adjusting the model, no adjusting the threshold to "fix" it | observe |
 | O5 | **Gamma-AEC in the continuous path** — `dataprep/compute_gamma_aec.py` currently runs on the already-split array; a continuous version is needed | write new code in `pipeline_demo.py` |
 | O6 | **`evaluation_protocol.py` and `stat_validation.py` were just restored to `src/`** (2026-09-03, tag `repo-deps-fixed`) after being mistakenly archived while still being imported. `fp_budget_operating_point.py` depends on this chain — verify the `import` runs before pulling parameters for O1 | 1 command |
 

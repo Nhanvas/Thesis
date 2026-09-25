@@ -142,9 +142,10 @@ checkpoint canonical · giới hạn diễn giải attribution · danh sách 8 s
 → Nếu một trong ba đổi, Boti mang bản `THESIS_CONTEXT_FOR_DEMO.md` mới sang project #2. Ngoài ba thứ
 này, thay đổi phía thesis **không** ảnh hưởng demo — vì demo không hiển thị metric nào.
 
-*Trường hợp cụ thể sắp tới:* nếu cô freeze nhãn attribution, số attribution sẽ đổi. Demo **không** bị
-ảnh hưởng (không hiển thị số), nhưng nếu trạng thái PROVISIONAL được gỡ thì §5 của
-`THESIS_CONTEXT_FOR_DEMO.md` cần cập nhật.
+*Cập nhật (2026-09-25):* nhãn attribution đã được cô freeze (đọc bởi reader mù, đã duyệt), kết quả
+**âm tính** (không hỗ trợ cách đọc localization/SOZ). Demo **không** bị ảnh hưởng (không hiển thị số),
+nhưng trạng thái PROVISIONAL đã được gỡ nên §5 của `THESIS_CONTEXT_FOR_DEMO.md` đã được cập nhật theo
+(Step 7 fix round 2).
 
 **(C) Divergence mới của demo cần báo cô.** Mọi chỗ demo làm khác pipeline thesis đều là quyết định
 phương pháp, không phải chi tiết kỹ thuật.

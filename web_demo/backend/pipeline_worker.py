@@ -25,8 +25,33 @@ import pipeline_demo as pd
 
 
 def _run_phase_b(payload: dict, out_path: str) -> None:
-    scores = pd.process_subject_phase_b_from_paths(payload["filtered_paths"])
+    filtered_paths = payload["filtered_paths"]
+    pernode = {}
+    pernode_baseline: dict = {}
+    scores = pd.process_subject_phase_b_from_paths(
+        filtered_paths, pernode_out=pernode, pernode_baseline_out=pernode_baseline
+    )
     np.savez(out_path, **scores)
+    # Step 7 (CC_STEP7_PROMPT.md Part 1 item 1): persist the per-node array next to the
+    # already-written `{stem}.filtered.npy`/`.raw.npy` in the same (still-draft) directory —
+    # `_finalize_draft_dir` in upload_manager.py moves the whole directory as one unit once
+    # Process locks in the subject id, so this rides along automatically. Never touches
+    # `.score.npy` or any other existing output.
+    for fn, arr in pernode.items():
+        filtered_path = Path(filtered_paths[fn])
+        stem = filtered_path.name.removesuffix(".filtered.npy")
+        pernode_path = filtered_path.with_name(f"{stem}.pernode.npy")
+        np.save(pernode_path, arr)
+    if "baseline" in pernode_baseline:
+        # Step 7 fix round 2 (CC_STEP7_FIX2_PROMPT.md Part 1): same rides-along mechanism as
+        # the per-file `.pernode.npy` arrays above — written into this still-draft directory
+        # under a subject-agnostic name (the subject id/Project ID isn't locked in yet at this
+        # point, see pipeline_demo.PERNODE_BASELINE_FILENAME's own comment), so it ends up at
+        # `uploads/{subject_id}/pernode_baseline.npy` once `_finalize_draft_dir` moves the
+        # whole directory.
+        any_filtered_path = Path(next(iter(filtered_paths.values())))
+        baseline_path = any_filtered_path.with_name(pd.PERNODE_BASELINE_FILENAME)
+        np.save(baseline_path, pernode_baseline["baseline"])
 
 
 def _run_process_events(payload: dict, out_path: str) -> None:

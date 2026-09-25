@@ -4,6 +4,7 @@ import Footer from '../components/Footer.jsx'
 import EegPanel from '../components/EegPanel.jsx'
 import MiniTimeline from '../components/MiniTimeline.jsx'
 import PanelEvent from '../components/PanelEvent.jsx'
+import AttributionPanel from '../components/AttributionPanel.jsx'
 import { ChevronDownIcon, PlayIcon, PauseIcon } from '../components/icons.jsx'
 import {
   getFile,
@@ -726,27 +727,22 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
             <input
               type="range"
               min={0}
-              // CC_STEP5_FIX7_PROMPT.md item 3: the handle's position must read as
-              // window_start_sec / file_duration_sec along the FULL file timeline, not
-              // window_start_sec / (file_duration_sec - windowSec). A native range input's
-              // rendered thumb fraction is (value-min)/(max-min) — with `value` already
-              // correctly tracking windowStartSec (drag/Play/event-click all set it, unchanged
-              // here), `max` must be the file's total duration for that fraction to match the
-              // spec'd formula. Using maxStart here (the old behavior) made the handle read
-              // 100% whenever the window was merely at its LAST reachable position, not at the
-              // file's actual end — increasingly wrong the larger windowSec is relative to the
-              // file (negligible for a 1 min window on a 1 hr file, ~10 percentage points off
-              // for a 1 min window on this file's 10 min chb15_01_short.edf). windowStartSec
-              // itself still never legitimately exceeds maxStart (the waveform-fetch effect
-              // above clamps it), so this only ever leaves unreachable track space on the
-              // right when windowSec is a non-trivial fraction of the file — the correct,
-              // physically-expected behavior for a "where does the window sit in the whole
-              // file" indicator, not a regression of round 2's drag-to-seek.
-              max={Math.max(fileMeta.usable_duration_seconds, 0.001)}
+              // CC_STEP7_FIX_PROMPT.md Part A: supersedes the round-7 formula above (`max =
+              // usable_duration_seconds`, `value = windowStartSec`) — that formula can never
+              // reach 100%, since windowStartSec's largest reachable value is `maxStart =
+              // usable_duration - windowSec`, strictly less than usable_duration whenever
+              // windowSec > 0 (a 1 min window on a 1 h file left the handle stuck ≈97-98%).
+              // Standard scrollbar convention instead: position = windowStartSec / maxStart,
+              // i.e. `max` IS `maxStart` (already computed above for pageForward/gotoEnd/the
+              // waveform-fetch clamp) — 0% at windowStartSec=0, 100% at windowStartSec=maxStart,
+              // linear between. When maxStart is 0 (window length >= file duration) the input
+              // is disabled outright rather than rendering a degenerate min=max=0 track.
+              max={maxStart}
               step={0.1}
               value={windowStartSec}
               onChange={handleSlider}
-              className="flex-1 accent-interaction"
+              disabled={maxStart <= 0}
+              className="flex-1 accent-interaction disabled:opacity-50"
             />
             <button type="button" onClick={pageForward} className="text-lg leading-none px-1" aria-label="Page forward">
               &rsaquo;
@@ -795,18 +791,39 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
         </div>
         </div>
 
-        <div className="w-[340px] shrink-0 flex flex-col">
-          <PanelEvent
-            events={events}
-            fileMeta={fileMeta}
-            selectedEventId={selectedEventId}
-            editingEventId={editingEventId}
-            onToggleEvent={handleToggleEvent}
-            onSaveEvent={handleSaveEvent}
-            onDeleteEvent={handleDeleteEvent}
-            onEditEvent={handleEditEvent}
-            onClearError={() => setError('')}
-          />
+        {/* CC_STEP7_FIX_PROMPT.md Part B: UI/B2a stacks Event Panel + Attribution Panel in
+            this column with the column's TOTAL height equal to the EEG card's height (the
+            EEG card alone defines the row's height; this column must not contribute to it).
+            Technique: this outer div is `relative` with no intrinsic height of its own
+            (nothing here sits in normal flow except position, so it takes only whatever
+            height `items-stretch` on the row above gives it — the EEG card's natural
+            height); the inner wrapper is `absolute inset-0`, taken out of flow entirely, so
+            IT sees a fixed, definite height to split between the two panels. Each panel is
+            `flex-1 basis-0 min-h-0` (measured from UI/B2a: ≈0.49/0.49 of the EEG card height
+            with a small gap — near enough to equal halves that a plain 50/50 split matches
+            it) with its own `overflow-y-auto` inside (built into PanelEvent already since
+            Step 5; AttributionPanel restructured this round). No hardcoded pixel height or
+            `maxHeight` anywhere here — that was the Step 5 round-1 mistake this deliberately
+            avoids repeating. */}
+        <div className="w-[340px] shrink-0 relative">
+          <div className="absolute inset-0 flex flex-col gap-3">
+            <div className="flex-1 basis-0 min-h-0">
+              <PanelEvent
+                events={events}
+                fileMeta={fileMeta}
+                selectedEventId={selectedEventId}
+                editingEventId={editingEventId}
+                onToggleEvent={handleToggleEvent}
+                onSaveEvent={handleSaveEvent}
+                onDeleteEvent={handleDeleteEvent}
+                onEditEvent={handleEditEvent}
+                onClearError={() => setError('')}
+              />
+            </div>
+            <div className="flex-1 basis-0 min-h-0">
+              <AttributionPanel event={events.find((e) => e.id === selectedEventId) || null} />
+            </div>
+          </div>
         </div>
         </div>
       </main>

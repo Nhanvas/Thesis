@@ -118,6 +118,34 @@ def _median_mad(x: np.ndarray) -> tuple[float, float]:
     return med, mad
 
 
+# Step 7 fix round 2 (CC_STEP7_FIX2_PROMPT.md Part 1): filename for the persisted per-subject
+# Channel Attribution Panel baseline, written alongside `{stem}.pernode.npy` in the same
+# (still-draft, then finalized) directory. No subject id embedded in the name — like
+# `.filtered.npy`/`.pernode.npy`, the subject identity comes from the directory it ends up in
+# after `_finalize_draft_dir` moves the whole draft directory (upload_manager.py), not from the
+# filename itself; the subject id (Project ID) is not yet known at Phase B write time (it stays
+# editable until start_process).
+PERNODE_BASELINE_FILENAME = "pernode_baseline.npy"
+
+
+def compute_pernode_baseline(pernode_arrays: list[np.ndarray]) -> np.ndarray:
+    """Per-subject Channel Attribution Panel baseline (CC_STEP7_FIX2_PROMPT.md Part 1):
+    median/MAD per channel over every window of every array given (one subject's complete set
+    of `.pernode.npy` files), NO 1.4826 factor — the exact same formula as
+    `src/attribution_pipeline.py` `cmd_score` (lines ~514-515), differing only in baseline scope
+    (whole-subject recording here vs. interictal-only there — the same divergence already
+    recorded in SZSCAN_SPEC_v5.md §1.6 item 1).
+
+    On-disk layout, persisted as `{subj}/pernode_baseline.npy`: stacked `[2, 18]` float32 — row 0
+    = median, row 1 = MAD (already +1e-9). One file per subject instead of two, computed once
+    here and never recomputed on an attribution read (attribution.py loads it as-is).
+    """
+    base = np.concatenate(pernode_arrays, axis=0).astype(np.float64)
+    med = np.median(base, axis=0)
+    mad = np.median(np.abs(base - med), axis=0) + 1e-9
+    return np.stack([med, mad]).astype(np.float32)
+
+
 class UnsupportedEdfError(ValueError):
     """Raised when an uploaded file isn't a readable EDF or is missing one of the 18
     common channels — the backend's cue to show SPEC §2's exact rejection toast."""
@@ -232,7 +260,11 @@ def process_file_phase_a(
 
 
 def process_subject_phase_b(
-    filtered_by_filename: dict[str, np.ndarray], device: str = "cpu"
+    filtered_by_filename: dict[str, np.ndarray],
+    device: str = "cpu",
+    pernode_out: Optional[dict] = None,
+    zrecon_out: Optional[dict] = None,
+    pernode_baseline_out: Optional[dict] = None,
 ) -> dict[str, np.ndarray]:
     """Phase B (SPEC §1.6a / CC_STEP3_PROMPT.md §1): subject-wide z-score + LedoitWolf +
     robust-z fits, rest of the pipeline run per file. Returns {filename: ensemble score
@@ -244,6 +276,22 @@ def process_subject_phase_b(
     passing PhaseAResult objects across that boundary would carry the same arrays either way,
     but keeping this function's signature array-only makes the disk hand-off in the
     process-pool wrapper the obvious place to look, not something buried in a dataclass.
+
+    `pernode_out` (Step 7, CC_STEP7_PROMPT.md Part 1): optional dict the caller passes in to
+    receive {filename: [n_windows, 18] float32} per-node reconstruction scores, computed from
+    the SAME `pg`/`A_batch`/`Xn_batch` batch as the existing scalar `zrecon_raw` call below —
+    via a second, independent `gae_joint.joint_score(..., per_node=True)` call rather than
+    deriving it from the scalar path, so the existing scalar computation is untouched byte-for-
+    byte. Default `None` (existing callers unaffected, zero risk to already-persisted
+    `{stem}.score.npy` cache files) — only the attribution backfill/live-wiring pass this.
+
+    `pernode_baseline_out` (Step 7 fix round 2, CC_STEP7_FIX2_PROMPT.md Part 1): optional dict
+    the caller passes in to receive `{"baseline": [2, 18] float32}` — the subject-wide
+    Channel Attribution Panel median/MAD baseline, fit on exactly the same `filenames_sorted`
+    set this function already uses for the z-score/LedoitWolf/robust-z subject-wide stats below
+    (same rule, not special-cased for attribution). Only computed when `pernode_out` is also
+    supplied, since it's derived from that dict's per-file contents. Default `None`, zero effect
+    on existing callers.
     """
     filenames_sorted = sorted(filtered_by_filename.keys())
     if not filenames_sorted:
@@ -291,9 +339,20 @@ def process_subject_phase_b(
             z = model.encoder(pg.x, pg.edge_index, pg.edge_attr)
             graph_z = z.view(B, N_CH, gae_joint.LATENT_DIM).mean(dim=1)
             zrecon_raw = gae_joint.joint_score(model, pg, A_batch, Xn_batch, B, per_node=False)
+            if pernode_out is not None:
+                # Independent second call (not derived from zrecon_raw above) — same inputs,
+                # same deterministic model, so it costs one extra small forward pass and
+                # cannot perturb the scalar path. Part 1 item 4's consistency gate checks the
+                # two agree (pernode.mean(axis=1) == zrecon_raw) rather than assuming it.
+                pernode_raw = gae_joint.joint_score(model, pg, A_batch, Xn_batch, B, per_node=True)
+                pernode_out[f] = pernode_raw.cpu().numpy().astype(np.float32)
 
         zrecon_raw = zrecon_raw.cpu().numpy().astype(np.float64)
         graph_z_np = graph_z.cpu().numpy().astype(np.float64)
+        if zrecon_out is not None:
+            # Exposes the raw scalar recon score (pre-ensemble) purely for the consistency
+            # gate below — never used by any existing caller, never changes `scores`.
+            zrecon_out[f] = zrecon_raw.copy()
 
         zgamma_raw = np.empty(n_windows, dtype=np.float32)
         zscored_f32 = zscored.astype(np.float32)
@@ -305,6 +364,15 @@ def process_subject_phase_b(
 
         per_file_raw[f] = dict(
             zrecon_raw=zrecon_raw, graph_z=graph_z_np, zgamma_raw=zgamma_raw.astype(np.float64)
+        )
+
+    if pernode_baseline_out is not None and pernode_out is not None:
+        # Step 7 fix round 2, Part 1: same subject-wide scope as the z-score/LedoitWolf stats
+        # above, fit on the per-node arrays just collected in the loop (one entry per file in
+        # `filenames_sorted`, guaranteed present since the loop always populates `pernode_out[f]`
+        # when `pernode_out is not None`).
+        pernode_baseline_out["baseline"] = compute_pernode_baseline(
+            [pernode_out[f] for f in filenames_sorted]
         )
 
     # 4. zlatent — LedoitWolf fit on the SUBJECT-wide concatenated graph-level Z (SPEC §1.6a).
@@ -338,7 +406,10 @@ def process_subject_phase_b(
 
 
 def process_subject_phase_b_from_paths(
-    filtered_paths: dict[str, str], device: str = "cpu"
+    filtered_paths: dict[str, str],
+    device: str = "cpu",
+    pernode_out: Optional[dict] = None,
+    pernode_baseline_out: Optional[dict] = None,
 ) -> dict[str, np.ndarray]:
     """Process-pool entry point for Phase B (see upload_manager.py's `_executor`). Takes
     filename -> filtered_path (from PhaseAResult.filtered_path) and loads each array from
@@ -347,7 +418,12 @@ def process_subject_phase_b_from_paths(
     hundred MB of numpy data through it, but a handful of path strings is negligible.
     """
     filtered_by_filename = {fn: np.load(p) for fn, p in filtered_paths.items()}
-    return process_subject_phase_b(filtered_by_filename, device=device)
+    return process_subject_phase_b(
+        filtered_by_filename,
+        device=device,
+        pernode_out=pernode_out,
+        pernode_baseline_out=pernode_baseline_out,
+    )
 
 
 @dataclass

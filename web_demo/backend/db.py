@@ -45,6 +45,18 @@ CREATE TABLE IF NOT EXISTS events (
                               OR review_status IS NULL),
     comment       TEXT NOT NULL DEFAULT ''
 );
+
+-- Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md §2.2): per-channel Accept/Reject,
+-- keyed by CHANNEL NAME (not index) so an edited Human event keeps its channel judgments.
+-- Deleting an event deletes its rows explicitly in delete_event() below — never relies on
+-- the FK pragma alone (SQLite's `PRAGMA foreign_keys` is connection-scoped and the prompt
+-- asks for this to be explicit).
+CREATE TABLE IF NOT EXISTS attribution_status (
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    channel  TEXT NOT NULL,
+    status   TEXT NOT NULL CHECK (status IN ('Accept', 'Reject')),
+    PRIMARY KEY (event_id, channel)
+);
 """
 
 
@@ -292,6 +304,7 @@ def _event_row(row: sqlite3.Row, index: int) -> dict:
     end' is naturally satisfied this way with no renumbering bookkeeping needed later."""
     return {
         "id": row["id"],
+        "file_id": row["file_id"],
         "name": f"Event {index + 1}",
         "source": row["source"],
         "onset_sec": row["onset_sec"],
@@ -305,7 +318,7 @@ def _event_row(row: sqlite3.Row, index: int) -> dict:
 def list_events(file_id: int) -> list[dict]:
     conn = get_connection()
     rows = conn.execute(
-        "SELECT id, source, onset_sec, offset_sec, review_status, comment "
+        "SELECT id, file_id, source, onset_sec, offset_sec, review_status, comment "
         "FROM events WHERE file_id = ? ORDER BY onset_sec ASC, id ASC",
         (file_id,),
     ).fetchall()
@@ -359,6 +372,9 @@ def update_event_times(event_id: int, onset_sec: float, offset_sec: float) -> No
 
 def delete_event(event_id: int) -> None:
     conn = get_connection()
+    # Explicit, not relying on the FK pragma alone (§2.2) — this connection does enable
+    # PRAGMA foreign_keys, but the attribution table's own delete is spelled out regardless.
+    conn.execute("DELETE FROM attribution_status WHERE event_id = ?", (event_id,))
     conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
     conn.commit()
     conn.close()
@@ -380,3 +396,30 @@ def create_event(file_id: int, onset_sec: float, offset_sec: float) -> int:
     event_id = cur.lastrowid
     conn.close()
     return event_id
+
+
+# ── Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md §2.2) ────────────────────────
+
+def get_attribution_status(event_id: int) -> dict[str, str]:
+    """{channel: 'Accept'|'Reject'} for every channel that has been reviewed on this event.
+    A channel absent from the dict is unset (SPEC's default, never a stored third value)."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT channel, status FROM attribution_status WHERE event_id = ?", (event_id,)
+    ).fetchall()
+    conn.close()
+    return {r["channel"]: r["status"] for r in rows}
+
+
+def set_attribution_status(event_id: int, statuses: dict[str, str]) -> None:
+    """Save (§2.2): replaces the stored set with exactly what the panel shows — an empty
+    dict (after Clear all) stores nothing, i.e. clears every prior status for this event.
+    Never called on every keystroke/click; only on the panel's own Save button."""
+    conn = get_connection()
+    conn.execute("DELETE FROM attribution_status WHERE event_id = ?", (event_id,))
+    conn.executemany(
+        "INSERT INTO attribution_status (event_id, channel, status) VALUES (?, ?, ?)",
+        [(event_id, ch, st) for ch, st in statuses.items()],
+    )
+    conn.commit()
+    conn.close()

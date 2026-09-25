@@ -108,3 +108,13 @@ export const createEvent = (fileId, onsetSec, offsetSec) =>
     method: 'POST',
     body: JSON.stringify({ onset_sec: onsetSec, offset_sec: offsetSec }),
   })
+
+// Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md §2.2).
+
+export const getAttribution = (eventId) => request(`/api/events/${eventId}/attribution`)
+
+export const saveAttributionStatus = (eventId, statuses) =>
+  request(`/api/events/${eventId}/attribution-status`, {
+    method: 'PUT',
+    body: JSON.stringify({ statuses }),
+  })

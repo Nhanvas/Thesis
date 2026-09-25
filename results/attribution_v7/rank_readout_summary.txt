@@ -1,0 +1,15 @@
+focal seizures                          62
+median rank of annotated channels       8.2   (chance 9.5)
+median rank of the best-ranked one      2.0
+top-ranked channel is annotated         0.387  (24 of 62; chance 0.253)
+recall at |S|                           0.320  (chance 0.253)
+seizures with >=1 annotated in top 3    0.613
+
+per patient (median rank of annotated channels, top-1 hit rate):
+  chb03  n= 4  median rank 10.0   top-1 0.50
+  chb13  n=11  median rank  6.5   top-1 0.73
+  chb14  n= 8  median rank  7.2   top-1 0.38
+  chb15  n=20  median rank  5.0   top-1 0.45
+  chb16  n=10  median rank 12.5   top-1 0.00
+  chb17  n= 3  median rank  6.5   top-1 0.33
+  chb18  n= 6  median rank 11.5   top-1 0.17

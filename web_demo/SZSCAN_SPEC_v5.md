@@ -262,7 +262,9 @@ EDF reading, gamma-AEC, GAE forward — all much smaller).
 > `9.76 s/hour` serial-CLI figure still quoted in `CLAUDE.md` — explained by genuine upload-transfer
 > overhead plus unbounded per-file Phase A thread concurrency (up to 19 concurrent threads observed on
 > a 4-physical/8-logical-core dev machine). The concurrency finding is recorded as an **open item, not
-> fixed**.
+> fixed** — deliberately deferred, since phase 1b's own measured total time is already comfortable
+> without a fix; revisit (cap concurrent Phase A threads) before the defense if timing margin ever
+> becomes a real concern.
 
 ---
 

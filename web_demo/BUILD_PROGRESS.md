@@ -949,7 +949,9 @@ measurement.
   and unbounded per-file Phase A thread concurrency (`upload_manager.py` spawns one background thread
   per file the instant its bytes land, not waiting for the previous file — up to 19 concurrent threads
   observed on this dev machine's 4-physical/8-logical-core CPU). The concurrency finding is an **open
-  item, not fixed** (§14).
+  item, not fixed** (§14) — deliberately deferred, since the measured total time above is already
+  comfortable without a fix; revisit (cap concurrent Phase A threads) before the defense if timing
+  margin ever becomes a real concern.
 - **Process/PELT alone:** 68.03 s for 19.00 h → **3.58 s/hour** — only **~25%** of Phase A+B's own
   wall-clock for the same subject. Recorded in `SZSCAN_SPEC_v5.md §1.7` as **C23** (this checkpoint):
   PELT is **not** the dominant cost, contradicting §1.7's own prior text.

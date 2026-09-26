@@ -21,6 +21,7 @@ from pydantic import BaseModel
 
 import attribution as attr
 import db
+import export_txt as et
 import upload_manager as um
 import waveform_serving as ws
 
@@ -113,6 +114,32 @@ def delete_subject(subject_id: str, request: Request):
     _require_auth(request)
     db.delete_subject(subject_id)
     return {"ok": True}
+
+
+# ── Export (Step 8, CC_STEP8_PROMPT.md) ─────────────────────────────────────────────────
+
+@app.get("/api/subjects/{subject_id}/export")
+def export_subject(subject_id: str, request: Request):
+    """§6.1: 'Only enabled once every file of the subject is Viewed' -- reuses
+    db._subject_status's existing derivation (db.get_subject(...)['status']) rather
+    than a second server-side check, same rule the Database screen's Status column and
+    the frontend's own enablement gate already use. Enforced here too (not just
+    frontend-disabled) since a client could otherwise call this endpoint directly."""
+    _require_auth(request)
+    subject = db.get_subject(subject_id)
+    if subject is None:
+        raise HTTPException(status_code=404, detail="Subject not found.")
+    if subject["status"] != "Viewed":
+        raise HTTPException(
+            status_code=409,
+            detail="Export is only available once every file of the subject is Viewed.",
+        )
+    text = et.build_subject_export(subject_id, um.UPLOAD_DIR)
+    return Response(
+        content=text,
+        media_type="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{subject_id}-summary.txt"'},
+    )
 
 
 # ── Analysis screen (Step 4, CC_STEP4_PROMPT.md): Panel EEG + toolbar + scrub ───────────

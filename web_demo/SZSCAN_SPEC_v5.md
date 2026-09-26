@@ -253,6 +253,17 @@ EDF reading, gamma-AEC, GAE forward — all much smaller).
   scenario should pick the subject with **the fewest files**; the exact number is measured when building
   the cache.
 
+> **PELT-cost correction (C23, 2026-09-26):** measured on `chb16` (19 real files, 19.0 h, via the real
+> Create-New→Process flow, `CC_STEP9_PHASE1B_REPORT.md`): PELT alone = **3.58 s/hour of EEG**, only
+> **~25%** of Phase A+B's own wall-clock (**14.29 s/hour**, real upload flow) for the same subject —
+> PELT is **not** the dominant cost; the bullet above was written against the older, component-level
+> cost figures at the top of this section, not a real end-to-end measurement. Real Phase A+B
+> wall-clock (14.29 s/hour, real HTTP upload flow) also runs **~46% higher** than the old
+> `9.76 s/hour` serial-CLI figure still quoted in `CLAUDE.md` — explained by genuine upload-transfer
+> overhead plus unbounded per-file Phase A thread concurrency (up to 19 concurrent threads observed on
+> a 4-physical/8-logical-core dev machine). The concurrency finding is recorded as an **open item, not
+> fixed**.
+
 ---
 
 ## 2 · DATA SCOPE
@@ -651,7 +662,10 @@ file).
 - **In the export file:** the line `Number of Seizures in File: N` is kept exactly per the original
   CHB-MIT convention (for machine cross-referencing), but sub-entries are still numbered `Event 1`,
   `Event 2`… matching exactly the numbering the clinician already saw on the UI. Both naming schemes
-  coexisting is **deliberate**, not a bug.
+  coexisting is **deliberate**, not a bug. (**C22, 2026-09-25:** `N` = the count of every `Event` block
+  listed below that file — AI (including Rejected) + Human, combined — confirmed by the author as the
+  settled reading, not a placeholder; was an open judgment call in `CC_STEP8_REPORT.md §3`, closed in
+  `CC_STEP8_FIX_REPORT.md §5`.)
 
 ### 7.3 Structure
 

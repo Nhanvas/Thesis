@@ -398,6 +398,23 @@ def create_event(file_id: int, onset_sec: float, offset_sec: float) -> int:
     return event_id
 
 
+# ── Export (Step 8, CC_STEP8_PROMPT.md) ─────────────────────────────────────────────────
+
+def list_files_by_filename(subject_id: str) -> list[dict]:
+    """File order for the .txt export (SZSCAN_SPEC_v5.md §7.1): file-NAME order, the
+    original CHB-MIT convention -- deliberately NOT `_subject_dict`'s meas_date/
+    start_time order (C17), which only drives the UI's 'Recording N' display and
+    Previous/Next."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, subject_id, filename, start_time, duration_seconds, status "
+        "FROM files WHERE subject_id = ? ORDER BY filename",
+        (subject_id,),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 # ── Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md §2.2) ────────────────────────
 
 def get_attribution_status(event_id: int) -> dict[str, str]:

@@ -17,6 +17,7 @@ import {
   createEvent,
   markFileViewed,
   markFileViewing,
+  exportSubjectTxt,
 } from '../api.js'
 
 // Analysis screen — Panel EEG + toolbar + scrub (Step 4) plus, as of Step 5
@@ -494,9 +495,13 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
   }
 
   const exportEnabled = Boolean(subject && subject.files.length > 0 && subject.files.every((f) => f.status === 'Viewed'))
-  function handleExportClick() {
+  async function handleExportClick() {
     if (!exportEnabled) return
-    showBanner("Export isn't implemented yet (Step 8).")
+    try {
+      await exportSubjectTxt(subjectId)
+    } catch (err) {
+      showBanner(err.message)
+    }
   }
 
   if (!fileMeta || !subject) {
@@ -550,7 +555,9 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
           type="button"
           onClick={handleExportClick}
           disabled={!exportEnabled}
-          className="bg-white/70 text-text-muted rounded-control px-3 py-1.5 text-xs font-medium disabled:opacity-50 shrink-0"
+          className={`rounded-control px-3 py-1.5 text-xs font-medium shrink-0 ${
+            exportEnabled ? 'bg-white text-text' : 'bg-white/70 text-text-muted opacity-50'
+          }`}
         >
           &#8681; Export
         </button>

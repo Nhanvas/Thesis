@@ -23,17 +23,20 @@ still the real spec. This is just "what happened and what exists," for continuit
 | 6 — Select Range: manual event creation | **DONE** | initial build + **2** UI fix rounds (all visual, requested by Boti after live use) — see §9 below |
 | 7 — Channel Attribution Panel | **DONE** | initial build + **2** fix rounds; round 2 changed the attribution *definition* itself, decided by Project #1 (thesis authority) — see §10 below, **read it before starting Step 8**. Committed: `cf5ee88` |
 | 8 — Export `.txt` | **DONE** | initial build + **2** fix rounds (round 2: Export-button styling + a score-format false alarm traced to a stale server) — see §11 below |
-| 9 — cache 8 subjects + pick live-upload subject | **IN PROGRESS** — phase 1 & 1b done; phase 2 (`chb03`/`chb06`/`chb14`/`chb15`/`chb17`/`chb18` still need a real upload+process) not started | see §15 below |
+| 9 — cache 8 subjects + pick live-upload subject | **DONE** | phase 1 (inventory/cleanup), phase 1b (real `chb16` timing, C23) and phase 2 (the other 6 real subjects uploaded + processed; a real memory bug found and fixed on `chb06`) all closed — see §15 below |
 
-**Where to resume:** Step 9 phase 2 — upload + process the 6 remaining real subjects
-(`chb03`/`chb06`/`chb14`/`chb15`/`chb17`/`chb18`) through the real Create-New→Process flow. Before
-drafting that prompt: `chb16`'s upload session is sitting `done: true`, unacknowledged — someone
-needs to open the app and click through the "Processing complete" panel first (one-subject-in-flight
-rule), and §14 below has two open decisions (file-count-per-subject scope; the `DELETE` endpoint's
-on-disk cleanup) that are Boti's call, not something to assume an answer to. Also still read §10.4
-below (one open item from Step 7 not yet resolved) and `STEP8_9_PREDEFENSE_CHECKLIST.md` (uploaded
-alongside this file — report needs + the fixed Tier 2 rules for Step 9, agreed with Project #1
-2026-09-25). Don't assume anything on that checklist is already done just because it's listed there.
+**Where to resume:** Step 9 was the last numbered build step (`DEMO_BUILD_HANDOFF.md §6` row 9) — all
+8 allowlisted subjects (`chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18`) are now real, fully
+processed, cached subjects in the DB, confirmed via `GET /api/subjects` (§15.3). What's left is not a
+new build step: **O4** (which subject to actually use for the live-upload defense scenario — real
+per-subject timing numbers now exist, §15.3/`CC_STEP9_PHASE2_REPORT.md §6.3`, but the pick itself is
+still Boti's call), the `DELETE /api/subjects/{id}` endpoint's on-disk cleanup (§14, deliberately
+deferred to a final cleanup pass), and Phase A's upload-thread concurrency (§14/§15.3 — still open,
+now with `chb06` evidence that it can cause real memory pressure, not just slower timing). Also still
+read §10.4 below (one open item from Step 7 not yet resolved) and `STEP8_9_PREDEFENSE_CHECKLIST.md`
+(uploaded alongside this file — report needs + the fixed Tier 2 rules for Step 9, agreed with
+Project #1 2026-09-25). Don't assume anything on that checklist is already done just because it's
+listed there.
 
 **One open item carried out of Step 7, not yet resolved:** an unexplained Human event (id 86,
 `chb13_03.edf`) appeared in the DB between fix round 1 and fix round 2; neither round created it,
@@ -90,6 +93,26 @@ web_demo/
 │                                  file order, guard comment, C22
 ├── CC_STEP8_FIX2_PROMPT.md / _FIX2_REPORT.md          **new** Step 8 fix round 2 — Export button
 │                                  styling, score-format false alarm (stale server), this file
+├── CC_STEP9_PROMPT.md / _PHASE1_REPORT.md             **new** Step 9 phase 1 — 8-subject inventory +
+│                                  synthetic-data cleanup (deleted synthetic `chb14`/`chb15`/`chb16`;
+│                                  `chb03`/`chb06` found as orphaned real partial uploads)
+├── CC_STEP9_PHASE1B_PROMPT.md / _PHASE1B_REPORT.md    **new** Step 9 phase 1b — real PELT/Phase A+B
+│                                  timing measured on `chb16` via the real HTTP upload flow (C23)
+├── CC_STEP9_CHECKPOINT_PROMPT.md / _CHECKPOINT_REPORT.md   **new** Step 9 checkpoint — recorded
+│                                  phase 1/1b in the docs before phase 2; no pipeline/DB state touched
+├── CC_STEP9_CHECKPOINT_FIX_PROMPT.md / _CHECKPOINT_FIX_REPORT.md   **new** Step 9 checkpoint fix —
+│                                  concurrency-finding wording; confirmed `chb16`'s session lock had
+│                                  already cleared on its own (backend restart)
+├── CC_STEP9_PHASE2_PROMPT.md / _PHASE2_REPORT.md      **new** Step 9 phase 2 — uploaded + processed
+│                                  the other 6 real subjects (`chb03`/`chb06`/`chb14`/`chb15`/`chb17`/
+│                                  `chb18`); found and fixed a real `chb06` OOM bug in
+│                                  `pipeline_demo.py` (see §15.3)
+├── CC_STEP9_PHASE2_RESUME_PROMPT.md                   **new** — resumed phase 2 twice after
+│                                  conversation interruptions; no data lost (server-side session
+│                                  state survives independently of the driver script) — see §15.3
+├── CC_STEP9_PHASE2_PROGRESS.md                        **new** — per-subject checkpoint log,
+│                                  appended after each subject finished so an interruption never had
+│                                  to re-derive already-completed numbers
 ├── backend/
 │   ├── .env                     real dev credentials, gitignored (see §5.1)
 │   ├── .env.example
@@ -884,24 +907,36 @@ list, not repeated here in full):**
       persists (`attribution_status` table + the attribution endpoint) — now using the **closed**
       p95-|robust-z| definition, not the round-1 PROVISIONAL one.
 
-**New from Step 9 phase 1/1b, decisions needed before phase 2 (both Boti's call, see §15):**
+**Still open after Step 9 (phase 2 done — see §15.3), Boti's call on each:**
 
-- [ ] **File-count-per-subject scope** for the 6 remaining subjects (`chb03`/`chb06`/`chb14`/`chb15`/
-      `chb17`/`chb18`) — full real file set (246.39 h combined) vs. a representative subset, per the
-      `chb13` precedent (2 of its 33 real files were used, not the full subject).
+- [ ] **O4 — which subject to use for the live-upload defense scenario.** File-count-per-subject scope
+      is now moot (decided 2026-09-26: full real file set for all 8 subjects, done — see §15.3); real
+      per-subject Phase A+B/PELT timing numbers for all 8 subjects now exist
+      (`CC_STEP9_PHASE2_REPORT.md §6.3`) so the pick itself can be made, but this report doesn't make
+      it — that stays Boti's decision.
 - [ ] `DELETE /api/subjects/{id}` doesn't clean up `uploads/{subject_id}/` on disk (only the DB rows) —
       confirmed by reading `main.py` directly. Deliberately deferred to a final cleanup pass before the
       demo is considered complete, per Boti's own decision — **not** an active bug needing a fix now.
+- [ ] **Phase A's unbounded upload-thread concurrency** (`upload_manager.py` spawns one background
+      thread per file the instant its upload completes, no cap) — deliberately deferred since Step 9
+      phase 1b first found it (C23/§15.2), but `chb06`'s phase 2 run added real evidence it isn't just
+      a timing curiosity: the driver process was OOM-killed three times during `chb06`'s own uploads,
+      before a separate (now-fixed, see §15.3) Phase B memory bug even ran. Still not fixed — worth
+      capping before the defense if an even larger subject or a more memory-constrained machine is
+      ever involved.
 
 ---
 
-## 15 · Step 9 — detail (phase 1 + phase 1b; phase 2 not started)
+## 15 · Step 9 — detail (phase 1, phase 1b, phase 2 — all done)
 
-**Scope so far:** Step 9 is **cache 8 subjects + pick live-upload subject** per
-`DEMO_BUILD_HANDOFF.md §6` row 9. Only the first two of its three planned phases have run. **Reports:**
+**Scope:** Step 9 is **cache 8 subjects + pick live-upload subject** per `DEMO_BUILD_HANDOFF.md §6`
+row 9 — the last numbered build step. All three planned phases have now run. **Reports:**
 `CC_STEP9_PROMPT.md`/`CC_STEP9_PHASE1_REPORT.md` (phase 1), `CC_STEP9_PHASE1B_PROMPT.md`/
-`CC_STEP9_PHASE1B_REPORT.md` (phase 1b), `CC_STEP9_CHECKPOINT_PROMPT.md` (this section's own source).
-Guards 4/4 green throughout both phases. No `git add`/`commit`/`push` run in either.
+`CC_STEP9_PHASE1B_REPORT.md` (phase 1b), `CC_STEP9_CHECKPOINT_PROMPT.md`/`_CHECKPOINT_REPORT.md` +
+`CC_STEP9_CHECKPOINT_FIX_PROMPT.md`/`_CHECKPOINT_FIX_REPORT.md` (the doc checkpoint between phases),
+`CC_STEP9_PHASE2_PROMPT.md`/`_PHASE2_REPORT.md` + `CC_STEP9_PHASE2_RESUME_PROMPT.md` +
+`CC_STEP9_PHASE2_PROGRESS.md` (phase 2). Guards 4/4 green throughout every phase. No
+`git add`/`commit`/`push` run in any of them.
 
 ### 15.1 Phase 1 — 8-subject inventory + synthetic-data cleanup
 
@@ -970,9 +1005,73 @@ measurement.
   a manual UI action for Boti, not something for a future prompt to script around, and does not affect
   `chb16`'s own already-committed DB row.
 
-### 15.3 Not yet done — phase 2
+### 15.3 Step 9 phase 2 — detail (uploaded + processed the other 6 real subjects)
 
-Uploading and processing the other 6 real subjects (`chb03`, `chb06`, `chb14`, `chb15`, `chb17`,
-`chb18`) has **not started**. Blocked on: (a) `chb16`'s unacknowledged upload session being dismissed
-in the app first, (b) Boti's decision on file-count-per-subject scope (§14). No pipeline, upload, or
-DB state was touched writing this section — documentation only.
+**Scope:** upload + process `chb17`, `chb14`, `chb18`, `chb03`, `chb15`, `chb06` (ascending by real
+duration, cheapest first) through the real Create-New→Process flow, full real file set for every
+subject (decided 2026-09-26, no representative subset). Driven entirely via the real HTTP flow
+(replaying `web_demo/frontend/src/api.js`'s own request shapes), same method as phase 1b used for
+`chb16` — never `claude-in-chrome` (its `file_upload` tool caps combined attachments at 10 MB, far
+below any of these subjects' real EDF sizes). Reports: `CC_STEP9_PHASE2_PROMPT.md`/`_PHASE2_REPORT.md`,
+`CC_STEP9_PHASE2_RESUME_PROMPT.md` (used twice, after two conversation interruptions),
+`CC_STEP9_PHASE2_PROGRESS.md` (the per-subject checkpoint log this phase append-only wrote after each
+subject finished). Guards 4/4 green after every one of the 6 subjects, not just at the end.
+
+**Per-subject results** (full table with all 8 subjects, plus O4's real timing numbers:
+`CC_STEP9_PHASE2_REPORT.md §6.3`):
+
+| Subject | Files | Hours (real) | Phase A+B (s) | rate (s/h) | Process/PELT (s) | rate (s/h) | `pen_mult` |
+|---|---|---|---|---|---|---|---|
+| `chb17` | 21 | 21.007 | 572.84 | 27.27 | 166.82 | 7.94 | 2.0 |
+| `chb14` | 26 | 26.000 | 607.01 | 23.35 | 171.87 | 6.61 | 5.0 |
+| `chb18` | 36 | 35.635 | 813.95 | 22.84 | 389.86 | 10.94 | 2.0 |
+| `chb03` | 38 | 38.002 | 462.70 | 12.18 | 138.79 | 3.65 | 2.0 |
+| `chb15` | 40 | 40.010 | 562.69 | 14.06 | 127.65 | 3.19 | 5.0 |
+| `chb06` | 18 | 66.735 | 726.05 | 10.88 | 293.48 | 4.40 | 2.0 |
+
+Rate variance across these 6 (11–27 s/h Phase A+B, 3.2–11 s/h PELT) did **not** cleanly reproduce
+`chb16`'s own phase-1b rate — consistent with `CLAUDE.md`'s already-documented "~5× run-to-run
+variance... dev-machine background load" caveat, not a new concern.
+
+**Three conversation interruptions, all resumed cleanly, no data lost:** server-side upload-session
+state lives in the FastAPI backend process itself, not in this session's own driver script, so an
+interrupted driver process never lost any real upload/pipeline progress — only its own polling died.
+`chb17` (interrupted at 15/21 uploaded, found live at 21/21 on resume — uploads continued
+server-side the whole time), `chb18` (interrupted after Process had already been clicked), and `chb03`
+(interrupted post-upload, plus a client-side `ReadTimeout` under heavy Phase A CPU contention, and one
+drafting mistake — a guessed, not log-derived, recovered timestamp — caught and corrected before
+finalizing) all resumed by detecting the live session and continuing from wherever it actually was,
+recovering genuine timestamps from each interrupted run's own poller log rather than using resume-time
+placeholders. Full detail: `CC_STEP9_PHASE2_REPORT.md §4`.
+
+**`chb06` hit a real pipeline bug, found and fixed — not a `chb06`-only patch:** after uploading
+cleanly (though OOM-killing the driver process 3 times along the way — see below), Phase B crashed
+with `numpy._core._exceptions._ArrayMemoryError: Unable to allocate 6.88 GiB for an array with shape
+(50121, 18, 1024)`. Root cause: `pipeline_demo.py`'s `process_subject_phase_b()` built one whole-subject
+float64 array just to compute per-channel mean/std — peak memory scaled with the subject's **total**
+duration, and `chb06` (66.74 h across only 18 files — the most hours-per-file of any allowlisted
+subject) was the first to actually exceed available RAM. **Fixed** (not read-only thesis code — see
+`CLAUDE.md`'s "Reusing thesis code": `pipeline_demo.py` is explicitly where new demo logic lives):
+rewrote the computation to run one file at a time, never materializing a whole-subject array. Verified
+**bit-identical** to the old single-shot computation by construction — `arr.sum(axis=(0,2))` decomposes
+exactly into `arr.sum(axis=2).sum(axis=0)` (confirmed empirically, at a synthetic multi-file scale of
+18 files / 4790 total windows — **not** at `chb06`'s real 50,121-window scale, since reproducing the
+old code's array at that scale is exactly the allocation that crashes on this machine; the underlying
+math argument is scale-independent regardless). Guards stayed 4/4 after the fix; `chb06`'s errored
+session and its 9.9 GB stale draft cache were discarded, then it was retried **completely from
+scratch with its full 18-file set** (no shortcut) and completed cleanly — no error, no OOM, DB row
+confirmed. The 5 subjects processed before this fix (`chb17`/`chb14`/`chb18`/`chb03`/`chb15`) do
+**not** need reprocessing: they were fully cached under the old code, and since the fix is bit-identical
+by construction, the old code's cached output for them is exactly what the new code would also have
+produced. Full detail, including the axis-decomposition proof: `CC_STEP9_PHASE2_REPORT.md §5`.
+
+**Flagged, not silently absorbed into the same fix:** the driver process being OOM-killed three times
+during `chb06`'s own uploads (before Phase B's separate, now-fixed bug even ran) is very likely
+connected to Phase A's already-known, still-deferred unbounded upload-thread concurrency (§15.2/§14) —
+`chb06`'s 18 files are individually much larger than any other subject's, so many large files' Phase A
+threads running concurrently is a plausible, compounding contributor to the same memory pressure. This
+was **not** fixed as a side effect of the Phase B fix, per the original phase 2 prompt's own explicit
+instruction not to. Both are recorded in §14 as two separate, only-partially-resolved memory findings.
+
+**Completion, confirmed live:** `GET /api/subjects` lists exactly the full 8-subject TEST allowlist —
+`chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18` — no more, no fewer, no synthetic subject.

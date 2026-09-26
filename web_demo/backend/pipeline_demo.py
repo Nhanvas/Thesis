@@ -298,13 +298,49 @@ def process_subject_phase_b(
         return {}
 
     # 1-2. Subject-wide z-score stats, fit on every currently-uploaded file's windows.
-    all_filtered = np.concatenate(
-        [filtered_by_filename[f] for f in filenames_sorted], axis=0
-    ).astype(np.float64)
-    ch_mean = all_filtered.mean(axis=(0, 2))
-    ch_std = all_filtered.std(axis=(0, 2))
+    #
+    # Computed one file at a time -- never materializing a whole-subject float64 array --
+    # so peak memory here scales with the LARGEST single file, not the subject's total
+    # duration. The old single-shot `np.concatenate(...).astype(np.float64)` needs one
+    # array of shape (n_windows_total, 18, 1024) float64 all at once: for chb06 (66.7 h
+    # across only 18 files, the most hours-per-file of any allowlisted subject) that is
+    # ~6.9 GiB, which crashed with `numpy._core._exceptions._ArrayMemoryError` on this
+    # machine during CC_STEP9_PHASE2 (see CC_STEP9_PHASE2_REPORT.md) even though every
+    # individual file's own array is easily manageable.
+    #
+    # Bit-identical to the old single-shot computation by construction, not an
+    # approximation: `.mean(axis=(0, 2))`/`.std(axis=(0, 2))` reduce axis 2 (the
+    # 1024-sample axis) before axis 0 internally -- confirmed empirically
+    # (`arr.sum(axis=(0, 2)) == arr.sum(axis=2).sum(axis=0)` exactly, at realistic
+    # scales). Axis-2 reduction is independent per window, so doing it one file at a
+    # time and concatenating the (now tiny, since the 1024-sample axis is already gone)
+    # per-file results gives the exact same intermediate the old code produced in one
+    # shot; the final axis-0 sum over that intermediate is still a single ordinary numpy
+    # call, so summation order never changes anywhere. Same identity used for the
+    # variance pass below (numpy's `.std()` is `sqrt(mean((x - mean) ** 2))`, verified
+    # bit-identical against `.std(axis=(0, 2))` the same way).
+    n_windows_total = 0
+    per_file_axis2_sum = []
+    for f in filenames_sorted:
+        f64 = filtered_by_filename[f].astype(np.float64)
+        per_file_axis2_sum.append(f64.sum(axis=2))
+        n_windows_total += f64.shape[0]
+        del f64
+    window_len = filtered_by_filename[filenames_sorted[0]].shape[2]
+    count = n_windows_total * window_len
+    ch_mean = np.concatenate(per_file_axis2_sum, axis=0).sum(axis=0) / count
+    del per_file_axis2_sum
+
+    per_file_sqdev_axis2_sum = []
+    for f in filenames_sorted:
+        f64 = filtered_by_filename[f].astype(np.float64)
+        dev = f64 - ch_mean[None, :, None]
+        per_file_sqdev_axis2_sum.append((dev * dev).sum(axis=2))
+        del f64, dev
+    ch_var = np.concatenate(per_file_sqdev_axis2_sum, axis=0).sum(axis=0) / count
+    del per_file_sqdev_axis2_sum
+    ch_std = np.sqrt(ch_var)
     ch_std = np.where(ch_std > 0, ch_std, 1.0)
-    del all_filtered
 
     _verify_checkpoint(CHECKPOINT_PATH)
     model = gae_joint.load_checkpoint(CHECKPOINT_PATH, device)

@@ -24,7 +24,14 @@ export default function EegPanel({
   channels,
   waveform, // {start_sec, end_sec, n_buckets, raw_uv, filtered_uv} | null
   amplitudeUv,
-  anyFilterOn,
+  // 'raw' (toggle off — no overlay) or 'preprocessed' (toggle on — waveform.filtered_uv,
+  // i.e. bandpass+notch combined, overlaid). CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md: the
+  // bandpass-only intermediate used to get its own toggle state, but measured bandpass-vs-
+  // bandpass+notch difference was only ~2.91 uV (vs ~127.92 uV raw-vs-preprocessed) — visually
+  // negligible at every amplitude scale the toolbar offers, and no real downstream consumer
+  // (z-score/adjacency/GAE) ever uses that intermediate on its own. Collapsed back to the 2
+  // states a viewer actually cares about.
+  filterMode,
   playheadSec, // absolute seconds within the file, or null
   fileMeta, // {start_time, usable_duration_seconds} — for the §6.2 time axis
   onGridClick, // (absoluteSec) => void — a plain seek, or the next Select Range click,
@@ -104,6 +111,8 @@ export default function EegPanel({
     if (waveform && waveform.n_buckets > 0) {
       const nBuckets = waveform.n_buckets
       const pxPerBucket = cssWidth / nBuckets
+      const anyFilterOn = filterMode === 'preprocessed'
+      const overlayUv = waveform.filtered_uv
 
       const drawSeries = (seriesUv, chIdx, bandTop, bandMid, pxPerUv, color, alpha) => {
         ctx.strokeStyle = color
@@ -149,12 +158,12 @@ export default function EegPanel({
         // a filtered trace is also shown on top.
         drawSeries(waveform.raw_uv, chIdx, bandTop, bandMid, pxPerUv, tokens.colorEegRaw, anyFilterOn ? 0.5 : 1)
         if (anyFilterOn) {
-          drawSeries(waveform.filtered_uv, chIdx, bandTop, bandMid, pxPerUv, tokens.colorEegFiltered, 1)
+          drawSeries(overlayUv, chIdx, bandTop, bandMid, pxPerUv, tokens.colorEegFiltered, 1)
         }
         ctx.restore()
       })
     }
-  }, [channels, waveform, amplitudeUv, anyFilterOn])
+  }, [channels, waveform, amplitudeUv, filterMode])
 
   // Playhead + (Step 6) Select Range onset marker overlay — cheap enough to redraw every
   // animation frame during playback. The onset marker reuses the exact playhead visual

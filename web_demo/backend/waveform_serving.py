@@ -3,10 +3,17 @@
 Serves decimated min/max envelopes of the currently-viewed time window from Phase A's
 per-file cache (`{stem}.raw.npy` / `{stem}.filtered.npy`, both [n_windows, 18, WIN_SAMPLES]
 float32, in Volts — see pipeline_demo.process_file_phase_a). Never sends a raw/lightly-
-sampled array to the browser (18 ch x 256 Hz x 1 h ~= 16.6M points/file — DEMO_BUILD_HANDOFF.md
-§5). Both raw and filtered are always decimated and returned together in one response so a
-filter-toggle click never needs a second round trip — the frontend already holds both once a
-window is fetched and switches which is drawn prominent purely client-side (SPEC §6.4).
+sampled array to the browser (18 ch x 256 Hz x 1 h ~= 16.6M points/file —
+DEMO_BUILD_HANDOFF.md §5). Raw and preprocessed (bandpass+notch) are always decimated and
+returned together in one response so the filter toggle never needs a second round trip —
+the frontend already holds both once a window is fetched and switches which is drawn
+prominent purely client-side (SPEC §6.4, single-toggle design —
+CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md).
+
+`process_file_phase_a` also caches a `{stem}.bandpass.npy` (bandpass-only, pre-notch)
+intermediate — CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md dropped its own toolbar toggle (no real
+downstream consumer, visually negligible vs. the fully preprocessed signal) but left that
+cache file in place as harmless sunk cost; this endpoint simply no longer reads it.
 
 Reuses pipeline_demo's already-configured `preprocessing` import (same sys.path wiring to
 src/dataprep) rather than re-importing it separately.
@@ -22,10 +29,14 @@ WIN_SAMPLES = pd.preprocessing.WIN_SAMPLES     # 1024 (4 s windows)
 CHANNELS = pd.preprocessing.COMMON_CHANNELS    # 18 fixed channel names, pipeline order
 
 
-def _cache_paths(subject_id: str, filename: str, upload_dir: Path) -> tuple[Path, Path]:
+def _cache_paths(subject_id: str, filename: str, upload_dir: Path) -> tuple[Path, Path, Path]:
     stem = Path(filename).stem
     base = Path(upload_dir) / subject_id
-    return base / f"{stem}.raw.npy", base / f"{stem}.filtered.npy"
+    return (
+        base / f"{stem}.raw.npy",
+        base / f"{stem}.filtered.npy",
+        base / f"{stem}.bandpass.npy",
+    )
 
 
 def _score_path(subject_id: str, filename: str, upload_dir: Path) -> Path:
@@ -92,10 +103,10 @@ def get_waveform(
     end_sec: float,
     width_px: int,
 ) -> dict:
-    """Single endpoint backing Panel EEG (SPEC §6.4): one call returns both raw and
-    filtered decimated envelopes for [start_sec, end_sec), clamped to the file's usable
-    duration. Values are in µV (the toolbar's `[X] uV` amplitude control's unit)."""
-    raw_path, filtered_path = _cache_paths(subject_id, filename, upload_dir)
+    """Single endpoint backing Panel EEG (SPEC §6.4): one call returns raw and preprocessed
+    (bandpass+notch) decimated envelopes for [start_sec, end_sec), clamped to the file's
+    usable duration. Values are in µV (the toolbar's `[X] uV` amplitude control's unit)."""
+    raw_path, filtered_path, _ = _cache_paths(subject_id, filename, upload_dir)
     duration = usable_duration_seconds(raw_path)
     start_sec = max(0.0, min(start_sec, duration))
     end_sec = max(start_sec, min(end_sec, duration))

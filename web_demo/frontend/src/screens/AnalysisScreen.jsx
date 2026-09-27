@@ -80,15 +80,15 @@ function windowLabel(seconds) {
   return found ? found.label : `${Math.round(seconds / 60)} min`
 }
 
-// Filter toggle pill (SPEC §6.4's lff/hff/60 trio). The three buttons visually toggle
-// independently (matches UI/B1a) but all gate the SAME real filtered series — see the
-// report's "filter toggle semantics" note: pipeline_demo's bandpass+notch is one combined,
-// non-separable filter (preprocessing.py Step 1+2), so there is no real "highpass-only" or
-// "lowpass-only" signal to show. Filtered is prominent whenever at least one is on.
-// UI/B1a shows this as a small violet badge holding the abbreviated label ("lff"/"hff"/
-// "60"), with a corner dot marking on/off (green/gray) and the value ("0.5 Hz") as plain
-// body text beside it — not a pill outline wrapping the whole control (see
-// CC_STEP4_FIX_PROMPT.md item 3).
+// Filter toggle pill (SPEC §6.4, collapsed to ONE real toggle — see
+// CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md, superseding CC_FIX_FILTERSTAGES_REPORT.md's 2-button
+// design): pipeline_demo.process_file_phase_a runs bandpass then notch, always both, always in
+// that order — no real consumer downstream (z-score/adjacency/GAE) ever uses the bandpass-only
+// intermediate on its own, and the measured bandpass-vs-bandpass+notch difference (~2.91 uV) is
+// visually negligible next to raw-vs-preprocessed (~127.92 uV) at every amplitude scale the
+// toolbar offers. One badge, one on/off state. UI/B1a's small violet badge + corner on/off dot
+// (green/gray) + plain body-text label beside it (not a pill outline wrapping the whole
+// control — CC_STEP4_FIX_PROMPT.md item 3) is otherwise unchanged.
 function FilterToggle({ active, onClick, badge, label }) {
   return (
     <button type="button" onClick={onClick} className="flex items-center gap-1.5 font-mono text-xs">
@@ -116,15 +116,20 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
   const [windowSec, setWindowSec] = useState(DEFAULT_WINDOW_SEC)
   const [windowStartSec, setWindowStartSec] = useState(0)
   const [amplitudeUv, setAmplitudeUv] = useState(DEFAULT_AMPLITUDE_UV)
-  // CC_STEP5_FIX4_PROMPT.md item 2: default must be genuinely raw. All three OFF on a fresh
-  // load — SPEC §6.4 ("when on, the filtered wave is highlighted, raw recedes") and DESIGN
-  // §3's raw/filtered tokens both describe an on/off toggle from a raw baseline, not three
-  // filters defaulting to already-applied. A prior default of all-true meant the very first
-  // thing shown was already-filtered data drawn prominent (EegPanel's `anyFilterOn` gate),
-  // with raw merely the dimmed background — the opposite of CLAUDE.md's "everything shown
-  // must be data that genuinely went into the computation" as the *default*, unannounced
-  // view.
-  const [filters, setFilters] = useState({ lff: false, hff: false, notch: false })
+  // CC_STEP5_FIX4_PROMPT.md item 2: default must be genuinely raw. OFF on a fresh load —
+  // SPEC §6.4 ("when on, the filtered wave is highlighted, raw recedes") and DESIGN §3's
+  // raw/filtered tokens both describe an on/off toggle from a raw baseline, not a filter
+  // defaulting to already-applied. A prior default of true meant the very first thing shown
+  // was already-filtered data drawn prominent (EegPanel's filter-overlay gate), with raw
+  // merely the dimmed background — the opposite of CLAUDE.md's "everything shown must be
+  // data that genuinely went into the computation" as the *default*, unannounced view.
+  //
+  // One real toggle (CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md): ON overlays the fully
+  // preprocessed (bandpass+notch) series on top of raw. The bandpass-only intermediate
+  // (CC_FIX_FILTERSTAGES_REPORT.md's short-lived 2-button design) had no real downstream
+  // consumer and a visually negligible difference from the full preprocessed signal, so it
+  // no longer gets its own toggle.
+  const [preprocessedOn, setPreprocessedOn] = useState(false)
   const [speed, setSpeed] = useState(1)
   const [playing, setPlaying] = useState(false)
   const [playheadSec, setPlayheadSec] = useState(null)
@@ -158,7 +163,8 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
     fileMetaRef.current = fileMeta
   }, [fileMeta])
 
-  const anyFilterOn = filters.lff || filters.hff || filters.notch
+  // 'raw' | 'preprocessed' — see EegPanel's `filterMode` prop doc.
+  const filterMode = preprocessedOn ? 'preprocessed' : 'raw'
   const waveformReqId = useRef(0)
 
   function showBanner(text, ms = 4000) {
@@ -418,8 +424,8 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
     }
   }, [playing, speed, waveform])
 
-  function toggleFilter(key) {
-    setFilters((f) => ({ ...f, [key]: !f[key] }))
+  function toggleFilter() {
+    setPreprocessedOn((v) => !v)
   }
 
   function handleSelectWindow(seconds) {
@@ -701,9 +707,12 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
             </button>
 
             <div className="flex items-center gap-2 ml-auto">
-              <FilterToggle active={filters.lff} onClick={() => toggleFilter('lff')} badge="lff" label="0.5 Hz" />
-              <FilterToggle active={filters.hff} onClick={() => toggleFilter('hff')} badge="hff" label="60 Hz" />
-              <FilterToggle active={filters.notch} onClick={() => toggleFilter('notch')} badge="60" />
+              <FilterToggle
+                active={preprocessedOn}
+                onClick={toggleFilter}
+                badge="pp"
+                label="Preprocessed (0.5-60 Hz + 60 Hz notch)"
+              />
             </div>
           </div>
 
@@ -712,7 +721,7 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
               channels={fileMeta.channels}
               waveform={waveform}
               amplitudeUv={amplitudeUv}
-              anyFilterOn={anyFilterOn}
+              filterMode={filterMode}
               playheadSec={playheadSec}
               fileMeta={fileMeta}
               onGridClick={handleGridClick}

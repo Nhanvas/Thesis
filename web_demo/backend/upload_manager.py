@@ -20,6 +20,7 @@ import sys
 import tempfile
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -31,6 +32,19 @@ import pipeline_demo as pd
 
 UPLOAD_DIR = Path(__file__).resolve().parent / "uploads"
 _WORKER_SCRIPT = Path(__file__).resolve().parent / "pipeline_worker.py"
+
+# Phase A used to get one threading.Thread per file the instant its upload completed, with
+# no cap -- fine for a couple of files, but a real 18-file/66h subject spawned 18 of them at
+# once and OOM-killed the process (each Phase A thread holds a full mne Raw load + scipy
+# filtering pass in memory). Bounding it to a small fixed pool caps peak memory to that many
+# files' worth regardless of how many are queued or how fast they upload. 4 is a compromise
+# between throughput and headroom on this CPU-only dev machine (CLAUDE.md) -- low enough that
+# 4 concurrent Raw loads comfortably fit without re-creating the OOM, high enough that a
+# typical multi-file subject still pipelines rather than serializing to 1-at-a-time.
+_PHASE_A_MAX_CONCURRENCY = 4
+_phase_a_executor = ThreadPoolExecutor(
+    max_workers=_PHASE_A_MAX_CONCURRENCY, thread_name_prefix="phase_a"
+)
 
 # Phase B and stage-2 Process run in a genuinely separate OS process (subprocess.Popen
 # launching pipeline_worker.py), not a thread of the API server and not a
@@ -177,7 +191,7 @@ def add_file(session: UploadSession, filename: str, tmp_path: Path) -> None:
         session.phase_b_done = False
         session.generation += 1
 
-    threading.Thread(target=_run_phase_a, args=(session, entry), daemon=True).start()
+    _phase_a_executor.submit(_run_phase_a, session, entry)
 
 
 def _run_phase_a(session: UploadSession, entry: FileEntry) -> None:

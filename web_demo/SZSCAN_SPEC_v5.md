@@ -475,7 +475,7 @@ illustrative example for the ≥ 24 h case; `UI/B0b` illustrates the < 24 h case
 | `⊲▷ [X] hr` | The length of the window shown on Panel EEG, **independent** of the mini-timeline's 1-hour zoom. Click the number → a vertical-slider popover from 24hr → 1min (`UI/B1b`) |
 | `⇕ [X] uV` | Amplitude scale, a dropdown of fixed steps **500/250/150/100/75 µV** (⚠ **CHANGED — C18, 2026-09-21, floor set final in Step 5 fix round 6**, see the note right below this table). Frontend-only, doesn't touch the backend |
 | `⏮⏭ Select Range` | Enables manual event-creation mode (§6.6) |
-| `lff 0.5 Hz` · `hff 60 Hz` · `60` | 3 filters matching the real preprocessing steps exactly |
+| `pp Preprocessed (0.5-60 Hz + 60 Hz notch)` | 1 toggle for the pipeline's only real filtered state — bandpass (0.5-60 Hz) then notch (60 Hz), always both, always in that order (⚠ **CHANGED — C24**, see the note below) |
 
 > **Amplitude-scale note (C18, 2026-09-21; floor decided in Step 5 fix round 6):** the original
 > 5/7/10/15/20/30 µV list was chosen before real data existed to check it against — reasonable at the
@@ -505,6 +505,23 @@ the toolbar's **Comment** button since Comment is already attached to each event
 
 **Filter toggle:** when on, the filtered wave is highlighted, the raw wave recedes into a dim background
 — **raw is never fully hidden**.
+
+> **Filter-toggle correction (C24, 2026-09-27):** this table's row used to read `lff 0.5 Hz` ·
+> `hff 60 Hz` · `60` — 3 independently-toggleable filters that were never real.
+> `pipeline_demo.process_file_phase_a` runs exactly one bandpass (0.5-60 Hz, `sosfiltfilt`) then
+> exactly one notch (60 Hz, `filtfilt`), always both, always in that order — there was only ever
+> one real filtered series, and all 3 old buttons toggled the same cached array
+> (`CC_FIX_FILTERSTAGES_REPORT.md`). That report first collapsed the toolbar to 2 buttons (`bpf
+> 0.5-60 Hz` + `60`, exposing the bandpass-only intermediate as its own toggleable state) — a fix
+> this document was never updated to reflect, so the table above was stale twice over. Measured
+> immediately after (same report, chb16): bandpass-vs-bandpass+notch differs by only **~2.91 µV**,
+> against **~127.92 µV** for raw-vs-preprocessed — visually negligible at every amplitude scale
+> this toolbar offers (75-500 µV, C18 above), and no real downstream stage (z-score, adjacency,
+> GAE) ever consumes the bandpass-only intermediate on its own; only the fully preprocessed signal
+> feeds the pipeline. `CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md` collapsed the toolbar to the single
+> real toggle the table now describes: **OFF = raw, ON = preprocessed (bandpass+notch combined)**.
+> The backend's `.bandpass.npy` cache file was left in place (harmless sunk cost) even though
+> nothing reads it anymore.
 
 **Playhead:** only clickable on Panel EEG. Clicking a point → the playhead jumps there, the mini-timeline
 syncs.

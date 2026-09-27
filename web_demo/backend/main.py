@@ -10,8 +10,10 @@ username, carried in an HttpOnly cookie. This is explicitly NOT a real security 
 no password hashing, no expiry, no CSRF protection — a symbolic access gate is all the spec
 asks for. Do not extend this into something it isn't.
 """
+import logging
 import os
 import secrets
+import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -26,6 +28,9 @@ import upload_manager as um
 import waveform_serving as ws
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 ADMIN_USER = os.environ.get("ADMIN_USER", "")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "")
@@ -111,8 +116,27 @@ def subjects(request: Request):
 
 @app.delete("/api/subjects/{subject_id}")
 def delete_subject(subject_id: str, request: Request):
+    """Removes both the DB row and the subject's uploads/{subject_id}/ directory tree.
+    The uploads-root check below (not just a path join) keeps this from ever touching
+    anything outside web_demo/backend/uploads/, even if subject_id were something like
+    ".." — it can't be, in practice, since it always comes from an existing DB row, but
+    the check costs nothing and removes the need to trust that invariant here."""
     _require_auth(request)
     db.delete_subject(subject_id)
+
+    uploads_root = um.UPLOAD_DIR.resolve()
+    subject_dir = (um.UPLOAD_DIR / subject_id).resolve()
+    if subject_dir == uploads_root or uploads_root not in subject_dir.parents:
+        logger.warning(
+            "Refusing to remove uploads path outside uploads/ for subject_id=%r: %s",
+            subject_id, subject_dir,
+        )
+    elif not subject_dir.exists():
+        logger.info("No uploads directory to remove for subject %s (already gone): %s", subject_id, subject_dir)
+    else:
+        shutil.rmtree(subject_dir)
+        logger.info("Removed uploads directory for subject %s: %s", subject_id, subject_dir)
+
     return {"ok": True}
 
 
@@ -160,7 +184,7 @@ def _file_detail(file_id: int) -> dict | None:
     f = db.get_file(file_id)
     if f is None:
         return None
-    raw_path, _ = ws._cache_paths(f["subject_id"], f["filename"], um.UPLOAD_DIR)
+    raw_path, _, _ = ws._cache_paths(f["subject_id"], f["filename"], um.UPLOAD_DIR)
     f["channels"] = ws.CHANNELS
     f["usable_duration_seconds"] = ws.usable_duration_seconds(raw_path)
     return f

@@ -167,6 +167,12 @@ class PhaseAResult:
     # added in Step 4 (CC_STEP4_PROMPT.md) for Panel EEG's raw/filtered dual-view (SPEC §6.4:
     # "raw is never fully hidden"). Same [n_windows, 18, WIN_SAMPLES] float32 layout as
     # `filtered`/`filtered_path`, just skipping the bandpass+notch step.
+    bandpass_path: Optional[Path] = None  # set when cache_dir given — continuous windows after
+    # the bandpass stage only, before the notch stage. Panel EEG's filter toolbar used to expose
+    # "lff"/"hff" as if independently toggleable, but the pipeline only ever runs bandpass then
+    # notch as one fixed sequence — this is the real intermediate state between those two stages,
+    # not a third independent filter. Same [n_windows, 18, WIN_SAMPLES] float32 layout as
+    # `filtered`/`filtered_path`.
 
 
 def process_file_phase_a(
@@ -224,6 +230,13 @@ def process_file_phase_a(
     filtered = np.ascontiguousarray(
         notched[:, :usable].reshape(N_CH, n_windows, preprocessing.WIN_SAMPLES).transpose(1, 0, 2)
     )
+    # Windowed the same way as `filtered`/`raw_windows` below, from `bp` (bandpass output,
+    # pre-notch) rather than `notched` — the real intermediate state between the pipeline's two
+    # filter stages, for Panel EEG's bandpass-only toolbar toggle. Does not affect `filtered`'s
+    # or `notched`'s own values or shape.
+    bandpass_windows = np.ascontiguousarray(
+        bp[:, :usable].reshape(N_CH, n_windows, preprocessing.WIN_SAMPLES).transpose(1, 0, 2)
+    )
     # Step 4 (CC_STEP4_PROMPT.md): Panel EEG's raw/filtered dual-view needs the SAME
     # continuous windowing applied to the untouched signal, not just `filtered` — reuse
     # `data` (already read above, pre-filter) rather than re-reading the EDF.
@@ -238,8 +251,10 @@ def process_file_phase_a(
     # (band powers / adjacency downstream are float32 already).
     filtered = filtered.astype(np.float32)
     raw_windows = raw_windows.astype(np.float32)
+    bandpass_windows = bandpass_windows.astype(np.float32)
     filtered_path = None
     raw_path = None
+    bandpass_path = None
     if cache_dir is not None:
         cache_dir = Path(cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
@@ -247,6 +262,8 @@ def process_file_phase_a(
         np.save(filtered_path, filtered)
         raw_path = cache_dir / f"{Path(edf_path).stem}.raw.npy"
         np.save(raw_path, raw_windows)
+        bandpass_path = cache_dir / f"{Path(edf_path).stem}.bandpass.npy"
+        np.save(bandpass_path, bandpass_windows)
 
     return PhaseAResult(
         filename=Path(edf_path).name,
@@ -256,6 +273,7 @@ def process_file_phase_a(
         file_duration_seconds=file_duration_seconds,
         filtered_path=filtered_path,
         raw_path=raw_path,
+        bandpass_path=bandpass_path,
     )
 
 
@@ -265,6 +283,7 @@ def process_subject_phase_b(
     pernode_out: Optional[dict] = None,
     zrecon_out: Optional[dict] = None,
     pernode_baseline_out: Optional[dict] = None,
+    timing: Optional[dict] = None,
 ) -> dict[str, np.ndarray]:
     """Phase B (SPEC §1.6a / CC_STEP3_PROMPT.md §1): subject-wide z-score + LedoitWolf +
     robust-z fits, rest of the pipeline run per file. Returns {filename: ensemble score
@@ -292,7 +311,25 @@ def process_subject_phase_b(
     (same rule, not special-cased for attribution). Only computed when `pernode_out` is also
     supplied, since it's derived from that dict's per-file contents. Default `None`, zero effect
     on existing callers.
+
+    `timing` (CC_STAGE_TIMING_REPORT.md — pre-freeze technical measurement, not the final
+    thesis numbers): optional dict the caller passes in to receive a per-stage wall-clock
+    breakdown, same optional-dict pattern as `pernode_out`/`zrecon_out` above — default
+    `None`, zero effect on existing callers. Written keys: `"adjacency_bandpower"` (the
+    per-window CAR/wPLI/AEC/top-k + band-power loop, summed across all files),
+    `"gae_scoring"` (build_batch + model.encoder + both `joint_score` calls, summed across
+    all files), `"gamma_aec"` (the `compute_gamma_scores_batch` loop, summed across all
+    files), and `"subject_stats_and_fits"` (everything else in this function — the
+    subject-wide z-score mean/std pass, checkpoint load, LedoitWolf fit, robust-z median/MAD
+    fit — computed as this function's own total wall-clock minus the other three, rather than
+    instrumented as separate regions, so nothing in between is silently uncounted). Purely
+    additive measurement: none of these timers touch what any existing caller receives.
     """
+    t_func_start = time.perf_counter()
+    t_adjacency_bandpower = 0.0
+    t_gae_scoring = 0.0
+    t_gamma_aec = 0.0
+
     filenames_sorted = sorted(filtered_by_filename.keys())
     if not filenames_sorted:
         return {}
@@ -357,6 +394,7 @@ def process_subject_phase_b(
 
         adjacency = np.empty((n_windows, N_CH, N_CH), dtype=np.float32)
         band_powers = np.empty((n_windows, N_CH, 5), dtype=np.float32)
+        t0 = time.perf_counter()
         for i in range(n_windows):
             window = zscored[i]
             car = graph_construction.apply_car(window)
@@ -366,7 +404,9 @@ def process_subject_phase_b(
             A = graph_construction.apply_topk_threshold(A, keep_ratio=graph_construction.DEFAULT_KEEP_RATIO)
             adjacency[i] = A.astype(np.float32)
             band_powers[i] = feature_extraction.compute_band_powers(window)
+        t_adjacency_bandpower += time.perf_counter() - t0
 
+        t0 = time.perf_counter()
         A_t = torch.tensor(adjacency, dtype=torch.float32)
         X_t = torch.tensor(band_powers, dtype=torch.float32)
         pg, A_batch, Xn_batch, B = gae_joint.build_batch(A_t, X_t, device)
@@ -385,11 +425,13 @@ def process_subject_phase_b(
 
         zrecon_raw = zrecon_raw.cpu().numpy().astype(np.float64)
         graph_z_np = graph_z.cpu().numpy().astype(np.float64)
+        t_gae_scoring += time.perf_counter() - t0
         if zrecon_out is not None:
             # Exposes the raw scalar recon score (pre-ensemble) purely for the consistency
             # gate below — never used by any existing caller, never changes `scores`.
             zrecon_out[f] = zrecon_raw.copy()
 
+        t0 = time.perf_counter()
         zgamma_raw = np.empty(n_windows, dtype=np.float32)
         zscored_f32 = zscored.astype(np.float32)
         for s in range(0, n_windows, compute_gamma_aec.BATCH_SIZE):
@@ -397,6 +439,7 @@ def process_subject_phase_b(
             zgamma_raw[s:e] = compute_gamma_aec.compute_gamma_scores_batch(
                 zscored_f32[s:e], gamma_b, gamma_a
             )
+        t_gamma_aec += time.perf_counter() - t0
 
         per_file_raw[f] = dict(
             zrecon_raw=zrecon_raw, graph_z=graph_z_np, zgamma_raw=zgamma_raw.astype(np.float64)
@@ -437,6 +480,14 @@ def process_subject_phase_b(
             subset=ensemble_recipe.CANDIDATES["rlg"],
         )
         scores[f] = score.astype(np.float64)
+
+    if timing is not None:
+        timing["adjacency_bandpower"] = t_adjacency_bandpower
+        timing["gae_scoring"] = t_gae_scoring
+        timing["gamma_aec"] = t_gamma_aec
+        timing["subject_stats_and_fits"] = (
+            (time.perf_counter() - t_func_start) - (t_adjacency_bandpower + t_gae_scoring + t_gamma_aec)
+        )
 
     return scores
 
@@ -504,11 +555,18 @@ class FileEvent:
 
 def process_subject_events(
     scores_by_filename: dict[str, np.ndarray],
+    timing: Optional[dict] = None,
 ) -> tuple[dict[str, list[FileEvent]], OperatingPointResult]:
     """Stage 2 (SPEC §5.5 / §1.5): concatenate per-file Phase B scores in FILENAME order,
     run PELT once on the whole timeline at a label-free-calibrated operating point, then
     assign each event back to its file by cumulative offset. No lookup module needed —
     SPEC §1.5 is explicit that this falls out of the per-file score lengths by construction.
+
+    `timing` (CC_STAGE_TIMING_REPORT.md — pre-freeze technical measurement): optional dict,
+    same pattern as `process_subject_phase_b`'s. Written key `"cpd"` = wall-clock spent inside
+    `calibrate_operating_point()` (which itself runs `detect_events()` once per grid point)
+    plus the one further `detect_events()` call below at the chosen operating point. Default
+    `None`, zero effect on existing callers.
     """
     win_sec = float(preprocessing.WIN_S)
     filenames_sorted = sorted(scores_by_filename.keys())
@@ -522,8 +580,11 @@ def process_subject_events(
     total_hours = (total_windows * win_sec) / 3600.0
 
     global_score = np.concatenate([scores_by_filename[f] for f in filenames_sorted])
+    t0 = time.perf_counter()
     op = calibrate_operating_point(global_score, total_hours)
     events_global = cpd_pipeline_v14.detect_events(global_score, op.pen_mult, min_mag_pct=MIN_MAG_PCT)
+    if timing is not None:
+        timing["cpd"] = time.perf_counter() - t0
 
     file_events: dict[str, list[FileEvent]] = {f: [] for f in filenames_sorted}
     for onset_s, offset_s in events_global:

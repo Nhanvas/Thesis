@@ -1,17 +1,17 @@
 # Captions — every figure and table
 
-**Revision 9 (2026-09-23).** Rebuilt after the page cut. Every body caption is copied verbatim from the
-finished chapters (`Chapter_1` to `Chapter_4`, 2026-09-23), so a caption here cannot disagree with the
-report; the appendix captions are the same text as before, carrying their new numbers.
+**Revision 10 (2026-09-25).** Rebuilt after the v3 restructure of the chapters. Every caption is copied
+verbatim, by script, from `Chapter_1_Introduction_v3.md` to `Chapter_4_Discussion_v3.md` and
+`Appendix_v3.md` (2026-09-25), so a caption here cannot disagree with the report.
 
-Counts after the cut: **13 body figures** (Figure 3.6 pending the application) and **9 appendix
-figures**, 22 in all; **14 body tables** (Table 3.6 pending the application) and **14 appendix tables**,
-28 in all. `EXHIBIT_RENUMBER_MAP.md` gives the old number of every exhibit that moved.
+Counts: **22 figures** (15 in the body, Figure 3.6 pending the application; 7 in the appendix) and
+**25 tables** (15 in the body, Table 3.7 pending the application; 10 in the appendix).
+`docs/EXHIBIT_RENUMBER_MAP.md` gives the old number of every exhibit that moved.
 
-What changed from revision 8: the old Table 1.1 (representative approaches) was cut, since Table 4.1
-carries the same studies; nine figures and nine tables moved to the appendix and were renumbered; Table
-3.6 (application detection) and Figure 3.6 (application screen) are new and pending the build; Table
-A.2 gained the rank columns. Revisions 2 to 8 are superseded and remain in the git history.
+What changed from revision 9: Figures A.2 and A.3 moved up as Figures 2.2 and 2.5, and Table A.11 as
+Table 3.3; Tables A.6, A.7 and A.13 were deleted; the remaining appendix exhibits were renumbered to
+close the gaps; the former Chapter 3 Tables 3.3 to 3.7 became 3.4 to 3.8. No caption text changed, except the section reference inside the pending Table 3.7 placeholder (§3.3 → §3.2). Revision 9 is
+superseded and remains in the git history.
 
 Figure captions go below the figure, table captions above the table.
 
@@ -40,18 +40,31 @@ scored once.
 the derivation is named. The four outer chains form the arc pattern known clinically as the double
 banana.
 
-**Figure 2.2.** Construction of a connectivity graph from one analysis window, patient chb11. (a) the
+**Figure 2.2.** One segment of recording before and after preprocessing, patient chb10. Panels (a) and
+(b) show six derivations on a common time axis; the vertical scales differ because the preprocessed
+signal is standardized. Panel (c) shows the power spectrum of one derivation before and after,
+normalized for comparison: the mains peak at 60 Hz is removed and content above the analysis band is
+attenuated.
+
+**Figure 2.3.** Construction of a connectivity graph from one analysis window, patient chb11. (a) the
 four-second segment across all derivations; (b) the five log band powers per derivation; (c) the
 weighted adjacency before sparsification; (d) the graph after retaining the strongest twenty percent
 of edges, thirty edges of a possible one hundred and fifty-three.
 
-**Figure 2.3.** The complete processing pipeline, from the corpus to the two evaluation tiers. The
+**Figure 2.4.** The complete processing pipeline, from the corpus to the two evaluation tiers. The
 graph autoencoder is trained on background windows only; the latent representation feeds the
 Mahalanobis readout and the two decoders feed the reconstruction readout, while the gamma-band readout
 is computed directly from the signal and does not pass through the model. Design decisions are made on
 the validation patients, and alternatives that fail are reported rather than discarded.
 
-**Figure 2.4.** Architecture of the review application. The application recomputes anomaly scores on
+**Figure 2.5.** Distribution of the reconstruction readout for two validation patients, chb11 and
+chb10, with background and seizure windows overlaid. The horizontal axis is the standardized
+reconstruction score and the vertical axis the density of windows; the dashed lines mark the mean of
+each group. For chb11 the seizure windows sit to the right of the background, for chb10 to the left,
+so the same readout separates the two states in opposite directions on different patients. The latent
+readout is unaffected by the reversal, which is why the two are combined.
+
+**Figure 2.6.** Architecture of the review application. The application recomputes anomaly scores on
 the continuous recording, retaining every window. It never reads the seizure annotations, any timeline
 reconstructed from them, or the pre-split background and seizure arrays, all three of which would make
 a label-free claim false.
@@ -100,20 +113,7 @@ seizure from background. *The corpus annotates seizure onset and offset only; th
 postictal regions are fixed sixty-second windows defined for this illustration and are not annotated
 states.*
 
-**Figure A.2.** One segment of recording before and after preprocessing, patient chb10. Panels (a) and
-(b) show six derivations on a common time axis; the vertical scales differ because the preprocessed
-signal is standardized. Panel (c) shows the power spectrum of one derivation before and after,
-normalized for comparison: the mains peak at 60 Hz is removed and content above the analysis band is
-attenuated.
-
-**Figure A.3.** Distribution of the reconstruction readout for two validation patients, chb11 and
-chb10, with background and seizure windows overlaid. The horizontal axis is the standardized
-reconstruction score and the vertical axis the density of windows; the dashed lines mark the mean of
-each group. For chb11 the seizure windows sit to the right of the background, for chb10 to the left,
-so the same readout separates the two states in opposite directions on different patients. The latent
-readout is unaffected by the reversal, which is why the two are combined.
-
-**Figure A.4.** Event-based scoring. (a) A detected interval is matched to an annotated seizure by any
+**Figure A.2.** Event-based scoring. (a) A detected interval is matched to an annotated seizure by any
 overlap, after the annotation is extended by 30 s before onset and 60 s after offset; the detection
 shown begins after the seizure has ended and still counts. (b) Detections separated by less than 90 s
 are merged into one interval before scoring. (c) A detection outside the tolerance window is a false
@@ -122,25 +122,25 @@ illustrative; the scoring depends only on the interval endpoints. *Specificity i
 level, because a true-negative event has no meaning once a timeline is expressed as events; false
 alarms per day replaces it.*
 
-**Figure A.5.** Detection latency relative to annotated onset for the 48 seizures matched by the
+**Figure A.3.** Detection latency relative to annotated onset for the 48 seizures matched by the
 latency procedure, with the pre-onset matching tolerance marked. The latency match is computed
 separately from the scoring framework's event matcher and counts one more match than the 47 true
 positives at the reported operating point. The post-offset tolerance is measured from seizure end and
 cannot be drawn on this axis.
 
-**Figure A.6.** Window-level discrimination against event-level F1, one point per test patient, with
+**Figure A.4.** Window-level discrimination against event-level F1, one point per test patient, with
 reference lines at the across-patient discrimination and the pooled event F1. *chb06 is drawn at zero
 because its F1 is undefined, not because it scored zero.*
 
-**Figure A.7.** One false positive with the concurrent recording, patient chb13, recording chb13_62.
+**Figure A.5.** One false positive with the concurrent recording, patient chb13, recording chb13_62.
 The detected interval coincides with high-amplitude transient activity visible across all displayed
 derivations. The signal panel shows the raw recording, unfiltered. *Scores were recomputed on the
 continuous recording; they are not the source of any reported number.*
 
-**Figure A.8.** Channel attribution performance against injection strength on the synthetic grid, where
+**Figure A.6.** Channel attribution performance against injection strength on the synthetic grid, where
 the affected channels are known exactly. This panel is label-free and depends on no annotation.
 
-**Figure A.9.** Diffuseness of the attribution map against the number of injected channels on the
+**Figure A.7.** Diffuseness of the attribution map against the number of injected channels on the
 synthetic grid. The measure is U-shaped, so it cannot separate focal from generalized seizures and is
 reported as a methodological negative.
 
@@ -180,20 +180,23 @@ mean.
 **Table 3.2.** Event-level detection results at each operating point. *The best point on the curve was
 located after the test set was scored.*
 
-**Table 3.3.** Results across four independently trained models on the validation patients. A
+**Table 3.3.** Event-level performance per test patient at the reported operating point. *chb06's F1 is
+undefined, not zero.*
+
+**Table 3.4.** Results across four independently trained models on the validation patients. A
 difference smaller than the spread is not treated as real.
 
-**Table 3.4.** Component ablations and design alternatives, on the validation patients.
+**Table 3.5.** Component ablations and design alternatives, on the validation patients.
 
-**Table 3.5.** Agreement between the channel ranking and the blind channel annotation, over 62 focal
+**Table 3.6.** Agreement between the channel ranking and the blind channel annotation, over 62 focal
 test seizures. *Single annotator, blind to the model, approved by the supervisor; agreement is
 concordance, not accuracy.*
 
-**Table 3.6.** [PENDING — detection of the application on the eight test patients against the same
+**Table 3.7.** [PENDING — detection of the application on the eight test patients against the same
 annotation, beside the offline values of Table 3.2; the false-alarm denominator is the recorded time of
-the processed files minus seizure time, not the 278.2 background hours of §3.3.]
+the processed files minus seizure time, not the 278.2 background hours of §3.2.]
 
-**Table 3.7.** Objectives and design requirements, with the outcome achieved for each.
+**Table 3.8.** Objectives and design requirements, with the outcome achieved for each.
 
 
 ## Chapter 4
@@ -227,26 +230,15 @@ Computed from the model's own channel rankings; it uses no annotation.
 
 **Table A.5.** Software and library versions.
 
-**Table A.6.** Specific task carried out in each week.
-
-**Table A.7.** Preprocessing steps and their parameters.
-
-**Table A.8.** Design of the synthetic validation grid for channel attribution. The multiplier is
+**Table A.6.** Design of the synthetic validation grid for channel attribution. The multiplier is
 applied to the chosen channels within the block only; every other channel, and every window outside
 the block, is left unchanged.
 
-**Table A.9.** Candidate public scalp EEG seizure corpora.
+**Table A.7.** Candidate public scalp EEG seizure corpora.
 
-**Table A.10.** Model and training configuration.
+**Table A.8.** Model and training configuration.
 
-**Table A.11.** Event-level performance per test patient at the reported operating point. *chb06's F1 is
-undefined, not zero.*
+**Table A.9.** Synthetic validation criteria and outcomes.
 
-**Table A.12.** Synthetic validation criteria and outcomes.
-
-**Table A.13.** Composition of the channel annotation and within-patient similarity. Similarity is the
-Jaccard index between the annotated channel sets of two focal seizures of the same patient, averaged
-over seizure pairs.
-
-**Table A.14.** Computational and deployment cost profile. Two quantities were not measured and are
+**Table A.10.** Computational and deployment cost profile. Two quantities were not measured and are
 marked as such.

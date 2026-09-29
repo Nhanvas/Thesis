@@ -41,7 +41,7 @@ _WORKER_SCRIPT = Path(__file__).resolve().parent / "pipeline_worker.py"
 # between throughput and headroom on this CPU-only dev machine (CLAUDE.md) -- low enough that
 # 4 concurrent Raw loads comfortably fit without re-creating the OOM, high enough that a
 # typical multi-file subject still pipelines rather than serializing to 1-at-a-time.
-_PHASE_A_MAX_CONCURRENCY = 4
+_PHASE_A_MAX_CONCURRENCY = 2
 _phase_a_executor = ThreadPoolExecutor(
     max_workers=_PHASE_A_MAX_CONCURRENCY, thread_name_prefix="phase_a"
 )

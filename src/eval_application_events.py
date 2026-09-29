@@ -161,6 +161,33 @@ def load_events_csv(path: Path, files_df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def check_files_known_to_annotation(files_df: pd.DataFrame, annotation_by_subject: dict) -> None:
+    """Before any scoring: every (subject, file_name) in files.csv must be a real file name in
+    that subject's annotation (the same 'fname' keys load_annotation() returns from
+    evaluation_protocol.parse_summary_edf_list). If it isn't, score_exports() would silently
+    treat that file as seizure-free (ref_iv=[]) -- its real seizures vanish and any AI event in
+    it is counted as a false alarm, and the shortfall would only surface afterwards, in the
+    coverage check. Fail fast here instead, naming every missing (subject, file_name) plus the
+    first three names the summary DOES have for that subject, so a format mismatch (e.g. a
+    missing '.edf' extension) is obvious immediately."""
+    missing = [(s, f) for s, f in zip(files_df["subject"], files_df["file_name"])
+              if f not in annotation_by_subject.get(s, {})]
+    if not missing:
+        return
+    missing_subjects = sorted({s for s, _ in missing})
+    lines = [f"  {s}/{f!r}" for s, f in missing]
+    sample_lines = [
+        f"  {s}: first 3 names the summary has: "
+        f"{sorted(annotation_by_subject.get(s, {}).keys())[:3]}"
+        for s in missing_subjects
+    ]
+    raise ScorerInputError(
+        "files.csv names file(s) absent from the annotation -- their seizures would silently "
+        "vanish and any AI event in them would be counted as a false alarm:\n"
+        + "\n".join(lines) + "\n" + "\n".join(sample_lines)
+    )
+
+
 # ---------------------------------------------------------------------------------------
 # Scoring -- per file via szcore_eval.score_szcore (SZ_PARAM imported, not retyped),
 # accumulated per subject and pooled per CC_PROMPT_APP_EVAL_SCORER.md's own formulas.
@@ -360,6 +387,7 @@ def run_eval(tier2_dir: Path, out_dir: Path | None, label: str) -> dict:
     events_df = pd.concat([load_events_csv(p, files_df) for p in event_csv_paths], ignore_index=True)
 
     annotation_by_subject = {s: load_annotation(s) for s in files_df["subject"].unique()}
+    check_files_known_to_annotation(files_df, annotation_by_subject)
 
     per_subject_rows, pooled_row = score_exports(events_df, files_df, annotation_by_subject)
     coverage_lines, coverage_issues = coverage_checks(files_df, annotation_by_subject)
@@ -485,9 +513,12 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
     annotation = load_annotation(subject)
 
     results = {}
+    unknown_error = None
+    unknown_raised_right_type = False
     with tempfile.TemporaryDirectory(prefix="szscan_app_eval_smoke_") as tmp:
         tmp_root = Path(tmp)
-        files_csv_bytes = build_synthetic_files_csv(tmp_root, subject).read_bytes()
+        files_csv_path = build_synthetic_files_csv(tmp_root, subject)
+        files_csv_bytes = files_csv_path.read_bytes()
         for mode in ("oracle", "empty", "displaced", "human"):
             mode_dir = tmp_root / mode
             mode_dir.mkdir()
@@ -495,6 +526,32 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
             build_synthetic_events_csv(mode_dir, subject, annotation, mode)
             res = run_eval(mode_dir, out_dir=None, label=f"SMOKE[{mode}]")
             results[mode] = res
+
+        # 5th smoke test: "Unknown file" -- the oracle export plus one extra files.csv row
+        # whose file_name is not in the annotation at all. Must stop with ScorerInputError
+        # and write nothing (guaranteed here by out_dir=None; in a real run the same
+        # ScorerInputError raises before run_eval() ever reaches its out_dir-writing block).
+        unknown_dir = tmp_root / "unknown_file"
+        unknown_dir.mkdir()
+        files_df = pd.read_csv(files_csv_path)
+        extra_row = pd.DataFrame([dict(
+            subject=subject, file_name=f"{subject}_99.edf", duration_s=3600.0,
+            n_windows=int(3600 * 256) // WIN_SAMPLES, status="success",
+        )])
+        pd.concat([files_df, extra_row], ignore_index=True).to_csv(
+            unknown_dir / "files.csv", index=False
+        )
+        build_synthetic_events_csv(unknown_dir, subject, annotation, "oracle")
+        print(f"\n=== SMOKE[unknown_file] ===")
+        try:
+            run_eval(unknown_dir, out_dir=None, label="SMOKE[unknown_file]")
+        except ScorerInputError as exc:
+            unknown_raised_right_type = True
+            unknown_error = str(exc)
+            print(f"Raised ScorerInputError (expected):\n{unknown_error}")
+        except Exception as exc:  # wrong exception type -- still a failure, but report it
+            unknown_error = f"{type(exc).__name__}: {exc}"
+            print(f"Raised the WRONG exception type: {unknown_error}")
 
     checks = []
     o, e, d, h = (results[m]["pooled"] for m in ("oracle", "empty", "displaced", "human"))
@@ -508,6 +565,8 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
     checks.append(("displaced: false_alarms == number of AI events",
                    d["false_alarms"] == results["displaced"]["n_ai_events"]))
     checks.append(("human: pooled identical to empty", h == e))
+    checks.append(("unknown file: raises ScorerInputError, writes nothing",
+                   unknown_raised_right_type))
 
     print("\n=== Step 3 smoke-test verdicts ===")
     all_ok = True
@@ -516,7 +575,7 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         all_ok = all_ok and ok
     if not all_ok:
         raise SystemExit("Smoke tests FAILED -- fix the scorer before running on real exports (Step 4).")
-    print("\nAll four smoke tests PASS.")
+    print("\nAll five smoke tests PASS.")
     return results
 
 

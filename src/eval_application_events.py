@@ -67,8 +67,16 @@ DEFAULT_TIER2_DIR = ROOT / "web_demo" / "report_handback" / "tier2"
 OUT_DIR = ROOT / "results" / "application_eval"
 REPORT_HANDBACK = ROOT / "web_demo" / "REPORT_HANDBACK.md"
 
-# FS(256) * WIN_S(4) -- see src/dataprep/preprocessing.py. Only used to fill the required
-# n_windows column of a synthetic files.csv (Step 3); never used in the scoring math itself.
+# Seconds per window (src/dataprep/preprocessing.py: FS=256, WIN_S=4, WIN_SAMPLES=FS*WIN_S=1024).
+# L = n_windows * WIN_S is a file's length on the APPLICATION's own concatenated timeline
+# (web_demo/backend/pipeline_demo.py process_subject_events(): "No window is ever dropped ...
+# t_seconds = window_index * 4" per SZSCAN_SPEC_v5.md Sec.1.3) -- it can differ from the EDF
+# header's duration_s by up to WIN_S seconds (n_windows is a floor-division window count).
+# Event onset/offset boundary checks (CC_PROMPT_SCORER_BOUNDARY.md) use L, not duration_s;
+# duration_s remains the unit for seizure time and the false-alarm-per-day denominator.
+WIN_S = 4
+# FS(256) * WIN_S(4). Only used to fill the required n_windows column of a synthetic files.csv
+# (Step 3 smoke tests); never used in the scoring math itself.
 WIN_SAMPLES = 1024
 
 REQUIRED_EVENT_COLS = ["subject", "file_name", "event_id", "onset_s", "offset_s", "source", "review_status"]
@@ -145,19 +153,38 @@ def load_events_csv(path: Path, files_df: pd.DataFrame) -> pd.DataFrame:
         raise ScorerInputError(
             f"{path}: offset_s <= onset_s for event_id(s) {list(bad_span['event_id'])}."
         )
-    dur_by_key = files_df.set_index(["subject", "file_name"])["duration_s"]
+    L_by_key = (files_df.set_index(["subject", "file_name"])["n_windows"] * WIN_S)
+    order_by_subject = {
+        s: sorted(files_df.loc[files_df["subject"] == s, "file_name"])
+        for s in files_df["subject"].unique()
+    }
     for row in df.itertuples():
         fk = (row.subject, row.file_name)
-        if fk not in dur_by_key.index:
+        if fk not in L_by_key.index:
             raise ScorerInputError(
                 f"{path}: file_name {row.file_name!r} (subject {row.subject}) is absent from files.csv."
             )
-        dur = dur_by_key.loc[fk]
-        if not (0 <= row.onset_s and row.offset_s <= dur):
+        L = L_by_key.loc[fk]
+        if not (0 <= row.onset_s < L):
             raise ScorerInputError(
-                f"{path}: event_id {row.event_id} in {row.file_name} spans "
-                f"[{row.onset_s}, {row.offset_s}] outside [0, {dur}]."
+                f"{path}: event_id {row.event_id} in {row.file_name} has onset_s={row.onset_s} "
+                f"outside [0, {L}) -- L = n_windows * {WIN_S} for that file."
             )
+        if row.offset_s > L:
+            # PELT runs once per subject on all files concatenated in sorted file-name order
+            # with no gap (web_demo/backend/pipeline_demo.py process_subject_events()), so an
+            # event's offset can legitimately continue past L into the next file -- but only
+            # if a next file exists; the last file of a subject cannot overflow
+            # (CC_PROMPT_SCORER_BOUNDARY.md Background). The actual split happens later, in
+            # split_boundary_events() -- this is a fail-fast check only.
+            order = order_by_subject[row.subject]
+            if order.index(row.file_name) + 1 >= len(order):
+                raise ScorerInputError(
+                    f"{path}: event_id {row.event_id} in {row.file_name} has offset_s="
+                    f"{row.offset_s} > L={L}, but {row.file_name} is {row.subject}'s last file "
+                    f"(sorted file-name order) -- an event cannot overflow past the end of a "
+                    f"subject's recording."
+                )
     return df
 
 
@@ -186,6 +213,75 @@ def check_files_known_to_annotation(files_df: pd.DataFrame, annotation_by_subjec
         "vanish and any AI event in them would be counted as a false alarm:\n"
         + "\n".join(lines) + "\n" + "\n".join(sample_lines)
     )
+
+
+def split_boundary_events(events_df: pd.DataFrame, files_df: pd.DataFrame):
+    """Before any scoring: an AI event's offset_s can exceed its own file's length
+    L = n_windows * WIN_S when the underlying change-point interval continues into the next
+    file -- the application runs PELT once per subject, on all files concatenated in sorted
+    file-name order with no gap (web_demo/backend/pipeline_demo.py process_subject_events()).
+
+    Matching that same convention (CC_PROMPT_SCORER_BOUNDARY.md Step 1: the offline evaluation,
+    szcore_eval.py build_timeline_masked()/evaluate_subject(), scores one concatenated
+    per-subject timeline too, never per file), the overflow is SPLIT: the file that held the
+    event keeps [onset_s, L) and the remainder [0, offset_s - L) is carried to the START of the
+    next file in sorted file-name order -- repeated if that also overflows. Only `source=="AI"`
+    rows are split (reference seizures never cross a file boundary; Human rows are dropped
+    before scoring and never reach this function's caller in a way that matters). `onset_s` is
+    already guaranteed in [0, L) and a next file is already guaranteed to exist whenever
+    offset_s > L, by load_events_csv()'s own fail-fast checks -- this function re-derives L and
+    file order itself rather than trusting that invariant blindly, so it still raises
+    ScorerInputError (not, say, an IndexError) if it somehow doesn't hold.
+
+    Returns (split_events_df, boundary_stats), boundary_stats = {subject: {"n_crossed": int,
+    "seconds_moved": float}} -- n_crossed counts ORIGINAL events that crossed at least one
+    boundary (an event carried across two boundaries counts once), seconds_moved sums every
+    segment's carried length.
+    """
+    L_by_key = {(r.subject, r.file_name): int(r.n_windows) * WIN_S for r in files_df.itertuples()}
+    order_by_subject = {
+        s: sorted(files_df.loc[files_df["subject"] == s, "file_name"])
+        for s in files_df["subject"].unique()
+    }
+    boundary_stats = {s: dict(n_crossed=0, seconds_moved=0.0) for s in files_df["subject"].unique()}
+
+    if len(events_df) == 0:
+        return events_df, boundary_stats
+
+    out_rows = []
+    for row in events_df.itertuples(index=False):
+        d = row._asdict()
+        if d["source"] != "AI":
+            out_rows.append(d)
+            continue
+        subject, fname = d["subject"], d["file_name"]
+        onset, offset = float(d["onset_s"]), float(d["offset_s"])
+        order = order_by_subject[subject]
+        idx = order.index(fname)
+        crossed_this_event = False
+        while True:
+            L = L_by_key[(subject, fname)]
+            if offset <= L:
+                piece = dict(d, file_name=fname, onset_s=onset, offset_s=offset)
+                out_rows.append(piece)
+                break
+            if idx + 1 >= len(order):
+                raise ScorerInputError(
+                    f"event_id {d['event_id']} in {subject}/{fname}: offset_s={offset:g} > "
+                    f"L={L:g} but {fname} is {subject}'s last file (sorted file-name order) -- "
+                    f"cannot carry the overflow to a next file."
+                )
+            out_rows.append(dict(d, file_name=fname, onset_s=onset, offset_s=float(L)))
+            moved = offset - L
+            boundary_stats[subject]["seconds_moved"] += moved
+            if not crossed_this_event:
+                boundary_stats[subject]["n_crossed"] += 1
+                crossed_this_event = True
+            idx += 1
+            fname = order[idx]
+            onset, offset = 0.0, moved
+
+    return pd.DataFrame(out_rows, columns=events_df.columns), boundary_stats
 
 
 # ---------------------------------------------------------------------------------------
@@ -327,7 +423,7 @@ def extract_app_commit() -> str | None:
     return m.group(1) if m else None
 
 
-def build_summary_md(per_subject_rows, pooled_row, coverage_lines, coverage_issues,
+def build_summary_md(per_subject_rows, pooled_row, boundary_lines, coverage_lines, coverage_issues,
                      input_hashes: dict, app_commit: str | None) -> str:
     lines = ["# Application-detection scoring -- SUMMARY", ""]
     lines.append("Scores the SzScan web demo application's own exported AI detections against the "
@@ -353,6 +449,16 @@ def build_summary_md(per_subject_rows, pooled_row, coverage_lines, coverage_issu
     lines.append("")
     for k, v in pooled_row.items():
         lines.append(f"- {k}: {v}")
+    lines.append("")
+    lines.append("## Boundary-crossing events")
+    lines.append("")
+    lines.append("Events split across a file boundary (CC_PROMPT_SCORER_BOUNDARY.md): the part "
+                 "beyond L = n_windows * 4 s of a file is carried to the start of the next file "
+                 "in sorted file-name order, matching the offline evaluation's own concatenated "
+                 "per-subject timeline (szcore_eval.py).")
+    lines.append("")
+    for l in boundary_lines:
+        lines.append(f"- {l}")
     lines.append("")
     lines.append("## Coverage checks")
     lines.append("")
@@ -389,12 +495,22 @@ def run_eval(tier2_dir: Path, out_dir: Path | None, label: str) -> dict:
     annotation_by_subject = {s: load_annotation(s) for s in files_df["subject"].unique()}
     check_files_known_to_annotation(files_df, annotation_by_subject)
 
+    events_df, boundary_stats = split_boundary_events(events_df, files_df)
+
     per_subject_rows, pooled_row = score_exports(events_df, files_df, annotation_by_subject)
     coverage_lines, coverage_issues = coverage_checks(files_df, annotation_by_subject)
+
+    boundary_lines = [
+        f"{s}: {v['n_crossed']} event(s) crossed a file boundary, {v['seconds_moved']:g} s moved"
+        for s, v in boundary_stats.items() if s in set(files_df["subject"])
+    ]
 
     print(f"\n=== {label} ===")
     print(pd.DataFrame(per_subject_rows).to_string(index=False) if per_subject_rows else "(no subjects)")
     print("\nPooled:", pooled_row)
+    print("\nBoundary-crossing events:")
+    for l in boundary_lines:
+        print(" ", l)
     print("\nCoverage checks:")
     for l in coverage_lines:
         print(" ", l)
@@ -414,14 +530,14 @@ def run_eval(tier2_dir: Path, out_dir: Path | None, label: str) -> dict:
         hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                  for p in [files_csv_path, *event_csv_paths]}
         commit = extract_app_commit()
-        summary = build_summary_md(per_subject_rows, pooled_row, coverage_lines, coverage_issues,
-                                   hashes, commit)
+        summary = build_summary_md(per_subject_rows, pooled_row, boundary_lines, coverage_lines,
+                                   coverage_issues, hashes, commit)
         (out_dir / "SUMMARY.md").write_text(summary)
         print(f"\nWrote {out_dir}/per_subject.csv, pooled.json, SUMMARY.md")
 
     return dict(per_subject=per_subject_rows, pooled=pooled_row,
                coverage_lines=coverage_lines, coverage_issues=coverage_issues,
-               n_ai_events=n_ai_events)
+               n_ai_events=n_ai_events, boundary_stats=boundary_stats)
 
 
 # ---------------------------------------------------------------------------------------
@@ -468,11 +584,16 @@ def _find_displaced_start(dur: float, seizures: list, span: float, used: list,
     return None
 
 
-def build_synthetic_events_csv(tmp_dir: Path, subject: str, annotation: dict, mode: str) -> Path:
+def build_synthetic_events_csv(tmp_dir: Path, subject: str, annotation: dict, mode: str,
+                               L_by_fname: dict) -> Path:
     rows = []
     eid = 0
     for fname, ann in sorted(annotation.items()):
-        dur = ann["duration_s"]
+        # L (files.csv's n_windows * WIN_S), not the annotation's own duration_s -- the two can
+        # differ by up to WIN_S seconds, and event onset/offset validation now checks against L
+        # (CC_PROMPT_SCORER_BOUNDARY.md), so the displaced-placement search must respect the
+        # same bound or it could place an event just past L while still inside duration_s.
+        dur = L_by_fname[fname]
         seizures = ann["seizures"]
         if mode == "oracle":
             for on, off in seizures:
@@ -519,11 +640,13 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         tmp_root = Path(tmp)
         files_csv_path = build_synthetic_files_csv(tmp_root, subject)
         files_csv_bytes = files_csv_path.read_bytes()
+        files_df = pd.read_csv(files_csv_path)
+        L_by_fname = {r.file_name: int(r.n_windows) * WIN_S for r in files_df.itertuples()}
         for mode in ("oracle", "empty", "displaced", "human"):
             mode_dir = tmp_root / mode
             mode_dir.mkdir()
             (mode_dir / "files.csv").write_bytes(files_csv_bytes)
-            build_synthetic_events_csv(mode_dir, subject, annotation, mode)
+            build_synthetic_events_csv(mode_dir, subject, annotation, mode, L_by_fname)
             res = run_eval(mode_dir, out_dir=None, label=f"SMOKE[{mode}]")
             results[mode] = res
 
@@ -533,7 +656,6 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         # ScorerInputError raises before run_eval() ever reaches its out_dir-writing block).
         unknown_dir = tmp_root / "unknown_file"
         unknown_dir.mkdir()
-        files_df = pd.read_csv(files_csv_path)
         extra_row = pd.DataFrame([dict(
             subject=subject, file_name=f"{subject}_99.edf", duration_s=3600.0,
             n_windows=int(3600 * 256) // WIN_SAMPLES, status="success",
@@ -541,7 +663,7 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         pd.concat([files_df, extra_row], ignore_index=True).to_csv(
             unknown_dir / "files.csv", index=False
         )
-        build_synthetic_events_csv(unknown_dir, subject, annotation, "oracle")
+        build_synthetic_events_csv(unknown_dir, subject, annotation, "oracle", L_by_fname)
         print(f"\n=== SMOKE[unknown_file] ===")
         try:
             run_eval(unknown_dir, out_dir=None, label="SMOKE[unknown_file]")
@@ -552,6 +674,77 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         except Exception as exc:  # wrong exception type -- still a failure, but report it
             unknown_error = f"{type(exc).__name__}: {exc}"
             print(f"Raised the WRONG exception type: {unknown_error}")
+
+        # 6th smoke test: "Boundary" -- a real seizure in the first minutes of a file that is
+        # not the subject's first file, hit by one AI event that starts 20 s before the end
+        # (L) of the PREVIOUS file in sorted order, with offset_s = onset_s + 20 +
+        # (seizure offset) -- so after the split it covers the seizure exactly
+        # (CC_PROMPT_SCORER_BOUNDARY.md Step 3). Also a failing case: an event whose
+        # offset_s > L in the subject's LAST file must raise ScorerInputError.
+        order = sorted(annotation.keys())
+        chosen = None
+        for i in range(1, len(order)):
+            seizure_file = order[i]
+            szs = annotation[seizure_file]["seizures"]
+            if not szs:
+                continue
+            s_on, s_off = szs[0]
+            if s_on > 600:  # keep it comfortably "in the first minutes" of the file
+                continue
+            prev_file = order[i - 1]
+            if annotation[prev_file]["seizures"]:
+                continue  # keep the pair unconfounded: no seizure of its own near prev_file's end
+            chosen = (prev_file, seizure_file, s_on, s_off)
+            break
+        if chosen is None:
+            raise SystemExit(
+                f"No usable (previous file, seizure file) pair found for {subject} to build "
+                f"the Boundary smoke test -- pick a different --smoke_subject."
+            )
+        prev_file, seizure_file, s_on, s_off = chosen
+        L_prev = L_by_fname[prev_file]
+        boundary_onset = float(L_prev - 20)
+        boundary_offset = float(L_prev + s_off)
+        print(f"\n[Boundary smoke test] subject={subject} prev_file={prev_file} (L={L_prev}) "
+             f"seizure_file={seizure_file} seizure=({s_on},{s_off}) event in {prev_file}="
+             f"({boundary_onset:g},{boundary_offset:g})")
+
+        boundary_dir = tmp_root / "boundary"
+        boundary_dir.mkdir()
+        pair_files_df = files_df[files_df["file_name"].isin([prev_file, seizure_file])]
+        pair_files_df.to_csv(boundary_dir / "files.csv", index=False)
+        pd.DataFrame([dict(
+            subject=subject, file_name=prev_file, event_id=1,
+            onset_s=boundary_onset, offset_s=boundary_offset,
+            source="AI", review_status="Unseen",
+        )], columns=REQUIRED_EVENT_COLS).to_csv(boundary_dir / f"{subject}_events.csv", index=False)
+        boundary_res = run_eval(boundary_dir, out_dir=None, label="SMOKE[boundary]")
+        boundary_pooled = boundary_res["pooled"]
+        boundary_crossed = boundary_res["boundary_stats"][subject]["n_crossed"]
+
+        last_file = order[-1]
+        L_last = L_by_fname[last_file]
+        overflow_dir = tmp_root / "boundary_overflow_last_file"
+        overflow_dir.mkdir()
+        files_df.to_csv(overflow_dir / "files.csv", index=False)
+        pd.DataFrame([dict(
+            subject=subject, file_name=last_file, event_id=1,
+            onset_s=float(L_last - 10), offset_s=float(L_last + 10),
+            source="AI", review_status="Unseen",
+        )], columns=REQUIRED_EVENT_COLS).to_csv(overflow_dir / f"{subject}_events.csv", index=False)
+        print(f"\n[Boundary smoke test: last-file overflow] subject={subject} last_file="
+             f"{last_file} (L={L_last}) event=({L_last - 10:g},{L_last + 10:g})")
+        overflow_raised_right_type = False
+        overflow_error = None
+        try:
+            run_eval(overflow_dir, out_dir=None, label="SMOKE[boundary_overflow_last_file]")
+        except ScorerInputError as exc:
+            overflow_raised_right_type = True
+            overflow_error = str(exc)
+            print(f"Raised ScorerInputError (expected):\n{overflow_error}")
+        except Exception as exc:
+            overflow_error = f"{type(exc).__name__}: {exc}"
+            print(f"Raised the WRONG exception type: {overflow_error}")
 
     checks = []
     o, e, d, h = (results[m]["pooled"] for m in ("oracle", "empty", "displaced", "human"))
@@ -567,6 +760,12 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
     checks.append(("human: pooled identical to empty", h == e))
     checks.append(("unknown file: raises ScorerInputError, writes nothing",
                    unknown_raised_right_type))
+    checks.append(("boundary: split carried the overflow into the next file",
+                   boundary_crossed == 1))
+    checks.append(("boundary: one TP for the seizure covered after the split",
+                   boundary_pooled["detected"] == 1))
+    checks.append(("boundary: last-file overflow raises ScorerInputError",
+                   overflow_raised_right_type))
 
     print("\n=== Step 3 smoke-test verdicts ===")
     all_ok = True
@@ -575,7 +774,7 @@ def run_smoke_tests(subject: str = "chb06") -> dict:
         all_ok = all_ok and ok
     if not all_ok:
         raise SystemExit("Smoke tests FAILED -- fix the scorer before running on real exports (Step 4).")
-    print("\nAll five smoke tests PASS.")
+    print("\nAll six smoke tests PASS.")
     return results
 
 

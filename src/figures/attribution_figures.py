@@ -172,7 +172,7 @@ def fig3_rank_heatmap():
     ax.set_xticks(range(18))
     ax.set_xticklabels(CH, rotation=90, fontsize=8)
     ax.set_yticks(range(len(order)))
-    ax.set_yticklabels([f"{s} sz{i}" for s, i in order], fontsize=6)
+    ax.set_yticklabels([f"{s} {i+1}" for s, i in order], fontsize=6)
     for b in np.cumsum([sum(1 for s, _ in order if s == t) for t in TEST_SUBJ])[:-1]:
         ax.axhline(b - 0.5, color="w", lw=1.6)
     for b in (3.5, 7.5, 11.5, 15.5):
@@ -196,7 +196,7 @@ def fig3_rank_heatmap():
     if (nf, ng, len(xs)) != (EXPECTED_FOCAL, EXPECTED_GEN, EXPECTED_MARKS):
         die("Figure 3.9 overlay self-check failed — stop")
     ax.scatter(xs, ys, s=9, c="white", edgecolors="black", linewidths=0.4, zorder=3)
-    ax.set_yticklabels([f"{s} sz{i}" + ("  (gen.)" if lab[(s, i)][0] == "generalized" else "")
+    ax.set_yticklabels([f"{s} {i+1}" + ("  (gen.)" if lab[(s, i)][0] == "generalized" else "")
                         for s, i in order], fontsize=6)
     cb = fig.colorbar(im, ax=ax, fraction=0.030, pad=0.02)
     cb.set_label("channel rank within the seizure  (1 = most anomalous)")

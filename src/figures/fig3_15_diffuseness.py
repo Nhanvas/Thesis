@@ -72,7 +72,7 @@ def main():
     ax.set_xticks(ticks)
     ax.set_xticklabels([str(t) for t in ticks])
     ax.set_xlabel("Number of injected channels, |S|")
-    ax.set_ylabel("Diffuseness (normalised entropy of the 18 scores)")
+    ax.set_ylabel("Diffuseness (normalized entropy of the 18 scores)")
     ax.legend(fontsize=8.5, frameon=False, loc="upper center")
     ax.grid(alpha=0.25, lw=0.5)
 

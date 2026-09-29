@@ -24,24 +24,22 @@ still the real spec. This is just "what happened and what exists," for continuit
 | 7 — Channel Attribution Panel | **DONE** | initial build + **2** fix rounds; round 2 changed the attribution *definition* itself, decided by Project #1 (thesis authority) — see §10 below, **read it before starting Step 8**. Committed: `cf5ee88` |
 | 8 — Export `.txt` | **DONE** | initial build + **2** fix rounds (round 2: Export-button styling + a score-format false alarm traced to a stale server) — see §11 below |
 | 9 — cache 8 subjects + pick live-upload subject | **DONE** | phase 1 (inventory/cleanup), phase 1b (real `chb16` timing, C23) and phase 2 (the other 6 real subjects uploaded + processed; a real memory bug found and fixed on `chb06`) all closed — see §15 below |
+| 9+ — post-Step-9 stabilization (2026-09-27 → 09-28) | **DONE** | disk cleanup on Delete, Phase-A concurrency cap, file-count audit + `chb13` completed to its full 33 files, filter toggle collapsed to one, pre-freeze per-stage timing, operating-point criterion confirmed from code — see §16 below |
 
-**Where to resume:** Step 9 was the last numbered build step (`DEMO_BUILD_HANDOFF.md §6` row 9) — all
-8 allowlisted subjects (`chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18`) are now real, fully
-processed, cached subjects in the DB, confirmed via `GET /api/subjects` (§15.3). What's left is not a
-new build step: **O4** (which subject to actually use for the live-upload defense scenario — real
-per-subject timing numbers now exist, §15.3/`CC_STEP9_PHASE2_REPORT.md §6.3`, but the pick itself is
-still Boti's call), the `DELETE /api/subjects/{id}` endpoint's on-disk cleanup (§14, deliberately
-deferred to a final cleanup pass), and Phase A's upload-thread concurrency (§14/§15.3 — still open,
-now with `chb06` evidence that it can cause real memory pressure, not just slower timing). Also still
-read §10.4 below (one open item from Step 7 not yet resolved) and `STEP8_9_PREDEFENSE_CHECKLIST.md`
-(uploaded alongside this file — report needs + the fixed Tier 2 rules for Step 9, agreed with
-Project #1 2026-09-25). Don't assume anything on that checklist is already done just because it's
-listed there.
+**Where to resume (2026-09-28):** all 9 build steps and the post-Step-9 stabilization pass (§16)
+are closed. All 8 allowlisted subjects (`chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18`) are
+real, full-file-set, processed subjects in the DB — `chb13` was completed to 33/33 files in §16 (the
+"8 subjects complete" statement at the end of §15.3 was true by subject count, but `chb13` still held
+only 2 of its 33 real files at that time). Boti is now in a **test-everything-then-lock** phase; nothing
+report-related (screenshots, Figure 3.6, final timing, egress evidence) starts until he says everything is
+tested and locked. The open list is §14 (top items: pending edits to the repo copy of
+`SZSCAN_SPEC_v5.md`, an Analysis-screen check on the long `chb06` files, the network-off run, then
+freeze + tag → final timing → Tier 2). **Boti has said he wants to raise further, important topics about
+the web demo once this update pass is finished — ask him first thing in the next chat.** Don't assume
+anything on `STEP8_9_PREDEFENSE_CHECKLIST.md` is done just because it is listed there.
 
-**One open item carried out of Step 7, not yet resolved:** an unexplained Human event (id 86,
-`chb13_03.edf`) appeared in the DB between fix round 1 and fix round 2; neither round created it,
-and Boti isn't fully certain whether he drew it himself live-testing. Verify before treating `chb13`
-as a clean subject for anything Tier-2-related (§14).
+**Former open item (event id 86) — closed:** it was Boti's own event, drawn live while testing; it was
+deleted together with the old 2-file `chb13` (§16.4), so it is moot.
 
 ---
 
@@ -221,6 +219,17 @@ web_demo/
          attribution tokens already present in `SZSCAN_DESIGN_v2.md §4`/§9; otherwise unchanged
          since Step 0)
 ```
+
+**Added after Step 9 (§16):** `backend/backfill_bandpass.py` (one-time backfill of `.bandpass.npy`, run to
+completion on all 8 subjects — kept, harmless); `backend/measure_stage_timing.py` (standalone per-stage
+timing driver — reads real EDFs from the dataset directory, never `uploads/` or the DB);
+`pipeline_demo.py` gained optional `timing=` dict parameters on `process_subject_phase_b` /
+`process_subject_events` (default `None`, no effect on output) and the `.bandpass.npy` intermediate;
+`main.py` delete endpoint now also removes `uploads/{id}/`; `upload_manager.py` Phase A now runs in a
+4-worker `ThreadPoolExecutor`. New reports at `web_demo/` root: `CC_FIX_DELETE_CONCURRENCY_REPORT.md`,
+`CC_FILECOUNT_AUDIT_REPORT.md`, `CC_FIX_FILTERSTAGES_REPORT.md` (superseded intermediate),
+`CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md`, `CC_STAGE_TIMING_REPORT.md`, `CC_CHB13_REUPLOAD_REPORT.md`.
+Also present, origin unconfirmed: `CC_STEP9_CHB13_COMPLETE_PROMPT.md` (§16.7).
 
 Outside `web_demo/`, untouched by any of this: `tables/tables_ch2.md`, `docs/VERIFIED_CORRECTIONS.md`,
 `docs/EXHIBIT_SET_FINAL.md`, `docs/PROJECT_STATUS.md`, `docs/RUBRIC_TRACKING.md`,
@@ -415,13 +424,15 @@ exist if this control ever misbehaves again.)*
 - The three filter buttons (`lff`/`hff`/`60`) are independently clickable but **not** independently
   wired to different data — `pipeline_demo.py` only ever caches one combined bandpass+notch series.
   Whether to invest in separately cacheable filter stages so the buttons become individually
-  meaningful is an open product decision for Boti, raised in rounds 4/5, not acted on. **Still open
-  as of Step 7 — see §14.**
+  meaningful is an open product decision for Boti, raised in rounds 4/5, not acted on. **RESOLVED
+  2026-09-27 — collapsed to a single Preprocessed toggle (C24), see §16.4.**
 - `chb06` has a real, correct `.npy` cache on disk from ad hoc measurement scripts but has never
   been uploaded through the actual Create-New flow — it has no DB rows and does not appear in the
   app. If a real ~4-hour file is wanted for testing the window-length control's larger options or
   the mini-timeline's untested pan/zoom case, `chb06` would need a real upload, not just its
-  existing cache. **Still open as of Step 7 — see §14.**
+  existing cache. **RESOLVED — `chb06` was uploaded through the real flow in Step 9 phase 2 (§15.3). Its
+  files run up to ~4 h, so the `DOMAIN_SEC = 3600` limitation above is now a live case, not a hypothetical
+  one — see §14 item 2.**
 - `HumanExpand` (the User-added event detail view in Panel Event) is implemented per spec but has
   never been exercised live — no Human event can exist until Step 6 (Select Range) is built.
 
@@ -778,11 +789,20 @@ and Step 7's own prompt-wording defect (§10.2), which was a layout bug, not a d
 
 ## 13 · Report material for Project #1 (per `PROJECT2_SETUP.md §9.2(D)`)
 
+**Standing rule (Boti, 2026-09-28):** nothing the committee sees — report text, slides, screenshot
+captions, spoken defense answers — may mention our internal step / phase / prompt / report-file names
+(`Step 7`, `Phase B`, `CC_*`, "fix round 2", …). The committee is not the party that did the work; it
+cares about what the system does and what it outputs. Those labels live only in working documents like
+this one. Anything lifted from this file into the report has to be re-described by what it *is*.
+Report-related work (screenshots, Figure 3.6, final timing, egress evidence) is deferred until Boti
+declares everything tested and locked. Newer material is in §16.
+
+
 End-to-end runtime measured = **9.76 s/hour of EEG** (Step 1, not re-measured since; restored to
 `CLAUDE.md` in Step 7 round 2 in place of a stale ~15 s/hour component-level estimate that had crept
 back into that file — see §10.2). Note for the report's own timing discussion: this is still a
-**single point figure with ~5× run-to-run variance** (per-stage timing, needed for the report, is
-still open — `STEP8_9_PREDEFENSE_CHECKLIST.md §1`).
+**single point figure with ~5× run-to-run variance** (per-stage timing is now measured pre-freeze — §16.5;
+the final numbers still have to be re-measured on the frozen build — `STEP8_9_PREDEFENSE_CHECKLIST.md §1`).
 
 **Operating point (O1)** demonstrated working since Step 3 (`chb06`, `pen_mult=2.0` →
 28.76 events/day against the 40/day balanced target).
@@ -836,94 +856,61 @@ Figure 3.6 requirement).
 
 ---
 
-## 14 · Open items going into Step 9
+## 14 · Open items (rewritten 2026-09-28 — supersedes the "going into Step 9" list)
 
-**Carried over from Step 7, not yet resolved:**
+**Open — to do:**
 
-- [ ] **Event id 86 on `chb13_03.edf`** (§10.4) — confirm whether Boti created it live-testing or
-      whether it needs investigating further. Resolve before treating `chb13` as a clean subject for
-      anything Tier-2-related.
+1. [ ] **Repo copy of `SZSCAN_SPEC_v5.md` — four small edits** (Claude Code prompt drafted 2026-09-28,
+   not confirmed run): record O1 exactly (target, grid and `min_mag_pct` read from source, not typed),
+   close O4 = `chb16`, update C23's "concurrency not fixed" note (now capped at 4), and add the
+   Delete-removes-`uploads/{id}/` sentence to §5.6. The repo copy is the authority — it already carries
+   C24; the Claude-project copy may not.
+2. [ ] **Analysis-screen check on `chb06`** (files up to ~4 h). `MiniTimeline.jsx`'s `DOMAIN_SEC` is still
+   hardcoded to 3600 (§8.5) and pan/zoom was never exercised; `chb06` is now real data, so this can no
+   longer be assumed away. Also exercise the window-length control's larger options on a long file.
+3. [ ] **Network-off run (Boti, by hand):** turn the machine's network fully off, run the whole
+   Create-New → Process → Analysis flow, confirm it works. Chosen over packet capture; a capture is an
+   optional extra. Not done yet.
+4. [ ] **O4b — post-ictal flagging extent:** human visual review of where events land relative to known
+   seizure timing (eyes only, no labels into code). Unchanged since Step 3/4.
+5. [ ] **Freeze + tag**, then the **final per-stage timing on the frozen build**, plus **one end-to-end
+   measurement through the real HTTP upload flow**. Keep the two kinds of figure apart (§16.5): algorithm-
+   only cost vs. what a user actually waits for.
+6. [ ] **Tier 2 run** (`STEP8_9_PREDEFENSE_CHECKLIST.md §2`) after everything is locked. Pre-checks: re-run
+   the file-count audit (cheap), DB holds only the 8 real subjects, no leftover test events.
+7. [ ] **Report material** (screenshots, Figure 3.6, egress evidence, final timing) — only after Boti
+   says everything is tested and locked. Committee-facing wording rule: §13.
+8. [ ] **To Project #1 via Boti (methodological, `PROJECT2_SETUP.md §9.2(C)`):** the demo's operating point
+   uses the thesis's 40/day "balanced" number but calibrates the *total detected-event rate* per subject
+   (§16.6), not true FP/day. Whether that counts under divergence item 3 or is a fourth item is a
+   decision for Project #1 / the advisor; §1.6 has not been changed.
+9. [ ] **Keep the Claude project's copies in sync** (this file, `DEMO_BUILD_HANDOFF.md`,
+   `PROJECT2_SETUP.md` were regenerated 2026-09-28; SPEC after item 1; code copies after any further code
+   change). `PROJECT2_SETUP.md` is shared with Project #1 — Boti carries the new version across.
 
-**Handled in the Step 7 chats (nothing left to do by hand):**
+**Low priority / known (carried):**
+- [ ] `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3). Left as-is.
+- [ ] `UI/B1a`/`B2a` show no avatar while shared `Header.jsx` renders one on Analysis (§9.3) — accepted.
+- [ ] `UI/` mockups still picture the old three filter buttons; the single toggle is a deliberate deviation
+  (C24). Mockups were not modified.
+- [ ] `process_subject_events` re-runs `detect_events` at the chosen `pen_mult` although the calibration
+  loop already ran it once (one redundant PELT pass) — harmless, left alone. `MIN_MAG_PCT = 60` is a
+  duplicated literal in `pipeline_demo.py` that matches `cpd_pipeline_v14`'s default rather than importing it.
+- [ ] Commit hygiene: keep `web_demo/` commits separate from `docs/`/`src/figures/`/`figures/`/
+  `rank_readout.py`/`results/`; never `git add .`. `bme11/` stays untracked (Boti's own).
 
-- [x] Delete the Human test events in `chb13_02`/`chb13_03` — Pre-step A.
-- [x] Verify the Accept fill `#16A34A` live once, on a synthetic file — Pre-step B.
-- [x] Record the attribution definition actually implemented in the spec (C20, then closed in C21).
-- [x] Restructure `SZSCAN_SPEC_v5.md §1.6` into exactly 3 numbered divergences, matching the report.
-- [x] Correct `CLAUDE.md`'s stale timing figure and the "PROVISIONAL" wording in
-      `THESIS_CONTEXT_FOR_DEMO.md`/`PROJECT2_SETUP.md`.
-
-**Handled in the Step 8 chats (nothing left to do by hand):**
-
-- [x] `.6f` score-format regression Boti flagged from his `chb13-summary.txt` export — confirmed a
-      false alarm (stale, un-reloaded backend process), not a code defect; no fix needed. §11.3 item 2.
-- [x] Export button's enabled state didn't visually match its sibling buttons — real computed-style
-      bug, fixed and verified live on 2 subjects. §11.3 item 1.
-
-**Deferred on purpose (decide at Step 9 / pre-defense, not before Step 9):**
-
-- [ ] **Filter stages.** The three toolbar buttons (`lff` / `hff` / `60`) are clickable but all gate the same
-      single cached bandpass+notch series (§8.5), which sits badly with the anti-staging principle
-      (`SZSCAN_SPEC_v5.md §0`: a button that reflects nothing real). The real pipeline has two operations
-      (one 0.5–60 Hz bandpass, one 60 Hz notch), so "separable" `lff`/`hff` would mean applying
-      high-pass / low-pass filters that are *not* in the pipeline. Options for Boti: (a) keep as is,
-      (b) collapse to the two real stages, (c) separate stages with new filters. Needs a decision, not
-      code, until then.
-- [ ] Synthetic test subjects under `chb14`/`chb15`/`chb16` were built from `chb15` clips — they are not real
-      subject data and must be removed before any demo run so no subject row shows synthetic data under a
-      real subject's name. **Also now a hard requirement of Tier 2** (`STEP8_9_PREDEFENSE_CHECKLIST.md §2`
-      item 2: only real EDF uploads of the 8 TEST subjects, no synthetic files).
-- [ ] A real ~4 h file (`chb06`) through the real Create-New flow, if the window-length control's larger
-      options and the mini-timeline's pan/zoom (`DOMAIN_SEC` hardcoded to 3600) are to be tested. Its
-      cache exists but was never attached to a real subject/file record.
-
-**New from Step 7, deferred to Step 8/9 by design (see `STEP8_9_PREDEFENSE_CHECKLIST.md` for the full
-list, not repeated here in full):**
-
-- [ ] Report screenshots: (a) import/process a recording, (b) Figure 3.6 (timeline + attribution of
-      the *same* recording, captured post-round-2, no `meas_date` calendar dates visible).
-- [ ] Per-stage timing (ingest/filter, adjacency+band-power, GAE scoring incl. per-node, CPD, total),
-      median + range, on a frozen build.
-- [ ] No-network-egress evidence.
-- [ ] `SZSCAN_SPEC_v5.md` O1 recorded with the exact operating-point parameters the demo uses.
-- [ ] Tier 2's 6 fixed rules (freeze+tag, clean 8-subject DB, per-subject export of unreviewed AI
-      events only, demo never scores itself, rerun-all-on-error, no UI metric).
-
-**Low priority / known:**
-
-- [ ] **Keep the Claude project's uploaded copies in sync with the repo.** Re-upload the repo versions
-      of `SZSCAN_SPEC_v5.md`, `SZSCAN_DESIGN_v2.md`, `CLAUDE.md`, `THESIS_CONTEXT_FOR_DEMO.md`,
-      `PROJECT2_SETUP.md`, and this file after every step; the repo is the source of truth. (Note from
-      Step 6: the project's copies were found stale at that point — same risk applies now that Step 7
-      touched four of these five files.)
-- [ ] Commit hygiene: keep splitting `web_demo/` commits from `docs/`/`tables/`/`src/figures/`/
-      `figures/`/`rank_readout.py`/`results/` commits. Step 7's commit (`cf5ee88`) followed this
-      correctly.
-- [ ] `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3); the pale row
-      highlight of an expanded Uncertain event barely shows. Left as-is.
-- [ ] `UI/B1a`/`B2a` show no avatar while the shared `Header.jsx` renders one on Analysis (§9.3) — a
-      flagged extrapolation Boti accepted.
-- [ ] Step 8 (Export) will read rank/channel/score/status of each event's attribution from what Step 7
-      persists (`attribution_status` table + the attribution endpoint) — now using the **closed**
-      p95-|robust-z| definition, not the round-1 PROVISIONAL one.
-
-**Still open after Step 9 (phase 2 done — see §15.3), Boti's call on each:**
-
-- [ ] **O4 — which subject to use for the live-upload defense scenario.** File-count-per-subject scope
-      is now moot (decided 2026-09-26: full real file set for all 8 subjects, done — see §15.3); real
-      per-subject Phase A+B/PELT timing numbers for all 8 subjects now exist
-      (`CC_STEP9_PHASE2_REPORT.md §6.3`) so the pick itself can be made, but this report doesn't make
-      it — that stays Boti's decision.
-- [ ] `DELETE /api/subjects/{id}` doesn't clean up `uploads/{subject_id}/` on disk (only the DB rows) —
-      confirmed by reading `main.py` directly. Deliberately deferred to a final cleanup pass before the
-      demo is considered complete, per Boti's own decision — **not** an active bug needing a fix now.
-- [ ] **Phase A's unbounded upload-thread concurrency** (`upload_manager.py` spawns one background
-      thread per file the instant its upload completes, no cap) — deliberately deferred since Step 9
-      phase 1b first found it (C23/§15.2), but `chb06`'s phase 2 run added real evidence it isn't just
-      a timing curiosity: the driver process was OOM-killed three times during `chb06`'s own uploads,
-      before a separate (now-fixed, see §15.3) Phase B memory bug even ran. Still not fixed — worth
-      capping before the defense if an even larger subject or a more memory-constrained machine is
-      ever involved.
+**Resolved since the previous version of this list:**
+- [x] Event id 86 — Boti's own event; moot after `chb13` was re-uploaded (§16.4).
+- [x] Filter stages — collapsed to one toggle (C24, §16.4).
+- [x] Synthetic `chb14`/`chb15`/`chb16` subjects — deleted in Step 9 phase 1 (§15.1); DB is real-only.
+- [x] A real `chb06` through the real flow — Step 9 phase 2 (§15.3).
+- [x] `DELETE /api/subjects/{id}` leaving `uploads/{id}/` on disk — fixed (§16.3).
+- [x] Unbounded Phase A concurrency — capped at 4 (§16.3).
+- [x] `chb13` holding 2 of 33 files — completed to 33/33 (§16.4).
+- [x] O4 — `chb16` chosen (§16.2).
+- [x] Operating-point criterion — confirmed by reading the code (§16.6).
+- [x] Step 7 / Step 8 hand-checks (Human test events, Accept fill, attribution wording, spec §1.6
+  restructure, `.6f` false alarm, Export button styling) — see §10 and §11.
 
 ---
 
@@ -1075,3 +1062,137 @@ instruction not to. Both are recorded in §14 as two separate, only-partially-re
 
 **Completion, confirmed live:** `GET /api/subjects` lists exactly the full 8-subject TEST allowlist —
 `chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18` — no more, no fewer, no synthetic subject.
+
+> **Correction (2026-09-28):** the sentence above is right about subject count only. `chb13` held just 2
+> of its 33 real files at that point (found by the audit in §16.3, fixed in §16.4). `chb13` had been
+> treated as "already done" because it predated Step 9 — a completeness check was never run on it.
+
+---
+
+## 16 · Post-Step-9 stabilization (2026-09-27 → 09-28)
+
+Not a numbered build step. After Step 9 closed, Boti went through the old open list item by item; every
+decision below is his — Project #2 reviewed and advised. Reports: `CC_FIX_DELETE_CONCURRENCY_REPORT.md`,
+`CC_FILECOUNT_AUDIT_REPORT.md`, `CC_FIX_FILTERSTAGES_REPORT.md` (intermediate, superseded),
+`CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md`, `CC_STAGE_TIMING_REPORT.md`, `CC_CHB13_REUPLOAD_REPORT.md`.
+Guards 4/4 after each; Boti also re-ran `pytest` himself in Git Bash (4 passed in 5.32 s). He ran the git
+checkpoint commands afterwards (hash not recorded here).
+
+### 16.1 Working rules restated by Boti
+- The "LOCKED" label on the doc set means a shared reference frame, not something immovable: Boti adjusts
+  it per situation and timing. Project #2 reviews and advises; only once he approves does it write fix
+  instructions. (The propose → approve → execute loop, restated — not a change to it.)
+- Nothing committee-facing may carry internal step / phase / prompt / report names (§13).
+- Report material waits until everything is tested and locked.
+
+### 16.2 Decisions
+
+| Item | Decision |
+|---|---|
+| Event id 86 | Boti's own event. Closed; deleted with the old `chb13`. |
+| O4 — live-upload subject | **`chb16`**, chosen on measured end-to-end time (table below), not on file count. Backup: `chb03`. |
+| Delete leaving files on disk | Fix now (done, §16.3). |
+| Phase A concurrency | Fix (done, §16.3). |
+| Filter toolbar | Three buttons → one "Preprocessed" toggle (done, §16.4). |
+| Operating point in SPEC O1 | Record it exactly (prompt pending, §14 item 1). |
+| Network-egress evidence | Option (a): network off, full flow. Boti's manual task; not done. |
+| Per-stage timing | Measure (done pre-freeze, §16.5); final numbers later. |
+| Report material | Deferred until everything is tested and locked. |
+
+O4 basis (Phase A+B + PELT wall-clock, from the real upload flow, §15 and §16.4):
+
+| Subject | Files | Hours | Total |
+|---|---|---|---|
+| **chb16** | 19 | 19.0 | **~5.7 min** |
+| chb03 | 38 | 38.0 | ~10.0 min |
+| chb15 | 40 | 40.0 | ~11.5 min |
+| chb17 | 21 | 21.0 | ~12.3 min |
+| chb14 | 26 | 26.0 | ~13.0 min |
+| chb06 | 18 | 66.7 | ~17.0 min |
+| chb13 | 33 | 33.0 | ~19.8 min |
+| chb18 | 36 | 35.6 | ~20.1 min |
+
+The old "fewest files" heuristic (SPEC §1.7 / HANDOFF §8) is superseded: `chb06` has the fewest files but
+one of the longest totals. Caveats to check before the defense: `chb16` currently shows `Viewing (0/19)`
+(one file was opened); confirm its events are all still `Unseen`. A live-upload run would delete and
+re-create it anyway, with the pre-built copy as insurance.
+
+### 16.3 Backend fixes (`CC_FIX_DELETE_CONCURRENCY_REPORT.md`, `CC_FILECOUNT_AUDIT_REPORT.md`)
+- **Delete** now also removes `uploads/{subject_id}/` (`main.py`): refuses any resolved path not strictly
+  under `uploads/`, logs "already gone" when absent, otherwise `shutil.rmtree` + log. Verified with a
+  throwaway subject; the 8 real subjects untouched. Re-confirmed on real data when `chb13` was deleted.
+- **Phase A concurrency** is bounded: a module-level `ThreadPoolExecutor(max_workers=4)` in
+  `upload_manager.py` replaces one-thread-per-file. 12 queued files: peak concurrency exactly 4, all 12
+  completed. **The cap of 4 was chosen without per-file memory profiling** (Claude Code said so itself);
+  lower it if OOM ever recurs.
+- **File-count audit** (real `.edf` count on disk vs `files` rows): 7 of 8 matched; `chb13` 33 vs 2.
+  Sidecar `.edf.seizures` files are excluded from the count and never read.
+
+### 16.4 Filter toolbar and `chb13`
+**Filter.** Three toggles (`lff`/`hff`/`60`) had all driven the same cached bandpass+notch array. First
+collapsed to two (`bpf` + `60`; the notch disabled while bandpass is off) — that needed a new
+`{stem}.bandpass.npy` intermediate, a `backfill_bandpass.py` run (200/200 files, every raw/filtered
+byte-identity assertion passed) and exposed a real regression: `main.py`'s `_file_detail()` still unpacked
+`_cache_paths()` as two values after it began returning three, which would have 500'd every open-a-file
+call (fixed, `raw_path, _, _ = …`). Live-verified in the browser. Then measured: bandpass-vs-bandpass+notch
+differs by **2.91 µV** against **127.92 µV** for raw-vs-preprocessed, invisible at every scale the toolbar
+offers (75–500 µV), and no pipeline stage consumes the bandpass-only signal on its own. **Final design:
+one toggle**, label `Preprocessed (0.5-60 Hz + 60 Hz notch)`, OFF = raw, ON = `filtered_uv`; the waveform
+endpoint no longer returns `bandpass_uv`; `.bandpass.npy` is still written (harmless). SPEC §6.4 updated
+(C24). Live-verified again, no console errors.
+
+**`chb13` completed to 33/33** through the real HTTP flow (`CC_CHB13_REUPLOAD_REPORT.md`): old subject
+deleted (directory confirmed gone on disk), 33 files uploaded and processed with no interruption
+(~19.6 min end to end), file ids 233–265 (disjoint from the old 10/11), 54 events, all AI / `Unseen`, no
+Human event, `attribution_status` empty across the whole DB. The old test state (4 reviewed AI events, the
+Human event id 86) is gone by design.
+
+| Subject | Files | Hours | Phase A+B (s/h) | PELT (s/h) | `pen_mult` | Events |
+|---|---|---|---|---|---|---|
+| chb13 | 33 | 33.000 | 26.58 | 9.41 | 2.0 | 54 (39.27/day) |
+
+### 16.5 Per-stage timing — pre-freeze (`CC_STAGE_TIMING_REPORT.md`)
+`measure_stage_timing.py`, subject `chb16` (19 files, 19.0 h), 5 repeats, sequential and single-process.
+Seconds per hour of EEG, median [min, max]:
+
+| Stage | Median | Range | Share |
+|---|---|---|---|
+| Ingest + filter (`process_file_phase_a`) | 1.202 | 1.140 – 1.836 | 11% |
+| Adjacency + band powers | 4.905 | 4.659 – 5.805 | 45% |
+| GAE scoring incl. per-node | 0.225 | 0.220 – 0.272 | 2% |
+| Gamma-AEC | 1.725 | 1.634 – 1.900 | 16% |
+| Subject z-score stats + checkpoint load + LedoitWolf + robust-z fits | 0.358 | 0.349 – 0.539 | 3% |
+| CPD (operating-point calibration + final `detect_events`) | 2.631 | 2.369 – 2.764 | 24% |
+| **Total (outer wall clock)** | **10.829** | 10.694 – 12.472 | |
+
+Sum-of-buckets vs wall clock differed by 0.01–0.02% on every run (flag threshold 2%).
+
+Caveats that must travel with these numbers: (1) this is **algorithm-only cost**, files processed one after
+another; the real upload flow runs up to 4 Phase A workers at once plus HTTP and disk I/O and measured
+**10.9–27.3 s/h** for Phase A+B across subjects (§15.3, §16.4) — never quote the two kinds of figure
+interchangeably; (2) the build is **not frozen yet** — final numbers get re-measured on the frozen build;
+(3) run-to-run variance on this machine is real (~5×, §4).
+
+### 16.6 Operating point — confirmed from `pipeline_demo.py`
+`calibrate_operating_point()`: the target is `fp_budget_operating_point.BUDGETS["balanced"]` (40.0/day,
+read at import, never hardcoded); the candidate grid is `final_eval.DEFAULT_PENS` (the thesis's own grid);
+`min_mag_pct = 60`. For every grid `pen_mult` it runs `cpd_pipeline_v14.detect_events` on the subject's
+concatenated label-free score, computes `rate = events / total recording hours × 24` (the whole recording
+is the denominator — no interictal mask exists), and keeps the `pen_mult` whose rate is closest to the
+target. **Same numeric target as the thesis, different quantity calibrated:** total detected-event rate as
+the label-free proxy for FP/day, because a new patient has no labels to tell true from false. Chosen values
+so far: chb16 1.0 · chb17 2.0 · chb14 5.0 · chb13 2.0 · chb18 2.0 · chb03 2.0 · chb15 5.0 · chb06 2.0.
+The literal grid values still have to be read out of `final_eval.py` when SPEC O1 is written (§14 item 1);
+route to Project #1: §14 item 8.
+
+### 16.7 Process observations
+- Only one Claude Code terminal was ever open. The unprompted activity Boti saw was Claude Code finishing
+  the task it had been given (live-verify, a regression fix, the backfill), not a parallel session.
+- `CC_STEP9_CHB13_COMPLETE_PROMPT.md` (dated 2026-09-26, origin unconfirmed): its structure and wording
+  match Project #2 prompts (reads `BUILD_PROGRESS.md §14/§15`, cites the phase-2 prompt), so it is most
+  likely a prompt from an earlier Project #2 session that was saved but never run. The `chb13` report cites
+  it (memo text, "what is lost" acknowledgment) and says it "never ran". Its step 2 (manual removal of
+  `uploads/chb13/`) is obsolete after the delete fix. It went into the git checkpoint with the rest of
+  `web_demo/`; keeping or deleting it is Boti's call.
+- Lesson kept: an audit of *counts* is what caught the `chb13` gap — "already processed" is not a
+  completeness check.

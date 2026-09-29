@@ -163,7 +163,7 @@ Phân biệt hai loại "demo", đừng lẫn:
 
 | Loại | Là gì | Cần gì |
 |---|---|---|
-| **Demo lúc bảo vệ** | Web đã hoàn chỉnh, trình bày end-to-end trước hội đồng | Bước 0–8 xong, kịch bản, subject ít file, cache dự phòng |
+| **Demo lúc bảo vệ** | Web đã hoàn chỉnh, trình bày end-to-end trước hội đồng | Build xong, test toàn bộ, kịch bản, subject demo live = `chb16` (chọn theo thời gian đo thực, không theo số file), bản dựng sẵn của 8 subject làm dự phòng |
 | **Báo cáo quá trình build** | Chương/mục trong report mô tả kiến trúc và lập luận thiết kế | Chủ yếu **viết được ngay**, không chờ code |
 
 Phần lớn vật liệu cho loại thứ hai đã sẵn sàng, vì nó là **lập luận thiết kế có bằng chứng**, không phải
@@ -176,11 +176,16 @@ kết quả thí nghiệm:
 - Divergence (b) hậu-cơn — sự **tồn tại** là tất yếu logic; **mức độ** thì chờ bước 1.
 - Lựa chọn stack, phạm vi 8 subject, ràng buộc wording attribution.
 
-**Bốn chỗ phải chờ bước 1 mới điền được:** thời gian chạy thật đầu-cuối (hiện chỉ có 16.9 ms/window ở
-mức thành phần) · mức độ gắn cờ đoạn hậu-cơn (O4b) · operating point của demo (O1) · ảnh chụp app thật.
+**Bốn chỗ trống ban đầu — trạng thái cập nhật 2026-09-28:**
 
-→ Viết phần report về demo **ngay bây giờ** với bốn chỗ trống đó, đừng đợi build xong. Project #2 cung
-cấp nội dung kỹ thuật; project hiện tại quyết định cách viết vào report và đặt vào tiêu chí nào.
+- **Thời gian chạy thật:** đã đo *trước freeze*. Chi phí thuật toán thuần = **10.83 s/giờ EEG** (median, `chb16`, 5 lần chạy; từng stage xem `BUILD_PROGRESS.md` §16.5). Đây khác với thời gian chờ qua luồng upload thật (Phase A+B đo được 10.9–27.3 s/giờ tùy subject) — hai loại số không được dùng thay cho nhau. Số cuối phải đo lại trên bản đã freeze.
+- **Operating point (O1):** cơ chế **đã xác nhận bằng code** — cùng mục tiêu 40 event/ngày ("balanced") như thesis, nhưng demo calibrate *tổng tỉ lệ event phát hiện/ngày* (proxy label-free cho FP/ngày, vì không có nhãn). Giá trị chi tiết sẽ ghi vào SPEC O1 (đang chờ). **Cần Project hiện tại cùng cô quyết định** đây thuộc divergence mục 3 hay là mục riêng (quyết định phương pháp, xem (C) ở trên).
+- **Mức độ gắn cờ hậu-cơn (O4b):** vẫn chờ, cần mắt người xem.
+- **Ảnh chụp app thật:** hoãn cho tới khi test và chốt xong toàn bộ.
+
+**Quy tắc trình bày (Boti, 2026-09-28):** không thứ gì hội đồng nhìn thấy — report, slide, chú thích ảnh, câu trả lời khi bảo vệ — được nhắc tên gọi nội bộ (step, phase, tên prompt, tên file `CC_*`, "fix round"…). Hội đồng chỉ quan tâm hệ thống làm gì và cho ra output gì. Khi lấy nội dung từ `BUILD_PROGRESS.md` vào report, phải diễn đạt lại theo bản chất của việc, không theo nhãn nội bộ.
+
+→ Viết phần report về demo khi Boti báo đã chốt xong test; Project #2 cung cấp nội dung kỹ thuật, project hiện tại quyết định cách viết vào report và đặt vào tiêu chí nào.
 
 ### 9.3 Câu hỏi nên hỏi đúng project nào
 

@@ -266,6 +266,10 @@ EDF reading, gamma-AEC, GAE forward — all much smaller).
 > without a fix; revisit (cap concurrent Phase A threads) before the defense if timing margin ever
 > becomes a real concern.
 
+> **Concurrency cap (C25, 2026-09-28):** Phase A concurrency is now capped at **4 workers**
+> (`ThreadPoolExecutor(max_workers=4)`, `upload_manager.py`), replacing the unbounded per-file
+> concurrency C23 measured above.
+
 ---
 
 ## 2 · DATA SCOPE
@@ -416,6 +420,7 @@ re-create" is far simpler than designing a review-preserving mechanism.
 - A confirmation screen exists. **The same single sentence is used for every delete case**
   (mid-processing or already complete) — not split into 2 messages *(the author's decision, different
   from v4)*.
+- Deleting a subject also removes `uploads/{subject_id}/` from disk.
 
 ### 5.7 Other buttons
 
@@ -461,6 +466,18 @@ illustrative example for the ≥ 24 h case; `UI/B0b` illustrates the < 24 h case
     z-score has no absolute clinical meaning worth reading as a number.
 - Has a playhead (▼) synced with Panel EEG.
 - **View-only, no interaction.** Clicks only work on Panel EEG.
+
+> **Paging past 1 h (C26, 2026-09-28):** files can run well past the 1 h default (chb06 up to
+> ~4 h). The mini-timeline pages in fixed 3600 s pages that follow the playhead:
+> `pageStart = floor(playheadSec / 3600) * 3600`, `pageEnd = min(pageStart + 3600,
+> usable_duration_seconds)`. The score line, Detections blocks, cell grid, time labels and
+> playhead are all drawn for `[pageStart, pageEnd)`; an event straddling a page edge is clipped
+> to it. The page automatically flips whenever the playhead crosses an hour boundary (playback,
+> scrub-bar seeking and Event Panel row clicks all already move the playhead) — no new controls,
+> still view-only. Every page keeps the same fixed 6-column, 10-min grid regardless of how much
+> of it a trailing partial page actually fills, so a file <= 1 h (`pageStart` always `0`) renders
+> pixel-identical to the pre-C26 single-page behaviour. The Y-axis auto-scale is unchanged: still
+> P1–P99 of the whole file's score, never just the visible page.
 
 ### 6.4 EEG Panel
 
@@ -522,6 +539,19 @@ the toolbar's **Comment** button since Comment is already attached to each event
 > real toggle the table now describes: **OFF = raw, ON = preprocessed (bandpass+notch combined)**.
 > The backend's `.bandpass.npy` cache file was left in place (harmless sunk cost) even though
 > nothing reads it anymore.
+
+> **Preprocessed-toggle default (C27, 2026-09-29, author decision, `CC_FIX_SCORECACHE_PROMPT.md`
+> Task 2):** the toggle now defaults **ON** on a fresh Analysis-screen load, superseding
+> CC_STEP5_FIX4_PROMPT.md's "genuinely raw on load" rule. That rule existed because the toggle
+> used to be mislabeled as 3 independent filters (see C24 above) — defaulting to an
+> already-filtered view under that mislabeling would have silently hidden which stages were
+> applied. Now that the label reads plainly `pp Preprocessed (0.5-60 Hz + 60 Hz notch)`, and the
+> preprocessed signal is what the model actually consumes, defaulting to it is the more
+> representative first view. Everything else about the toggle is unchanged: raw stays drawn,
+> dimmed, underneath ("raw is never fully hidden"), and turning the toggle OFF still shows raw
+> alone. The amplitude default (C18 above, 75 µV) is also unchanged — screenshots of `chb06_02.edf`
+> at 75/150/250 µV under this new default are in `CC_FIX_SCORECACHE_REPORT.md`, but the author
+> keeps final say on that default.
 
 **Playhead:** only clickable on Panel EEG. Clicking a point → the playhead jumps there, the mini-timeline
 syncs.
@@ -730,10 +760,10 @@ for human reading.
 
 | # | Item | How to handle |
 |---|---|---|
-| O1 | **The demo's operating point** (the event-detection threshold). The FP-budget procedure is label-free so it's usable, but the **specific budget value** must be **read from a file** (`src/retrain/fp_budget_operating_point.py` + `docs/RESULTS_OF_RECORD_phaseB.md`) at build time — **absolutely never type it from memory** | read the file |
+| ~~O1~~ | ~~The demo's operating point~~ — **RECORDED**: `pipeline_demo.calibrate_operating_point()` targets `fp_budget_operating_point.BUDGETS["balanced"]` = **40.0 FP/day**, over the candidate grid `final_eval.DEFAULT_PENS` = **[0.3, 0.5, 1.0, 2.0, 5.0, 10.0]**, with `pipeline_demo.MIN_MAG_PCT` = **60**. Rate = events / total recording hours × 24, using the **whole recording** as the denominator (no labels — SPEC §1.6a's label-free equivalence argument). The chosen `pen_mult` is whichever grid point's rate is closest to the target. **SUPERSEDED 2026-09-29** (`REPORT_REPLY_TO_PROJECT2_OP.md` §1, Project 1's methodological decision, confirmed by the author): the app now uses **ONE fixed operating point for every patient** — `mag_pct = 50`, `pen_mult = 2.0` — as both the shipped default and for the Tier 2 run, validation-derived on the three VAL patients before any test patient was scored. `calibrate_operating_point()` no longer runs on the live path; it stays in `pipeline_demo.py` as a documented "not built" alternative (future work, thesis Ch.4 §4.5). See `pipeline_demo.FIXED_MAG_PCT`/`FIXED_PEN_MULT`. | closed |
 | O2 | **PELT parameters** (penalty, model, min_size) — take them exactly from `src/cpd_pipeline_v14.py`, don't re-choose them | read the file |
 | ~~O3~~ | ~~what the demo's robust-z fits on~~ — **CLOSED 2026-09-03**: `retrain_io.robust_z` already fits on the entire window set (lines 56–60). Not a divergence, nothing to handle | closed |
-| O4 | **Which subject to use for the live-upload scenario** — chosen by real file count, measured while building the cache | measure |
+| ~~O4~~ | ~~Which subject to use for the live-upload scenario~~ — **CLOSED**: `chb16`, chosen by measured end-to-end time (~5.7 min, the fastest of the 8 allowlisted subjects), not by file count | closed |
 | O4b | **The extent of post-ictal flagging** (§1.6 item 2) — observed at step 1, decide whether to call it out separately in the defense slides. No adjusting the model, no adjusting the threshold to "fix" it | observe |
 | O5 | **Gamma-AEC in the continuous path** — `dataprep/compute_gamma_aec.py` currently runs on the already-split array; a continuous version is needed | write new code in `pipeline_demo.py` |
 | O6 | **`evaluation_protocol.py` and `stat_validation.py` were just restored to `src/`** (2026-09-03, tag `repo-deps-fixed`) after being mistakenly archived while still being imported. `fp_budget_operating_point.py` depends on this chain — verify the `import` runs before pulling parameters for O1 | 1 command |

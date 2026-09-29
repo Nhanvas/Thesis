@@ -168,7 +168,7 @@ convention.
 | Risk | Handling |
 |---|---|
 | Label-free pipeline produces results far from the thesis (too many/too few events) | Caught at **step 1**, before building the UI. If the deviation is too large, adjust the **operating point** (label-free, legitimate) — **do not** touch the model, **do not** use labels to adjust |
-| Processing 17 files takes ~6 minutes during a live demo | Pick a subject with few files for the live scenario; pre-cache the rest |
+| A live upload + Process takes minutes, not seconds (measured end to end: `chb16` ~5.7 min — the fastest of the 8; the others ~10–20 min) | Use `chb16` for the live scenario — chosen by measured total time, not by file count; pre-built copies of all 8 subjects are the insurance |
 | Committee asks why the demo's numbers differ from the report | Prepared answer in `SZSCAN_SPEC_v5.md §1.6` |
 | Ground truth accidentally leaks into the demo | `test_guards.py` blocks it in CI/local, see `CLAUDE.md` |
 | Timeline: report due 15 Oct, IELTS 09 Oct | **The report is priority 1.** If something must be cut, cut backward from step 8 → 6. Steps 0–5 are the minimum demo that's still defensible |

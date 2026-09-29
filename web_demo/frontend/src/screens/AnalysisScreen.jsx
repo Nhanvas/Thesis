@@ -116,20 +116,20 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
   const [windowSec, setWindowSec] = useState(DEFAULT_WINDOW_SEC)
   const [windowStartSec, setWindowStartSec] = useState(0)
   const [amplitudeUv, setAmplitudeUv] = useState(DEFAULT_AMPLITUDE_UV)
-  // CC_STEP5_FIX4_PROMPT.md item 2: default must be genuinely raw. OFF on a fresh load —
-  // SPEC §6.4 ("when on, the filtered wave is highlighted, raw recedes") and DESIGN §3's
-  // raw/filtered tokens both describe an on/off toggle from a raw baseline, not a filter
-  // defaulting to already-applied. A prior default of true meant the very first thing shown
-  // was already-filtered data drawn prominent (EegPanel's filter-overlay gate), with raw
-  // merely the dimmed background — the opposite of CLAUDE.md's "everything shown must be
-  // data that genuinely went into the computation" as the *default*, unannounced view.
+  // SPEC §6.4 C27 (2026-09-29, CC_FIX_SCORECACHE_PROMPT.md Task 2, author decision):
+  // defaults ON. Supersedes CC_STEP5_FIX4_PROMPT.md item 2's "genuinely raw on load" rule,
+  // which existed because this toggle used to be mislabeled as a plain on/off filter state;
+  // the label is now honest ("Preprocessed"), and the filtered signal is what the model
+  // actually consumes, so defaulting to it is the more representative first view. Raw is
+  // still never fully hidden — it stays drawn, dimmed, underneath — and turning the toggle
+  // OFF still shows raw alone, exactly as before.
   //
   // One real toggle (CC_FIX_FILTER_SINGLE_TOGGLE_REPORT.md): ON overlays the fully
   // preprocessed (bandpass+notch) series on top of raw. The bandpass-only intermediate
   // (CC_FIX_FILTERSTAGES_REPORT.md's short-lived 2-button design) had no real downstream
   // consumer and a visually negligible difference from the full preprocessed signal, so it
   // no longer gets its own toggle.
-  const [preprocessedOn, setPreprocessedOn] = useState(false)
+  const [preprocessedOn, setPreprocessedOn] = useState(true)
   const [speed, setSpeed] = useState(1)
   const [playing, setPlaying] = useState(false)
   const [playheadSec, setPlayheadSec] = useState(null)

@@ -425,6 +425,16 @@ def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict
                 for onset, offset in file_events.get(fn, [])
             ]
 
+        # Persist the subject-wide ensemble score (waveform_serving.get_timeline's cache —
+        # CC_FIX_SCORECACHE_PROMPT.md Task 1a) BEFORE the subject exists in the DB, so a
+        # write failure here fails the whole Process through the except below rather than
+        # leaving a subject row with no score cache. `_finalize_draft_dir` (already run by
+        # the caller) has moved the draft directory to its final uploads/{project_id}/ path
+        # by this point.
+        subject_dir = UPLOAD_DIR / session.project_id
+        for fn, score in scores.items():
+            np.save(subject_dir / f"{Path(fn).stem}.score.npy", score)
+
         db.create_subject_with_files(session.project_id, session.memo, files_payload, events_payload)
     except Exception as exc:  # pragma: no cover - unexpected pipeline/DB failure
         with session.lock:

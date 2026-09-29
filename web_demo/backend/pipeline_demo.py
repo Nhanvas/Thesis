@@ -28,11 +28,12 @@ Phase split (resolves the two `# TODO(step3)` markers that used to sit in proces
 
   Stage 2 — process_subject_events(): runs on "Process" click. Concatenates the per-file
     Phase B scores in FILENAME order (SPEC §5.5 is explicit that this is filename order, not
-    upload order), calibrates a label-free per-subject operating point (SPEC §8 O1 — see
-    calibrate_operating_point()), runs cpd_pipeline_v14.detect_events() once on the whole
-    concatenated timeline, then assigns each returned event back to its file by the
-    cumulative-offset construction in SPEC §1.5 (no lookup module — offsets fall out of the
-    per-file score lengths by construction).
+    upload order), runs cpd_pipeline_v14.detect_events() once on the whole concatenated
+    timeline at the fixed operating point (FIXED_MAG_PCT/FIXED_PEN_MULT -- see SPEC §8 (O1)
+    dated note; per-subject label-free calibration via calibrate_operating_point() no longer
+    runs on this path), then assigns each returned event back to its file by the cumulative-
+    offset construction in SPEC §1.5 (no lookup module — offsets fall out of the per-file
+    score lengths by construction).
 
 Read SZSCAN_SPEC_v5.md §1 before touching this file — it is the measured justification for
 every divergence from the thesis pipeline.
@@ -99,6 +100,14 @@ PEN_MULT_GRID = list(_final_eval.DEFAULT_PENS)
 # cpd_pipeline_v14.detect_events's own default; SPEC §8 O2 says use PELT params as locked
 # in that file — this one is a keyword default there, not something demo code should re-pick.
 MIN_MAG_PCT = 60
+
+# Per-subject label-free calibration (calibrate_operating_point() below) is no longer run on
+# the live processing path. REPORT_REPLY_TO_PROJECT2_OP.md section 1 (Project 1's methodological
+# decision, confirmed by the author): the application uses ONE fixed operating point for every
+# patient -- validation-derived, fixed on the three VAL patients before any test patient was
+# scored, never read from the patient being processed.
+FIXED_MAG_PCT = 50
+FIXED_PEN_MULT = 2.0
 
 
 def _verify_checkpoint(path: Path) -> None:
@@ -520,6 +529,10 @@ class OperatingPointResult:
     grid: list[tuple[float, int, float]]  # (pen_mult, n_events, rate_per_day) for every value tried
 
 
+# No longer called on the live processing path (see FIXED_MAG_PCT/FIXED_PEN_MULT above) --
+# kept for reference only, as a documented "not built" alternative (future work, thesis
+# Chapter 4 section 4.5). The __main__ CLI smoke-test block at the bottom of this file still
+# calls it for dev-only comparison against the fixed operating point.
 def calibrate_operating_point(global_score: np.ndarray, total_hours: float) -> OperatingPointResult:
     """SPEC §8 O1 — label-free, per-subject operating-point calibration.
 
@@ -564,9 +577,9 @@ def process_subject_events(
 
     `timing` (CC_STAGE_TIMING_REPORT.md — pre-freeze technical measurement): optional dict,
     same pattern as `process_subject_phase_b`'s. Written key `"cpd"` = wall-clock spent inside
-    `calibrate_operating_point()` (which itself runs `detect_events()` once per grid point)
-    plus the one further `detect_events()` call below at the chosen operating point. Default
-    `None`, zero effect on existing callers.
+    the single `detect_events()` call below at the fixed operating point (FIXED_MAG_PCT/
+    FIXED_PEN_MULT -- see the module-level comment; no grid search runs here any more).
+    Default `None`, zero effect on existing callers.
     """
     win_sec = float(preprocessing.WIN_S)
     filenames_sorted = sorted(scores_by_filename.keys())
@@ -581,8 +594,16 @@ def process_subject_events(
 
     global_score = np.concatenate([scores_by_filename[f] for f in filenames_sorted])
     t0 = time.perf_counter()
-    op = calibrate_operating_point(global_score, total_hours)
-    events_global = cpd_pipeline_v14.detect_events(global_score, op.pen_mult, min_mag_pct=MIN_MAG_PCT)
+    events_global = cpd_pipeline_v14.detect_events(
+        global_score, FIXED_PEN_MULT, min_mag_pct=FIXED_MAG_PCT
+    )
+    event_rate_per_day = (len(events_global) / total_hours * 24.0) if total_hours > 0 else 0.0
+    # `grid` no longer reflects a search -- one entry, for the single fixed point actually used.
+    op = OperatingPointResult(
+        pen_mult=FIXED_PEN_MULT,
+        event_rate_per_day=event_rate_per_day,
+        grid=[(FIXED_PEN_MULT, len(events_global), event_rate_per_day)],
+    )
     if timing is not None:
         timing["cpd"] = time.perf_counter() - t0
 

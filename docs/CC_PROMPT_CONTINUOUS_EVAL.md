@@ -130,3 +130,10 @@ G2 gates Scope T; G1 gates Scope W only. If G2 passes and G1 fails, Steps A, B a
 in full; Scope W is still computed and reported in a separate table marked "G1 failed — not used to
 set the application's operating point", and no Scope W operating point is proposed. G1 results are
 reported per file, with the files grouped by subject.
+
+## Correction C1 (2026-10-01, before Step A)
+
+"Fitting scopes" defines Scope T as the locked thesis pipeline, unchanged. The locked pipeline filters
+every window independently with preprocessing.filter_window (4 s window plus FILTER_PAD on each side,
+as in write_windows). Scope T must use exactly that for the scored signal; Scope W keeps whole-file
+filtering (the application's convention).

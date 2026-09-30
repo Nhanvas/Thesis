@@ -123,3 +123,10 @@ Either expectation failing is reported as such, not explained away.
 Step B table: rows = offline reconstructed (Table 9, copied), Scope T continuous, Scope W continuous
 (its 50 / 2.0 row must equal the application's Table 13: stop and report if not); columns as above.
 Closing lines: E1 met or not, E2 met or not. No other interpretation. Report wall-clock time.
+
+## Amendment A1 (2026-09-30, before Step A)
+
+G2 gates Scope T; G1 gates Scope W only. If G2 passes and G1 fails, Steps A, B and C run for Scope T
+in full; Scope W is still computed and reported in a separate table marked "G1 failed — not used to
+set the application's operating point", and no Scope W operating point is proposed. G1 results are
+reported per file, with the files grouped by subject.

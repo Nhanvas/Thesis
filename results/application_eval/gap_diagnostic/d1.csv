@@ -1,0 +1,9 @@
+subject,n_app_ictal,n_offline_ictal,ictal_count_match,ictal_best_lag_k,ictal_rho_at_best_k,ictal_rho_at_k0,n_app_inter_retained,n_offline_inter,inter_count_match,inter_rho_at_k0,d1_pass
+chb03,106,106,True,0,0.9523,0.9523,17204,17204,True,0.9126,True
+chb06,45,45,True,0,0.9626,0.9626,19826,19826,True,0.955,True
+chb13,144,144,True,0,0.7872,0.7872,12452,12452,True,0.8553,False
+chb14,49,49,True,0,0.9842,0.9842,13983,13983,True,0.9886,True
+chb15,515,515,True,0,0.9728,0.9728,17026,17026,True,0.947,True
+chb16,28,28,True,0,0.9529,0.9529,6428,6428,True,0.8003,True
+chb17,74,74,True,0,0.9247,0.9247,9304,9304,True,0.9328,True
+chb18,83,83,True,0,0.8532,0.8532,14853,14853,True,0.8054,True

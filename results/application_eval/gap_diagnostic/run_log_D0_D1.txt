@@ -1,0 +1,29 @@
+=== D0 ===
+D0a reproduced: True  pooled={'tp': 47, 'fp': 318, 'n_ref': 76, 'fn': 29, 'sensitivity': 0.618, 'precision': 0.129, 'f1': 0.213, 'fp_per_day': 27.4, 'n_inter_h': 278.2}
+
+=== D1 (heavy EDF pass) ===
+  [D1] chb03: ictal 106/106 match=True best_k=0 rho@best=0.952 rho@0=0.952 | inter 17204/17204 match=True rho@0=0.913 -> PASS
+  [D1] chb06: ictal 45/45 match=True best_k=0 rho@best=0.963 rho@0=0.963 | inter 19826/19826 match=True rho@0=0.955 -> PASS
+  [D1] chb13: ictal 144/144 match=True best_k=0 rho@best=0.787 rho@0=0.787 | inter 12452/12452 match=True rho@0=0.855 -> FAIL
+  [D1] chb14: ictal 49/49 match=True best_k=0 rho@best=0.984 rho@0=0.984 | inter 13983/13983 match=True rho@0=0.989 -> PASS
+  [D1] chb15: ictal 515/515 match=True best_k=0 rho@best=0.973 rho@0=0.973 | inter 17026/17026 match=True rho@0=0.947 -> PASS
+  [D1] chb16: ictal 28/28 match=True best_k=0 rho@best=0.953 rho@0=0.953 | inter 6428/6428 match=True rho@0=0.800 -> PASS
+  [D1] chb17: ictal 74/74 match=True best_k=0 rho@best=0.925 rho@0=0.925 | inter 9304/9304 match=True rho@0=0.933 -> PASS
+  [D1] chb18: ictal 83/83 match=True best_k=0 rho@best=0.853 rho@0=0.853 | inter 14853/14853 match=True rho@0=0.805 -> PASS
+D1 all_pass=False
+
+D1 FAILED for at least one patient -- stopping. D2/D3/D4 not run.
+Traceback (most recent call last):
+  File "F:\Study\Thesis\Code\src\diag_application_gap.py", line 642, in <module>
+    main()
+  File "F:\Study\Thesis\Code\src\diag_application_gap.py", line 636, in main
+    write_summary(d0, d1, d2, d3, d4, elapsed)
+  File "F:\Study\Thesis\Code\src\diag_application_gap.py", line 565, in write_summary
+    (OUT_DIR / "SUMMARY.md").write_text("\n".join(lines) + f"\n\nComputation time: {elapsed_s:.1f} s.\n")
+  File "C:\Users\Dell Latitude 3590\AppData\Local\Programs\Python\Python311\Lib\pathlib.py", line 1079, in write_text
+    return f.write(data)
+           ^^^^^^^^^^^^^
+  File "C:\Users\Dell Latitude 3590\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 6192-6193: character maps to <undefined>

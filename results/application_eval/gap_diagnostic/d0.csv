@@ -1,0 +1,9 @@
+subject,timeline_positions,real_windows_from_edf,positions_minus_real_windows,reported_fa_denominator_h,recomputed_fa_denominator_h,reported_fp,recomputed_fp_per_day
+chb03,34201,34201,0,37.883,37.883,39,24.707
+chb06,60060,60060,0,66.683,66.683,54,19.435
+chb13,29700,29700,0,32.84,32.84,32,23.386
+chb14,23400,23400,0,25.946,25.946,58,53.651
+chb15,36008,36008,0,39.437,39.437,45,27.386
+chb16,17100,17100,0,18.969,18.969,17,21.509
+chb17,18906,18906,0,20.924,20.924,23,26.381
+chb18,32070,32070,0,35.541,35.541,50,33.764

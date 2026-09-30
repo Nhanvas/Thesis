@@ -1,0 +1,11 @@
+{
+  "files": 231,
+  "hours": 279.3881,
+  "seizures": 76,
+  "detected": 16,
+  "false_alarms": 608,
+  "sensitivity": 0.21052631578947367,
+  "precision": 0.02564102564102564,
+  "f1": 0.045714285714285714,
+  "false_alarms_per_day": 52.4340920615021
+}

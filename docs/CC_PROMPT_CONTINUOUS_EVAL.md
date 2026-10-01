@@ -137,3 +137,17 @@ reported per file, with the files grouped by subject.
 every window independently with preprocessing.filter_window (4 s window plus FILTER_PAD on each side,
 as in write_windows). Scope T must use exactly that for the scored signal; Scope W keeps whole-file
 filtering (the application's convention).
+
+## Amendment A2 (2026-10-01, before Step A)
+
+Signal-loss rule: a window is flagged as signal loss when the standard deviation of the raw
+(unfiltered) signal is below 1e-10 V on every one of the 18 channels; the threshold is fixed, not
+tuned (real EEG ~1e-5 V, flat ~1e-22 V). It uses no annotation. In both scopes, flagged windows (a)
+are excluded from every fit — robust-z median and MAD, LedoitWolf covariance, CPD penalty variance
+and magnitude-filter background; (b) keep their place on the timeline with fused score set to 0, the
+robust-z median, so they cannot create change points on their own; (c) are excluded from the FA/day
+denominator, with the excluded hours reported per subject. Scope T's per-subject z-score statistics
+stay those committed in data/processed. G2 is evaluated on windows not flagged, since the score of a
+flagged window is numerically undefined in both computations; the per-subject number of flagged
+windows is reported beside G2. Thresholds of G1 and G2 unchanged. The same rule will be added to the
+application before its next run.

@@ -151,3 +151,12 @@ stay those committed in data/processed. G2 is evaluated on windows not flagged, 
 flagged window is numerically undefined in both computations; the per-subject number of flagged
 windows is reported beside G2. Thresholds of G1 and G2 unchanged. The same rule will be added to the
 application before its next run.
+
+## Amendment A3 (before Step A; reorders and drops, changes no computation of the thesis result)
+
+Scope W is computed through G1 only; Scope W Steps A, B and C are dropped, because the application's
+operating point will be selected on the application's own output for the validation patients, and its
+test result comes from the application's own rerun. Order after the gates: Step A for Scope T; then
+Step B for Scope T at its selected point and at 50 / 2.0 with merge 90, running PELT only for the
+penalties those two points need; then write SUMMARY.md immediately; then Step C, with the full Scope T
+test grid for the curve as the last task.

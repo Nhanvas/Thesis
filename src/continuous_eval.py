@@ -624,13 +624,19 @@ def c1_scores_cache_path(subj):
     return CACHE_DIR / "scores" / f"T_c1_{subj}.npy"
 
 
+def c1_components_cache_path(subj):
+    return CACHE_DIR / "scores" / f"T_c1_{subj}_components.npz"
+
+
 def recompute_scope_t_c1(subj):
     """Amendment A6 (docs/CC_PROMPT_CONTINUOUS_EVAL.md, 2026-10-01): reproduction-only Scope T
     recompute using the literal Correction C1 fit -- background_mask, signal-loss windows
     INCLUDED in the robust-z median/MAD and LedoitWolf fits, exactly as the committed offline
     arrays were fitted. Used only to gate G2 for a subject with flagged windows (chb17); never
     used for Steps A/B/C, which stay on the Amendment-A2-fitted cache. Written to a separate
-    cache path (c1_scores_cache_path) -- never overwrites scores_cache_path('T', subj)."""
+    cache path (c1_scores_cache_path) -- never overwrites scores_cache_path('T', subj). Also
+    saves the per-branch robust-z components (zr, zl, zg) to c1_components_cache_path, used by
+    Amendment A7's per-branch G2 diagnostic (zrecon/zlatent/zgamma vs. the offline components)."""
     t0 = time.time()
     (CACHE_DIR / "scores").mkdir(parents=True, exist_ok=True)
     cpath = c1_scores_cache_path(subj)
@@ -679,6 +685,8 @@ def recompute_scope_t_c1(subj):
     ens_T = ER.build_ensemble_subset({"zrecon": zr, "zlatent": zl, "zgamma": zg},
                                      ER.CANDIDATES["rlg"])
     np.save(cpath, ens_T.astype(np.float32))
+    np.savez(c1_components_cache_path(subj), zr=zr.astype(np.float32),
+             zl=zl.astype(np.float32), zg=zg.astype(np.float32))
     elapsed = time.time() - t0
     log("G2", f"{subj}: Scope T (Correction C1 fit, Amendment A6) done ({len(ens_T)} windows, "
              f"background={int(background_mask.sum())}) in {elapsed:.1f}s -> {cpath}")
@@ -970,6 +978,44 @@ def gate_g2():
     return passed, df
 
 
+def g2_branch_report(subj):
+    """Amendment A7: per-branch (zrecon, zlatent, zgamma) Spearman against the offline
+    components (results/phaseB/tier2/ens_test_tf/components/), under the Correction C1 fit
+    (c1_components_cache_path, from recompute_scope_t_c1), over windows not flagged
+    signal-loss -- the diagnostic detail behind G2's recorded FAIL for a subject with flagged
+    windows. Requires recompute_scope_t_c1(subj) to have been run first."""
+    z = np.load(c1_components_cache_path(subj))
+    mask = load_mask(subj)
+    is_ictal, is_buffer, is_artifact = mask["is_ictal"], mask["is_buffer"], mask["is_artifact"]
+    is_signal_loss = mask["is_signal_loss"]
+    background = (~is_ictal) & (~is_buffer) & (~is_artifact)
+
+    comp_dir = ROOT / "results" / "phaseB" / "tier2" / "ens_test_tf" / "components"
+    rows = []
+    for branch, key in (("zrecon", "zr"), ("zlatent", "zl"), ("zgamma", "zg")):
+        mine = z[key]
+        off_ictal = np.load(comp_dir / f"{branch}_{subj}_ictal.npy")
+        off_inter = np.load(comp_dir / f"{branch}_{subj}_inter.npy")
+        mine_ictal, mine_inter = mine[is_ictal], mine[background]
+        m1 = min(len(mine_ictal), len(off_ictal))
+        m2 = min(len(mine_inter), len(off_inter))
+        sl_ictal = is_signal_loss[is_ictal][:m1]
+        sl_inter = is_signal_loss[background][:m2]
+
+        def _rho(a, b, m, keep):
+            aa, bb = a[:m][keep], b[:m][keep]
+            r, _ = spearmanr(aa, bb) if len(aa) >= 2 else (float("nan"), None)
+            return round(float(r), 4)
+
+        rows.append(dict(branch=branch,
+                         rho_ictal=_rho(mine_ictal, off_ictal, m1, ~sl_ictal),
+                         rho_inter=_rho(mine_inter, off_inter, m2, ~sl_inter)))
+    df = pd.DataFrame(rows)
+    log("G2", f"{subj}: Amendment A7 per-branch report (C1 fit, windows not flagged):\n"
+             f"{df.to_string(index=False)}")
+    return df
+
+
 # ── change points -> merged events (byte-identical to cpd_pipeline_v14.detect_events's own
 #    merge loop; separated out so PELT (pen_mult-only) can be fit once and reused across the
 #    merge_s grid -- verified below in verify_fast_grid). No buffer don't-care exclusion: every
@@ -1186,9 +1232,14 @@ def run_step_a():
 #    calls V14.detect_events directly (one PELT fit for that point's own pen_mult) -- Amendment
 #    A3's "PELT only for the penalties those two points need", not the full PEN_MULTS grid. ──
 def run_step_b(step_a_result):
+    # Amendment A7: chb17's G2 remains FAIL for a documented, hardware-dependent reason, not a
+    # pipeline defect -- by the author's decision Step B still scores all eight test patients,
+    # but every pooled row is also reported without chb17 as a sensitivity row.
     scope = "T"
+    no_chb17 = [s for s in TEST_SUBJS if s != "chb17"]
     rows = []
     macro_auroc, _ = window_auroc_macro(scope, TEST_SUBJS)
+    macro_auroc_no_chb17, _ = window_auroc_macro(scope, no_chb17)
     for label, mag, pen, ms in (
         ("selected", step_a_result[scope]["selected"]["mag_pct"],
          step_a_result[scope]["selected"]["pen_mult"],
@@ -1204,13 +1255,21 @@ def run_step_b(step_a_result):
             per_patient.append(dict(scope=scope, point=label, mag_pct=mag, pen_mult=pen,
                                     merge_s=ms, subject=subj, **cell))
         pooled = pool_cells(per_patient)
+        pooled_no_chb17 = pool_cells([c for c in per_patient if c["subject"] != "chb17"])
         rows.extend(per_patient)
         rows.append(dict(scope=scope, point=label, mag_pct=mag, pen_mult=pen, merge_s=ms,
                          subject="POOLED", window_auroc_macro=macro_auroc, **pooled))
+        rows.append(dict(scope=scope, point=label, mag_pct=mag, pen_mult=pen, merge_s=ms,
+                         subject="POOLED_no_chb17", window_auroc_macro=macro_auroc_no_chb17,
+                         **pooled_no_chb17))
         log("B", f"scope {scope} @ {label} (m{mag:g}/p{pen:g}/merge{ms}): "
                  f"pooled TP={pooled['tp']} FP={pooled['fp']} sens={pooled['sensitivity']:.3f} "
                  f"prec={pooled['precision']:.3f} FA/day={pooled['fp_per_day']:.2f} "
                  f"macroAUROC={macro_auroc:.3f}")
+        log("B", f"scope {scope} @ {label} (m{mag:g}/p{pen:g}/merge{ms}) no_chb17: "
+                 f"pooled TP={pooled_no_chb17['tp']} FP={pooled_no_chb17['fp']} "
+                 f"sens={pooled_no_chb17['sensitivity']:.3f} prec={pooled_no_chb17['precision']:.3f} "
+                 f"FA/day={pooled_no_chb17['fp_per_day']:.2f} macroAUROC={macro_auroc_no_chb17:.3f}")
     df = pd.DataFrame(rows)
     df.to_csv(OUT_DIR / "stepB.csv", index=False)
     return df
@@ -1281,6 +1340,123 @@ def run_step_c(step_a_result, step_b_df):
     return tables
 
 
+def run_a8_test_point(mag=75.0, pen=5.0, ms=300):
+    """Amendment A8: the reported operating point -- maximizes pooled validation sensitivity
+    subject to pooled validation FA/day <= 25, decided before the Step C test grid was read.
+    Test result at this point (present in stepC_full_test_grid_scopeT.csv as a pooled row;
+    recomputed here for the per-subject and no-chb17 breakdown Amendment A8 also asks for)."""
+    scope = "T"
+    per_patient = []
+    cells = []
+    for subj in TEST_SUBJS:
+        d = load_subject_data(scope, subj)
+        ev = V14.detect_events(d["score"], pen, min_mag_pct=mag, local_win=15,
+                               win_sec=WIN_SEC, inter_mask=d["inter_mask"], merge_s=ms)
+        cell = score_one_cell(d, ev)
+        cells.append(dict(subject=subj, **cell))
+        per_patient.append(dict(subject=subj, n_seizures=cell["n_ref"], detected=cell["tp"],
+                                false_alarms=cell["fp"], sensitivity=round(cell["sensitivity"], 4),
+                                precision=round(cell["precision"], 4), f1=round(cell["f1"], 4),
+                                fp_per_day=round(cell["fp_per_day"], 3),
+                                n_signal_loss=d["n_signal_loss"],
+                                excluded_h=round(d["excluded_h"], 4)))
+    pooled = pool_cells(cells)
+    pooled_no_chb17 = pool_cells([c for c in cells if c["subject"] != "chb17"])
+    log("C", f"Amendment A8 test point (m{mag:g}/p{pen:g}/merge{ms:g}): pooled "
+             f"sens={pooled['sensitivity']:.3f} prec={pooled['precision']:.3f} "
+             f"FA/day={pooled['fp_per_day']:.2f} | no_chb17 sens={pooled_no_chb17['sensitivity']:.3f} "
+             f"prec={pooled_no_chb17['precision']:.3f} FA/day={pooled_no_chb17['fp_per_day']:.2f}")
+    return dict(operating_point=dict(mag_pct=mag, pen_mult=pen, merge_s=ms),
+               per_patient=per_patient, pooled=pooled, pooled_no_chb17=pooled_no_chb17)
+
+
+def run_alert_budget_exploratory():
+    """EXPLORATORY, POST-HOC -- not pre-registered in docs/CC_PROMPT_CONTINUOUS_EVAL.md.
+
+    Per-patient alert-budget operating point, computed from the same grid as Step C's full
+    Scope T test grid (grid_for_subject, on the already-cached Scope T score arrays -- no new
+    GAE/connectivity scoring; only change-point detection, deterministic and identical to what
+    stepC_full_test_grid_scopeT.csv pools). For each test patient, among the 96 cells (8
+    magnitude percentiles x 6 penalty multipliers x 2 merge gaps), the cell chosen is the one
+    whose raw alert rate -- hypothesized event count / recorded days excluding signal-loss time
+    only (no seizure annotation used in this selection) -- is the largest value not above
+    25/day; ties by lower pen_mult, then lower mag_pct, then merge_s == 300. Sensitivity,
+    precision and FA/day (which DO use the annotation, same as the rest of Step C) are then
+    read off for that cell, per patient and pooled."""
+    scope = "T"
+    rows = []
+    cells_for_pool = []
+    for subj in TEST_SUBJS:
+        d = load_subject_data(scope, subj)
+        grid = grid_for_subject(d["score"], d["inter_mask"], None, MAG_PCTS, PEN_MULTS, MERGE_GAPS)
+        recorded_days = (d["total_dur_s"] / 3600.0 - d["excluded_h"]) / 24.0
+
+        scored = []
+        for cell in grid:
+            rate = len(cell["hyp_events"]) / recorded_days if recorded_days > 0 else float("inf")
+            scored.append((rate, cell))
+        within_budget = [(r, c) for (r, c) in scored if r <= 25.0]
+        if within_budget:
+            rate, cell = min(within_budget, key=lambda rc: (
+                -rc[0], rc[1]["pen_mult"], rc[1]["mag_pct"], 0 if rc[1]["merge_s"] == 300 else 1))
+        else:
+            # no cell stays within the 25/day budget for this patient -- fall back to the
+            # lowest-rate cell and flag it, rather than silently picking an out-of-budget one
+            rate, cell = min(scored, key=lambda rc: rc[0])
+
+        sc = score_one_cell(d, cell["hyp_events"])
+        cells_for_pool.append(dict(subject=subj, **sc))
+        rows.append(dict(subject=subj, mag_pct=cell["mag_pct"], pen_mult=cell["pen_mult"],
+                         merge_s=cell["merge_s"], n_hyp_events=len(cell["hyp_events"]),
+                         recorded_days_excl_sigloss=round(recorded_days, 4),
+                         alert_rate_per_day=round(rate, 4), within_budget=bool(within_budget),
+                         n_seizures=sc["n_ref"], detected=sc["tp"], false_alarms=sc["fp"],
+                         sensitivity=round(sc["sensitivity"], 4), precision=round(sc["precision"], 4),
+                         f1=round(sc["f1"], 4), fp_per_day=round(sc["fp_per_day"], 3)))
+        log("C", f"alert-budget exploratory {subj}: m{cell['mag_pct']:g}/p{cell['pen_mult']:g}"
+                 f"/merge{cell['merge_s']:g} rate={rate:.2f}/day within_budget="
+                 f"{bool(within_budget)} sens={sc['sensitivity']:.3f} FA/day={sc['fp_per_day']:.2f}")
+    pooled = pool_cells(cells_for_pool)
+    df = pd.DataFrame(rows)
+    log("C", f"alert-budget exploratory pooled: sens={pooled['sensitivity']:.3f} "
+             f"prec={pooled['precision']:.3f} FA/day={pooled['fp_per_day']:.2f}")
+    return df, pooled
+
+
+def write_alert_budget_exploratory(df, pooled):
+    lines = [
+        "# Alert-budget per-patient operating point -- EXPLORATORY, POST-HOC",
+        "",
+        "**This analysis is exploratory and post-hoc: it was not pre-registered in "
+        "docs/CC_PROMPT_CONTINUOUS_EVAL.md and is not one of Steps A/B/C's results of "
+        "record.**",
+        "",
+        "Computed from the same grid as Step C's full Scope T test grid (`grid_for_subject`, "
+        "on the already-cached Scope T score arrays -- no new GAE/connectivity scoring run, "
+        "only change-point detection, identical to what `stepC_full_test_grid_scopeT.csv` "
+        "pools). For each test patient, among the 96 grid cells (8 magnitude percentiles x "
+        "6 penalty multipliers x 2 merge gaps), the cell chosen is the one whose raw alert "
+        "rate -- hypothesized event count divided by the patient's recorded days, excluding "
+        "signal-loss time only (no seizure annotation used in this selection) -- is the "
+        "largest value not above 25/day; ties by lower `pen_mult`, then lower `mag_pct`, "
+        "then `merge_s` == 300. Sensitivity, precision and FA/day (which DO use the seizure "
+        "annotation, same as the rest of Step C) are then read off for the selected cell, "
+        "per patient and pooled.",
+        "",
+        "## Per patient",
+        "",
+        df.to_string(index=False),
+        "",
+        "## Pooled (all 8 test patients)",
+        "",
+        f"TP={pooled['tp']} FP={pooled['fp']} n_ref={pooled['n_ref']} "
+        f"sensitivity={pooled['sensitivity']:.4f} precision={pooled['precision']:.4f} "
+        f"FA/day={pooled['fp_per_day']:.3f}",
+        "",
+    ]
+    (OUT_DIR / "alert_budget_exploratory.md").write_text("\n".join(lines), encoding="utf-8")
+
+
 # ── SUMMARY.md ────────────────────────────────────────────────────────────────
 def write_readme():
     (OUT_DIR / "README.md").write_text(
@@ -1293,7 +1469,7 @@ def write_readme():
 
 
 def write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a=None, step_b=None, step_c=None,
-                  elapsed_s=None, stopped_at=None):
+                  elapsed_s=None, stopped_at=None, g2_branch_df=None, a8=None):
     lines = ["# Continuous-timeline evaluation -- SUMMARY", "",
             "docs/CC_PROMPT_CONTINUOUS_EVAL.md. Locked thesis pipeline, unchanged, run on the "
             "real continuous timeline (every window scored, files concatenated in file-name "
@@ -1329,6 +1505,20 @@ def write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a=None, step_b=None, step
     lines.append(f"**G2: {'PASS' if g2_pass else 'FAIL'}**")
     lines.append("")
 
+    if g2_branch_df is not None:
+        lines.append("### Amendment A7 -- per-branch diagnostic for chb17's recorded G2 FAIL")
+        lines.append("")
+        lines.append("zrecon, zlatent, zgamma vs. the offline components (Correction C1 fit, "
+                    "windows not flagged signal-loss). Cause: the committed offline arrays were "
+                    "fitted on signal-loss windows whose GAE reconstruction score is numerically "
+                    "undefined and hardware-dependent (zrecon 48.70 on the GPU that produced "
+                    "them, 3.00 on this CPU; chb17_zrecon_outliers.txt, chb17b_69_inspect.txt) -- "
+                    "no CPU recomputation can reproduce them. By the author's decision, Steps A "
+                    "and B below proceed regardless.")
+        lines.append("")
+        lines.append(g2_branch_df.to_string(index=False))
+        lines.append("")
+
     if stopped_at:
         lines.append(f"**Stopped after {stopped_at} failed. Steps A/B/C not run.**")
         (OUT_DIR / "SUMMARY.md").write_text("\n".join(lines), encoding="utf-8")
@@ -1357,7 +1547,10 @@ def write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a=None, step_b=None, step
 
     lines.append("## Step B -- test patients at Scope T's selected point and at 50/2.0/merge90")
     lines.append("")
-    lines.append(step_b[step_b.subject == "POOLED"].to_string(index=False))
+    lines.append("Amendment A7: POOLED_no_chb17 excludes chb17 (see the per-branch diagnostic "
+                "above for why its G2 is recorded as FAIL) from the pooled sensitivity row.")
+    lines.append("")
+    lines.append(step_b[step_b.subject.isin(["POOLED", "POOLED_no_chb17"])].to_string(index=False))
     lines.append("")
 
     if step_c is None:
@@ -1384,6 +1577,28 @@ def write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a=None, step_b=None, step
                 f"{p['f1']:.3f} | {p['fp_per_day']:.2f} | "
                 f"{step_c['T']['window_auroc_macro']:.3f} |")
     lines.append("")
+
+    if a8 is not None:
+        lines.append("### Amendment A8 -- reported operating point (75/5/300)")
+        lines.append("")
+        lines.append("Maximizes pooled validation sensitivity subject to pooled validation "
+                    "FA/day <= 25 (validation sensitivity 0.333, 24.99 FA/day), decided before "
+                    "this test grid was read. The Step A rule's own point (above) stays "
+                    "reported; this is the one actually proposed.")
+        lines.append("")
+        op = a8["operating_point"]
+        p, pnc = a8["pooled"], a8["pooled_no_chb17"]
+        lines.append(f"| row | TP | FP | n_ref | sens | prec | FA/day |")
+        lines.append("|---|---|---|---|---|---|---|")
+        lines.append(f"| POOLED | {p['tp']} | {p['fp']} | {p['n_ref']} | {p['sensitivity']:.3f} | "
+                    f"{p['precision']:.3f} | {p['fp_per_day']:.2f} |")
+        lines.append(f"| POOLED_no_chb17 | {pnc['tp']} | {pnc['fp']} | {pnc['n_ref']} | "
+                    f"{pnc['sensitivity']:.3f} | {pnc['precision']:.3f} | {pnc['fp_per_day']:.2f} |")
+        lines.append("")
+        lines.append("Per patient:")
+        lines.append("")
+        lines.append(pd.DataFrame(a8["per_patient"]).to_string(index=False))
+        lines.append("")
 
     e1 = step_c["T"]["pooled"]["sensitivity"] < D0A_TABLE9["sensitivity"] and \
         step_c["T"]["pooled"]["fp_per_day"] > D0A_TABLE9["fp_per_day"]
@@ -1423,7 +1638,8 @@ def write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a=None, step_b=None, step
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", default="all",
-                    choices=["score", "rescore_t", "a2", "a6", "gates", "abc", "stepc", "all"])
+                    choices=["score", "rescore_t", "a2", "a6", "a7", "gates", "abc", "stepc",
+                            "alert_budget", "all"])
     ap.add_argument("--subjects", default=None, help="comma list; default = all 11")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--smoke", action="store_true", help="one validation file only")
@@ -1483,6 +1699,38 @@ def main():
         log("A6", f"Amendment A6 C1-fit reproduction recompute done for {flagged_subjs} in "
                  f"{time.time()-t0:.1f}s -- continuing to gates")
 
+    if a.stage == "a7":
+        # Amendment A7 (docs/CC_PROMPT_CONTINUOUS_EVAL.md, 2026-10-01): chb17's G2 FAIL is
+        # recorded as a documented, hardware-dependent irreproducibility of the committed
+        # offline arrays (not a pipeline defect) -- by the author's explicit decision, this
+        # stage continues to Step A/B regardless of G2, unlike every other stage above, which
+        # still stops on G2 failure. recompute_scope_t_c1 is rerun once to also persist the
+        # per-branch components g2_branch_report needs (not saved by the Amendment A6 run).
+        recompute_scope_t_c1("chb17")
+        g1_pass, g1_df = gate_g1()
+        g2_pass, g2_df = gate_g2()
+        g2_branch_df = g2_branch_report("chb17")
+        log("A7", f"G2 {'PASS' if g2_pass else 'FAIL'} -- by the author's decision (Amendment "
+                 f"A7), continuing to Step A/B regardless (chb17's FAIL is hardware-dependent, "
+                 f"not a pipeline defect; see the per-branch report above).")
+
+        verify_fast_grid("chb10")
+        t_a0 = time.time()
+        step_a = run_step_a()
+        log("A", f"[A] done in {time.time()-t_a0:.1f}s")
+        t_b0 = time.time()
+        step_b = run_step_b(step_a)
+        log("B", f"[B] done in {time.time()-t_b0:.1f}s")
+
+        write_readme()
+        write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a, step_b, step_c=None,
+                     elapsed_s=time.time() - t0, g2_branch_df=g2_branch_df)
+        log("SUMMARY", f"[SUMMARY] written (gates + per-branch report + Step A + Step B; "
+                       f"Step C pending) -> {OUT_DIR / 'SUMMARY.md'}")
+        print(f"Amendment A4: stopping after [SUMMARY] written -- Step C not started. "
+             f"Run with --stage stepc to continue. See {OUT_DIR / 'SUMMARY.md'}")
+        return
+
     if a.stage in ("gates", "abc", "all", "a2", "a6"):
         g1_pass, g1_df = gate_g1()
         g2_pass, g2_df = gate_g2()
@@ -1534,6 +1782,8 @@ def main():
         # Amendment A4: the explicit instruction to run Step C, after [SUMMARY] written.
         g1_pass, g1_df = gate_g1()
         g2_pass, g2_df = gate_g2()
+        g2_branch_df = (g2_branch_report("chb17")
+                        if c1_components_cache_path("chb17").exists() else None)
         with open(OUT_DIR / "stepA_selected.json", encoding="utf-8") as f:
             step_a = json.load(f)
         step_b = pd.read_csv(OUT_DIR / "stepB.csv")
@@ -1542,12 +1792,24 @@ def main():
         step_c = run_step_c(step_a, step_b)
         log("C", f"[C] done in {time.time()-t_c0:.1f}s")
 
+        # Amendment A8: reported operating point (75/5/300), read from/alongside the Step C
+        # test grid just written -- decided before that grid was read.
+        a8 = run_a8_test_point(75.0, 5.0, 300)
+
         write_readme()
         write_summary(g1_pass, g1_df, g2_pass, g2_df, step_a, step_b, step_c,
-                     elapsed_s=time.time() - t0)
+                     elapsed_s=time.time() - t0, g2_branch_df=g2_branch_df, a8=a8)
         print(f"ALL DONE in {time.time()-t0:.1f}s "
              f"(G1 {'PASS' if g1_pass else 'FAIL -- Scope T only, Amendment A1'}). "
              f"See {OUT_DIR / 'SUMMARY.md'}")
+
+    if a.stage == "alert_budget":
+        # EXPLORATORY, POST-HOC -- not pre-registered. See run_alert_budget_exploratory's
+        # own docstring; writes results/continuous_eval/alert_budget_exploratory.md.
+        df, pooled = run_alert_budget_exploratory()
+        write_alert_budget_exploratory(df, pooled)
+        print(f"alert_budget exploratory done in {time.time()-t0:.1f}s. "
+             f"See {OUT_DIR / 'alert_budget_exploratory.md'}")
 
 
 if __name__ == "__main__":

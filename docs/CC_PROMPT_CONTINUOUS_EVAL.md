@@ -170,3 +170,12 @@ After [SUMMARY] written, do not start Step C; stop and wait for an explicit inst
 For a subject with 0 flagged windows, A2 changes no fit and no score, so its Scope T and Scope W
 scores equal the Correction C1 caches, which are reused for those 10 subjects; only chb17 is
 recomputed under A2.
+
+## Amendment A6 (before Step A; changes no threshold)
+
+G2 tests whether the recomputation reproduces the thesis pipeline. The committed offline arrays were
+fitted with the signal-loss windows included, so for chb17 G2 is evaluated on the Correction C1
+computation (fits including flagged windows, as the offline did), over the windows not flagged, with
+the threshold unchanged at 0.99. The A2 computation, which excludes flagged windows from every fit, is
+what Steps A, B and C use; its agreement with the offline arrays (chb17 inter 0.9894) is reported beside
+G2 as the effect of A2. All other subjects have no flagged window and their G2 is unchanged.

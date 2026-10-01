@@ -1,0 +1,15 @@
+[LOAD] 2026-10-01 17:57:05 loading cached mask + Scope T scores for 11 subjects from F:\Study\Thesis\Code\results\continuous_eval\cache (no EDF re-read, no model run); use_artifact_mask=False -- only the signal-loss rule masks windows
+[GRID] 2026-10-01 18:02:21 verify_fast_grid PASS on chb10 (4 cells x 2 merge_s, byte-identical to a direct cpd_pipeline_v14.detect_events call)
+[A] 2026-10-01 18:07:07 chb10: 96-cell grid built in 285.7s
+[A] 2026-10-01 18:09:48 chb11: 96-cell grid built in 161.3s
+[A] 2026-10-01 18:13:41 chb22: 96-cell grid built in 233.0s
+[A] 2026-10-01 18:13:43 scored 96 grid cells x 3 subject(s) in 2.2s
+[A] 2026-10-01 18:13:43 stepA_grid.csv written (384 rows)
+[A] 2026-10-01 18:13:43 Amendment A8: mag=40 pen=10 merge=300 sens=0.333 FA/day=15.80
+[A] 2026-10-01 18:13:43 Info point (sens==prec): mag=80 pen=10 merge=300 sens=0.200 prec=0.115
+[B] 2026-10-01 18:26:14 scored 8 test subjects at the single A8 point (mag=40 pen=10 merge=300) in 750.6s. No other test point is computed.
+[B] 2026-10-01 18:26:14 pooled: sens=0.026 prec=0.013 FA/day=16.09 median_latency_s=40.0
+[C] 2026-10-01 18:26:14 window-level macro AUROC (test): lab-protocol-conventions=0.6261, all-windows=0.6208 (docs cite 0.621)
+[V2-RECORD] 2026-10-01 18:26:14 also reporting, for the record of v2 (no rerun): of v2's 47 detected test seizures, how many were entirely masked and where the matching change point lies vs. the mask boundary
+[V2-RECORD] 2026-10-01 18:36:33 reproduced 47 detected test seizures (v2's own 47, cross-checked); 26 of them were entirely masked
+[DONE] 2026-10-01 18:36:33 v3 SUMMARY.md written. total wall-clock: 39.5 min

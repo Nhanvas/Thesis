@@ -99,6 +99,12 @@ CONT_EVAL_CACHE = ROOT / "results" / "continuous_eval" / "cache"
 OUT_DIR = ROOT / "results" / "lab_protocol"
 
 ALL_WINDOWS_TEST_AUROC_DOC_REF = 0.621  # docs/CC_PROMPT_LAB_PROTOCOL.md Step C's own citation
+# docs/CC_PROMPT_LAB_PROTOCOL_V3.md Step 4's own citation -- src/diag_application_windows.py's
+# OFFLINE_MACRO_AUROC = 0.805 ("report Table 3.1, for comparison only"), the thesis's own
+# offline (label-based interictal/ictal split) window AUROC with artifact rejection -- a
+# DIFFERENT pipeline than this script's continuous-timeline Scope T cache, so it is cited
+# here, never recomputed (this script is "cached scores only", docs/CC_PROMPT_LAB_PROTOCOL_V3.md).
+OFFLINE_BG_AUROC_DOC_REF = 0.805
 
 # Same dataset/stats layout src/continuous_eval.py's own compute_artifact_flags call site uses
 # (edf_path/PROCESSED_DIR), read-only here too -- used only by compute_ictal_artifact_flags.
@@ -133,13 +139,20 @@ def scores_cache_path(subj):
     return CONT_EVAL_CACHE / "scores" / f"T_{subj}.npy"
 
 
-def load_subject_data(subj, corrected_ictal_artifact=None):
+def load_subject_data(subj, corrected_ictal_artifact=None, use_artifact_mask=True):
     """`corrected_ictal_artifact`: optional bool array, same length as is_ictal, True only
     at ictal windows that fail the +-5 SD check under compute_ictal_artifact_flags (see
     module docstring) -- False everywhere else by construction. When given, OR'd into the
     cached is_artifact before anything else is derived, so every downstream quantity
     (score_masked, fit_mask, masked_s, Step D) reflects the correction. Default None
-    reproduces the original run byte-for-byte (is_artifact used exactly as cached)."""
+    reproduces the original run byte-for-byte (is_artifact used exactly as cached).
+
+    `use_artifact_mask` (docs/CC_PROMPT_LAB_PROTOCOL_V3.md): when False, is_artifact is
+    zeroed out entirely (corrected_ictal_artifact is then meaningless and should not be
+    passed) -- v3's "only the signal-loss rule (A2) masks windows; no +-5 SD masking."
+    Every downstream quantity (masked, score_masked, fit_mask, masked_s/denominator) falls
+    out of the SAME formulas below unchanged -- `masked` reduces to exactly `is_signal_loss`
+    and `masked_s` to exactly signal-loss time, with no separate code path needed."""
     mpath, spath = mask_cache_path(subj), scores_cache_path(subj)
     if not mpath.exists() or not spath.exists():
         raise LabProtocolError(
@@ -153,7 +166,14 @@ def load_subject_data(subj, corrected_ictal_artifact=None):
     sz_ranges = [tuple(int(v) for v in x) for x in z["sz_ranges"]]
     spans = [tuple(x) for x in z["spans"]]
 
-    if corrected_ictal_artifact is not None:
+    if not use_artifact_mask:
+        if corrected_ictal_artifact is not None:
+            raise LabProtocolError(
+                f"{subj}: corrected_ictal_artifact given with use_artifact_mask=False -- "
+                f"these are mutually exclusive (v3 drops is_artifact entirely)."
+            )
+        is_artifact = np.zeros_like(is_artifact)
+    elif corrected_ictal_artifact is not None:
         if len(corrected_ictal_artifact) != len(is_artifact):
             raise LabProtocolError(
                 f"{subj}: corrected_ictal_artifact length ({len(corrected_ictal_artifact)}) "
@@ -699,6 +719,228 @@ def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elaps
 
 
 # ---------------------------------------------------------------------------------------
+# v3 -- no amplitude masking (docs/CC_PROMPT_LAB_PROTOCOL_V3.md), results/lab_protocol/v3/
+# ---------------------------------------------------------------------------------------
+V3_OUT_DIR = ROOT / "results" / "lab_protocol" / "v3"
+
+
+def write_readme_v3():
+    (V3_OUT_DIR / "README.md").write_text(
+        "# results/lab_protocol/v3/ -- producing script\n\n"
+        "`stepA_grid.csv`, `stepB.csv`, `stepC_auroc.csv`, `denominators.csv`, `SUMMARY.md`, "
+        "`run.log`, `v2_detected_seizures_full.csv`, "
+        "`v2_entirely_masked_detected_seizures.csv` <- `src/lab_protocol_eval.py --v3` "
+        "(docs/CC_PROMPT_LAB_PROTOCOL_V3.md). Reads only results/continuous_eval/cache/ "
+        "(mask + Scope T scores); the v2-record report also reads nothing new -- same cache, "
+        "same deterministic ictal-artifact recompute as v2. Does not edit v1's or v2's own "
+        "results/lab_protocol/ files.\n",
+        encoding="utf-8")
+
+
+def build_summary_v3_md(grid_df, a8_row, info_row, stepB_df, stepC, elapsed_s,
+                        v2_masked_df, v2_n_detected_check):
+    lines = ["# Laboratory evaluation protocol v3 -- no amplitude masking -- SUMMARY", ""]
+    lines.append(
+        "docs/CC_PROMPT_LAB_PROTOCOL_V3.md (pre-registered 2026-10-01, committed alone "
+        "before this ran). Same code base as src/lab_protocol_eval.py "
+        "(results/lab_protocol/SUMMARY.md = v1, SUMMARY_v2.md = v2), cached scores only. "
+        "v2 found the +-5 SD rule masks 86% of ictal windows (32/76 test seizures entirely) "
+        "and collapses the lab-protocol window AUROC to 0.4532 -- amplitude masking cannot "
+        "separate artifact from seizure, so it is dropped from the detector here: only the "
+        "signal-loss rule (Amendment A2) masks windows. Does not edit the v1 or v2 outputs."
+    )
+    lines.append("")
+    lines.append(f"wall-clock time (Steps A-C): {elapsed_s / 60:.1f} min")
+    lines.append("")
+
+    lines.append("## Step A -- validation grid + operating-point selection")
+    lines.append("")
+    lines.append(f"8 magnitude percentiles x 6 penalty multipliers x 2 merge gaps = "
+                f"{len(grid_df) // 4} cells, scored pooled across {', '.join(VAL_SUBJS)} "
+                f"(`stepA_grid.csv`, {len(grid_df)} rows).")
+    lines.append("")
+    lines.append("**Amendment A8 rule (reported result):** maximize pooled validation "
+                 "sensitivity subject to pooled validation FA/day <= 25; ties by lower "
+                 "FA/day, then lower penalty.")
+    lines.append("")
+    lines.append(f"- mag_pct = {a8_row['mag_pct']:g}, pen_mult = {a8_row['pen_mult']:g}, "
+                 f"merge_s = {a8_row['merge_s']:g}")
+    lines.append(f"- pooled: sensitivity={a8_row['sensitivity']:.4f} "
+                 f"precision={a8_row['precision']:.4f} f1={a8_row['f1']:.4f} "
+                 f"FA/day={a8_row['fp_per_day']:.2f} seizures={a8_row['seizures']} "
+                 f"detected={a8_row['detected']} false_alarms={a8_row['false_alarms']}")
+    lines.append("")
+    lines.append("**Information only (sensitivity == precision):**")
+    lines.append("")
+    lines.append(f"- mag_pct = {info_row['mag_pct']:g}, pen_mult = {info_row['pen_mult']:g}, "
+                 f"merge_s = {info_row['merge_s']:g}")
+    lines.append(f"- pooled: sensitivity={info_row['sensitivity']:.4f} "
+                 f"precision={info_row['precision']:.4f} f1={info_row['f1']:.4f} "
+                 f"FA/day={info_row['fp_per_day']:.2f}")
+    lines.append("")
+
+    lines.append("## Step B -- test, scored ONCE at the Amendment A8 point")
+    lines.append("")
+    lines.append("No other test point is computed or reported. Nothing chosen after this "
+                 "step is seen.")
+    lines.append("")
+    cols = ["subject", "seizures", "detected", "false_alarms", "sensitivity", "precision",
+           "f1", "fp_per_day", "median_latency_s", "n_latency", "recorded_hours",
+           "seizure_hours", "dontcare_hours", "masked_hours", "denom_hours"]
+    lines.append("(`masked_hours` here is exactly signal-loss time -- v3 has no +-5 SD "
+                 "masking, so `masked` reduces to `is_signal_loss`.)")
+    lines.append("")
+    lines.append("```")
+    lines.append(stepB_df[cols].to_string(index=False))
+    lines.append("```")
+    lines.append("")
+
+    lines.append("## Step C -- window-level macro AUROC on test")
+    lines.append("")
+    lines.append(f"- lab-protocol v3 conventions (negatives = non-ictal, outside the "
+                 f"don't-care region, not signal-loss): **{stepC['macro_new']:.4f}**")
+    lines.append(f"- all windows (no exclusions, recomputed fresh from the same cache): "
+                 f"**{stepC['macro_all']:.4f}** (docs cite {ALL_WINDOWS_TEST_AUROC_DOC_REF:g})")
+    lines.append(f"- artifact-free background, the offline definition "
+                 f"(src/diag_application_windows.py's `OFFLINE_MACRO_AUROC`, report Table "
+                 f"3.1 -- a different, label-based offline pipeline; cited here, never "
+                 f"recomputed): **{OFFLINE_BG_AUROC_DOC_REF:g}**")
+    lines.append("")
+    lines.append("Per subject in `stepC_auroc.csv`.")
+    lines.append("")
+
+    lines.append("## For the record of v2 (no rerun)")
+    lines.append("")
+    lines.append(
+        f"Of the {v2_n_detected_check} test seizures detected in v2 at its own A8 point "
+        f"(mag=80, pen=10, merge=90 -- taken from `results/lab_protocol/SUMMARY_v2.md`, not "
+        f"re-derived; reproduced here via v2's own deterministic ictal-artifact correction "
+        f"as a cross-check against `stepB_v2.csv`'s POOLED `detected=47`), "
+        f"**{len(v2_masked_df)}** were entirely masked (fused score 0 on every one of their "
+        f"windows). For those, the matching hypothesis event's onset position relative to "
+        f"the seizure's own mask boundary `[seizure_start_win, seizure_end_win)`:"
+    )
+    lines.append("")
+    if len(v2_masked_df):
+        lines.append("```")
+        lines.append(v2_masked_df[["subject", "seizure_start_win", "seizure_end_win",
+                                   "n_seizure_windows", "onset_win", "offset_win",
+                                   "onset_pos_vs_mask_boundary"]].to_string(index=False))
+        lines.append("```")
+    else:
+        lines.append("(none)")
+    lines.append("")
+    lines.append("Full per-seizure detail (all seizures detected in v2, not just the "
+                 "entirely-masked ones) in `v2_detected_seizures_full.csv`; the "
+                 "entirely-masked subset alone in `v2_entirely_masked_detected_seizures.csv`.")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def v2_entirely_masked_detected_seizures_report():
+    """docs/CC_PROMPT_LAB_PROTOCOL_V3.md, 'Also report, for the record of v2 (no rerun)':
+    of the 47 test seizures detected in v2, how many were entirely masked (fused score 0 on
+    every one of their windows), and for those, where the matching change point lies
+    relative to the seizure's own mask boundary [seizure_start_win, seizure_end_win).
+
+    Reuses v2's OWN fixed operating point (mag=80, pen=10, merge=90 -- taken from
+    results/lab_protocol/SUMMARY_v2.md; "no rerun" means the grid search and operating-point
+    SELECTION are not repeated, only the single already-known point is re-evaluated) and
+    v2's own ictal-artifact correction (compute_ictal_artifact_flags is deterministic, so
+    this reproduces v2's own per-subject `detected` counts in stepB_v2.csv exactly --
+    checked below, logged as a warning if it ever doesn't)."""
+    V2_MAG, V2_PEN, V2_MS = 80.0, 10.0, 90
+    rows = []
+    n_detected_check = 0
+    for s in TEST_SUBJS:
+        base = load_subject_data(s)
+        mask = dict(is_ictal=base["is_ictal"], spans=base["spans"])
+        corrected = compute_ictal_artifact_flags(s, mask)
+        d = load_subject_data(s, corrected_ictal_artifact=corrected)
+        ev = V14.detect_events(d["score_masked"], V2_PEN, min_mag_pct=V2_MAG, local_win=15,
+                               win_sec=WIN_SEC, inter_mask=d["fit_mask"], merge_s=V2_MS)
+        matches = per_interval_match(d["ref_iv"], ev, d["total_dur_s"]) if ev else []
+        kept = []
+        for e, m in zip(ev, matches):
+            onset_win = int(round(e[0] / WIN_SEC))
+            if d["is_buffer"][onset_win] and not m["matched"]:
+                continue
+            kept.append(e)
+        for (ss, se) in d["sz_ranges"]:
+            r0, r1 = ss * WIN_SEC, se * WIN_SEC
+            cands = [(h0, h1) for (h0, h1) in kept
+                    if h1 >= r0 - SZ_PARAM.toleranceStart and h0 <= r1 + SZ_PARAM.toleranceEnd]
+            if not cands:
+                continue
+            n_detected_check += 1
+            h0, h1 = min(cands, key=lambda h: abs(h[0] - r0))
+            seg = d["masked"][ss:se]
+            entirely_masked = bool(seg.all())
+            onset_win_h = int(round(h0 / WIN_SEC))
+            offset_win_h = int(round(h1 / WIN_SEC))
+            if onset_win_h < ss:
+                pos = f"before mask start (ss{onset_win_h - ss:+d})"
+            elif onset_win_h == ss:
+                pos = "at mask start"
+            elif onset_win_h < se:
+                pos = f"inside mask (ss{onset_win_h - ss:+d})"
+            elif onset_win_h == se:
+                pos = "at mask end"
+            else:
+                pos = f"after mask end (se{onset_win_h - se:+d})"
+            rows.append(dict(subject=s, seizure_start_win=ss, seizure_end_win=se,
+                             n_seizure_windows=se - ss, entirely_masked=entirely_masked,
+                             hyp_onset_s=h0, hyp_offset_s=h1, onset_win=onset_win_h,
+                             offset_win=offset_win_h,
+                             onset_pos_vs_mask_boundary=pos if entirely_masked else ""))
+    full_df = pd.DataFrame(rows)
+    if n_detected_check != 47:
+        log("V2-RECORD", f"WARNING: reproduced {n_detected_check} detected test seizures, "
+                        f"expected 47 (results/lab_protocol/stepB_v2.csv POOLED.detected) "
+                        f"-- the v2 operating point/correction may not match exactly.")
+    full_df.to_csv(V3_OUT_DIR / "v2_detected_seizures_full.csv", index=False)
+    masked_df = full_df[full_df.entirely_masked].copy() if len(full_df) else full_df
+    masked_df.to_csv(V3_OUT_DIR / "v2_entirely_masked_detected_seizures.csv", index=False)
+    log("V2-RECORD", f"reproduced {n_detected_check} detected test seizures (v2's own 47, "
+                     f"cross-checked); {len(masked_df)} of them were entirely masked")
+    return masked_df, n_detected_check
+
+
+def run_v3():
+    """docs/CC_PROMPT_LAB_PROTOCOL_V3.md: same code base, no +-5 SD masking -- only the
+    signal-loss rule (A2) masks windows. Writes results/lab_protocol/v3/ (never touches v1's
+    or v2's own files, which live directly under results/lab_protocol/)."""
+    global OUT_DIR
+    OUT_DIR = V3_OUT_DIR
+    t_start = time.time()
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    log("LOAD", f"loading cached mask + Scope T scores for {len(ALL_SUBJS)} subjects from "
+               f"{CONT_EVAL_CACHE} (no EDF re-read, no model run); use_artifact_mask=False "
+               f"-- only the signal-loss rule masks windows")
+    all_data = {s: load_subject_data(s, use_artifact_mask=False) for s in ALL_SUBJS}
+    write_denominators_csv(all_data)
+
+    grid_df, a8_row, info_row = run_step_a(all_data)
+    stepB_df = run_step_b(all_data, a8_row)
+    stepC = run_step_c(all_data)
+
+    log("V2-RECORD", "also reporting, for the record of v2 (no rerun): of v2's 47 detected "
+                     "test seizures, how many were entirely masked and where the matching "
+                     "change point lies vs. the mask boundary")
+    v2_masked_df, v2_n_detected_check = v2_entirely_masked_detected_seizures_report()
+
+    elapsed_s = time.time() - t_start
+    summary = build_summary_v3_md(grid_df, a8_row, info_row, stepB_df, stepC, elapsed_s,
+                                  v2_masked_df, v2_n_detected_check)
+    (OUT_DIR / "SUMMARY.md").write_text(summary, encoding="utf-8")
+    write_readme_v3()
+    log("DONE", f"v3 SUMMARY.md written. total wall-clock: {elapsed_s / 60:.1f} min")
+
+    OUT_DIR = ROOT / "results" / "lab_protocol"  # restore default for any later call
+
+
+# ---------------------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------------------
 def run_original():
@@ -787,9 +1029,15 @@ def main():
                     help="audit Step D's is_artifact skip of ictal windows, and rerun "
                          "Steps A-D with the correction if any ictal window is flagged "
                          "(writes *_v2.csv + SUMMARY_v2.md; never touches SUMMARY.md)")
+    ap.add_argument("--v3", action="store_true",
+                    help="docs/CC_PROMPT_LAB_PROTOCOL_V3.md: no +-5 SD masking, only the "
+                         "signal-loss rule -- writes results/lab_protocol/v3/ (never "
+                         "touches v1's or v2's own files)")
     args = ap.parse_args()
 
-    if args.verify_and_correct_step_d:
+    if args.v3:
+        run_v3()
+    elif args.verify_and_correct_step_d:
         run_verify_and_correct_step_d()
     else:
         run_original()

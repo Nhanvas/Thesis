@@ -1,0 +1,27 @@
+[GATE] 2026-10-01 15:46:34 running python src/verify_provenance.py ...
+[GATE] 2026-10-01 15:47:04 verify_provenance.py PASS
+[GATE] 2026-10-01 15:47:04 git rev-parse HEAD = 3f49d2804fd2d4af172387729516b7ac46f987fd
+[GATE] 2026-10-01 15:47:05 web_demo/backend/pipeline_demo.py confirmed at commit 3336bd7 (App v3 code), working tree clean
+[B] 2026-10-01 15:47:05 chb11: 31 EDF(s), calling pipeline_demo.process_subject_headless (max_workers=1, cache under F:\Study\Thesis\Code\results\app_eval_v3\cache\chb11)
+[B] 2026-10-01 15:55:56 chb11: process_subject_headless done in 8.9 min (31 file(s))
+[B] 2026-10-01 15:55:56 chb11: fused scores+flags persisted to chb11_scores.npz
+[C] 2026-10-01 15:58:39 verify_fast_grid PASS on chb11 (4 cells x 2 merge_s, byte-identical to a direct cpd_pipeline_v14.detect_events call)
+[C] 2026-10-01 15:58:40 chb11: 31 files, 27713 windows (30.79 h), 0 signal-loss window(s)
+[B] 2026-10-01 15:58:40 chb22: 31 EDF(s), calling pipeline_demo.process_subject_headless (max_workers=1, cache under F:\Study\Thesis\Code\results\app_eval_v3\cache\chb22)
+[B] 2026-10-01 16:07:23 chb22: process_subject_headless done in 8.7 min (31 file(s))
+[B] 2026-10-01 16:07:25 chb22: fused scores+flags persisted to chb22_scores.npz
+[C] 2026-10-01 16:10:18 verify_fast_grid PASS on chb22 (4 cells x 2 merge_s, byte-identical to a direct cpd_pipeline_v14.detect_events call)
+[C] 2026-10-01 16:10:18 chb22: 31 files, 27902 windows (31.00 h), 0 signal-loss window(s)
+[B] 2026-10-01 16:10:18 chb10: 25 EDF(s), calling pipeline_demo.process_subject_headless (max_workers=1, cache under F:\Study\Thesis\Code\results\app_eval_v3\cache\chb10)
+[B] 2026-10-01 16:23:58 chb10: process_subject_headless done in 13.7 min (25 file(s))
+[B] 2026-10-01 16:23:58 chb10: fused scores+flags persisted to chb10_scores.npz
+[C] 2026-10-01 16:28:41 verify_fast_grid PASS on chb10 (4 cells x 2 merge_s, byte-identical to a direct cpd_pipeline_v14.detect_events call)
+[C] 2026-10-01 16:28:41 chb10: 25 files, 45020 windows (50.02 h), 0 signal-loss window(s)
+[C] 2026-10-01 16:28:41 building per-subject grids (PELT once per penalty, magnitude+merge post-hoc)
+[C] 2026-10-01 16:31:02 chb11: 96-cell grid built in 140.3s
+[C] 2026-10-01 16:33:18 chb22: 96-cell grid built in 135.9s
+[C] 2026-10-01 16:37:24 chb10: 96-cell grid built in 246.5s
+[C] 2026-10-01 16:37:28 scored 96 grid cells x 3 subject(s) in 3.4s
+[DONE] 2026-10-01 16:37:28 val_grid.csv written (384 rows)
+[DONE] 2026-10-01 16:37:28 SELECTED.md written. Amendment A8: mag=40 pen=10 merge=300 sens=0.400 FA/day=17.232825141176033
+[DONE] 2026-10-01 16:37:28 total wall-clock: 50.9 min

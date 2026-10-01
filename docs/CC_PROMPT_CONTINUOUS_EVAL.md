@@ -164,3 +164,9 @@ test grid for the curve as the last task.
 ## Amendment A4 (ordering only)
 
 After [SUMMARY] written, do not start Step C; stop and wait for an explicit instruction.
+
+## Amendment A5 (efficiency, no change to any computation)
+
+For a subject with 0 flagged windows, A2 changes no fit and no score, so its Scope T and Scope W
+scores equal the Correction C1 caches, which are reused for those 10 subjects; only chb17 is
+recomputed under A2.

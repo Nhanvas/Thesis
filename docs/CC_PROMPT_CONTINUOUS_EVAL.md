@@ -179,3 +179,13 @@ computation (fits including flagged windows, as the offline did), over the windo
 the threshold unchanged at 0.99. The A2 computation, which excludes flagged windows from every fit, is
 what Steps A, B and C use; its agreement with the offline arrays (chb17 inter 0.9894) is reported beside
 G2 as the effect of A2. All other subjects have no flagged window and their G2 is unchanged.
+
+## Amendment A7 (before Step A; changes no threshold, drops no data)
+
+G2 remains recorded as FAIL for chb17 (inter 0.9837 under the C1 fit, 0.9894 under A2; all other
+subjects ≥ 0.998). Cause: the committed offline chb17 arrays were fitted on 534 signal-loss windows
+whose scores are numerically undefined and hardware-dependent (zrecon 48.70 on the GPU that produced
+them, 3.00 on this CPU; results/continuous_eval/chb17_zrecon_outliers.txt, chb17b_69_inspect.txt), so no
+CPU recomputation can reproduce them. By the author's decision, Steps A and B proceed for Scope T with
+the A2 scores on all eight test patients, and every pooled Step B result is also reported without chb17
+as a sensitivity row.

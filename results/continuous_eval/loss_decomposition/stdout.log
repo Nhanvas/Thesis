@@ -1,0 +1,19 @@
+[LOAD] 2026-10-02 00:53:54 loading cached masks + Scope T scores (+ app v3 scores for validation, + per-branch components where cached) for 11 subjects -- no EDF read, no model run
+[LOAD] 2026-10-02 00:53:54 chb10: 45020 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb11: 27713 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb22: 27902 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb03: 34201 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb06: 60060 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb13: 29700 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb14: 23400 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb15: 36008 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb16: 17100 windows, branches_cached=False
+[LOAD] 2026-10-02 00:53:54 chb17: 18906 windows, branches_cached=True
+[LOAD] 2026-10-02 00:53:54 chb18: 32070 windows, branches_cached=False
+[ITEM1] 2026-10-02 00:53:54 categories.csv written (104 rows)
+[ITEM6] 2026-10-02 00:54:33 validation/50_2_0_90 (mag=50 pen=2 merge=90): pooled 448 false alarms (38.9s)
+[ITEM6] 2026-10-02 00:55:18 validation/75_5_300 (mag=75 pen=5 merge=300): pooled 109 false alarms (44.3s)
+[ITEM6] 2026-10-02 00:56:52 test/50_2_0_90 (mag=50 pen=2 merge=90): pooled 847 false alarms (94.4s)
+[ITEM6] 2026-10-02 00:59:16 test/75_5_300 (mag=75 pen=5 merge=300): pooled 210 false alarms (143.7s)
+[ITEM6] 2026-10-02 00:59:16 fa_categories.csv written (26 rows)
+[DONE] 2026-10-02 00:59:18 SUMMARY.md written. total wall-clock: 5.4 min

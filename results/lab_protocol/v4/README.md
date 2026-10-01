@@ -1,0 +1,3 @@
+# results/lab_protocol/v4/ -- producing script
+
+`denominators.csv`, `stepA_grid.csv`, `stepB.csv`, `fa_ignored_by_component.csv`, `SUMMARY.md`, `run.log` <- `src/lab_protocol_eval.py --v4` (docs/CC_PROMPT_LAB_PROTOCOL_V4.md). Reads results/continuous_eval/cache/ (mask + Scope T scores) plus the raw EDFs ONLY for ictal and post-ictal-buffer windows (the two categories the cache's own compute_artifact_flags never actually tests -- see compute_artifact_every_window), to get the +-5 SD artifact flag for literally every window. That flag is evaluation-side only here; the detector is v3's (signal-loss masking only). Does not edit v1's, v2's or v3's own results/lab_protocol/ files.

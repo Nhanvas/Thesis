@@ -237,34 +237,38 @@ def load_subject_data(subj, corrected_ictal_artifact=None, use_artifact_mask=Tru
 # recomputes the +-5 SD flag for ICTAL windows only, reading them from the EDFs -- the one
 # place in this file that touches an EDF.
 # ---------------------------------------------------------------------------------------
-def compute_ictal_artifact_flags(subj, mask):
-    """Recomputes the +-5 SD artifact flag for every ICTAL window of `subj`, using the
-    EXACT same rule/threshold/filtering as src/continuous_eval.py's compute_artifact_flags
-    (P.filter_window, same 3 s-padding convention; artifact_thresh_uV from the same
-    data/processed/{subj}_stats.json) but WITHOUT that function's `if wl[i] or wb[i]:
-    continue` skip -- every ictal window is actually tested here. Reads only the ictal
+def compute_ictal_artifact_flags(subj, mask, extra_mask=None):
+    """Recomputes the +-5 SD artifact flag for every ICTAL window of `subj` (plus, when
+    `extra_mask` is given, every window flagged there too -- docs/CC_PROMPT_LAB_PROTOCOL_V4.md
+    Step 2(b) passes is_buffer here, since the cache's own compute_artifact_flags skips a
+    window that is ictal OR buffer identically; testing is_ictal | extra_mask thus covers
+    every window the cache never actually tested), using the EXACT same rule/threshold/
+    filtering as src/continuous_eval.py's compute_artifact_flags (P.filter_window, same 3
+    s-padding convention; artifact_thresh_uV from the same data/processed/{subj}_stats.json)
+    but WITHOUT that function's `if wl[i] or wb[i]: continue` skip. Reads only the tested
     windows' own padded segments from the EDFs (read-only, nothing is written, no model is
     run) via `mask["spans"]` (file, start, end in GLOBAL window-index space, from the same
     cache load_subject_data reads).
 
     Returns a bool array the same length as mask["is_ictal"], True only where a recomputed
-    ictal window is flagged -- False everywhere else (including every non-ictal index) by
+    tested window is flagged -- False everywhere else (including every untested index) by
     construction, so a caller can safely OR it into the cached is_artifact array."""
     is_ictal = mask["is_ictal"]
     spans = mask["spans"]
+    test_mask = is_ictal if extra_mask is None else (is_ictal | extra_mask)
     stats = json.loads((PROCESSED_DIR / f"{subj}_stats.json").read_text())
     artifact_threshold = np.asarray(stats["artifact_thresh_uV"], dtype=np.float64) * 1e-6
 
     flags = np.zeros(len(is_ictal), dtype=bool)
     for fname, start, end in spans:
         start, end = int(start), int(end)
-        local_ictal = np.nonzero(is_ictal[start:end])[0]
-        if len(local_ictal) == 0:
+        local_test = np.nonzero(test_mask[start:end])[0]
+        if len(local_test) == 0:
             continue
         raw = P.open_edf(edf_path(subj, fname))
         if raw is None:
             raise LabProtocolError(f"{subj}/{fname}: missing one of the 18 common channels")
-        for local_i in local_ictal:
+        for local_i in local_test:
             local_i = int(local_i)
             w = P.filter_window(raw, local_i * P.WIN_SAMPLES,
                                 local_i * P.WIN_SAMPLES + P.WIN_SAMPLES)
@@ -941,6 +945,389 @@ def run_v3():
 
 
 # ---------------------------------------------------------------------------------------
+# v4 -- event-level evaluation on artifact-free EEG (docs/CC_PROMPT_LAB_PROTOCOL_V4.md),
+# results/lab_protocol/v4/. Detector side is v3's (signal-loss masking only); the +-5 SD
+# artifact rule moves to the EVALUATION side as a second don't-care region, computed for
+# every window including ictal ones (never used to mask the detector in v4).
+# ---------------------------------------------------------------------------------------
+V4_OUT_DIR = ROOT / "results" / "lab_protocol" / "v4"
+
+
+def write_readme_v4():
+    (V4_OUT_DIR / "README.md").write_text(
+        "# results/lab_protocol/v4/ -- producing script\n\n"
+        "`denominators.csv`, `stepA_grid.csv`, `stepB.csv`, `fa_ignored_by_component.csv`, "
+        "`SUMMARY.md`, `run.log` <- `src/lab_protocol_eval.py --v4` "
+        "(docs/CC_PROMPT_LAB_PROTOCOL_V4.md). Reads results/continuous_eval/cache/ (mask + "
+        "Scope T scores) plus the raw EDFs ONLY for ictal and post-ictal-buffer windows (the "
+        "two categories the cache's own compute_artifact_flags never actually tests -- see "
+        "compute_artifact_every_window), to get the +-5 SD artifact flag for literally every "
+        "window. That flag is evaluation-side only here; the detector is v3's (signal-loss "
+        "masking only). Does not edit v1's, v2's or v3's own results/lab_protocol/ files.\n",
+        encoding="utf-8")
+
+
+def compute_artifact_every_window(subj):
+    """docs/CC_PROMPT_LAB_PROTOCOL_V4.md Step 2(b): the +-5 SD artifact rule's flag for
+    literally every window (ictal included), used ONLY as an evaluation-side don't-care
+    region in v4 -- never to mask the detector (v4's detector is v3's: signal-loss only).
+    The cache's own compute_artifact_flags already tests every window that is NEITHER ictal
+    NOR buffer (`if wl[i] or wb[i]: continue`), so its cached is_artifact is already the
+    rule's correct flag for that majority subset; this recomputes the SAME rule only for the
+    is_ictal | is_buffer windows the cache skipped (compute_ictal_artifact_flags with
+    extra_mask=is_buffer) and ORs the two together -- equivalent to testing every window from
+    scratch, without repeating the cache's own (already paid) cost on the untested majority."""
+    z = np.load(mask_cache_path(subj), allow_pickle=True)
+    is_ictal = z["is_ictal"]; is_buffer = z["is_buffer"]; cached_is_artifact = z["is_artifact"]
+    spans = [tuple(x) for x in z["spans"]]
+    t0 = time.time()
+    new_flags = compute_ictal_artifact_flags(subj, dict(is_ictal=is_ictal, spans=spans),
+                                             extra_mask=is_buffer)
+    every_window = cached_is_artifact | new_flags
+    log("V4-ARTIFACT", f"{subj}: +-5 SD rule recomputed for {int((is_ictal | is_buffer).sum())} "
+                       f"ictal/buffer windows ({int(new_flags.sum())} flagged); "
+                       f"{int(every_window.sum())}/{len(every_window)} windows flagged in "
+                       f"total ({time.time() - t0:.1f}s)")
+    return every_window
+
+
+def load_subject_data_v4(subj):
+    """docs/CC_PROMPT_LAB_PROTOCOL_V4.md: detector side identical to v3 (only the
+    signal-loss rule masks windows; no +-5 SD masking at all). Evaluation side carries TWO
+    disjoint don't-care priorities on top of v3's single post-ictal buffer -- signal-loss
+    (detector mask, highest priority, as in v1-v3's own `masked` convention) > post-ictal
+    buffer (as in v3) > the full-window +-5 SD artifact flag (new in v4, lowest priority,
+    evaluation-side only) -- so the FA/day denominator's four subtracted components never
+    double-count the same window."""
+    mpath, spath = mask_cache_path(subj), scores_cache_path(subj)
+    if not mpath.exists() or not spath.exists():
+        raise LabProtocolError(
+            f"{subj}: missing cached mask ({mpath}) or Scope T score ({spath}) -- "
+            f"src/continuous_eval.py's score stage must have already run."
+        )
+    z = np.load(mpath, allow_pickle=True)
+    is_ictal = z["is_ictal"]; is_buffer = z["is_buffer"]; is_signal_loss = z["is_signal_loss"]
+    sz_ranges = [tuple(int(v) for v in x) for x in z["sz_ranges"]]
+    spans = [tuple(x) for x in z["spans"]]
+
+    ens_T = np.load(spath).astype(np.float64)
+    if len(ens_T) != len(is_ictal):
+        raise LabProtocolError(
+            f"{subj}: score length ({len(ens_T)}) != mask length ({len(is_ictal)}) -- "
+            f"cache is stale/inconsistent."
+        )
+
+    # Step 1 (detector, == v3): only signal-loss forces fused score 0 before smoothing.
+    score_masked = ens_T.copy()
+    score_masked[is_signal_loss] = 0.0
+    fit_mask = (~is_ictal) & (~is_buffer) & (~is_signal_loss)
+
+    artifact_every_window = compute_artifact_every_window(subj)
+
+    n_windows = len(ens_T)
+    total_dur_s = float(n_windows * WIN_SEC)
+    seizure_s = float(int(is_ictal.sum()) * WIN_SEC)
+    # Disjoint priority for the FA/day denominator (Step 3): ictal > signal-loss (detector
+    # mask) > post-ictal buffer > full-window artifact flag -- each `& (~is_ictal)` etc.
+    # below excludes windows already counted by a higher-priority component, so the four
+    # subtracted hour figures never double-count the same window.
+    signal_loss_s = float(int((is_signal_loss & (~is_ictal)).sum()) * WIN_SEC)
+    dontcare_s = float(int((is_buffer & (~is_ictal) & (~is_signal_loss)).sum()) * WIN_SEC)
+    artifact_dontcare_s = float(int(
+        (artifact_every_window & (~is_ictal) & (~is_signal_loss) & (~is_buffer)).sum()
+    ) * WIN_SEC)
+    denom_s = total_dur_s - seizure_s - signal_loss_s - dontcare_s - artifact_dontcare_s
+    n_inter_h = denom_s / 3600.0
+
+    ref_iv = [(s * WIN_SEC, e * WIN_SEC) for (s, e) in sz_ranges]
+
+    return dict(subject=subj, score_masked=score_masked, fit_mask=fit_mask, is_ictal=is_ictal,
+               is_buffer=is_buffer, is_signal_loss=is_signal_loss,
+               artifact_every_window=artifact_every_window, sz_ranges=sz_ranges, spans=spans,
+               ref_iv=ref_iv, n_windows=n_windows, total_dur_s=total_dur_s,
+               seizure_s=seizure_s, signal_loss_s=signal_loss_s, dontcare_s=dontcare_s,
+               artifact_dontcare_s=artifact_dontcare_s, n_inter_h=n_inter_h)
+
+
+def apply_dontcare_and_score_v4(data, hyp_events):
+    """docs/CC_PROMPT_LAB_PROTOCOL_V4.md Step 2: a hyp event that overlaps NO seizure
+    (SzCORE tolerance, per_interval_match -- the library's own match assignment) is dropped
+    entirely (neither TP nor FP) when its onset window falls in EITHER don't-care region --
+    the post-ictal buffer (as in v3) or the full-window +-5 SD artifact flag (new). An event
+    that DOES overlap a seizure is always scored normally regardless of either region, so
+    sensitivity is never affected by the convention (Step 2's own stated guarantee)."""
+    matches = per_interval_match(data["ref_iv"], hyp_events, data["total_dur_s"]) if hyp_events else []
+    kept = []
+    n_dropped_buffer = n_dropped_artifact = n_dropped_total = 0
+    for ev, m in zip(hyp_events, matches):
+        if m["matched"]:
+            kept.append(ev)
+            continue
+        onset_win = int(round(ev[0] / WIN_SEC))
+        in_buffer = bool(data["is_buffer"][onset_win])
+        in_artifact = bool(data["artifact_every_window"][onset_win])
+        if in_buffer or in_artifact:
+            n_dropped_total += 1
+            n_dropped_buffer += int(in_buffer)
+            n_dropped_artifact += int(in_artifact)
+            continue
+        kept.append(ev)
+    sc = score_szcore(data["ref_iv"], kept, data["total_dur_s"], data["n_inter_h"])
+    lats = per_seizure_latencies(data["ref_iv"], kept, SZ_PARAM.toleranceStart, SZ_PARAM.toleranceEnd)
+    return dict(tp=sc["tp"], fp=sc["fp"], n_ref=sc["n_ref"], sensitivity=sc["sensitivity"],
+               precision=sc["precision"], f1=sc["f1"], fp_per_day=sc["fp_per_day"],
+               n_inter_h=data["n_inter_h"], latencies=lats,
+               n_dropped_buffer=n_dropped_buffer, n_dropped_artifact=n_dropped_artifact,
+               n_dropped_total=n_dropped_total, total_dur_s=data["total_dur_s"],
+               seizure_s=data["seizure_s"], signal_loss_s=data["signal_loss_s"],
+               dontcare_s=data["dontcare_s"], artifact_dontcare_s=data["artifact_dontcare_s"])
+
+
+def pool_cells_v4(cells):
+    tp = sum(c["tp"] for c in cells); fp = sum(c["fp"] for c in cells)
+    n_ref = sum(c["n_ref"] for c in cells); h = sum(c["n_inter_h"] for c in cells)
+    sens = tp / n_ref if n_ref else float("nan")
+    prec = tp / (tp + fp) if (tp + fp) else float("nan")
+    f1 = (2 * prec * sens / (prec + sens)
+         if (prec + sens) and prec == prec and sens == sens else float("nan"))
+    fa = fp / h * 24.0 if h else float("nan")
+    lats = [l for c in cells for l in c["latencies"]]
+    return dict(tp=tp, fp=fp, n_ref=n_ref, sensitivity=sens, precision=prec, f1=f1,
+               fp_per_day=fa, n_inter_h=h, latencies=lats,
+               n_dropped_buffer=sum(c["n_dropped_buffer"] for c in cells),
+               n_dropped_artifact=sum(c["n_dropped_artifact"] for c in cells),
+               n_dropped_total=sum(c["n_dropped_total"] for c in cells),
+               total_dur_s=sum(c["total_dur_s"] for c in cells),
+               seizure_s=sum(c["seizure_s"] for c in cells),
+               signal_loss_s=sum(c["signal_loss_s"] for c in cells),
+               dontcare_s=sum(c["dontcare_s"] for c in cells),
+               artifact_dontcare_s=sum(c["artifact_dontcare_s"] for c in cells))
+
+
+def grid_row_v4(mag, pen, ms, subject, sc):
+    lats = sc["latencies"]
+    return dict(mag_pct=mag, pen_mult=pen, merge_s=ms, subject=subject,
+               seizures=sc["n_ref"], detected=sc["tp"], false_alarms=sc["fp"],
+               sensitivity=sc["sensitivity"], precision=sc["precision"], f1=sc["f1"],
+               fp_per_day=sc["fp_per_day"],
+               median_latency_s=float(np.median(lats)) if lats else float("nan"),
+               n_latency=len(lats),
+               recorded_hours=round(sc["total_dur_s"] / 3600.0, 4),
+               seizure_hours=round(sc["seizure_s"] / 3600.0, 4),
+               signal_loss_hours=round(sc["signal_loss_s"] / 3600.0, 4),
+               post_ictal_dontcare_hours=round(sc["dontcare_s"] / 3600.0, 4),
+               artifact_dontcare_hours=round(sc["artifact_dontcare_s"] / 3600.0, 4),
+               denom_hours=round(sc["n_inter_h"], 4),
+               n_dropped_buffer=sc["n_dropped_buffer"],
+               n_dropped_artifact=sc["n_dropped_artifact"],
+               n_dropped_total=sc["n_dropped_total"])
+
+
+def select_operating_points_v4(grid_df):
+    pooled = grid_df[grid_df.subject == "POOLED"].copy()
+
+    # Amendment A8 rule: maximize pooled validation sensitivity s.t. pooled FA/day <= 25;
+    # ties by lower FA/day, then lower penalty.
+    ok = pooled[pooled.fp_per_day <= 25.0]
+    if len(ok) == 0:
+        raise LabProtocolError("Amendment A8 rule: no grid cell has pooled validation FA/day <= 25.")
+    ok = ok.sort_values(by=["sensitivity", "fp_per_day", "pen_mult"], ascending=[False, True, True])
+    a8_row = ok.iloc[0].to_dict()
+
+    # docs/CC_PROMPT_LAB_PROTOCOL_V4.md Step 4: "also report the best F1 cell on validation
+    # for information" (replaces v1-v3's sensitivity==precision information point).
+    info_row = pooled.loc[pooled["f1"].idxmax()].to_dict()
+    return a8_row, info_row
+
+
+def run_step_a_v4(all_data):
+    verify_fast_grid(all_data[VAL_SUBJS[0]]["score_masked"], all_data[VAL_SUBJS[0]]["fit_mask"],
+                     VAL_SUBJS[0])
+
+    per_subj_grid = {}
+    for s in VAL_SUBJS:
+        t0 = time.time()
+        per_subj_grid[s] = grid_for_subject(all_data[s]["score_masked"], all_data[s]["fit_mask"],
+                                            MAG_PCTS, PEN_MULTS, MERGE_GAPS)
+        log("A", f"{s}: 96-cell grid built in {time.time() - t0:.1f}s")
+
+    n_cells = len(per_subj_grid[VAL_SUBJS[0]])
+    rows = []
+    t0 = time.time()
+    for i in range(n_cells):
+        ref = per_subj_grid[VAL_SUBJS[0]][i]
+        mag, pen, ms = ref["mag_pct"], ref["pen_mult"], ref["merge_s"]
+        cells = []
+        for s in VAL_SUBJS:
+            cell = per_subj_grid[s][i]
+            assert (cell["mag_pct"], cell["pen_mult"], cell["merge_s"]) == (mag, pen, ms)
+            sc = apply_dontcare_and_score_v4(all_data[s], cell["hyp_events"])
+            cells.append(sc)
+            rows.append(grid_row_v4(mag, pen, ms, s, sc))
+        rows.append(grid_row_v4(mag, pen, ms, "POOLED", pool_cells_v4(cells)))
+    log("A", f"scored {n_cells} grid cells x {len(VAL_SUBJS)} subject(s) in {time.time() - t0:.1f}s")
+
+    grid_df = pd.DataFrame(rows)
+    grid_df.to_csv(V4_OUT_DIR / "stepA_grid.csv", index=False)
+    log("A", f"stepA_grid.csv written ({len(grid_df)} rows)")
+
+    a8_row, info_row = select_operating_points_v4(grid_df)
+    log("A", f"Amendment A8: mag={a8_row['mag_pct']:g} pen={a8_row['pen_mult']:g} "
+             f"merge={a8_row['merge_s']:g} sens={a8_row['sensitivity']:.3f} "
+             f"FA/day={a8_row['fp_per_day']:.2f}")
+    log("A", f"Info point (best F1): mag={info_row['mag_pct']:g} pen={info_row['pen_mult']:g} "
+             f"merge={info_row['merge_s']:g} f1={info_row['f1']:.3f} "
+             f"sens={info_row['sensitivity']:.3f} prec={info_row['precision']:.3f}")
+    return grid_df, a8_row, info_row
+
+
+def run_step_b_v4(all_data, a8_row):
+    mag, pen, ms = a8_row["mag_pct"], a8_row["pen_mult"], a8_row["merge_s"]
+    cells = {}
+    t0 = time.time()
+    for s in TEST_SUBJS:
+        d = all_data[s]
+        ev = V14.detect_events(d["score_masked"], pen, min_mag_pct=mag, local_win=15,
+                               win_sec=WIN_SEC, inter_mask=d["fit_mask"], merge_s=ms)
+        cells[s] = apply_dontcare_and_score_v4(d, ev)
+    log("B", f"scored {len(TEST_SUBJS)} test subjects at the single A8 point "
+             f"(mag={mag:g} pen={pen:g} merge={ms:g}) in {time.time() - t0:.1f}s. "
+             f"No other test point is computed.")
+
+    rows = [grid_row_v4(mag, pen, ms, s, cells[s]) for s in TEST_SUBJS]
+    rows.append(grid_row_v4(mag, pen, ms, "POOLED", pool_cells_v4(list(cells.values()))))
+    rows.append(grid_row_v4(mag, pen, ms, "POOLED_no_chb17",
+                            pool_cells_v4([cells[s] for s in TEST_SUBJS if s != "chb17"])))
+    stepB_df = pd.DataFrame(rows)
+    stepB_df.to_csv(V4_OUT_DIR / "stepB.csv", index=False)
+    pooled = stepB_df[stepB_df.subject == "POOLED"].iloc[0]
+    log("B", f"pooled: sens={pooled['sensitivity']:.3f} prec={pooled['precision']:.3f} "
+             f"FA/day={pooled['fp_per_day']:.2f} median_latency_s={pooled['median_latency_s']:.1f}")
+    return stepB_df
+
+
+def write_denominators_csv_v4(all_data):
+    rows = [dict(subject=s, recorded_hours=round(all_data[s]["total_dur_s"] / 3600.0, 4),
+                seizure_hours=round(all_data[s]["seizure_s"] / 3600.0, 4),
+                signal_loss_hours=round(all_data[s]["signal_loss_s"] / 3600.0, 4),
+                post_ictal_dontcare_hours=round(all_data[s]["dontcare_s"] / 3600.0, 4),
+                artifact_dontcare_hours=round(all_data[s]["artifact_dontcare_s"] / 3600.0, 4),
+                denom_hours=round(all_data[s]["n_inter_h"], 4))
+            for s in ALL_SUBJS]
+    pd.DataFrame(rows).to_csv(V4_OUT_DIR / "denominators.csv", index=False)
+
+
+def build_summary_v4_md(grid_df, a8_row, info_row, stepB_df, elapsed_s):
+    lines = ["# Laboratory evaluation protocol v4 -- event-level evaluation on "
+            "artifact-free EEG -- SUMMARY", ""]
+    lines.append(
+        "docs/CC_PROMPT_LAB_PROTOCOL_V4.md (pre-registered 2026-10-01, committed alone "
+        "before this ran). Same code base as src/lab_protocol_eval.py, cached Scope T (A2) "
+        "scores only. Detector side is v3's (results/lab_protocol/v3/SUMMARY.md): only the "
+        "signal-loss rule masks windows, no +-5 SD masking. The +-5 SD artifact rule moves "
+        "entirely to the EVALUATION side here, as a second don't-care region alongside the "
+        "post-ictal buffer -- computed for every window including ictal ones, from the raw "
+        "signal, with no annotation used to compute the flag. A hyp event overlapping an "
+        "annotated seizure is always scored normally (sensitivity unaffected); an "
+        "unmatched hyp event is a false alarm only if its onset window is outside both "
+        "don't-care regions. Does not edit the v1, v2 or v3 outputs."
+    )
+    lines.append("")
+    lines.append(f"wall-clock time: {elapsed_s / 60:.1f} min")
+    lines.append("")
+
+    lines.append("## Denominators (all 11 subjects)")
+    lines.append("")
+    lines.append("Per-patient breakdown of the four disjoint FA/day components (Step 3) in "
+                 "`denominators.csv`.")
+    lines.append("")
+
+    lines.append("## Step A -- validation grid + operating-point selection")
+    lines.append("")
+    lines.append(f"8 magnitude percentiles x 6 penalty multipliers x 2 merge gaps = "
+                f"{len(grid_df) // 4} cells, scored pooled across {', '.join(VAL_SUBJS)} "
+                f"(`stepA_grid.csv`, {len(grid_df)} rows).")
+    lines.append("")
+    lines.append("**Amendment A8 rule (reported result):** maximize pooled validation "
+                 "sensitivity subject to pooled validation FA/day <= 25; ties by lower "
+                 "FA/day, then lower penalty.")
+    lines.append("")
+    lines.append(f"- mag_pct = {a8_row['mag_pct']:g}, pen_mult = {a8_row['pen_mult']:g}, "
+                 f"merge_s = {a8_row['merge_s']:g}")
+    lines.append(f"- pooled: sensitivity={a8_row['sensitivity']:.4f} "
+                 f"precision={a8_row['precision']:.4f} f1={a8_row['f1']:.4f} "
+                 f"FA/day={a8_row['fp_per_day']:.2f} seizures={a8_row['seizures']} "
+                 f"detected={a8_row['detected']} false_alarms={a8_row['false_alarms']}")
+    lines.append("")
+    lines.append("**Information only (best F1 cell on validation):**")
+    lines.append("")
+    lines.append(f"- mag_pct = {info_row['mag_pct']:g}, pen_mult = {info_row['pen_mult']:g}, "
+                 f"merge_s = {info_row['merge_s']:g}")
+    lines.append(f"- pooled: sensitivity={info_row['sensitivity']:.4f} "
+                 f"precision={info_row['precision']:.4f} f1={info_row['f1']:.4f} "
+                 f"FA/day={info_row['fp_per_day']:.2f}")
+    lines.append("")
+
+    lines.append("## Step B -- test, scored ONCE at the Amendment A8 point")
+    lines.append("")
+    lines.append("No other test point is computed or reported. Nothing chosen after this "
+                 "step is seen.")
+    lines.append("")
+    cols = ["subject", "seizures", "detected", "false_alarms", "sensitivity", "precision",
+           "f1", "fp_per_day", "median_latency_s", "n_latency", "recorded_hours",
+           "seizure_hours", "signal_loss_hours", "post_ictal_dontcare_hours",
+           "artifact_dontcare_hours", "denom_hours"]
+    lines.append("```")
+    lines.append(stepB_df[cols].to_string(index=False))
+    lines.append("```")
+    lines.append("")
+
+    lines.append("## Step 5 -- false alarms ignored by each don't-care component (test, "
+                 "A8 point)")
+    lines.append("")
+    lines.append("Counts of unmatched hyp events dropped because their onset window fell in "
+                 "a given don't-care region; the two regions can overlap for a given event "
+                 "(then it counts under both), so `n_dropped_total` (the actual number of "
+                 "events ignored) is not necessarily their sum.")
+    lines.append("")
+    cols5 = ["subject", "n_dropped_buffer", "n_dropped_artifact", "n_dropped_total"]
+    lines.append("```")
+    lines.append(stepB_df[cols5].to_string(index=False))
+    lines.append("```")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def run_v4():
+    """docs/CC_PROMPT_LAB_PROTOCOL_V4.md: detector == v3 (signal-loss only); the +-5 SD rule
+    becomes an evaluation-side don't-care region, computed for every window including ictal
+    ones. Writes results/lab_protocol/v4/ (never touches v1's, v2's or v3's own files)."""
+    t_start = time.time()
+    V4_OUT_DIR.mkdir(parents=True, exist_ok=True)
+    global OUT_DIR
+    OUT_DIR = V4_OUT_DIR
+
+    log("LOAD", f"loading cached mask + Scope T scores for {len(ALL_SUBJS)} subjects from "
+               f"{CONT_EVAL_CACHE} (detector = v3's signal-loss-only masking); recomputing "
+               f"the +-5 SD artifact flag for every ictal/post-ictal-buffer window of each "
+               f"subject from the raw EDFs (the only EDF reads this run does) for the "
+               f"evaluation-side don't-care region")
+    all_data = {s: load_subject_data_v4(s) for s in ALL_SUBJS}
+    write_denominators_csv_v4(all_data)
+
+    grid_df, a8_row, info_row = run_step_a_v4(all_data)
+    stepB_df = run_step_b_v4(all_data, a8_row)
+
+    elapsed_s = time.time() - t_start
+    summary = build_summary_v4_md(grid_df, a8_row, info_row, stepB_df, elapsed_s)
+    (V4_OUT_DIR / "SUMMARY.md").write_text(summary, encoding="utf-8")
+    write_readme_v4()
+    log("DONE", f"v4 SUMMARY.md written. total wall-clock: {elapsed_s / 60:.1f} min")
+
+    OUT_DIR = ROOT / "results" / "lab_protocol"  # restore default for any later call
+
+
+# ---------------------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------------------
 def run_original():
@@ -1033,9 +1420,16 @@ def main():
                     help="docs/CC_PROMPT_LAB_PROTOCOL_V3.md: no +-5 SD masking, only the "
                          "signal-loss rule -- writes results/lab_protocol/v3/ (never "
                          "touches v1's or v2's own files)")
+    ap.add_argument("--v4", action="store_true",
+                    help="docs/CC_PROMPT_LAB_PROTOCOL_V4.md: detector == v3 (signal-loss "
+                         "only); the +-5 SD rule becomes an evaluation-side don't-care "
+                         "region, computed for every window including ictal ones -- writes "
+                         "results/lab_protocol/v4/ (never touches v1's, v2's or v3's files)")
     args = ap.parse_args()
 
-    if args.v3:
+    if args.v4:
+        run_v4()
+    elif args.v3:
         run_v3()
     elif args.verify_and_correct_step_d:
         run_verify_and_correct_step_d()

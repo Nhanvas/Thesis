@@ -189,3 +189,13 @@ them, 3.00 on this CPU; results/continuous_eval/chb17_zrecon_outliers.txt, chb17
 CPU recomputation can reproduce them. By the author's decision, Steps A and B proceed for Scope T with
 the A2 scores on all eight test patients, and every pooled Step B result is also reported without chb17
 as a sensitivity row.
+
+## Amendment A8 (operating-point rule; written while Step C is running and before its test grid is read)
+
+On the continuous timeline precision is 0.02-0.04 at every grid point, so the sensitivity-equals-precision
+rule of Step A selects a point with validation sensitivity 0.13, unusable for review. The reported
+operating point is instead the one that maximizes pooled validation sensitivity subject to pooled
+validation FA/day <= 25 (the product's alert budget), ties by lower FA/day then lower penalty: Scope T
+75/5/300 (validation sensitivity 0.333, 24.99 FA/day). This rule was set after Step B had shown two test
+points and before the Step C test grid was read; the test result at 75/5/300 is read from the Step C
+grid. The Step A rule's result stays reported.

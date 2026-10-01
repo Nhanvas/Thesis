@@ -160,3 +160,7 @@ test result comes from the application's own rerun. Order after the gates: Step 
 Step B for Scope T at its selected point and at 50 / 2.0 with merge 90, running PELT only for the
 penalties those two points need; then write SUMMARY.md immediately; then Step C, with the full Scope T
 test grid for the curve as the last task.
+
+## Amendment A4 (ordering only)
+
+After [SUMMARY] written, do not start Step C; stop and wait for an explicit instruction.

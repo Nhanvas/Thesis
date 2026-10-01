@@ -1,0 +1,10 @@
+subject,n_seizures,n_any_masked_window,n_entirely_masked
+chb03,7,7,7
+chb06,10,10,1
+chb13,12,11,4
+chb14,8,7,1
+chb15,20,19,5
+chb16,10,10,8
+chb17,3,3,1
+chb18,6,6,5
+POOLED,76,73,32

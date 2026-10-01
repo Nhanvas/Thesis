@@ -1,0 +1,13 @@
+subject,n_ictal_windows,n_ictal_flagged,n_seizures,n_seizures_any_flagged,n_seizures_entirely_flagged
+chb10,117,116,7,7,6
+chb11,204,204,3,3,3
+chb22,55,53,3,3,2
+chb03,106,106,7,7,7
+chb06,45,15,10,10,1
+chb13,144,78,12,11,4
+chb14,49,27,8,7,1
+chb15,515,453,20,19,5
+chb16,28,26,10,10,8
+chb17,74,66,3,3,1
+chb18,83,76,6,6,5
+POOLED,1420,1220,89,86,43

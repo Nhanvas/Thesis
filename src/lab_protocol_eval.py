@@ -46,10 +46,26 @@ Steps A-D are exactly docs/CC_PROMPT_LAB_PROTOCOL.md's own list:
      results/continuous_eval/stepC_tables.json's own window_auroc_macro).
   D. Cost of masking on test: seizures with >=1 masked window, and seizures entirely masked.
 
+Step D verification/correction (added post-hoc, after the first run): src/continuous_eval.py's
+compute_artifact_flags() never actually tests an ictal (or buffer) window against the +-5 SD
+threshold -- `if wl[i] or wb[i]: continue` leaves `art[i]` at its array-default False for
+every such window, so Step D's original "0/76 seizures have any masked window" reflected that
+skip, not a real absence of artifacts during seizures. `--verify_and_correct_step_d` recomputes
+the +-5 SD flag for every ICTAL window only (same rule/threshold/filtering, reading just those
+windows from the EDFs -- the one place in this file that reads an EDF, and only because this
+specific check requires it), reports the finding, and -- if any window is flagged -- reruns
+Steps A-D with a corrected mask (ictal windows now subject to the same rule as every other
+window) to results/lab_protocol/*_v2.csv and SUMMARY_v2.md, leaving the original SUMMARY.md and
+its CSVs untouched. Plain `python src/lab_protocol_eval.py` (no flag) still reproduces exactly
+the original run.
+
 Usage
 -----
-  python src/lab_protocol_eval.py
+  python src/lab_protocol_eval.py                        # original run -> SUMMARY.md
+  python src/lab_protocol_eval.py --verify_and_correct_step_d   # Step D audit -> SUMMARY_v2.md
 """
+import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -60,12 +76,15 @@ import ruptures as rpt
 from sklearn.metrics import roc_auc_score
 
 ROOT = Path(__file__).resolve().parents[1]
-for _p in (ROOT / "src",):
+for _p in (ROOT / "src", ROOT / "src" / "dataprep"):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
 import cpd_pipeline_v14 as V14                                   # noqa: E402 -- read-only, locked
 from szcore_eval import SZ_PARAM, score_szcore, per_interval_match  # noqa: E402 -- reused, not retyped
+import preprocessing as P                                        # noqa: E402 -- read-only, locked;
+# used ONLY by compute_ictal_artifact_flags below (--verify_and_correct_step_d), never by the
+# original Steps A-D path, which stays cache-only.
 
 VAL_SUBJS = ["chb10", "chb11", "chb22"]
 TEST_SUBJS = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
@@ -80,6 +99,15 @@ CONT_EVAL_CACHE = ROOT / "results" / "continuous_eval" / "cache"
 OUT_DIR = ROOT / "results" / "lab_protocol"
 
 ALL_WINDOWS_TEST_AUROC_DOC_REF = 0.621  # docs/CC_PROMPT_LAB_PROTOCOL.md Step C's own citation
+
+# Same dataset/stats layout src/continuous_eval.py's own compute_artifact_flags call site uses
+# (edf_path/PROCESSED_DIR), read-only here too -- used only by compute_ictal_artifact_flags.
+DATASET_DIR = Path("F:/Study/Thesis/Dataset/CHB-MIT")
+PROCESSED_DIR = ROOT / "data" / "processed"
+
+
+def edf_path(subj, fname):
+    return DATASET_DIR / subj / fname
 
 
 class LabProtocolError(Exception):
@@ -105,7 +133,13 @@ def scores_cache_path(subj):
     return CONT_EVAL_CACHE / "scores" / f"T_{subj}.npy"
 
 
-def load_subject_data(subj):
+def load_subject_data(subj, corrected_ictal_artifact=None):
+    """`corrected_ictal_artifact`: optional bool array, same length as is_ictal, True only
+    at ictal windows that fail the +-5 SD check under compute_ictal_artifact_flags (see
+    module docstring) -- False everywhere else by construction. When given, OR'd into the
+    cached is_artifact before anything else is derived, so every downstream quantity
+    (score_masked, fit_mask, masked_s, Step D) reflects the correction. Default None
+    reproduces the original run byte-for-byte (is_artifact used exactly as cached)."""
     mpath, spath = mask_cache_path(subj), scores_cache_path(subj)
     if not mpath.exists() or not spath.exists():
         raise LabProtocolError(
@@ -117,6 +151,15 @@ def load_subject_data(subj):
     is_ictal = z["is_ictal"]; is_buffer = z["is_buffer"]; is_artifact = z["is_artifact"]
     is_signal_loss = z["is_signal_loss"]
     sz_ranges = [tuple(int(v) for v in x) for x in z["sz_ranges"]]
+    spans = [tuple(x) for x in z["spans"]]
+
+    if corrected_ictal_artifact is not None:
+        if len(corrected_ictal_artifact) != len(is_artifact):
+            raise LabProtocolError(
+                f"{subj}: corrected_ictal_artifact length ({len(corrected_ictal_artifact)}) "
+                f"!= mask length ({len(is_artifact)})."
+            )
+        is_artifact = is_artifact | corrected_ictal_artifact
 
     ens_T = np.load(spath).astype(np.float64)
     if len(ens_T) != len(is_ictal):
@@ -136,7 +179,9 @@ def load_subject_data(subj):
 
     # Scope T's own background mask, UNCHANGED (src/continuous_eval.py's background_mask &
     # ~is_signal_loss) -- "Scope T fits are unchanged: their background mask already
-    # excludes these windows." Reused as the PELT/magnitude background below.
+    # excludes these windows." Reused as the PELT/magnitude background below. ictal windows
+    # are already excluded here regardless of is_artifact, so the correction above never
+    # changes fit_mask itself -- only score_masked/masked_s (via the `masked` array).
     fit_mask = (~is_ictal) & (~is_buffer) & (~is_artifact) & (~is_signal_loss)
 
     n_windows = len(ens_T)
@@ -146,7 +191,10 @@ def load_subject_data(subj):
     # first (never excluded elsewhere), then masked (detector-side, applies regardless of
     # context), then don't-care (evaluation-side, post-ictal only) -- a window that is both
     # masked and in the post-ictal buffer is counted under "masked", not "don't-care", so
-    # the three subtracted components never double-count the same window.
+    # the three subtracted components never double-count the same window. Note: `& (~is_ictal)`
+    # on masked_s means an ictal window's masked-or-not status NEVER changes this denominator
+    # (it is always counted under seizure_s) -- the ictal-artifact correction above changes
+    # score_masked/Step D, not any FA/day denominator.
     masked_s = float(int((masked & (~is_ictal)).sum()) * WIN_SEC)
     dontcare_s = float(int((is_buffer & (~is_ictal) & (~masked)).sum()) * WIN_SEC)
     denom_s = total_dur_s - seizure_s - masked_s - dontcare_s
@@ -156,9 +204,96 @@ def load_subject_data(subj):
 
     return dict(subject=subj, ens_T_raw=ens_T, score_masked=score_masked, fit_mask=fit_mask,
                is_ictal=is_ictal, is_buffer=is_buffer, masked=masked, sz_ranges=sz_ranges,
-               ref_iv=ref_iv, n_windows=n_windows, total_dur_s=total_dur_s,
+               spans=spans, ref_iv=ref_iv, n_windows=n_windows, total_dur_s=total_dur_s,
                seizure_s=seizure_s, masked_s=masked_s, dontcare_s=dontcare_s,
                n_inter_h=n_inter_h)
+
+
+# ---------------------------------------------------------------------------------------
+# Step D verification/correction: did the cached is_artifact mask ever actually test an
+# ictal window? (src/continuous_eval.py compute_artifact_flags, lines ~259-267:
+# `if wl[i] or wb[i]: continue` -- it does not; `art[i]` stays at its array-default False
+# for every ictal/buffer window, regardless of the window's true amplitude.) This section
+# recomputes the +-5 SD flag for ICTAL windows only, reading them from the EDFs -- the one
+# place in this file that touches an EDF.
+# ---------------------------------------------------------------------------------------
+def compute_ictal_artifact_flags(subj, mask):
+    """Recomputes the +-5 SD artifact flag for every ICTAL window of `subj`, using the
+    EXACT same rule/threshold/filtering as src/continuous_eval.py's compute_artifact_flags
+    (P.filter_window, same 3 s-padding convention; artifact_thresh_uV from the same
+    data/processed/{subj}_stats.json) but WITHOUT that function's `if wl[i] or wb[i]:
+    continue` skip -- every ictal window is actually tested here. Reads only the ictal
+    windows' own padded segments from the EDFs (read-only, nothing is written, no model is
+    run) via `mask["spans"]` (file, start, end in GLOBAL window-index space, from the same
+    cache load_subject_data reads).
+
+    Returns a bool array the same length as mask["is_ictal"], True only where a recomputed
+    ictal window is flagged -- False everywhere else (including every non-ictal index) by
+    construction, so a caller can safely OR it into the cached is_artifact array."""
+    is_ictal = mask["is_ictal"]
+    spans = mask["spans"]
+    stats = json.loads((PROCESSED_DIR / f"{subj}_stats.json").read_text())
+    artifact_threshold = np.asarray(stats["artifact_thresh_uV"], dtype=np.float64) * 1e-6
+
+    flags = np.zeros(len(is_ictal), dtype=bool)
+    for fname, start, end in spans:
+        start, end = int(start), int(end)
+        local_ictal = np.nonzero(is_ictal[start:end])[0]
+        if len(local_ictal) == 0:
+            continue
+        raw = P.open_edf(edf_path(subj, fname))
+        if raw is None:
+            raise LabProtocolError(f"{subj}/{fname}: missing one of the 18 common channels")
+        for local_i in local_ictal:
+            local_i = int(local_i)
+            w = P.filter_window(raw, local_i * P.WIN_SAMPLES,
+                                local_i * P.WIN_SAMPLES + P.WIN_SAMPLES)
+            if np.any(np.abs(w).max(axis=1) > artifact_threshold):
+                flags[start + local_i] = True
+        del raw
+    return flags
+
+
+def verify_step_d(all_data):
+    """Part (2): per subject (all 11), ictal windows flagged / seizures with any flagged
+    window / seizures entirely flagged, using compute_ictal_artifact_flags above. Writes
+    results/lab_protocol/step_d_verification.csv and returns (report_df,
+    corrected_flags_by_subject) -- the latter feeds load_subject_data's
+    corrected_ictal_artifact parameter for the v2 rerun."""
+    rows = []
+    corrected_flags = {}
+    for s in ALL_SUBJS:
+        d = all_data[s]
+        mask = dict(is_ictal=d["is_ictal"], spans=d["spans"])
+        t0 = time.time()
+        flags = compute_ictal_artifact_flags(s, mask)
+        corrected_flags[s] = flags
+        n_ictal = int(d["is_ictal"].sum())
+        n_flagged = int(flags.sum())
+        n_seiz = len(d["sz_ranges"])
+        n_any = sum(1 for (ss, se) in d["sz_ranges"] if flags[ss:se].any())
+        n_all = sum(1 for (ss, se) in d["sz_ranges"] if flags[ss:se].all())
+        rows.append(dict(subject=s, n_ictal_windows=n_ictal, n_ictal_flagged=n_flagged,
+                         n_seizures=n_seiz, n_seizures_any_flagged=n_any,
+                         n_seizures_entirely_flagged=n_all))
+        log("STEPD-VERIFY", f"{s}: {n_flagged}/{n_ictal} ictal windows flagged "
+                            f"(+-5 SD, never checked by the cache), {n_any}/{n_seiz} "
+                            f"seizures have >=1, {n_all}/{n_seiz} entirely flagged "
+                            f"({time.time() - t0:.1f}s)")
+    df = pd.DataFrame(rows)
+    pooled = dict(subject="POOLED", n_ictal_windows=int(df.n_ictal_windows.sum()),
+                 n_ictal_flagged=int(df.n_ictal_flagged.sum()),
+                 n_seizures=int(df.n_seizures.sum()),
+                 n_seizures_any_flagged=int(df.n_seizures_any_flagged.sum()),
+                 n_seizures_entirely_flagged=int(df.n_seizures_entirely_flagged.sum()))
+    df = pd.concat([df, pd.DataFrame([pooled])], ignore_index=True)
+    df.to_csv(OUT_DIR / "step_d_verification.csv", index=False)
+    log("STEPD-VERIFY", f"pooled: {pooled['n_ictal_flagged']}/{pooled['n_ictal_windows']} "
+                        f"ictal windows flagged, {pooled['n_seizures_any_flagged']}/"
+                        f"{pooled['n_seizures']} seizures have >=1, "
+                        f"{pooled['n_seizures_entirely_flagged']}/{pooled['n_seizures']} "
+                        f"entirely flagged")
+    return df, corrected_flags
 
 
 # ---------------------------------------------------------------------------------------
@@ -329,7 +464,7 @@ def select_operating_points(grid_df):
     return a8_row, info_row
 
 
-def run_step_a(all_data):
+def run_step_a(all_data, suffix=""):
     # Verifies the fast-grid ALGORITHM (PELT once per penalty, magnitude/merge post-hoc)
     # against a direct cpd_pipeline_v14.detect_events call -- a code-correctness check, not
     # a per-subject data check, so one validation subject is enough (each direct call is a
@@ -361,8 +496,8 @@ def run_step_a(all_data):
     log("A", f"scored {n_cells} grid cells x {len(VAL_SUBJS)} subject(s) in {time.time() - t0:.1f}s")
 
     grid_df = pd.DataFrame(rows)
-    grid_df.to_csv(OUT_DIR / "stepA_grid.csv", index=False)
-    log("A", f"stepA_grid.csv written ({len(grid_df)} rows)")
+    grid_df.to_csv(OUT_DIR / f"stepA_grid{suffix}.csv", index=False)
+    log("A", f"stepA_grid{suffix}.csv written ({len(grid_df)} rows)")
 
     a8_row, info_row = select_operating_points(grid_df)
     log("A", f"Amendment A8: mag={a8_row['mag_pct']:g} pen={a8_row['pen_mult']:g} "
@@ -377,7 +512,7 @@ def run_step_a(all_data):
 # ---------------------------------------------------------------------------------------
 # Step B -- test, scored ONCE at the A8 point
 # ---------------------------------------------------------------------------------------
-def run_step_b(all_data, a8_row):
+def run_step_b(all_data, a8_row, suffix=""):
     mag, pen, ms = a8_row["mag_pct"], a8_row["pen_mult"], a8_row["merge_s"]
     cells = {}
     t0 = time.time()
@@ -395,7 +530,7 @@ def run_step_b(all_data, a8_row):
     rows.append(grid_row(mag, pen, ms, "POOLED_no_chb17",
                          pool_cells([cells[s] for s in TEST_SUBJS if s != "chb17"])))
     stepB_df = pd.DataFrame(rows)
-    stepB_df.to_csv(OUT_DIR / "stepB.csv", index=False)
+    stepB_df.to_csv(OUT_DIR / f"stepB{suffix}.csv", index=False)
     pooled = stepB_df[stepB_df.subject == "POOLED"].iloc[0]
     log("B", f"pooled: sens={pooled['sensitivity']:.3f} prec={pooled['precision']:.3f} "
              f"FA/day={pooled['fp_per_day']:.2f} median_latency_s={pooled['median_latency_s']:.1f}")
@@ -405,7 +540,7 @@ def run_step_b(all_data, a8_row):
 # ---------------------------------------------------------------------------------------
 # Step C -- window-level macro AUROC on test
 # ---------------------------------------------------------------------------------------
-def run_step_c(all_data):
+def run_step_c(all_data, suffix=""):
     aurocs_new, aurocs_all = {}, {}
     for s in TEST_SUBJS:
         d = all_data[s]
@@ -425,7 +560,7 @@ def run_step_c(all_data):
         dict(subject=s, auroc_lab_protocol=aurocs_new[s], auroc_all_windows=aurocs_all[s])
         for s in TEST_SUBJS
     ] + [dict(subject="MACRO", auroc_lab_protocol=macro_new, auroc_all_windows=macro_all)])
-    df.to_csv(OUT_DIR / "stepC_auroc.csv", index=False)
+    df.to_csv(OUT_DIR / f"stepC_auroc{suffix}.csv", index=False)
     return dict(macro_new=macro_new, macro_all=macro_all, per_subject_new=aurocs_new,
                per_subject_all=aurocs_all)
 
@@ -433,7 +568,7 @@ def run_step_c(all_data):
 # ---------------------------------------------------------------------------------------
 # Step D -- cost of masking
 # ---------------------------------------------------------------------------------------
-def run_step_d(all_data):
+def run_step_d(all_data, suffix=""):
     rows = []
     tot_seiz = tot_any = tot_all = 0
     for s in TEST_SUBJS:
@@ -453,7 +588,7 @@ def run_step_d(all_data):
     rows.append(dict(subject="POOLED", n_seizures=tot_seiz, n_any_masked_window=tot_any,
                      n_entirely_masked=tot_all))
     df = pd.DataFrame(rows)
-    df.to_csv(OUT_DIR / "masking_cost.csv", index=False)
+    df.to_csv(OUT_DIR / f"masking_cost{suffix}.csv", index=False)
     log("D", f"masking cost (test): {tot_any}/{tot_seiz} seizures have >=1 masked window, "
              f"{tot_all}/{tot_seiz} entirely masked")
     return df
@@ -483,8 +618,9 @@ def write_readme():
         encoding="utf-8")
 
 
-def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elapsed_s):
-    lines = ["# Laboratory evaluation protocol -- SUMMARY", ""]
+def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elapsed_s,
+                     suffix="", preamble_lines=None):
+    lines = ["# Laboratory evaluation protocol -- SUMMARY" + (" v2" if suffix else ""), ""]
     lines.append(
         "docs/CC_PROMPT_LAB_PROTOCOL.md (pre-registered 2026-10-01, committed alone before "
         "this ran). Real continuous timeline, no reconstruction, no resampling; two "
@@ -494,6 +630,8 @@ def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elaps
         "(src/app_val_op.py)."
     )
     lines.append("")
+    if preamble_lines:
+        lines.extend(preamble_lines)
     lines.append(f"wall-clock time: {elapsed_s / 60:.1f} min")
     lines.append("")
 
@@ -501,7 +639,7 @@ def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elaps
     lines.append("")
     lines.append(f"8 magnitude percentiles x 6 penalty multipliers x 2 merge gaps = "
                 f"{len(grid_df) // 4} cells, scored pooled across {', '.join(VAL_SUBJS)} "
-                f"(`stepA_grid.csv`, {len(grid_df)} rows).")
+                f"(`stepA_grid{suffix}.csv`, {len(grid_df)} rows).")
     lines.append("")
     lines.append("**Amendment A8 rule (reported result):** maximize pooled validation "
                  "sensitivity subject to pooled validation FA/day <= 25; ties by lower "
@@ -543,7 +681,7 @@ def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elaps
     lines.append(f"- all-windows (no exclusions, recomputed fresh from the same cache): "
                  f"**{stepC['macro_all']:.4f}** (docs cite {ALL_WINDOWS_TEST_AUROC_DOC_REF:g})")
     lines.append("")
-    lines.append("Per subject in `stepC_auroc.csv`.")
+    lines.append(f"Per subject in `stepC_auroc{suffix}.csv`.")
     lines.append("")
 
     lines.append("## Step D -- cost of masking (test)")
@@ -563,7 +701,9 @@ def build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elaps
 # ---------------------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------------------
-def main():
+def run_original():
+    """The pre-registered run: Steps A-D on the cached mask exactly as-is -> SUMMARY.md.
+    Unchanged by the --verify_and_correct_step_d addition below."""
     t_start = time.time()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -582,6 +722,77 @@ def main():
     (OUT_DIR / "SUMMARY.md").write_text(summary, encoding="utf-8")
     write_readme()
     log("DONE", f"SUMMARY.md written. total wall-clock: {elapsed_s / 60:.1f} min")
+
+
+def run_verify_and_correct_step_d():
+    """Post-hoc audit of Step D (never touches SUMMARY.md or any v1 CSV): recompute the
+    +-5 SD artifact flag for every ictal window (verify_step_d), report it, and -- only if
+    at least one ictal window is flagged -- rerun Steps A-D with that correction folded into
+    is_artifact, writing *_v2.csv + SUMMARY_v2.md."""
+    t_start = time.time()
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    log("LOAD", f"loading cached mask + Scope T scores for {len(ALL_SUBJS)} subjects "
+               f"from {CONT_EVAL_CACHE} (no EDF re-read, no model run)")
+    all_data_v1 = {s: load_subject_data(s) for s in ALL_SUBJS}
+
+    log("STEPD-VERIFY", "recomputing the +-5 SD artifact flag for every ICTAL window "
+                        "(reads the EDFs -- the only place this script does so)")
+    verify_df, corrected_flags = verify_step_d(all_data_v1)
+
+    n_flagged_total = int(verify_df.loc[verify_df.subject == "POOLED", "n_ictal_flagged"].iloc[0])
+    if n_flagged_total == 0:
+        log("STEPD-VERIFY", "0 ictal windows flagged across all 11 subjects -- the original "
+                            "SUMMARY.md's Step D result stands uncorrected; no v2 rerun.")
+        return
+
+    log("STEPD-VERIFY", f"{n_flagged_total} ictal window(s) flagged -- rerunning Steps A-D "
+                        f"with the corrected mask (*_v2.csv, SUMMARY_v2.md)")
+    all_data_v2 = {s: load_subject_data(s, corrected_ictal_artifact=corrected_flags[s])
+                  for s in ALL_SUBJS}
+
+    grid_df, a8_row, info_row = run_step_a(all_data_v2, suffix="_v2")
+    stepB_df = run_step_b(all_data_v2, a8_row, suffix="_v2")
+    stepC = run_step_c(all_data_v2, suffix="_v2")
+    stepD_df = run_step_d(all_data_v2, suffix="_v2")
+
+    elapsed_s = time.time() - t_start
+    preamble = [
+        "**Correction applied (see `step_d_verification.csv`):** the first run's cached "
+        "is_artifact mask exempted every ictal window from the +-5 SD check -- "
+        "src/continuous_eval.py's `compute_artifact_flags` skips the test entirely "
+        "(`if wl[i] or wb[i]: continue`) for any ictal or buffer window, leaving its flag at "
+        "the array default `False` regardless of true amplitude. This run recomputes that "
+        "flag for every ictal window (same rule, threshold, and per-window filtering, read "
+        "directly from the EDFs) and reruns Steps A-D with it folded into is_artifact. The "
+        f"original `SUMMARY.md` and its CSVs are unchanged.",
+        "",
+        f"Ictal windows flagged: {n_flagged_total} "
+        f"(`step_d_verification.csv` has the per-subject breakdown). FA/day denominators "
+        f"are identical to v1 -- ictal windows are always subtracted via seizure time "
+        f"regardless of masking status (see `load_subject_data`'s own comment), so "
+        f"`denominators.csv` is not rerun.",
+        "",
+    ]
+    summary = build_summary_md(grid_df, a8_row, info_row, stepB_df, stepC, stepD_df, elapsed_s,
+                               suffix="_v2", preamble_lines=preamble)
+    (OUT_DIR / "SUMMARY_v2.md").write_text(summary, encoding="utf-8")
+    log("DONE", f"SUMMARY_v2.md written. total wall-clock: {elapsed_s / 60:.1f} min")
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--verify_and_correct_step_d", action="store_true",
+                    help="audit Step D's is_artifact skip of ictal windows, and rerun "
+                         "Steps A-D with the correction if any ictal window is flagged "
+                         "(writes *_v2.csv + SUMMARY_v2.md; never touches SUMMARY.md)")
+    args = ap.parse_args()
+
+    if args.verify_and_correct_step_d:
+        run_verify_and_correct_step_d()
+    else:
+        run_original()
 
 
 if __name__ == "__main__":

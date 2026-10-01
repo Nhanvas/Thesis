@@ -26,10 +26,12 @@ import pipeline_demo as pd
 
 def _run_phase_b(payload: dict, out_path: str) -> None:
     filtered_paths = payload["filtered_paths"]
+    flag_paths = payload.get("flag_paths")  # App v3 item 1: Amendment A2 signal-loss flags
     pernode = {}
     pernode_baseline: dict = {}
     scores = pd.process_subject_phase_b_from_paths(
-        filtered_paths, pernode_out=pernode, pernode_baseline_out=pernode_baseline
+        filtered_paths, pernode_out=pernode, pernode_baseline_out=pernode_baseline,
+        flag_paths=flag_paths,
     )
     np.savez(out_path, **scores)
     # Step 7 (CC_STEP7_PROMPT.md Part 1 item 1): persist the per-node array next to the
@@ -54,10 +56,19 @@ def _run_phase_b(payload: dict, out_path: str) -> None:
         np.save(baseline_path, pernode_baseline["baseline"])
 
 
+_FLAG_KEY_PREFIX = "flag__"  # App v3 item 1: see upload_manager.py's _run_process
+
+
 def _run_process_events(payload: dict, out_path: str) -> None:
     with np.load(payload["score_npz_path"]) as data:
-        scores = {fn: data[fn] for fn in data.files}
-    file_events, op = pd.process_subject_events(scores)
+        scores = {}
+        flags = {}
+        for key in data.files:
+            if key.startswith(_FLAG_KEY_PREFIX):
+                flags[key[len(_FLAG_KEY_PREFIX):]] = data[key]
+            else:
+                scores[key] = data[key]
+    file_events, op = pd.process_subject_events(scores, flag_by_filename=flags or None)
     result = {
         "pen_mult": op.pen_mult,
         "event_rate_per_day": op.event_rate_per_day,

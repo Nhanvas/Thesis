@@ -273,13 +273,20 @@ def _maybe_run_phase_b(session: UploadSession) -> None:
             for fn, f in session.files.items()
             if f.status == "uploaded"
         }
+        # App v3 item 1 (CC_PROMPT_APP_V3_CODE.md): Amendment A2 signal-loss flags, same
+        # path-not-array convention as filtered_paths above.
+        flag_paths = {
+            fn: str(f.phase_a.flag_path)
+            for fn, f in session.files.items()
+            if f.status == "uploaded"
+        }
     if not filtered_paths:
         with session.lock:
             session.phase_b_running = False
         return
 
     threading.Thread(
-        target=_run_phase_b, args=(session, gen, filtered_paths), daemon=True
+        target=_run_phase_b, args=(session, gen, filtered_paths, flag_paths), daemon=True
     ).start()
 
 
@@ -307,9 +314,11 @@ def _run_worker(mode: str, payload: dict, out_suffix: str) -> Path:
         Path(in_name).unlink(missing_ok=True)
 
 
-def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict) -> None:
+def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_paths: dict) -> None:
     try:
-        out_path = _run_worker("phase_b", {"filtered_paths": filtered_paths}, ".npz")
+        out_path = _run_worker(
+            "phase_b", {"filtered_paths": filtered_paths, "flag_paths": flag_paths}, ".npz"
+        )
         with np.load(out_path) as data:
             scores = {fn: data[fn] for fn in data.files}
         out_path.unlink(missing_ok=True)
@@ -399,7 +408,14 @@ def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict
         score_npz.mkdir(parents=True, exist_ok=True)
         score_npz_fd, score_npz_name = tempfile.mkstemp(suffix=".npz", dir=str(score_npz))
         os.close(score_npz_fd)
-        np.savez(score_npz_name, **scores)
+        # App v3 item 1 (CC_PROMPT_APP_V3_CODE.md): Amendment A2 signal-loss flags, tiny
+        # bool arrays embedded in the same score npz (stage-2 subprocess only ever gets file
+        # paths/arrays — see pipeline_worker.py's `_run_process_events` / `_FLAG_KEY_PREFIX`,
+        # never the raw signal itself) so it can build `inter_mask` for `detect_events`.
+        savez_payload = dict(scores)
+        for fn, phase_a in phase_a_by_filename.items():
+            savez_payload[f"flag__{fn}"] = phase_a.flag
+        np.savez(score_npz_name, **savez_payload)
 
         out_path = _run_worker("process_events", {"score_npz_path": score_npz_name}, ".json")
         Path(score_npz_name).unlink(missing_ok=True)

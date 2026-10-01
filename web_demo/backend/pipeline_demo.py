@@ -45,7 +45,9 @@ they are single-source, shared with the thesis. Read-only.
 import argparse
 import hashlib
 import sys
+import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -108,6 +110,39 @@ MIN_MAG_PCT = 60
 # scored, never read from the patient being processed.
 FIXED_MAG_PCT = 50
 FIXED_PEN_MULT = 2.0
+# App v3 (CC_PROMPT_APP_V3_CODE.md item 2): event-merge gap, passed to the single
+# detect_events() call below alongside FIXED_MAG_PCT/FIXED_PEN_MULT. Left at
+# cpd_pipeline_v14.detect_events's own default (90) -- a validation-selected value comes in
+# a later instruction, same convention as FIXED_MAG_PCT/FIXED_PEN_MULT above.
+FIXED_MERGE_S = 90
+
+# App v3 item 1 (CC_PROMPT_APP_V3_CODE.md), Amendment A2 (docs/CC_PROMPT_CONTINUOUS_EVAL.md,
+# 2026-10-01): "Signal-loss rule: a window is flagged as signal loss when the standard
+# deviation of the raw (unfiltered) signal is below 1e-10 V on every one of the 18 channels;
+# the threshold is fixed, not tuned (real EEG ~1e-5 V, flat ~1e-22 V)." Mirrored here verbatim
+# from src/continuous_eval.py's SIGNAL_LOSS_STD_V / compute_signal_loss_flags (read-only,
+# never imported -- see that file's own root-cause comment, results/continuous_eval/
+# chb17b_69_inspect.txt: hardware signal-loss was found numerically undefined through the
+# GAE/connectivity pipeline). Defined ONCE here; every exclusion below reads this constant.
+SIGNAL_LOSS_STD_V = 1e-10
+
+
+def compute_signal_loss_flags(raw_windows: np.ndarray) -> np.ndarray:
+    """Window i is signal-loss if the std of its RAW (unfiltered) segment is below
+    SIGNAL_LOSS_STD_V on every one of the 18 channels. `raw_windows`: [n_windows, 18,
+    WIN_SAMPLES], volts (mne's native get_data() unit -- same unit continuous_eval.py's
+    compute_signal_loss_flags reads via raw.get_data(), no conversion needed). Vectorized
+    equivalent of that function's per-window streaming loop: Phase A already holds the whole
+    file's raw windows in RAM at once (see process_file_phase_a), so there is no bounded-
+    memory reason to stream window-by-window here the way the thesis-side evaluation does."""
+    stds = raw_windows.std(axis=2)  # [n_windows, 18]
+    return np.all(stds < SIGNAL_LOSS_STD_V, axis=1)
+
+
+def _masked(arr: np.ndarray, mask: Optional[np.ndarray]) -> np.ndarray:
+    """arr unchanged when mask is None -- keeps the no-flags call path byte-identical to the
+    pre-Amendment-A2 code (same object handed to LedoitWolf.fit / _median_mad either way)."""
+    return arr if mask is None else arr[mask]
 
 
 def _verify_checkpoint(path: Path) -> None:
@@ -168,6 +203,9 @@ class CancelledError(Exception):
 class PhaseAResult:
     filename: str
     filtered: np.ndarray       # [n_windows, 18, WIN_SAMPLES] float32, filtered, NOT z-scored
+    flag: np.ndarray           # [n_windows] bool — signal-loss flag (App v3 item 1, Amendment
+    # A2), computed from RAW windows below. True windows keep their place on the timeline with
+    # fused score 0 and are excluded from every subject-wide fit (see process_subject_phase_b).
     n_windows: int
     start_time: datetime       # from the EDF header (raw.info['meas_date']) — never user-entered
     file_duration_seconds: float  # true recording length (raw.n_times / sfreq)
@@ -182,6 +220,7 @@ class PhaseAResult:
     # notch as one fixed sequence — this is the real intermediate state between those two stages,
     # not a third independent filter. Same [n_windows, 18, WIN_SAMPLES] float32 layout as
     # `filtered`/`filtered_path`.
+    flag_path: Optional[Path] = None  # set when cache_dir given — see process_file_phase_a
 
 
 def process_file_phase_a(
@@ -254,6 +293,13 @@ def process_file_phase_a(
     )
     _check()
 
+    # App v3 item 1 (CC_PROMPT_APP_V3_CODE.md), Amendment A2: computed from RAW windows
+    # (`raw_windows`, float64, pre-downcast below) -- same quantity continuous_eval.py's Scope
+    # W flags from, before anything is cast to float32. Persisted below so Phase B and the
+    # stage-2 subprocess (pipeline_worker.py) only ever need a file path, never the raw signal
+    # itself, to know which windows are flagged.
+    flag = compute_signal_loss_flags(raw_windows)
+
     # Stored as float32 (not float64) purely to keep memory bounded while every file of a
     # subject's raw windows sits in RAM until Phase B runs — a multi-hour, multi-file subject
     # would otherwise use ~2x the RAM for no measurable precision benefit at this stage
@@ -264,6 +310,7 @@ def process_file_phase_a(
     filtered_path = None
     raw_path = None
     bandpass_path = None
+    flag_path = None
     if cache_dir is not None:
         cache_dir = Path(cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
@@ -273,16 +320,20 @@ def process_file_phase_a(
         np.save(raw_path, raw_windows)
         bandpass_path = cache_dir / f"{Path(edf_path).stem}.bandpass.npy"
         np.save(bandpass_path, bandpass_windows)
+        flag_path = cache_dir / f"{Path(edf_path).stem}.flag.npy"
+        np.save(flag_path, flag)
 
     return PhaseAResult(
         filename=Path(edf_path).name,
         filtered=filtered,
+        flag=flag,
         n_windows=n_windows,
         start_time=start_time,
         file_duration_seconds=file_duration_seconds,
         filtered_path=filtered_path,
         raw_path=raw_path,
         bandpass_path=bandpass_path,
+        flag_path=flag_path,
     )
 
 
@@ -292,6 +343,7 @@ def process_subject_phase_b(
     pernode_out: Optional[dict] = None,
     zrecon_out: Optional[dict] = None,
     pernode_baseline_out: Optional[dict] = None,
+    flag_by_filename: Optional[dict[str, np.ndarray]] = None,
     timing: Optional[dict] = None,
 ) -> dict[str, np.ndarray]:
     """Phase B (SPEC §1.6a / CC_STEP3_PROMPT.md §1): subject-wide z-score + LedoitWolf +
@@ -320,6 +372,17 @@ def process_subject_phase_b(
     (same rule, not special-cased for attribution). Only computed when `pernode_out` is also
     supplied, since it's derived from that dict's per-file contents. Default `None`, zero effect
     on existing callers.
+
+    `flag_by_filename` (App v3 item 1, CC_PROMPT_APP_V3_CODE.md, Amendment A2): optional
+    {filename: [n_windows] bool} signal-loss flags (Phase A's `PhaseAResult.flag` / the
+    persisted `{stem}.flag.npy`), same keys and per-file lengths as `filtered_by_filename`.
+    When given, flagged windows are excluded from the LedoitWolf fit, the robust-z median/MAD
+    fit (all three branches), and the Channel Attribution Panel baseline fit below -- exactly
+    where src/continuous_eval.py's Scope W excludes them (fit_mask_W = ~is_signal_loss) -- and
+    the returned score is forced to 0 at those indices so they keep their place on the
+    timeline without being able to create a change point on their own. Default `None`
+    (existing callers unaffected, byte-identical to the pre-Amendment-A2 code path -- see
+    `_masked` above).
 
     `timing` (CC_STAGE_TIMING_REPORT.md — pre-freeze technical measurement, not the final
     thesis numbers): optional dict the caller passes in to receive a per-stage wall-clock
@@ -454,30 +517,45 @@ def process_subject_phase_b(
             zrecon_raw=zrecon_raw, graph_z=graph_z_np, zgamma_raw=zgamma_raw.astype(np.float64)
         )
 
+    # App v3 item 1, Amendment A2: fit_mask is None (no-op, see `_masked`) unless the caller
+    # supplied flags -- byte-identical to the pre-Amendment-A2 code whenever it doesn't.
+    fit_mask = None
+    if flag_by_filename is not None:
+        is_signal_loss = np.concatenate([flag_by_filename[f] for f in filenames_sorted])
+        fit_mask = ~is_signal_loss
+
     if pernode_baseline_out is not None and pernode_out is not None:
         # Step 7 fix round 2, Part 1: same subject-wide scope as the z-score/LedoitWolf stats
         # above, fit on the per-node arrays just collected in the loop (one entry per file in
         # `filenames_sorted`, guaranteed present since the loop always populates `pernode_out[f]`
-        # when `pernode_out is not None`).
+        # when `pernode_out is not None`). Amendment A2: flagged windows excluded per file
+        # before concatenation, same rule as every other fit in this function.
         pernode_baseline_out["baseline"] = compute_pernode_baseline(
-            [pernode_out[f] for f in filenames_sorted]
+            [
+                _masked(pernode_out[f], None if flag_by_filename is None else ~flag_by_filename[f])
+                for f in filenames_sorted
+            ]
         )
 
     # 4. zlatent — LedoitWolf fit on the SUBJECT-wide concatenated graph-level Z (SPEC §1.6a).
+    # Amendment A2: fit excludes flagged windows (fit_mask), mirrors src/continuous_eval.py's
+    # Scope W `cov = LedoitWolf().fit(all_graph_z[fit_mask_W])` (fit_mask_W = ~is_signal_loss).
     all_graph_z = np.concatenate([per_file_raw[f]["graph_z"] for f in filenames_sorted], axis=0)
-    cov = LedoitWolf().fit(all_graph_z)
+    cov = LedoitWolf().fit(_masked(all_graph_z, fit_mask))
     for f in filenames_sorted:
         per_file_raw[f]["zlatent_raw"] = cov.mahalanobis(per_file_raw[f]["graph_z"])
 
     # 5. Robust-z — SPEC §1.6a's table: NOT a divergence, thesis already fits this on the
     # whole window set available at that stage. Here "the whole window set" is the subject's
     # concatenated per-branch raw arrays; fit median/MAD subject-wide, apply per file.
+    # Amendment A2: fit excludes flagged windows (fit_mask), mirrors Scope W's
+    # `median_mad(all_zrecon[fit_mask_W])` / `all_zlatent[fit_mask_W]` / `all_zgamma[fit_mask_W]`.
     all_zrecon = np.concatenate([per_file_raw[f]["zrecon_raw"] for f in filenames_sorted])
     all_zlatent = np.concatenate([per_file_raw[f]["zlatent_raw"] for f in filenames_sorted])
     all_zgamma = np.concatenate([per_file_raw[f]["zgamma_raw"] for f in filenames_sorted])
-    med_r, mad_r = _median_mad(all_zrecon)
-    med_l, mad_l = _median_mad(all_zlatent)
-    med_g, mad_g = _median_mad(all_zgamma)
+    med_r, mad_r = _median_mad(_masked(all_zrecon, fit_mask))
+    med_l, mad_l = _median_mad(_masked(all_zlatent, fit_mask))
+    med_g, mad_g = _median_mad(_masked(all_zgamma, fit_mask))
 
     scores: dict[str, np.ndarray] = {}
     for f in filenames_sorted:
@@ -487,8 +565,15 @@ def process_subject_phase_b(
         score = ensemble_recipe.build_ensemble_subset(
             {"zrecon": zr, "zlatent": zl, "zgamma": zg},
             subset=ensemble_recipe.CANDIDATES["rlg"],
-        )
-        scores[f] = score.astype(np.float64)
+        ).astype(np.float64)
+        if flag_by_filename is not None:
+            # Amendment A2: flagged windows keep their place on the timeline with fused score
+            # 0 (the robust-z median), mirrors Scope W's `ens_W[is_signal_loss] = 0.0` — so
+            # they cannot create a change point on their own and never numerically-undefined
+            # GAE/connectivity output (the root cause this rule exists for) leaks downstream.
+            score = score.copy()
+            score[flag_by_filename[f]] = 0.0
+        scores[f] = score
 
     if timing is not None:
         timing["adjacency_bandpower"] = t_adjacency_bandpower
@@ -506,19 +591,31 @@ def process_subject_phase_b_from_paths(
     device: str = "cpu",
     pernode_out: Optional[dict] = None,
     pernode_baseline_out: Optional[dict] = None,
+    flag_paths: Optional[dict[str, str]] = None,
 ) -> dict[str, np.ndarray]:
     """Process-pool entry point for Phase B (see upload_manager.py's `_executor`). Takes
     filename -> filtered_path (from PhaseAResult.filtered_path) and loads each array from
     disk INSIDE the worker process, instead of the caller passing the arrays themselves —
     ProcessPoolExecutor's call queue reliably deadlocks on Windows when asked to move a few
     hundred MB of numpy data through it, but a handful of path strings is negligible.
+
+    `flag_paths` (App v3 item 1, CC_PROMPT_APP_V3_CODE.md): same {filename: path} shape as
+    `filtered_paths`, pointing at each file's persisted `{stem}.flag.npy` (PhaseAResult.
+    flag_path) — the Phase B subprocess only ever gets paths/arrays, never the raw signal
+    itself, matching `filtered_paths`'s own path-not-array convention. Default `None`
+    (byte-identical to the pre-Amendment-A2 code, same as `process_subject_phase_b`'s own
+    `flag_by_filename=None`).
     """
     filtered_by_filename = {fn: np.load(p) for fn, p in filtered_paths.items()}
+    flag_by_filename = (
+        {fn: np.load(p) for fn, p in flag_paths.items()} if flag_paths is not None else None
+    )
     return process_subject_phase_b(
         filtered_by_filename,
         device=device,
         pernode_out=pernode_out,
         pernode_baseline_out=pernode_baseline_out,
+        flag_by_filename=flag_by_filename,
     )
 
 
@@ -568,6 +665,7 @@ class FileEvent:
 
 def process_subject_events(
     scores_by_filename: dict[str, np.ndarray],
+    flag_by_filename: Optional[dict[str, np.ndarray]] = None,
     timing: Optional[dict] = None,
 ) -> tuple[dict[str, list[FileEvent]], OperatingPointResult]:
     """Stage 2 (SPEC §5.5 / §1.5): concatenate per-file Phase B scores in FILENAME order,
@@ -575,11 +673,20 @@ def process_subject_events(
     assign each event back to its file by cumulative offset. No lookup module needed —
     SPEC §1.5 is explicit that this falls out of the per-file score lengths by construction.
 
+    `flag_by_filename` (App v3 item 1, CC_PROMPT_APP_V3_CODE.md, Amendment A2): optional
+    {filename: [n_windows] bool} signal-loss flags, same keys as `scores_by_filename`. When
+    given, the concatenated `~flags` is passed as `inter_mask` to `detect_events` below, so
+    flagged windows are excluded from the CPD penalty variance and magnitude-filter
+    background — mirrors src/continuous_eval.py's Scope W `inter_mask = ~is_signal_loss`
+    (cpd_pipeline_v14.py itself is never edited; `inter_mask` is its own existing parameter).
+    Default `None` (byte-identical to the pre-Amendment-A2 code: `inter_mask=None`, same as
+    `detect_events`'s own default).
+
     `timing` (CC_STAGE_TIMING_REPORT.md — pre-freeze technical measurement): optional dict,
     same pattern as `process_subject_phase_b`'s. Written key `"cpd"` = wall-clock spent inside
     the single `detect_events()` call below at the fixed operating point (FIXED_MAG_PCT/
-    FIXED_PEN_MULT -- see the module-level comment; no grid search runs here any more).
-    Default `None`, zero effect on existing callers.
+    FIXED_PEN_MULT/FIXED_MERGE_S -- see the module-level comment; no grid search runs here any
+    more). Default `None`, zero effect on existing callers.
     """
     win_sec = float(preprocessing.WIN_S)
     filenames_sorted = sorted(scores_by_filename.keys())
@@ -593,9 +700,14 @@ def process_subject_events(
     total_hours = (total_windows * win_sec) / 3600.0
 
     global_score = np.concatenate([scores_by_filename[f] for f in filenames_sorted])
+    inter_mask = None
+    if flag_by_filename is not None:
+        is_signal_loss = np.concatenate([flag_by_filename[f] for f in filenames_sorted])
+        inter_mask = ~is_signal_loss
     t0 = time.perf_counter()
     events_global = cpd_pipeline_v14.detect_events(
-        global_score, FIXED_PEN_MULT, min_mag_pct=FIXED_MAG_PCT
+        global_score, FIXED_PEN_MULT, min_mag_pct=FIXED_MAG_PCT,
+        inter_mask=inter_mask, merge_s=FIXED_MERGE_S,
     )
     event_rate_per_day = (len(events_global) / total_hours * 24.0) if total_hours > 0 else 0.0
     # `grid` no longer reflects a search -- one entry, for the single fixed point actually used.
@@ -641,6 +753,67 @@ def process_file(edf_path: str, device: str = "cpu", timing: dict | None = None)
         timing["total"] = time.perf_counter() - t_start
 
     return scores[phase_a.filename]
+
+
+# App v3 item 3 (CC_PROMPT_APP_V3_CODE.md): headless cache dir, kept on F: (same drive as
+# REPO_ROOT on this machine, CLAUDE.md "Environment") rather than whatever the OS default
+# temp directory happens to be, so a multi-hour subject's intermediate .filtered/.raw/
+# .bandpass/.flag arrays never spill onto a different, possibly smaller drive. Lives under
+# web_demo/, same as every other on-disk artifact this file writes (`cache` is already an
+# excluded directory name in test_guards.py's source scan, same convention as `uploads/_work`).
+DEFAULT_HEADLESS_CACHE_DIR = REPO_ROOT / "web_demo" / "backend" / "cache" / "headless"
+
+# Clarification (b): "max 2 workers" -- same concurrency cap as upload_manager.py's
+# _PHASE_A_MAX_CONCURRENCY (Phase A memory pressure from holding multiple whole-file mne Raw
+# loads + filtering passes in RAM at once; see that module's own comment on the chb06 OOM
+# this cap was lowered from 4 to 2 for).
+HEADLESS_MAX_WORKERS = 2
+
+
+def process_subject_headless(
+    edf_paths: list[str],
+    cache_dir: Optional[Path] = None,
+    max_workers: int = HEADLESS_MAX_WORKERS,
+) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray]]:
+    """Headless entry point (App v3 item 3): runs Phase A then Phase B through the exact same
+    functions the live flow uses — no database, no HTTP, no annotation of any kind read or
+    touched — so the thesis side can run the application's own computation on the validation/
+    test patients (docs/CC_PROMPT_CONTINUOUS_EVAL.md's Amendment A3/A5).
+
+    Runs Phase A for each file in `edf_paths` from `cache_dir` (default `
+    DEFAULT_HEADLESS_CACHE_DIR`, on F: — see above), at most `max_workers` files concurrently
+    (ThreadPoolExecutor — Phase A is mne+scipy only, no torch, and is already run this way by
+    upload_manager.py's own `_phase_a_executor`), then runs Phase B once on the whole subject.
+
+    Returns `(scores_by_filename, flag_by_filename)` — clarification (b): the per-file
+    signal-loss flag mask is both returned here AND persisted (process_file_phase_a already
+    writes `{stem}.flag.npy` into `cache_dir` whenever `cache_dir` is given, exactly as it
+    does for `.filtered.npy`/`.raw.npy`/`.bandpass.npy`).
+    """
+    if cache_dir is None:
+        cache_dir = DEFAULT_HEADLESS_CACHE_DIR
+    cache_dir = Path(cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    prev_tempdir = tempfile.tempdir
+    tempfile.tempdir = str(cache_dir)  # (b): TMP on F: — this cache_dir, not the OS default
+    try:
+        phase_a_by_filename: dict[str, PhaseAResult] = {}
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            futures = {
+                ex.submit(process_file_phase_a, p, cache_dir=cache_dir): p for p in edf_paths
+            }
+            for fut in as_completed(futures):
+                result = fut.result()
+                phase_a_by_filename[result.filename] = result
+
+        filtered_by_filename = {fn: r.filtered for fn, r in phase_a_by_filename.items()}
+        flag_by_filename = {fn: r.flag for fn, r in phase_a_by_filename.items()}
+        scores = process_subject_phase_b(filtered_by_filename, flag_by_filename=flag_by_filename)
+    finally:
+        tempfile.tempdir = prev_tempdir
+
+    return scores, flag_by_filename
 
 
 if __name__ == "__main__":

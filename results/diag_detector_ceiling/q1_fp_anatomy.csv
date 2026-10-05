@@ -1,0 +1,7 @@
+point,subject,n_events,n_fp_approx,fp_falls_only,fp_near_file_boundary,fp_onset_flagged,n_file_boundaries
+50_2.0_90,chb10,178,170,59,2,66,24
+50_2.0_90,chb11,161,158,62,11,90,30
+50_2.0_90,chb22,123,120,47,2,77,30
+75_5.0_300,chb10,41,39,15,1,16,24
+75_5.0_300,chb11,44,43,10,3,27,30
+75_5.0_300,chb22,28,26,5,0,14,30

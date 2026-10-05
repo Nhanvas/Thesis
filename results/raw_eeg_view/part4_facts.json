@@ -1,0 +1,109 @@
+{
+  "a_rows": [
+    {
+      "subject": "chb01",
+      "n_interictal_stats_json": 15409,
+      "n_interictal_npy_shape0": 15409,
+      "n_rejected_5sd": 17883,
+      "n_ictal": 115,
+      "n_adjs_topk20": 15409
+    },
+    {
+      "subject": "chb02",
+      "n_interictal_stats_json": 17805,
+      "n_interictal_npy_shape0": 17805,
+      "n_rejected_5sd": 13512,
+      "n_ictal": 45,
+      "n_adjs_topk20": 17805
+    },
+    {
+      "subject": "chb04",
+      "n_interictal_stats_json": 94438,
+      "n_interictal_npy_shape0": 94438,
+      "n_rejected_5sd": 40407,
+      "n_ictal": 99,
+      "n_adjs_topk20": 94438
+    },
+    {
+      "subject": "chb05",
+      "n_interictal_stats_json": 18692,
+      "n_interictal_npy_shape0": 18692,
+      "n_rejected_5sd": 14063,
+      "n_ictal": 143,
+      "n_adjs_topk20": 18692
+    },
+    {
+      "subject": "chb07",
+      "n_interictal_stats_json": 28019,
+      "n_interictal_npy_shape0": 28019,
+      "n_rejected_5sd": 29666,
+      "n_ictal": 83,
+      "n_adjs_topk20": 28019
+    },
+    {
+      "subject": "chb08",
+      "n_interictal_stats_json": 7550,
+      "n_interictal_npy_shape0": 7550,
+      "n_rejected_5sd": 9207,
+      "n_ictal": 234,
+      "n_adjs_topk20": 7550
+    },
+    {
+      "subject": "chb09",
+      "n_interictal_stats_json": 36434,
+      "n_interictal_npy_shape0": 36434,
+      "n_rejected_5sd": 21139,
+      "n_ictal": 73,
+      "n_adjs_topk20": 36434
+    },
+    {
+      "subject": "chb12",
+      "n_interictal_stats_json": 7459,
+      "n_interictal_npy_shape0": 7459,
+      "n_rejected_5sd": 5739,
+      "n_ictal": 271,
+      "n_adjs_topk20": 7459
+    },
+    {
+      "subject": "chb19",
+      "n_interictal_stats_json": 12926,
+      "n_interictal_npy_shape0": 12926,
+      "n_rejected_5sd": 12978,
+      "n_ictal": 62,
+      "n_adjs_topk20": 12926
+    },
+    {
+      "subject": "chb20",
+      "n_interictal_stats_json": 11852,
+      "n_interictal_npy_shape0": 11852,
+      "n_rejected_5sd": 9855,
+      "n_ictal": 81,
+      "n_adjs_topk20": 11852
+    },
+    {
+      "subject": "chb21",
+      "n_interictal_stats_json": 11047,
+      "n_interictal_npy_shape0": 11047,
+      "n_rejected_5sd": 16268,
+      "n_ictal": 53,
+      "n_adjs_topk20": 11047
+    },
+    {
+      "subject": "chb23",
+      "n_interictal_stats_json": 8556,
+      "n_interictal_npy_shape0": 8556,
+      "n_rejected_5sd": 9000,
+      "n_ictal": 109,
+      "n_adjs_topk20": 8556
+    }
+  ],
+  "a_total": 270187,
+  "a_answer": "Yes -- only windows that passed the +-5 SD rule are written. In preprocessing.write_windows a window reaches mm_inter only on the `elif not win_buffered` branch, and inside it only `if not is_artifact and idx_inter < n_inter_max`, where is_artifact is True as soon as any of the 18 channels has max|x| > artifact_threshold[ch] = 5 x ch_std[ch]. So {subj}_interictal.npy holds exactly the non-ictal, non-4h-post-seizure-buffer windows whose peak amplitude stays within 5 SD on every channel (then z-scored). Ictal windows go to {subj}_ictal.npy and are deliberately NOT artifact-rejected.",
+  "b": {
+    "n_train_windows": 270187,
+    "n_train_windows_source": "sum of n_interictal over the 12 training subjects in data/processed/{subj}_stats.json, equal to the committed {subj}_interictal_adjs_topk20.npy row counts; independently recorded as \"270,187 interictal windows\" in docs/PHASE_C_FULL_AUDIT.md:202 and docs/PHASE_C_CLOSEOUT_provenance.md:37 and docs/RESULTS_OF_RECORD_phaseB.md:152",
+    "train_subject_contract": "docs/archive/PROVENANCE_MAP.md:160 -- \"The joint model was trained on 12 of the 15 (interictal only) with 3 held-out as validation subjects: train = chb01,02,04,05,07,08,09,12,19,20,21,23; val = chb10,11,22\"; the same 12 are TRAIN_SUBJS in src/retrain/train_gae_joint.py",
+    "wall_clock": "No wall-clock time for the ORIGINAL GAE training exists anywhere in the repo, the notebooks or on Kaggle: docs/archive/PROVENANCE_MAP.md:152 records that the original training notebook was \"confirmed unrecoverable (not in repo, notebook, or Kaggle)\" and notebooks/kaggle_gpu/thesis-cpd-final.ipynb only loads the trained checkpoint and scores with it (Sections 1B/2) -- it contains no training loop. The recorded Kaggle wall-clock figures are for the reconstructed retrain (PREREG 01 recipe, same 270,187 windows): ~3.5 h per GAE seed (docs/PHASE_C_FINAL_HANDOFF.md:20) and ~3.2 h per seed (docs/PHASE_D_HANDOFF.md:44 for the small rlg-class model; docs/PHASE_C_FULL_AUDIT.md:198 reports the same ~3.2 h after a host-bound data-movement bug was fixed), 200 epochs, 4 Kaggle accounts in parallel.",
+    "script_defining_training_windows": "Two scripts, in sequence. (1) src/dataprep/preprocessing.py defines WHICH windows exist: write_windows() (called from process_subject) emits data/processed/{subj}_interictal.npy = non-ictal, non-buffer, 5 SD-passing, z-scored 4 s windows. (2) src/retrain/train_gae_joint.py defines which of them are the TRAINING set: TRAIN_SUBJS (the 12 subjects, lines 35-38) + build_dataset()/load_subject(), which read {subj}_interictal_adjs_topk20.npy and {subj}_interictal_features.npy -- the graph/feature tensors derived from those same interictal windows by src/dataprep/build_graphs.py + apply_topk_multiband.py. The window grid itself (4 s, 1024 samples, no overlap) is preprocessing.py's WIN_S/WIN_SAMPLES."
+  }
+}

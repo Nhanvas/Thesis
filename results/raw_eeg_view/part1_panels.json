@@ -1,0 +1,570 @@
+{
+  "A": {
+    "caption": "A: the 3 shortest seizures of chb16, the 3 shortest of chb06, the 2 shortest of chb14",
+    "spacing_uV": 500.0,
+    "sheets": [
+      "sheet_A.png"
+    ],
+    "panels": [
+      {
+        "subj": "chb16",
+        "file": "chb16_16.edf",
+        "onset": 1214,
+        "offset": 1220,
+        "dur_s": 6
+      },
+      {
+        "subj": "chb16",
+        "file": "chb16_17.edf",
+        "onset": 1694,
+        "offset": 1700,
+        "dur_s": 6
+      },
+      {
+        "subj": "chb16",
+        "file": "chb16_18.edf",
+        "onset": 1909,
+        "offset": 1916,
+        "dur_s": 7
+      },
+      {
+        "subj": "chb06",
+        "file": "chb06_10.edf",
+        "onset": 10833,
+        "offset": 10845,
+        "dur_s": 12
+      },
+      {
+        "subj": "chb06",
+        "file": "chb06_18.edf",
+        "onset": 7799,
+        "offset": 7811,
+        "dur_s": 12
+      },
+      {
+        "subj": "chb06",
+        "file": "chb06_13.edf",
+        "onset": 506,
+        "offset": 519,
+        "dur_s": 13
+      },
+      {
+        "subj": "chb14",
+        "file": "chb14_03.edf",
+        "onset": 1986,
+        "offset": 2000,
+        "dur_s": 14
+      },
+      {
+        "subj": "chb14",
+        "file": "chb14_06.edf",
+        "onset": 1911,
+        "offset": 1925,
+        "dur_s": 14
+      }
+    ]
+  },
+  "B": {
+    "caption": "B: 3 seizures of chb15, 2 of chb03, 2 of chb18, each drawn with random.Random(42) over that subject's seizures (no model score)",
+    "spacing_uV": 300.0,
+    "sheets": [
+      "sheet_B.png"
+    ],
+    "panels": [
+      {
+        "subj": "chb15",
+        "file": "chb15_06.edf",
+        "onset": 272,
+        "offset": 397,
+        "dur_s": 125
+      },
+      {
+        "subj": "chb15",
+        "file": "chb15_17.edf",
+        "onset": 1925,
+        "offset": 1960,
+        "dur_s": 35
+      },
+      {
+        "subj": "chb15",
+        "file": "chb15_40.edf",
+        "onset": 834,
+        "offset": 894,
+        "dur_s": 60
+      },
+      {
+        "subj": "chb03",
+        "file": "chb03_01.edf",
+        "onset": 362,
+        "offset": 414,
+        "dur_s": 52
+      },
+      {
+        "subj": "chb03",
+        "file": "chb03_35.edf",
+        "onset": 2592,
+        "offset": 2656,
+        "dur_s": 64
+      },
+      {
+        "subj": "chb18",
+        "file": "chb18_29.edf",
+        "onset": 3477,
+        "offset": 3527,
+        "dur_s": 50
+      },
+      {
+        "subj": "chb18",
+        "file": "chb18_36.edf",
+        "onset": 463,
+        "offset": 509,
+        "dur_s": 46
+      }
+    ]
+  },
+  "CD": {
+    "caption_C": "C: flagged (is_artifact) non-ictal non-buffer windows -- 2 per subject from chb10, chb11, chb22, chb13, one single-spike and one sustained each, first of each cause met in a random.Random(42) permutation of that subject's flagged windows",
+    "caption_D": "D: chb13's 2 files with the highest flagged share, 3 random.Random(42) flagged windows each; the per-channel SD of the file divided by the subject-wide per-channel SD (stats.json ch_std_uV) is printed beside each trace",
+    "spacing_uV": 500.0,
+    "sheets": [
+      "sheet_CD.png",
+      "sheet_CD_p2.png"
+    ],
+    "panels_C": [
+      {
+        "subj": "chb10",
+        "file": "chb10_05.edf",
+        "window_s": [
+          4008,
+          4012
+        ],
+        "n_exceed": 3,
+        "cause": "single-spike"
+      },
+      {
+        "subj": "chb10",
+        "file": "chb10_13.edf",
+        "window_s": [
+          6972,
+          6976
+        ],
+        "n_exceed": 60,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb11",
+        "file": "chb11_56.edf",
+        "window_s": [
+          2708,
+          2712
+        ],
+        "n_exceed": 1,
+        "cause": "single-spike"
+      },
+      {
+        "subj": "chb11",
+        "file": "chb11_99.edf",
+        "window_s": [
+          1060,
+          1064
+        ],
+        "n_exceed": 867,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb22",
+        "file": "chb22_18.edf",
+        "window_s": [
+          8,
+          12
+        ],
+        "n_exceed": 3,
+        "cause": "single-spike"
+      },
+      {
+        "subj": "chb22",
+        "file": "chb22_04.edf",
+        "window_s": [
+          3392,
+          3396
+        ],
+        "n_exceed": 30,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_47.edf",
+        "window_s": [
+          240,
+          244
+        ],
+        "n_exceed": 3,
+        "cause": "single-spike"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_19.edf",
+        "window_s": [
+          1936,
+          1940
+        ],
+        "n_exceed": 18,
+        "cause": "sustained"
+      }
+    ],
+    "panels_D": [
+      {
+        "subj": "chb13",
+        "file": "chb13_04.edf",
+        "window_s": [
+          112,
+          116
+        ],
+        "n_exceed": 94,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_04.edf",
+        "window_s": [
+          472,
+          476
+        ],
+        "n_exceed": 16,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_04.edf",
+        "window_s": [
+          2708,
+          2712
+        ],
+        "n_exceed": 179,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_05.edf",
+        "window_s": [
+          104,
+          108
+        ],
+        "n_exceed": 194,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_05.edf",
+        "window_s": [
+          460,
+          464
+        ],
+        "n_exceed": 490,
+        "cause": "sustained"
+      },
+      {
+        "subj": "chb13",
+        "file": "chb13_05.edf",
+        "window_s": [
+          2716,
+          2720
+        ],
+        "n_exceed": 6,
+        "cause": "sustained"
+      }
+    ],
+    "chb13_files": {
+      "chb13_04.edf": {
+        "n_flag": 869,
+        "n_win": 900,
+        "share": 0.9655555555555555,
+        "ratio": [
+          1.3085726812756906,
+          1.3250440368718723,
+          1.371004927819493,
+          1.2368701246697977,
+          1.2580345063119305,
+          1.0161163217476556,
+          1.6718749412603546,
+          1.5033754199678844,
+          1.343067242637047,
+          1.074995877390315,
+          0.9725496254353596,
+          0.9678264652178278,
+          1.291769416843574,
+          1.2673679432920921,
+          1.452429760117629,
+          1.4691397584759207,
+          0.8536579314899244,
+          1.1268962257933637
+        ],
+        "file_sd_uV": [
+          68.8160204896199,
+          71.96030780809657,
+          87.43397949480091,
+          71.36195279954896,
+          80.1229346408081,
+          45.823576943850874,
+          103.29838741485486,
+          107.85814814546016,
+          86.39806313390841,
+          45.89200311181294,
+          37.886314266580634,
+          51.28690185150808,
+          83.27822739953383,
+          71.46823607833389,
+          83.136887986694,
+          82.05526420907604,
+          41.2143270923116,
+          49.13473283493209
+        ]
+      },
+      "chb13_05.edf": {
+        "n_flag": 853,
+        "n_win": 900,
+        "share": 0.9477777777777778,
+        "ratio": [
+          1.2757145011310282,
+          1.3026138299941066,
+          1.4572386953624965,
+          1.3232651476144242,
+          1.1936356033778186,
+          0.9176193599293517,
+          2.1468634481498174,
+          1.8852352279171254,
+          1.2526130583812034,
+          1.0290015107765422,
+          0.9472179252541285,
+          0.9159644836064684,
+          1.2590932151397665,
+          1.281015165293978,
+          1.4740688516925424,
+          1.5948729810751296,
+          0.7621502715305694,
+          1.0684524450440847
+        ],
+        "file_sd_uV": [
+          67.08805441601798,
+          70.74217124341773,
+          92.9334210432029,
+          76.34656470545647,
+          76.0214341932121,
+          41.38168086166445,
+          132.64600522488243,
+          135.25429363882338,
+          80.57924329081696,
+          43.92848524150325,
+          36.89950112216828,
+          48.53864019891123,
+          81.17164698312176,
+          72.23781754755638,
+          84.37550673563213,
+          89.07779065063089,
+          36.79636705246934,
+          46.58647729262829
+        ]
+      }
+    },
+    "chb13_flagged_share_ranking": [
+      {
+        "file": "chb13_04.edf",
+        "n_flagged": 869,
+        "n_windows": 900,
+        "share": 0.9656
+      },
+      {
+        "file": "chb13_05.edf",
+        "n_flagged": 853,
+        "n_windows": 900,
+        "share": 0.9478
+      },
+      {
+        "file": "chb13_22.edf",
+        "n_flagged": 828,
+        "n_windows": 900,
+        "share": 0.92
+      },
+      {
+        "file": "chb13_03.edf",
+        "n_flagged": 826,
+        "n_windows": 900,
+        "share": 0.9178
+      },
+      {
+        "file": "chb13_30.edf",
+        "n_flagged": 823,
+        "n_windows": 900,
+        "share": 0.9144
+      },
+      {
+        "file": "chb13_06.edf",
+        "n_flagged": 801,
+        "n_windows": 900,
+        "share": 0.89
+      },
+      {
+        "file": "chb13_47.edf",
+        "n_flagged": 793,
+        "n_windows": 900,
+        "share": 0.8811
+      },
+      {
+        "file": "chb13_02.edf",
+        "n_flagged": 788,
+        "n_windows": 900,
+        "share": 0.8756
+      },
+      {
+        "file": "chb13_18.edf",
+        "n_flagged": 773,
+        "n_windows": 900,
+        "share": 0.8589
+      },
+      {
+        "file": "chb13_07.edf",
+        "n_flagged": 706,
+        "n_windows": 900,
+        "share": 0.7844
+      },
+      {
+        "file": "chb13_24.edf",
+        "n_flagged": 611,
+        "n_windows": 900,
+        "share": 0.6789
+      },
+      {
+        "file": "chb13_19.edf",
+        "n_flagged": 458,
+        "n_windows": 900,
+        "share": 0.5089
+      },
+      {
+        "file": "chb13_56.edf",
+        "n_flagged": 436,
+        "n_windows": 900,
+        "share": 0.4844
+      },
+      {
+        "file": "chb13_08.edf",
+        "n_flagged": 369,
+        "n_windows": 900,
+        "share": 0.41
+      },
+      {
+        "file": "chb13_16.edf",
+        "n_flagged": 322,
+        "n_windows": 900,
+        "share": 0.3578
+      },
+      {
+        "file": "chb13_59.edf",
+        "n_flagged": 225,
+        "n_windows": 900,
+        "share": 0.25
+      },
+      {
+        "file": "chb13_09.edf",
+        "n_flagged": 215,
+        "n_windows": 900,
+        "share": 0.2389
+      },
+      {
+        "file": "chb13_21.edf",
+        "n_flagged": 197,
+        "n_windows": 900,
+        "share": 0.2189
+      },
+      {
+        "file": "chb13_10.edf",
+        "n_flagged": 193,
+        "n_windows": 900,
+        "share": 0.2144
+      },
+      {
+        "file": "chb13_15.edf",
+        "n_flagged": 187,
+        "n_windows": 900,
+        "share": 0.2078
+      },
+      {
+        "file": "chb13_37.edf",
+        "n_flagged": 183,
+        "n_windows": 900,
+        "share": 0.2033
+      },
+      {
+        "file": "chb13_36.edf",
+        "n_flagged": 170,
+        "n_windows": 900,
+        "share": 0.1889
+      },
+      {
+        "file": "chb13_12.edf",
+        "n_flagged": 168,
+        "n_windows": 900,
+        "share": 0.1867
+      },
+      {
+        "file": "chb13_38.edf",
+        "n_flagged": 167,
+        "n_windows": 900,
+        "share": 0.1856
+      },
+      {
+        "file": "chb13_13.edf",
+        "n_flagged": 154,
+        "n_windows": 900,
+        "share": 0.1711
+      },
+      {
+        "file": "chb13_39.edf",
+        "n_flagged": 134,
+        "n_windows": 900,
+        "share": 0.1489
+      },
+      {
+        "file": "chb13_58.edf",
+        "n_flagged": 118,
+        "n_windows": 900,
+        "share": 0.1311
+      },
+      {
+        "file": "chb13_11.edf",
+        "n_flagged": 111,
+        "n_windows": 900,
+        "share": 0.1233
+      },
+      {
+        "file": "chb13_55.edf",
+        "n_flagged": 108,
+        "n_windows": 900,
+        "share": 0.12
+      },
+      {
+        "file": "chb13_14.edf",
+        "n_flagged": 96,
+        "n_windows": 900,
+        "share": 0.1067
+      },
+      {
+        "file": "chb13_62.edf",
+        "n_flagged": 43,
+        "n_windows": 900,
+        "share": 0.0478
+      },
+      {
+        "file": "chb13_60.edf",
+        "n_flagged": 33,
+        "n_windows": 900,
+        "share": 0.0367
+      },
+      {
+        "file": "chb13_40.edf",
+        "n_flagged": 14,
+        "n_windows": 900,
+        "share": 0.0156
+      }
+    ]
+  }
+}

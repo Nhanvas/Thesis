@@ -1,0 +1,259 @@
+[raw_eeg_view] 2026-10-05 14:22:03 selfcheck: filter_window_mem vs preprocessing.filter_window
+[raw_eeg_view] 2026-10-05 14:22:05   chb10/chb10_01.edf: 6 windows, max abs diff = 0
+[raw_eeg_view] 2026-10-05 14:22:07   chb16/chb16_01.edf: 6 windows, max abs diff = 0
+[raw_eeg_view] 2026-10-05 14:22:29 PART 4: 270187 training windows over 12 subjects
+[raw_eeg_view] 2026-10-05 14:22:29 ALL DONE in 0.0 min -- F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md
+[raw_eeg_view] 2026-10-05 14:22:49 A: 8 panels, common channel spacing 1000 uV
+[raw_eeg_view] 2026-10-05 14:23:16   wrote sheet_A.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:23:17 B: 7 panels, common channel spacing 2000 uV
+[raw_eeg_view] 2026-10-05 14:23:36   wrote sheet_B.png (7 panels)
+[raw_eeg_view] 2026-10-05 14:24:55 CD: 14 panels, common channel spacing 2000 uV
+[raw_eeg_view] 2026-10-05 14:25:26   wrote sheet_CD.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:25:33   wrote sheet_CD_p2.png (6 panels)
+[raw_eeg_view] 2026-10-05 14:25:33 PART 1 done in 166s
+[raw_eeg_view] 2026-10-05 14:25:33 ALL DONE in 2.8 min -- F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md
+[raw_eeg_view] 2026-10-05 14:26:19 A: 8 panels, common channel spacing 500 uV
+[raw_eeg_view] 2026-10-05 14:26:42   wrote sheet_A.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:26:43 B: 7 panels, common channel spacing 300 uV
+[raw_eeg_view] 2026-10-05 14:27:02   wrote sheet_B.png (7 panels)
+[raw_eeg_view] 2026-10-05 14:27:58 CD: 14 panels, common channel spacing 500 uV
+[raw_eeg_view] 2026-10-05 14:28:25   wrote sheet_CD.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:28:33   wrote sheet_CD_p2.png (6 panels)
+[raw_eeg_view] 2026-10-05 14:28:33 PART 1 done in 136s
+[raw_eeg_view] 2026-10-05 14:28:33 ALL DONE in 2.3 min -- F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md
+[raw_eeg_view] 2026-10-05 14:29:07 A: 8 panels, common channel spacing 500 uV
+[raw_eeg_view] 2026-10-05 14:29:20   wrote sheet_A.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:29:21 B: 7 panels, common channel spacing 300 uV
+[raw_eeg_view] 2026-10-05 14:29:33   wrote sheet_B.png (7 panels)
+[raw_eeg_view] 2026-10-05 14:30:14 CD: 14 panels, common channel spacing 500 uV
+[raw_eeg_view] 2026-10-05 14:30:31   wrote sheet_CD.png (8 panels)
+[raw_eeg_view] 2026-10-05 14:30:35   wrote sheet_CD_p2.png (6 panels)
+[raw_eeg_view] 2026-10-05 14:30:35 PART 1 done in 90s
+[raw_eeg_view] 2026-10-05 14:30:35 ALL DONE in 1.5 min -- F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md
+[raw_eeg_view] 2026-10-05 14:30:51 chb23: 5 file(s) selected -- 3 seizure file(s) + ['chb23_07.edf', 'chb23_20.edf']
+[raw_eeg_view] 2026-10-05 14:31:11   chb23/chb23_06.edf: 1871 win, ictal=29, flagged=445, 19.9s, rss=186MB
+[raw_eeg_view] 2026-10-05 14:31:18   chb23/chb23_07.edf: 640 win, ictal=0, flagged=415, 7.0s, rss=187MB
+[raw_eeg_view] 2026-10-05 14:31:47   chb23/chb23_08.edf: 2585 win, ictal=18, flagged=49, 28.5s, rss=187MB
+[raw_eeg_view] 2026-10-05 14:32:24   chb23/chb23_09.edf: 3606 win, ictal=62, flagged=476, 36.4s, rss=188MB
+[raw_eeg_view] 2026-10-05 14:32:52 chb10: 25 file(s) selected -- all files
+[raw_eeg_view] 2026-10-05 14:33:22   chb10/chb10_01.edf: 1805 win, ictal=0, flagged=831, 29.5s, rss=186MB
+[raw_eeg_view] 2026-10-05 14:33:49   chb10/chb10_02.edf: 1800 win, ictal=0, flagged=963, 27.1s, rss=186MB
+[raw_eeg_view] 2026-10-05 14:34:14   chb10/chb10_03.edf: 1800 win, ictal=0, flagged=258, 24.9s, rss=186MB
+[raw_eeg_view] 2026-10-05 14:34:39   chb10/chb10_04.edf: 1800 win, ictal=0, flagged=116, 24.8s, rss=188MB
+[raw_eeg_view] 2026-10-05 14:35:01   chb10/chb10_05.edf: 1800 win, ictal=0, flagged=673, 22.0s, rss=188MB
+[raw_eeg_view] 2026-10-05 14:35:23   chb10/chb10_06.edf: 1800 win, ictal=0, flagged=371, 21.8s, rss=189MB
+[raw_eeg_view] 2026-10-05 14:35:41   chb10/chb10_07.edf: 1800 win, ictal=0, flagged=734, 17.7s, rss=188MB
+[raw_eeg_view] 2026-10-05 14:35:58   chb10/chb10_08.edf: 1800 win, ictal=0, flagged=910, 16.9s, rss=191MB
+[raw_eeg_view] 2026-10-05 14:36:18   chb10/chb10_12.edf: 1800 win, ictal=9, flagged=747, 20.5s, rss=190MB
+[raw_eeg_view] 2026-10-05 14:36:46   chb10/chb10_13.edf: 1800 win, ictal=0, flagged=727, 27.5s, rss=191MB
+[raw_eeg_view] 2026-10-05 14:37:10   chb10/chb10_14.edf: 1800 win, ictal=0, flagged=494, 23.9s, rss=192MB
+[raw_eeg_view] 2026-10-05 14:37:34   chb10/chb10_15.edf: 1800 win, ictal=0, flagged=204, 24.0s, rss=192MB
+[raw_eeg_view] 2026-10-05 14:37:54   chb10/chb10_16.edf: 1800 win, ictal=0, flagged=37, 19.8s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:38:15   chb10/chb10_17.edf: 1800 win, ictal=0, flagged=82, 20.9s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:38:35   chb10/chb10_18.edf: 1800 win, ictal=0, flagged=160, 20.5s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:38:56   chb10/chb10_19.edf: 1800 win, ictal=0, flagged=428, 20.4s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:39:17   chb10/chb10_20.edf: 1803 win, ictal=18, flagged=1089, 21.6s, rss=195MB
+[raw_eeg_view] 2026-10-05 14:39:38   chb10/chb10_21.edf: 1800 win, ictal=0, flagged=723, 20.5s, rss=196MB
+[raw_eeg_view] 2026-10-05 14:39:58   chb10/chb10_22.edf: 1800 win, ictal=0, flagged=140, 20.3s, rss=196MB
+[raw_eeg_view] 2026-10-05 14:40:19   chb10/chb10_27.edf: 1804 win, ictal=17, flagged=108, 20.7s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:40:40   chb10/chb10_28.edf: 1800 win, ictal=0, flagged=48, 20.7s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:40:58   chb10/chb10_30.edf: 1803 win, ictal=15, flagged=27, 18.3s, rss=198MB
+[raw_eeg_view] 2026-10-05 14:41:17   chb10/chb10_31.edf: 1805 win, ictal=20, flagged=188, 18.8s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:41:43   chb10/chb10_38.edf: 1800 win, ictal=23, flagged=750, 25.3s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:42:06   chb10/chb10_89.edf: 1800 win, ictal=15, flagged=170, 23.3s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:42:08 chb10: DONE 45020 windows in 9.3 min (556s), rss=209MB -> chb10.npz
+[raw_eeg_view] 2026-10-05 14:42:08 chb11: 31 file(s) selected -- all files
+[raw_eeg_view] 2026-10-05 14:42:22   chb11/chb11_01.edf: 899 win, ictal=0, flagged=496, 14.1s, rss=202MB
+[raw_eeg_view] 2026-10-05 14:42:34   chb11/chb11_02.edf: 900 win, ictal=0, flagged=301, 11.6s, rss=196MB
+[raw_eeg_view] 2026-10-05 14:42:47   chb11/chb11_03.edf: 900 win, ictal=0, flagged=315, 13.2s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:43:00   chb11/chb11_04.edf: 900 win, ictal=0, flagged=351, 12.9s, rss=196MB
+[raw_eeg_view] 2026-10-05 14:43:13   chb11/chb11_05.edf: 900 win, ictal=0, flagged=564, 13.3s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:43:27   chb11/chb11_06.edf: 900 win, ictal=0, flagged=543, 13.6s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:43:39   chb11/chb11_07.edf: 900 win, ictal=0, flagged=546, 12.0s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:43:52   chb11/chb11_08.edf: 900 win, ictal=0, flagged=653, 12.5s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:44:04   chb11/chb11_09.edf: 900 win, ictal=0, flagged=569, 12.0s, rss=197MB
+[raw_eeg_view] 2026-10-05 14:44:13   chb11/chb11_10.edf: 900 win, ictal=0, flagged=417, 8.9s, rss=198MB
+[raw_eeg_view] 2026-10-05 14:44:22   chb11/chb11_11.edf: 900 win, ictal=0, flagged=464, 9.0s, rss=198MB
+[raw_eeg_view] 2026-10-05 14:44:31   chb11/chb11_16.edf: 900 win, ictal=0, flagged=572, 9.4s, rss=198MB
+[raw_eeg_view] 2026-10-05 14:44:40   chb11/chb11_17.edf: 900 win, ictal=0, flagged=434, 8.3s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:44:49   chb11/chb11_18.edf: 900 win, ictal=0, flagged=281, 9.4s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:45:00   chb11/chb11_19.edf: 900 win, ictal=0, flagged=435, 10.5s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:45:10   chb11/chb11_24.edf: 900 win, ictal=0, flagged=375, 10.4s, rss=199MB
+[raw_eeg_view] 2026-10-05 14:45:22   chb11/chb11_25.edf: 900 win, ictal=0, flagged=401, 11.4s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:45:32   chb11/chb11_26.edf: 900 win, ictal=0, flagged=550, 10.0s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:45:42   chb11/chb11_27.edf: 900 win, ictal=0, flagged=602, 10.0s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:45:53   chb11/chb11_53.edf: 900 win, ictal=0, flagged=720, 11.3s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:46:04   chb11/chb11_54.edf: 900 win, ictal=0, flagged=208, 10.6s, rss=200MB
+[raw_eeg_view] 2026-10-05 14:46:15   chb11/chb11_55.edf: 900 win, ictal=0, flagged=276, 11.2s, rss=201MB
+[raw_eeg_view] 2026-10-05 14:46:26   chb11/chb11_56.edf: 900 win, ictal=0, flagged=254, 10.8s, rss=201MB
+[raw_eeg_view] 2026-10-05 14:46:37   chb11/chb11_58.edf: 900 win, ictal=0, flagged=118, 11.0s, rss=201MB
+[raw_eeg_view] 2026-10-05 14:46:49   chb11/chb11_60.edf: 900 win, ictal=0, flagged=390, 11.9s, rss=201MB
+[raw_eeg_view] 2026-10-05 14:47:00   chb11/chb11_61.edf: 900 win, ictal=0, flagged=178, 10.8s, rss=201MB
+[raw_eeg_view] 2026-10-05 14:47:12   chb11/chb11_62.edf: 900 win, ictal=0, flagged=47, 11.5s, rss=202MB
+[raw_eeg_view] 2026-10-05 14:47:27   chb11/chb11_63.edf: 900 win, ictal=0, flagged=228, 14.8s, rss=202MB
+[raw_eeg_view] 2026-10-05 14:47:40   chb11/chb11_82.edf: 900 win, ictal=6, flagged=39, 13.2s, rss=202MB
+[raw_eeg_view] 2026-10-05 14:47:53   chb11/chb11_92.edf: 900 win, ictal=9, flagged=455, 12.7s, rss=203MB
+[raw_eeg_view] 2026-10-05 14:48:02   chb11/chb11_99.edf: 714 win, ictal=189, flagged=296, 8.8s, rss=207MB
+[raw_eeg_view] 2026-10-05 14:48:03 chb11: DONE 27713 windows in 5.9 min (355s), rss=199MB -> chb11.npz
+[raw_eeg_view] 2026-10-05 14:48:03 chb22: 31 file(s) selected -- all files
+[raw_eeg_view] 2026-10-05 14:48:15   chb22/chb22_01.edf: 900 win, ictal=0, flagged=497, 11.7s, rss=192MB
+[raw_eeg_view] 2026-10-05 14:48:25   chb22/chb22_02.edf: 900 win, ictal=0, flagged=394, 10.6s, rss=192MB
+[raw_eeg_view] 2026-10-05 14:48:36   chb22/chb22_03.edf: 900 win, ictal=0, flagged=402, 10.3s, rss=192MB
+[raw_eeg_view] 2026-10-05 14:48:47   chb22/chb22_04.edf: 900 win, ictal=0, flagged=343, 10.7s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:48:58   chb22/chb22_05.edf: 900 win, ictal=0, flagged=100, 11.1s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:49:08   chb22/chb22_06.edf: 900 win, ictal=0, flagged=185, 9.8s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:49:17   chb22/chb22_07.edf: 900 win, ictal=0, flagged=320, 9.5s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:49:26   chb22/chb22_08.edf: 900 win, ictal=0, flagged=640, 8.9s, rss=193MB
+[raw_eeg_view] 2026-10-05 14:49:37   chb22/chb22_09.edf: 900 win, ictal=0, flagged=690, 10.9s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:49:48   chb22/chb22_10.edf: 900 win, ictal=0, flagged=694, 11.3s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:49:58   chb22/chb22_11.edf: 902 win, ictal=0, flagged=745, 9.6s, rss=195MB
+[raw_eeg_view] 2026-10-05 14:50:08   chb22/chb22_15.edf: 900 win, ictal=0, flagged=827, 10.3s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:50:20   chb22/chb22_16.edf: 900 win, ictal=0, flagged=728, 11.2s, rss=194MB
+[raw_eeg_view] 2026-10-05 14:50:30   chb22/chb22_17.edf: 900 win, ictal=0, flagged=715, 10.7s, rss=195MB
+[raw_eeg_view] 2026-10-05 14:50:41   chb22/chb22_18.edf: 900 win, ictal=0, flagged=751, 10.1s, rss=195MB
+[raw_eeg_view] 2026-10-05 14:50:51   chb22/chb22_19.edf: 900 win, ictal=0, flagged=626, 10.7s, rss=195MB
+[raw_eeg_view] 2026-10-05 14:51:02   chb22/chb22_20.edf: 900 win, ictal=16, flagged=679, 10.1s, rss=166MB
+[raw_eeg_view] 2026-10-05 14:51:11   chb22/chb22_21.edf: 900 win, ictal=0, flagged=578, 9.8s, rss=167MB
+[raw_eeg_view] 2026-10-05 14:51:22   chb22/chb22_22.edf: 900 win, ictal=0, flagged=817, 10.3s, rss=167MB
+[raw_eeg_view] 2026-10-05 14:51:32   chb22/chb22_23.edf: 900 win, ictal=0, flagged=715, 10.2s, rss=167MB
+[raw_eeg_view] 2026-10-05 14:51:42   chb22/chb22_24.edf: 900 win, ictal=0, flagged=718, 10.0s, rss=168MB
+[raw_eeg_view] 2026-10-05 14:51:53   chb22/chb22_25.edf: 900 win, ictal=20, flagged=409, 10.4s, rss=168MB
+[raw_eeg_view] 2026-10-05 14:52:03   chb22/chb22_26.edf: 900 win, ictal=0, flagged=317, 10.1s, rss=168MB
+[raw_eeg_view] 2026-10-05 14:52:13   chb22/chb22_27.edf: 900 win, ictal=0, flagged=346, 10.6s, rss=168MB
+[raw_eeg_view] 2026-10-05 14:52:26   chb22/chb22_28.edf: 900 win, ictal=0, flagged=52, 12.1s, rss=169MB
+[raw_eeg_view] 2026-10-05 14:52:37   chb22/chb22_29.edf: 900 win, ictal=0, flagged=354, 10.8s, rss=169MB
+[raw_eeg_view] 2026-10-05 14:52:47   chb22/chb22_30.edf: 900 win, ictal=0, flagged=100, 10.1s, rss=169MB
+[raw_eeg_view] 2026-10-05 14:52:57   chb22/chb22_38.edf: 900 win, ictal=19, flagged=214, 9.9s, rss=169MB
+[raw_eeg_view] 2026-10-05 14:53:07   chb22/chb22_51.edf: 900 win, ictal=0, flagged=421, 10.4s, rss=169MB
+[raw_eeg_view] 2026-10-05 14:53:18   chb22/chb22_54.edf: 900 win, ictal=0, flagged=692, 10.4s, rss=170MB
+[raw_eeg_view] 2026-10-05 14:53:28   chb22/chb22_77.edf: 900 win, ictal=0, flagged=597, 10.5s, rss=170MB
+[raw_eeg_view] 2026-10-05 14:53:29 chb22: DONE 27902 windows in 5.4 min (327s), rss=171MB -> chb22.npz
+[raw_eeg_view] 2026-10-05 14:53:30 chb01: 9 file(s) selected -- 7 seizure file(s) + ['chb01_02.edf', 'chb01_10.edf']
+[raw_eeg_view] 2026-10-05 14:53:41   chb01/chb01_02.edf: 900 win, ictal=0, flagged=322, 11.4s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:53:51   chb01/chb01_03.edf: 900 win, ictal=10, flagged=341, 10.3s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:54:02   chb01/chb01_04.edf: 900 win, ictal=8, flagged=84, 10.3s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:54:13   chb01/chb01_10.edf: 900 win, ictal=0, flagged=532, 10.7s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:54:24   chb01/chb01_15.edf: 900 win, ictal=10, flagged=420, 11.0s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:54:34   chb01/chb01_16.edf: 900 win, ictal=14, flagged=123, 10.5s, rss=164MB
+[raw_eeg_view] 2026-10-05 14:54:44   chb01/chb01_18.edf: 900 win, ictal=23, flagged=51, 10.1s, rss=165MB
+[raw_eeg_view] 2026-10-05 14:54:55   chb01/chb01_21.edf: 900 win, ictal=24, flagged=31, 10.1s, rss=165MB
+[raw_eeg_view] 2026-10-05 14:55:02   chb01/chb01_26.edf: 581 win, ictal=26, flagged=239, 7.2s, rss=170MB
+[raw_eeg_view] 2026-10-05 14:55:03 chb01: DONE 7781 windows in 1.6 min (93s), rss=162MB -> chb01.npz
+[raw_eeg_view] 2026-10-05 14:55:03 chb02: 5 file(s) selected -- 3 seizure file(s) + ['chb02_02.edf', 'chb02_08.edf']
+[raw_eeg_view] 2026-10-05 14:55:14   chb02/chb02_02.edf: 900 win, ictal=0, flagged=131, 10.9s, rss=158MB
+[raw_eeg_view] 2026-10-05 14:55:24   chb02/chb02_08.edf: 900 win, ictal=0, flagged=492, 10.5s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:55:35   chb02/chb02_16+.edf: 900 win, ictal=21, flagged=732, 10.5s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:55:37   chb02/chb02_16.edf: 239 win, ictal=21, flagged=26, 2.6s, rss=163MB
+[raw_eeg_view] 2026-10-05 14:55:48   chb02/chb02_19.edf: 900 win, ictal=3, flagged=493, 10.4s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:55:48 chb02: DONE 3839 windows in 0.8 min (46s), rss=160MB -> chb02.npz
+[raw_eeg_view] 2026-10-05 14:55:48 chb04: 5 file(s) selected -- 3 seizure file(s) + ['chb04_02.edf', 'chb04_10.edf']
+[raw_eeg_view] 2026-10-05 14:56:27   chb04/chb04_02.edf: 3600 win, ictal=0, flagged=310, 39.1s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:56:54   chb04/chb04_05.edf: 2384 win, ictal=13, flagged=1877, 26.6s, rss=160MB
+[raw_eeg_view] 2026-10-05 14:57:41   chb04/chb04_08.edf: 3600 win, ictal=29, flagged=571, 46.8s, rss=161MB
+[raw_eeg_view] 2026-10-05 14:58:27   chb04/chb04_10.edf: 3600 win, ictal=0, flagged=281, 45.4s, rss=162MB
+[raw_eeg_view] 2026-10-05 14:59:11   chb04/chb04_28.edf: 3605 win, ictal=57, flagged=25, 44.7s, rss=163MB
+[raw_eeg_view] 2026-10-05 14:59:12 chb04: DONE 16789 windows in 3.4 min (204s), rss=166MB -> chb04.npz
+[raw_eeg_view] 2026-10-05 14:59:12 chb05: 7 file(s) selected -- 5 seizure file(s) + ['chb05_02.edf', 'chb05_09.edf']
+[raw_eeg_view] 2026-10-05 14:59:26   chb05/chb05_02.edf: 900 win, ictal=0, flagged=479, 13.2s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:59:38   chb05/chb05_06.edf: 900 win, ictal=29, flagged=57, 12.6s, rss=159MB
+[raw_eeg_view] 2026-10-05 14:59:50   chb05/chb05_09.edf: 900 win, ictal=0, flagged=80, 11.7s, rss=159MB
+[raw_eeg_view] 2026-10-05 15:00:03   chb05/chb05_13.edf: 900 win, ictal=28, flagged=35, 12.2s, rss=160MB
+[raw_eeg_view] 2026-10-05 15:00:15   chb05/chb05_16.edf: 900 win, ictal=25, flagged=122, 12.5s, rss=159MB
+[raw_eeg_view] 2026-10-05 15:00:27   chb05/chb05_17.edf: 900 win, ictal=31, flagged=198, 12.0s, rss=160MB
+[raw_eeg_view] 2026-10-05 15:00:38   chb05/chb05_22.edf: 900 win, ictal=30, flagged=493, 11.1s, rss=160MB
+[raw_eeg_view] 2026-10-05 15:00:40 chb05: DONE 6300 windows in 1.5 min (87s), rss=160MB -> chb05.npz
+[raw_eeg_view] 2026-10-05 15:00:40 chb07: 5 file(s) selected -- 3 seizure file(s) + ['chb07_01.edf', 'chb07_04.edf']
+[raw_eeg_view] 2026-10-05 15:01:25   chb07/chb07_01.edf: 3602 win, ictal=0, flagged=2046, 45.5s, rss=145MB
+[raw_eeg_view] 2026-10-05 15:02:08   chb07/chb07_04.edf: 3600 win, ictal=0, flagged=1294, 42.8s, rss=146MB
+[raw_eeg_view] 2026-10-05 15:02:47   chb07/chb07_12.edf: 3600 win, ictal=22, flagged=707, 38.8s, rss=146MB
+[raw_eeg_view] 2026-10-05 15:02:58   chb07/chb07_13.edf: 931 win, ictal=25, flagged=469, 10.9s, rss=148MB
+[raw_eeg_view] 2026-10-05 15:03:38   chb07/chb07_19.edf: 3602 win, ictal=36, flagged=2021, 39.6s, rss=148MB
+[raw_eeg_view] 2026-10-05 15:03:39 chb07: DONE 15335 windows in 3.0 min (179s), rss=150MB -> chb07.npz
+[raw_eeg_view] 2026-10-05 15:03:39 chb08: 7 file(s) selected -- 5 seizure file(s) + ['chb08_04.edf', 'chb08_20.edf']
+[raw_eeg_view] 2026-10-05 15:03:49   chb08/chb08_02.edf: 900 win, ictal=44, flagged=467, 10.4s, rss=142MB
+[raw_eeg_view] 2026-10-05 15:03:59   chb08/chb08_04.edf: 900 win, ictal=0, flagged=271, 9.7s, rss=143MB
+[raw_eeg_view] 2026-10-05 15:04:09   chb08/chb08_05.edf: 900 win, ictal=48, flagged=498, 9.5s, rss=143MB
+[raw_eeg_view] 2026-10-05 15:04:18   chb08/chb08_11.edf: 900 win, ictal=34, flagged=616, 9.8s, rss=143MB
+[raw_eeg_view] 2026-10-05 15:04:29   chb08/chb08_13.edf: 900 win, ictal=41, flagged=427, 10.0s, rss=143MB
+[raw_eeg_view] 2026-10-05 15:04:39   chb08/chb08_20.edf: 900 win, ictal=0, flagged=601, 10.3s, rss=144MB
+[raw_eeg_view] 2026-10-05 15:04:49   chb08/chb08_21.edf: 900 win, ictal=67, flagged=364, 10.1s, rss=144MB
+[raw_eeg_view] 2026-10-05 15:04:50 chb08: DONE 6300 windows in 1.2 min (71s), rss=143MB -> chb08.npz
+[raw_eeg_view] 2026-10-05 15:04:50 chb09: 5 file(s) selected -- 3 seizure file(s) + ['chb09_01.edf', 'chb09_04.edf']
+[raw_eeg_view] 2026-10-05 15:05:15   chb09/chb09_01.edf: 2005 win, ictal=0, flagged=244, 24.7s, rss=146MB
+[raw_eeg_view] 2026-10-05 15:06:05   chb09/chb09_04.edf: 3603 win, ictal=0, flagged=246, 50.2s, rss=137MB
+[raw_eeg_view] 2026-10-05 15:06:51   chb09/chb09_06.edf: 3599 win, ictal=17, flagged=1470, 46.0s, rss=138MB
+[raw_eeg_view] 2026-10-05 15:07:38   chb09/chb09_08.edf: 3600 win, ictal=39, flagged=397, 47.0s, rss=139MB
+[raw_eeg_view] 2026-10-05 15:07:56   chb09/chb09_19.edf: 1425 win, ictal=17, flagged=869, 18.1s, rss=140MB
+[raw_eeg_view] 2026-10-05 15:07:57 chb09: DONE 14232 windows in 3.1 min (188s), rss=142MB -> chb09.npz
+[raw_eeg_view] 2026-10-05 15:07:58 chb12: 15 file(s) selected -- 13 seizure file(s) + ['chb12_20.edf', 'chb12_41.edf']
+[raw_eeg_view] 2026-10-05 15:08:11   chb12/chb12_06.edf: 901 win, ictal=25, flagged=232, 13.2s, rss=133MB
+[raw_eeg_view] 2026-10-05 15:08:23   chb12/chb12_08.edf: 900 win, ictal=24, flagged=92, 12.0s, rss=134MB
+[raw_eeg_view] 2026-10-05 15:08:32   chb12/chb12_09.edf: 903 win, ictal=18, flagged=81, 9.0s, rss=135MB
+[raw_eeg_view] 2026-10-05 15:08:41   chb12/chb12_10.edf: 902 win, ictal=21, flagged=7, 8.9s, rss=135MB
+[raw_eeg_view] 2026-10-05 15:08:47   chb12/chb12_11.edf: 607 win, ictal=10, flagged=119, 6.0s, rss=139MB
+[raw_eeg_view] 2026-10-05 15:08:56   chb12/chb12_20.edf: 900 win, ictal=0, flagged=571, 8.5s, rss=134MB
+[raw_eeg_view] 2026-10-05 15:09:04   chb12/chb12_23.edf: 900 win, ictal=57, flagged=29, 7.9s, rss=135MB
+[raw_eeg_view] 2026-10-05 16:04:50 chb10: cached (chb10.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb11: cached (chb11.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb22: cached (chb22.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb01: cached (chb01.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb02: cached (chb02.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb04: cached (chb04.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb05: cached (chb05.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb07: cached (chb07.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb08: cached (chb08.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb09: cached (chb09.npz), skip
+[raw_eeg_view] 2026-10-05 16:04:50 chb12: 15 file(s) selected -- 13 seizure file(s) + ['chb12_20.edf', 'chb12_41.edf']
+[raw_eeg_view] 2026-10-05 16:04:56   chb12/chb12_06.edf: 901 win, ictal=25, flagged=232, 5.1s, rss=183MB
+[raw_eeg_view] 2026-10-05 16:05:00   chb12/chb12_08.edf: 900 win, ictal=24, flagged=92, 4.5s, rss=184MB
+[raw_eeg_view] 2026-10-05 16:05:05   chb12/chb12_09.edf: 903 win, ictal=18, flagged=81, 4.4s, rss=184MB
+[raw_eeg_view] 2026-10-05 16:05:09   chb12/chb12_10.edf: 902 win, ictal=21, flagged=7, 4.2s, rss=185MB
+[raw_eeg_view] 2026-10-05 16:05:12   chb12/chb12_11.edf: 607 win, ictal=10, flagged=119, 3.0s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:05:17   chb12/chb12_20.edf: 900 win, ictal=0, flagged=571, 4.6s, rss=185MB
+[raw_eeg_view] 2026-10-05 16:05:21   chb12/chb12_23.edf: 900 win, ictal=57, flagged=29, 4.3s, rss=186MB
+[raw_eeg_view] 2026-10-05 16:05:21   chb12/chb12_27.edf: SKIPPED (missing one of the 18 common channels or <1 window) -- preprocessing.py's own convention
+[raw_eeg_view] 2026-10-05 16:05:21   chb12/chb12_28.edf: SKIPPED (missing one of the 18 common channels or <1 window) -- preprocessing.py's own convention
+[raw_eeg_view] 2026-10-05 16:05:21   chb12/chb12_29.edf: SKIPPED (missing one of the 18 common channels or <1 window) -- preprocessing.py's own convention
+[raw_eeg_view] 2026-10-05 16:05:26   chb12/chb12_33.edf: 900 win, ictal=13, flagged=72, 5.3s, rss=186MB
+[raw_eeg_view] 2026-10-05 16:05:31   chb12/chb12_36.edf: 900 win, ictal=7, flagged=28, 5.1s, rss=186MB
+[raw_eeg_view] 2026-10-05 16:05:36   chb12/chb12_38.edf: 900 win, ictal=53, flagged=248, 4.9s, rss=186MB
+[raw_eeg_view] 2026-10-05 16:05:41   chb12/chb12_41.edf: 900 win, ictal=0, flagged=202, 4.8s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:05:46   chb12/chb12_42.edf: 900 win, ictal=43, flagged=29, 4.8s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:05:46 chb12: DONE 10513 windows in 0.9 min (56s), rss=192MB -> chb12.npz
+[raw_eeg_view] 2026-10-05 16:05:46 chb19: 5 file(s) selected -- 3 seizure file(s) + ['chb19_04.edf', 'chb19_21.edf']
+[raw_eeg_view] 2026-10-05 16:05:52   chb19/chb19_04.edf: 900 win, ictal=0, flagged=726, 5.2s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:05:56   chb19/chb19_21.edf: 900 win, ictal=0, flagged=599, 4.8s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:06:01   chb19/chb19_28.edf: 903 win, ictal=21, flagged=12, 4.8s, rss=189MB
+[raw_eeg_view] 2026-10-05 16:06:06   chb19/chb19_29.edf: 900 win, ictal=20, flagged=385, 4.9s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:06:11   chb19/chb19_30.edf: 833 win, ictal=21, flagged=464, 4.5s, rss=193MB
+[raw_eeg_view] 2026-10-05 16:06:11 chb19: DONE 4436 windows in 0.4 min (25s), rss=188MB -> chb19.npz
+[raw_eeg_view] 2026-10-05 16:06:11 chb20: 8 file(s) selected -- 6 seizure file(s) + ['chb20_04.edf', 'chb20_34.edf']
+[raw_eeg_view] 2026-10-05 16:06:16   chb20/chb20_04.edf: 900 win, ictal=0, flagged=385, 5.3s, rss=186MB
+[raw_eeg_view] 2026-10-05 16:06:21   chb20/chb20_12.edf: 900 win, ictal=8, flagged=3, 5.0s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:06:26   chb20/chb20_13.edf: 900 win, ictal=19, flagged=40, 4.9s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:06:31   chb20/chb20_14.edf: 900 win, ictal=11, flagged=228, 4.8s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:06:36   chb20/chb20_15.edf: 900 win, ictal=23, flagged=10, 4.7s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:06:40   chb20/chb20_16.edf: 867 win, ictal=10, flagged=85, 4.7s, rss=191MB
+[raw_eeg_view] 2026-10-05 16:06:45   chb20/chb20_34.edf: 900 win, ictal=0, flagged=370, 4.9s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:06:48   chb20/chb20_68.edf: 541 win, ictal=10, flagged=61, 2.9s, rss=192MB
+[raw_eeg_view] 2026-10-05 16:06:49 chb20: DONE 6808 windows in 0.6 min (38s), rss=191MB -> chb20.npz
+[raw_eeg_view] 2026-10-05 16:06:49 chb21: 6 file(s) selected -- 4 seizure file(s) + ['chb21_04.edf', 'chb21_26.edf']
+[raw_eeg_view] 2026-10-05 16:06:54   chb21/chb21_04.edf: 900 win, ictal=0, flagged=558, 5.0s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:06:59   chb21/chb21_19.edf: 900 win, ictal=14, flagged=212, 5.0s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:07:03   chb21/chb21_20.edf: 747 win, ictal=14, flagged=473, 4.1s, rss=191MB
+[raw_eeg_view] 2026-10-05 16:07:08   chb21/chb21_21.edf: 900 win, ictal=21, flagged=270, 5.0s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:07:13   chb21/chb21_22.edf: 900 win, ictal=4, flagged=468, 4.8s, rss=187MB
+[raw_eeg_view] 2026-10-05 16:07:17   chb21/chb21_26.edf: 900 win, ictal=0, flagged=785, 4.8s, rss=188MB
+[raw_eeg_view] 2026-10-05 16:07:18 chb21: DONE 5247 windows in 0.5 min (29s), rss=188MB -> chb21.npz
+[raw_eeg_view] 2026-10-05 16:07:18 chb23: 5 file(s) selected -- 3 seizure file(s) + ['chb23_07.edf', 'chb23_20.edf']
+[raw_eeg_view] 2026-10-05 16:07:28   chb23/chb23_06.edf: 1871 win, ictal=29, flagged=445, 10.0s, rss=191MB
+[raw_eeg_view] 2026-10-05 16:07:31   chb23/chb23_07.edf: 640 win, ictal=0, flagged=415, 3.4s, rss=191MB
+[raw_eeg_view] 2026-10-05 16:07:45   chb23/chb23_08.edf: 2585 win, ictal=18, flagged=49, 13.3s, rss=191MB
+[raw_eeg_view] 2026-10-05 16:08:02   chb23/chb23_09.edf: 3606 win, ictal=62, flagged=476, 17.8s, rss=192MB
+[raw_eeg_view] 2026-10-05 16:08:09   chb23/chb23_20.edf: 1252 win, ictal=0, flagged=344, 6.3s, rss=192MB
+[raw_eeg_view] 2026-10-05 16:08:09 chb23: DONE 9954 windows in 0.9 min (51s), rss=194MB -> chb23.npz
+[raw_eeg_view] 2026-10-05 16:08:09 mask agreement vs continuous_eval chb10: {'comparable': True, 'n': 45020, 'is_ictal': 45020, 'is_buffer': 45020, 'is_artifact': 45020, 'is_signal_loss': 45020}
+[raw_eeg_view] 2026-10-05 16:08:09 mask agreement vs continuous_eval chb11: {'comparable': True, 'n': 27713, 'is_ictal': 27713, 'is_buffer': 27713, 'is_artifact': 27713, 'is_signal_loss': 27713}
+[raw_eeg_view] 2026-10-05 16:08:09 mask agreement vs continuous_eval chb22: {'comparable': True, 'n': 27902, 'is_ictal': 27902, 'is_buffer': 27902, 'is_artifact': 27902, 'is_signal_loss': 27902}
+[raw_eeg_view] 2026-10-05 16:08:29 wrote F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md
+[raw_eeg_view] 2026-10-05 16:08:29 ALL DONE in 3.7 min -- F:\Study\Thesis\Code\results\raw_eeg_view\SUMMARY.md

@@ -1,0 +1,2 @@
+feature,pooled_auroc,direction,n_val_agree,agrees_2of3,auroc_chb10,auroc_chb11,auroc_chb22
+frac_ch_sd_gt3med,0.755766,higher in seizures,3,True,0.854673,0.916488,0.880923

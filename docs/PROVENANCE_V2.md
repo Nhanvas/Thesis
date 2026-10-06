@@ -1,0 +1,48 @@
+# PROVENANCE_V2 — identity of the v2 GAE checkpoints and input sets (MACHINE-GENERATED)
+
+Generated 2026-10-06 by `src/perf_p1_close.py`. Regenerate rather than edit. A v2 checkpoint is
+identified by the sha256 below, never by its filename.
+
+## Checkpoints (`data/models_v2/`)
+
+| file | bytes | sha256 | note |
+|---|---|---|---|
+| gae_v2_all_seed1.pt | 19979 | `4f3e994fb6be6f090c81420bd4414e1a2efcd6d5d763cab6596c6d9652d48e99` |  |
+| gae_v2_all_seed42.pt | 19993 | `85481a99714aba3ad20ee9252550de62f0bffbdea19e416cdbbe681e1e868ab8` |  |
+| gae_v2_clean_seed1.pt | 20007 | `e8455cbfb83cc6ca9cb20db88262ed56a9270947a656e23d8d3b876fe0f1a6b3` |  |
+| gae_v2_clean_seed2.pt | 20007 | `dabd96f5a3b88583051175c421a0ec5cc4f704f7553fc654dbdac44c14ee810b` |  |
+| gae_v2_clean_seed3.pt | 20007 | `77c73e17866c7910f9183fcbe3e2d8a868681b91c57b968a102bfe1eca75b705` |  |
+| gae_v2_clean_seed42.pt | 20021 | `6e310307b046407a18d839273b84c74b2905457ec6ace892b674c6972dac590f` |  |
+
+## Input set `data/trainset_v2/` (15 npz)
+
+| file | bytes | sha256 |
+|---|---|---|
+| chb01.npz | 55550177 | `0dd95e8d2e3a94d047257e8406c47c4a14c75ea85b50550f9dce054127d8a1ce` |
+| chb02.npz | 48309934 | `da527953a77c6107032f83e98e0d78448217276fd360e26e4be4ebecb24dcea2` |
+| chb04.npz | 213772731 | `0d15932ad3071f05c7a6ba4c2b066d7fb0680c53ebca9332501321d16cd49199` |
+| chb05.npz | 53428464 | `4c9513059d639808cf33dd0921edb1ba1ab3e181c2c2563df8aa89554d7526b4` |
+| chb07.npz | 91848010 | `26f2792db1cc3414f7ded19a6a3440c48acc8c9f6b9672c749744f305bbaa314` |
+| chb08.npz | 27406545 | `d5ce94bcd19d980c0ea9f72ca4d494ae690f667293e889a26979ef440d282d1e` |
+| chb09.npz | 92965158 | `6aef274d4657b4e5271227c56e0f86af76b6357d03b5c99204e855ad057f8c9c` |
+| chb10.npz | 68523450 | `1be4a9c975d027429e2c1b5ecdbc461c85592dce1b4ef0ce87b5b5085e90aea3` |
+| chb11.npz | 42182286 | `b4da4c387ba8e755b7b880792e17e728a928e40d895f8d9a2977351edb3e11ee` |
+| chb12.npz | 28338476 | `9298ae37971683661de993ace0097e945c4d62871a81b8ed0e63efcfe794886e` |
+| chb19.npz | 40999677 | `fd9c894801970ba7e30c59188ee0302ab7cae48197e7b281c7e9be724e2e05ff` |
+| chb20.npz | 37808028 | `a93f6fde228ea6049b8b5700b739d7e18361aa781a8f0015392f4368eb5b8f80` |
+| chb21.npz | 43602327 | `8c27b6d7d7b810ce61648252133ca75fee3201fefbf18b2b8b3c14af4f4634fe` |
+| chb22.npz | 42469944 | `d3c9aebccd013e47230996e6fb7a9776cb65b5b155eea652153e0f8fb59cae93` |
+| chb23.npz | 36378975 | `bb80b937638a1fb5ab132cdd9df0c84f1bb34017fb8250f97e75d7874282065d` |
+
+## Input set `data/testset_v2/` (8 npz)
+
+| file | bytes | sha256 |
+|---|---|---|
+| chb03.npz | 52057532 | `a6a510ac761f0a8c833544813ad6b7df350b62647294ea03b02cd7cc66040e46` |
+| chb06.npz | 91414630 | `601bb264ff43cb66ea8804ef6b3022d893f38adf4f1b6c9c4c255999261efe92` |
+| chb13.npz | 45206935 | `77279ba73f9e6fb201567ee414d2ac5474696d1a1d0a9d07ff56e23bcb81a748` |
+| chb14.npz | 35618230 | `690065d983e63f177271025b295d7d52b566fbc569af2175f57a3048b62152ff` |
+| chb15.npz | 54807816 | `fd7f3a901f9a1fdbf69b43b195a29f02395dd558e3234c564809bc7700258c7f` |
+| chb16.npz | 26029525 | `eae95f85e9f6e8b9c14ea9687587f2a1d7ec49e7943bf8d12bcd2a3abf4f2410` |
+| chb17.npz | 28778308 | `38dba59a2d011f10a357d98670afebfb6c5408a6fe69fa7a4a406f8a8071bced` |
+| chb18.npz | 48814120 | `2c73e8241c7ee5bf13f59d05e1b843c3245e794971eca75526639598e14e33a0` |

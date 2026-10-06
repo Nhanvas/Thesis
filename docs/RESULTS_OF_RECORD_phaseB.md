@@ -1,4 +1,10 @@
 # RESULTS_OF_RECORD — PHASE B / TIER-2 (rlg optimized pipeline)
+<!-- perf-p1-close 2026-10-06 -->
+> **Note 2026-10-06 (pointer only; no number below is changed).** Every detection number in this
+> file is from the **offline protocol**: the timeline is rebuilt from the seizure annotations and its
+> gaps are filled with bootstrapped scores of artifact-rejected interictal windows. Continuous-timeline
+> numbers and the performance phase are in `docs/PERF_PHASE_RECORD.md`.
+
 **Status:** LOCKED (one-shot TEST executed once, as pre-registered in PREREG_TIER2 + Amendment A1).
 **Last verified 2026-09-02. §10 rewritten 2026-09-18 and completed 2026-09-19 (final channel annotation, attribution results FINAL).** Before quoting any number here, run `python src/verify_provenance.py`
 (~20 s): it re-derives the canonical checkpoint identity from the committed TEST components.

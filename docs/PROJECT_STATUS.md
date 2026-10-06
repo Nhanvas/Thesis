@@ -1,4 +1,10 @@
 # PROJECT STATUS — single source of truth for "where are we right now"
+<!-- perf-p1-close 2026-10-06 -->
+> **⚠️ 2026-10-06 — current state is NOT in this file.** Performance work was re-opened on
+> 2026-10-05. The current state, the continuous-timeline numbers, the log of every TEST look and the
+> next plan are in `docs/PERF_PHASE_RECORD.md`, which wins over this file. The report and demo
+> entries below are as of rev F (2026-09-28).
+
 **Last updated:** 2026-09-19 (rev. E2). **Replaces:** `MASTER_HANDOFF_v2.md`, `PLAN_AND_STATUS.md`,
 `NEXT_TASKS_AND_PLAN.md` (all retired). **On any number conflict, `RESULTS_OF_RECORD_phaseB.md` wins
 over this file.** On artifact identity, `PROVENANCE.md` wins. On paths, `REPO_MAP.md` wins. On any

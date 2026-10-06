@@ -193,3 +193,35 @@ pairwise Jaccard 0.5144. The draft it replaces was machine-generated (`VERIFIED_
 - Report text written before 2026-09-18 (Chapters 1–5, front matter, `tables/CAPTIONS.md`,
   `tables/tables_ch3.md`, `RUBRIC_TRACKING.md`) still carries the retired framing until step 5 of the
   rerun rewrites it. Where those files disagree with this entry, this entry wins.
+
+<!-- perf-p1-close 2026-10-06 -->
+## 13 · Performance phase, stage P1 (2026-10-06)
+
+Settled by code reading and runs during the performance phase; full log in `PERF_PHASE_RECORD.md`.
+
+- **The offline timeline is not a continuous-recording estimate.** `szcore_eval.build_timeline_masked`
+  rebuilds it from the annotations and fills gaps with bootstrapped scores of artifact-rejected interictal
+  windows (`src/szcore_eval.py:98–109`). On the real continuous timeline V1 + PELT scores 23/76 at
+  73.3 FA/day (`results/continuous_eval/`). Replaces: "F1 0.213 @ 27.4 is the honest headline".
+- **The ±5 SD flag means high amplitude, not artifact.** One sample on one channel above 5 SD flags the
+  window; it flags 46 % of training interictal windows and ~90 % of seizure windows
+  (`results/raw_eeg_view/`). Using it as an artifact label (E4) calls 81.5 % of seizure windows artifact.
+- **V1's node features erase amplitude and window spectral shape**: band powers are z-scored within each
+  window (`feature_extraction.compute_band_powers`) and min-maxed per band across channels within each
+  window (`train_gae_joint.make_window_data`).
+- **PELT on the anomaly score alarms on falling change points as well as rising ones**
+  (`results/diag_detector_ceiling/`).
+- **Precision and F1 come from the scorer's counts.** timescoring: precision = tp/(tp+fp),
+  F1 = 2tp/(2tp+fp+(ref−tp)) (read from `timescoring/scoring.py`). The E9 hand formula gave negative
+  precision; its precision/F1 columns are invalid.
+- **SzCORE's official aggregate is the mean of per-subject metrics** (`szcore-evaluation`,
+  `evaluate_dataset(avg_per_subject=True)` by default, `nanmean` over subjects; counts summed within a
+  subject; each recording scored separately). The P1 scripts pool counts; both are reported from P2 on.
+- **The selection set over-predicts test.** v2: 0.489 @ 19.8 on the 15 non-test subjects (E8), 3/76 @ 24.1
+  on test (E9); test seizure peaks are out-ranked by 20–50 % of same-length non-ictal spans vs 4 % on
+  validation (`results/oracle_gate_bound/`).
+- **The test collapse is not mainly a detection-stage problem** (corrects HANDOVER_PERF §3): a
+  local-contrast kernel-CPD detector (E10) and removing long events (D1c) do not raise sensitivity, while
+  removing flagged windows (oracle) does.
+- **Benchmark rows are read from `esl-epfl/szcore/results/*/chbmit.json`.** A Perplexity row
+  "ESL_RF 34.1 % / 1.08 FP/day" is not in that repository and is not cited.

@@ -1,0 +1,7 @@
+score,group,n,median,p90,p98
+V1,clean bg,324421,-0.193,0.988,1.983
+V1,flagged,238427,1.02,3.012,4.476
+V1,seizure,1744,1.396,3.772,5.513
+v2 clean s42,clean bg,324421,-0.209,0.984,1.964
+v2 clean s42,flagged,238427,1.024,3.088,4.924
+v2 clean s42,seizure,1744,2.311,5.16,7.014

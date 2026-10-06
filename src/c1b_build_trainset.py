@@ -77,10 +77,12 @@ def graph_and_bp(zw):
     return adj, bp
 
 
-def build(subj, max_files=None):
-    if subj in SE.TEST_SUBJS:
+def build(subj, max_files=None, out_dir=None, allow_test=False):
+    if subj in SE.TEST_SUBJS and not allow_test:
         raise SystemExit(f"TEST GUARD: {subj}")
-    out = OUT / (f"{subj}_SMOKE.npz" if max_files else f"{subj}.npz")
+    out_dir = Path(out_dir) if out_dir else OUT
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = out_dir / (f"{subj}_SMOKE.npz" if max_files else f"{subj}.npz")
     if out.exists():
         print(f"{subj}: exists, skip"); return
     t0 = time.time()

@@ -1,8 +1,9 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. A, 2026-10-06.** Single source for the performance phase. Supersedes
+**Rev. B, 2026-10-07** (rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
-Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is planned in §6 and starts in a new chat.
+Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
+Rev. B: §6 rewritten with E11–E14 and the queue; wording on flagged windows corrected (§6.0).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -141,49 +142,40 @@ Several submissions show 0 sensitivity on CHB-MIT (failed runs); they are not co
 unsupervised method among them, and its key design — **a baseline model fitted on the patient's own
 recording** — is the mechanism P2 tests on the GAE.
 
-## 6 · Stage P2 — plan (to be finalized in the P2 chat after reading the code)
+## 6 · Stage P2 — log and queue
 
-**Hypothesis.** The GAE fails on test because its "normal" belongs to other patients. Adapting the GAE,
-label-free, to each patient's own complete recording (test-time / transductive adaptation) makes that
-patient's frequent high-amplitude states normal (they are ~40 % of the time) while seizures stay rare
-(~0.2–0.7 %). Evidence for: E5 (+0.256 with patient-own density on features), E1 (cross-patient normal
-fails), §4 point 2 (the test tail is owned by the patient's own flagged windows), DynaSD (§5).
-Evidence against / risks: contamination (a patient with many similar seizures, chb15 has 20, may teach
-the model its seizures); the gamma branch is a fixed feature that adaptation does not touch; the
-selection set is easier than test.
+### 6.0 Wording
+A ±5 SD flag means **high amplitude**, not artifact (46 % of training interictal windows are flagged,
+~90 % of seizure windows). "Flagged window" below never means "noise". Mechanisms such as "muscle gives
+high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypotheses.
 
-**E11 — tail anatomy by branch (cache only, minutes, no test).** On the E8 cache of the 15 non-test
-subjects, V1 and v2: for recon, latent, gamma and the ensemble — seizure vs flagged and seizure vs clean
-AUROC per subject, the Part-B exceedance fraction per seizure, and which branch owns the top-2 %
-non-ictal windows. Decides which readouts the adaptation must cover. Needs the cache format first.
+### 6.1 Log (15 non-test subjects, cache-based unless stated; every gate fixed in the docstring first)
 
-**E12 — patient-specific adaptation of the GAE (the P2 lever).** Per patient: start from frozen v2 clean;
-fine-tune on every window of that patient's recording with no labels and no flags, under a fixed budget;
-re-derive the readouts (latent covariance refit on the adapted encoder; gamma as E11 dictates); D1
-frozen; SzCORE. Seeds 42 and 1. Design items fixed in the docstring before the run: which parameters
-adapt, epochs and learning rate (fixed a priori, not tuned), contamination guard (none vs trimmed loss),
-the gate (proposal: ≥ v2 + 0.10 sensitivity at ≤ 25 FA/day pooled, validation not lower, ≥ 9/15 subjects
-not worse, plus a required mechanism check: flagged non-ictal score median and seizure exceedance both
-fall), and the measured CPU cost per patient, because the application must be able to run it.
+| step | result | reading |
+|---|---|---|
+| **E11** tail anatomy by readout (`results/e11_tail_anatomy/`) | top-2 % tail of the frozen ensemble: 95–96 % flagged (base rate of flagged windows ≈ 46 % in training interictal). Owner of the tail (largest mean z): **gamma** in 12/15 (both seeds). Seizure-vs-flagged AUROC: gamma 0.762, recon 0.527–0.534, **latent 0.966**. Mean z in tail vs in seizures: gamma 6.2–6.3 vs 3.29; recon 1.90 vs 0.68–0.71; latent 1.50–1.59 vs 3.15–3.50 | rule R3: gamma dominates the tail because its z is heavy-tailed (it still ranks seizures above flagged windows on average); recon is near chance against flagged windows; the v2 latent is the readout that separates. Adapting the GAE alone would not touch gamma |
+| **E12** latent-only readout L vs frozen ensemble E (`results/e12_readout_composition/`) | reproduction of E8 exact. L 0.553 @ 23.8 vs E 0.489 @ 19.8 (≤ 15: 0.511 vs 0.378; ≤ 10: 0.426 vs 0.277); validation 0.867 vs 0.733; 9/15 subjects; subject-mean 0.676 vs 0.651. Tail flagged share 0.96 → 0.87 | **NOT adopted** (G1 +0.064 < +0.10). Without chb12 (26 of 94 seizures) L ≈ E at ≤ 25 (45.5/68 vs 45/68, computed from the per-subject table) |
+| **E13** recon trained on flagged windows (`all`) vs not (`clean`), 12 training subjects (`results/e13_recon_seen_artifacts/`) | recon seizure-vs-flagged ΔAUROC median −0.007, positive 4/12; latent 0.946 → 0.936 | rule B. **Scope:** a pooled 12-patient model, recon readout only — a diluted proxy, NOT patient-specific fine-tuning. Reading: "no support from this proxy", not "adaptation fails". Adaptation is **postponed, not tested** (author decision 2026-10-07) |
+| **E14** spatial-recruitment readout S9 = 9th largest of 18 per-channel latent anomalies (per-channel LedoitWolf on the v2 node latent, per patient) (`results/e14_spatial_recruitment/`) | reproduction exact. **S9 0.622 @ 24.6** (≤ 15: 0.521; ≤ 10: 0.426); validation 0.867; 12/15 subjects ≥ E; subject-mean 0.747 @ 25.4 FP/day (E 0.651 @ 20.8); short seizures 1/3. Characterisation: S12 0.617, channel mean 0.601, S6 0.543, S3 0.537, max 0.457. **Tail flagged share 0.95** (L 0.87) | G1–G3 pass; the pre-registered **mechanism check FAILED** (tail not cleaner). The script printed "ADOPTED" because the mechanism condition was not wired into its decision (coding error, corrected in the reading here). Reading: an empirical gain at ≤ 25 FA/day, not explained by the spread hypothesis; the per-channel modelling (mean 0.601 ≈ S9) seems to carry it. vs L: +0.069 at ≤ 25, +0.010 at ≤ 15, 0 at ≤ 10. Without chb12: S9 50.5/68, L 45.5/68, E 45/68 (computed). **Status: best candidate, not frozen, no test look** |
 
-**E13 — CPD as the localization step (cheap, after the detector is frozen).** Keep detection by the
-patient-calibrated threshold; place onset and offset of each detected event with non-parametric kernel
-CPD inside a fixed margin. Metric: onset/offset error on true positives vs the raw D1 boundaries, with
-sensitivity and FA/day required unchanged. This gives Objective 2 a measured role instead of a nominal
-one.
+Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E14; seizure
+peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
+test expectation.
 
-**Candidate readout, only if E11 shows the flagged tail is focal:** a spatial-recruitment score — how many
-channels have a per-node v2 reconstruction error above the patient's own baseline — mirroring DynaSD's
-"≥ 9 of 18 channels" rule and the raw-view spread separator (AUROC 0.85–0.92 on validation). It keeps the
-GAE as the source of the score; it needs a per-node re-dump of the non-test subjects.
+### 6.2 Queue (each step: design approved by the author before it is coded)
 
-**Optional, only if time:** cross-fitted base GAEs so that every non-test subject is unseen (3 folds,
-one night on 3 Kaggle accounts); running the public DynaSD container on our 8 test patients for a
-same-patient comparator.
-
-**Time box.** Supervisor meeting Thu 08/10 08:00 (P1 + this plan); IELTS 09/10 (`PROJECT_STATUS.md` §0);
-P2 decision and at most one test look by **11/10**; 12–15/10 application and report. Whatever P2
-returns, the report is written from the record as it stands on 11/10.
+1. **E15 — patient-specific adaptation, tested as intended.** Per patient, fine-tune v2 clean (seeds 42
+   and 1) on every non-signal-loss window of that patient's recording (no labels, no flags, no buffer
+   mask), with a budget fixed before the run; recompute S9 from the adapted encoder. Compared with **S9**,
+   not E. Mechanism measured directly: z of flagged non-ictal windows falls, z of seizure windows does
+   not fall, tail flagged share falls below 0.95. Adoption logic includes the mechanism check.
+2. **E16 — CPD as the onset/offset localizer** (Objective 2 must have a measured role in the final
+   system; Chapter 2 currently rejects a threshold-only localizer). Detection by the frozen score;
+   non-parametric kernel CPD places onset and offset inside a fixed margin; metric = onset/offset error
+   on true positives vs the raw threshold boundaries, sensitivity and FA/day unchanged.
+3. Freeze the full system (score + detector + CPD localizer) → **one** disclosed test look (#6).
+4. Untested options kept on file: multivariate kernel CPD on the latent trajectory (temporal
+   evolution); cross-fitted base GAEs; running the DynaSD container on our 8 test patients.
 
 ## 7 · Decisions open for the supervisor (08/10)
 
@@ -201,7 +193,8 @@ returns, the report is written from the record as it stands on 11/10.
 src: `diag_detector_ceiling`, `e1_normal_definition`, `e3_supervised_loso`, `e4_artifact_rejection`,
 `e5_patient_density`, `e6_dump_gae`, `e6_gae_patient_density`, `e7_ensemble_cpd`, `c1_nodefeat`,
 `c1b_build_trainset`, `c1t_build_testset`, `retrain/train_gae_v2`, `e8_gae_v2_eval`, `e8_diagnostics`,
-`e9_test_oneshot`, `e10_kernel_cpd`. data: `trainset_v2/` (15 npz), `testset_v2/` (8 npz), `models_v2/`
+`e9_test_oneshot`, `e10_kernel_cpd`, P2: `e11_tail_anatomy`, `e12_readout_composition`,
+`e13_recon_seen_artifacts`, `e14_spatial_recruitment` (per-node dump in `results/e14_spatial_recruitment/pernode/`, not committed). data: `trainset_v2/` (15 npz), `testset_v2/` (8 npz), `models_v2/`
 (clean 42, 1, 2, 3; all 42, 1; identity in `docs/PROVENANCE_V2.md`). results: `diag_detector_ceiling`,
 `e1_*` … `e7_*`, `e8_gae_v2` (+ `diag/`), `e9_test_oneshot` (tag `e9-test-oneshot`), `e10_kernel_cpd`.
 Kaggle: `Agent/gae_v2_train.ipynb`, dataset `nhn2mm/gae-v2`, GPU T4×2, ~3.3–3.8 h per seed (clean).

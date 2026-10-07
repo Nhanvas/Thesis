@@ -9,9 +9,11 @@ ensemble_scalar(ctx, tag, parts, c_arm="S9base", c_k=9, detrend=False)
     {"C", "L", "gamma", "recon"}. C = E16 arm `c_arm` with order statistic c_k.
     detrend=True subtracts the centred running median over 451 windows (+-15 min) inside each file
     (the E16e location-only drift correction), applied to the final scalar.
-d1_events(ctx, sc, smooth, top, keep_max_s=None)  D1 events per file (seconds), as E10/E1:
-    per-file centred rolling mean over `smooth` windows of non-signal-loss windows, threshold = the
-    patient's (1 - top) quantile, contiguous supra-threshold runs, merge gaps <= 90 s.
+d1_events(ctx, sc, smooth, top, keep_max_s=None)  D1 events per file (seconds), identical to
+    e1_normal_definition.event_grid: signal-loss windows set to NaN, per-file centred rolling mean
+    (min_periods 1), threshold = (1 - top) quantile of every non-NaN smoothed value, contiguous
+    supra-threshold runs, merge gaps <= 90 s. (Fixed 2026-10-07: the threshold was taken over
+    non-signal-loss positions only, which changed fp by 1 on chb04 seed 2 and stopped E19.)
 score(ctx, per_file)  SzCORE counts via e10_kernel_cpd.score_events (tp, fp, n_ref, non-ictal hours).
 """
 import sys
@@ -130,7 +132,7 @@ def smoothed(ctx, sc, smooth):
 
 def d1_events(ctx, sc, smooth, top, keep_max_s=None, merge_events=True):
     sm = smoothed(ctx, sc, smooth)
-    thr = np.nanquantile(sm[ctx["ok"]], 1 - top)
+    thr = np.nanquantile(sm, 1 - top)          # as e1_normal_definition.event_grid: every non-NaN smoothed value
     ev = {}
     for f in np.unique(ctx["fidx"]):
         m = np.flatnonzero(ctx["fidx"] == f)
@@ -161,6 +163,6 @@ def caught(refs, per_file, pre=30, post=60):
     for f, rr in refs.items():
         for a, b in rr:
             n += 1
-            if any(h0 < b + post and h1 > a - pre for h0, h1 in per_file.get(f, [])):
+            if any(h1 >= a - pre and h0 <= b + post for h0, h1 in per_file.get(f, [])):   # E1 overlap rule
                 k += 1
     return k, n

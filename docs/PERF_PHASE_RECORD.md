@@ -1,11 +1,12 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. G, 2026-10-07** (rev. B–F same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. H, 2026-10-07** (rev. B–G same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
 clarifications (order E19 before E18, short events in E18, branch ledger §6.4, single-readout framing, runtimes).
-Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready.
+Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready. Rev. H: E16g arms dt, h; E19 stop
+(threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -163,8 +164,9 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E16** per-recording baseline, 4 seeds (`results/e16_recording_baseline/`); reference S9 base 4-seed 0.612 @ 24.6 (seeds 0.617/0.628/0.564/0.606), ≤ 15 0.513, ≤ 10 0.423, val 0.867, subject-mean 0.742 @ 25.7 | a (first 10 min of each file) 0.191; c (30 min) 0.295; d (causal sliding 30 min) 0.487; **b (patient covariance + per-file median/MAD) 0.582 @ 22.5, ≤ 15 0.548, ≤ 10 0.444, val 0.800, subject-mean 0.735 @ 22.7, seizure z 4.72 → 4.08**. Drift under S9 base: per-file median IQR / patient MAD 0.85; **84.5 % of the top-2 % non-ictal windows lie in the patient's top-quartile files** | none adopted (all fail G1). Mechanism: short baselines fit one state (fit-noise ratio 0.62, self-scoring −0.92 z), so everything else looks anomalous — longer baselines are monotonically better. File-level drift is real and owns the false-alarm tail; b (location + scale) helps at strict FA but lowers seizure z. Next (proposed): location-only corrections e, f |
 | **E16 e, f** location-only drift correction of S9 (same gate) | **e (minus ±15 min running median inside each file): 0.628 @ 22.3; ≤ 15 0.614; ≤ 10 0.487; val 0.867; without chb12 0.783; subject-mean 0.766 @ 22.2; every seed above its S9 (0.649/0.638/0.596/0.638 vs 0.617/0.628/0.564/0.606); 11/15 subjects; seizure z 4.62**. f (minus file median) 0.559. Drift diagnostics under S9 base: top-quartile files contain a seizure in 8.3 %; flagged share 0.459 in top files = 0.459 elsewhere | e: G1 FAIL only (+0.016 at ≤ 25); G2–G5 and M pass. The correction shifts the whole curve left (+0.10 at ≤ 15). The drift is a file-level shift of the latent readout, not more high-amplitude activity and not seizure files. Candidate C stays S9 base (rule) |
 | **E17** rank ensemble, C = S9 base | Ea (C+recon+gamma) 0.535, inferior; **Eb (C+L+gamma) 0.617 @ 22.8, ≤ 15 0.545, ≤ 10 0.441, val 0.800, without chb12 0.824, subject-mean 0.791 @ 24.3**, non-inferior; Ec (C+L) 0.572, inferior. Percentile AUROC seizure-vs-flagged: C 0.908, L 0.858, gamma 0.651, recon 0.445 | **Eb chosen** (only non-inferior combination). Final scalar = rank ensemble of three readouts: per-channel latent order statistic, graph-level latent, gamma-AEC |
+| **E16g** drift correction with the ensemble (reference Eb) | dt (detrend the final scalar): 0.529, seizure z 2.89 → 2.48, NOT adopted. h (detrend only the S9 component inside the ensemble): 0.598 @ 15.2 (cell 15/0.01), ≤ 15 0.471, ≤ 10 0.471, val 0.867, without chb12 0.801, subject-mean 0.775 @ 14.8, 11/15 subjects, seizure z 2.85 | neither adopted; candidate = **Eb**. dt hurts (the running median of the bounded percentile mix absorbs seizure elevation). h moves the operating point to much lower FA (subject-mean FP/day 24.3 → 14.8 at similar sensitivity) but its next grid step exceeds 25 FA/day |
 
-Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E17; seizure
+Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E17 and E16g; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
 test expectation.
 
@@ -263,6 +265,7 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E15 | 1 (S9 adapted, 2,000 steps) | not selected | 500 and 1,000 steps |
 | E16 | 6 (a–f) | none adopted (e: G1 only) | — |
 | E17 | 3 (Ea, Eb, Ec; non-inferiority) | Eb chosen | — |
+| E16g | 2 (dt, h) | none adopted | — |
 
 Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16 and about
 24 after E17. From E16 on, `results/p2_ledger.csv` is the complete list.
@@ -271,6 +274,16 @@ Together with P1 (E1–E10) the non-test set has carried about 15 gated decision
 C, described as an ensemble over channels — the 9th order statistic of 18 per-channel anomaly scores of
 the GAE latent. The report states plainly that ensembles across readouts (recon, gamma, graph-level
 latent) were tested and were inferior, with their numbers.
+
+**Grid-resolution observation (2026-10-07).** The top-p grid {0.001, 0.002, 0.005, 0.01, 0.02, 0.05}
+moves FA/day in factor-2 steps, so an arm that lowers FA cannot spend the 25 FA/day budget when its
+next step jumps past it (E16g-h: best cell 15.2 FA/day, next step > 25; E16e: 22.3). Verdicts already
+given stand. Any use of a finer grid needs a pre-registered decision by the author (proposed: E21).
+
+**E19 stop (2026-10-07).** The D1 rebuilt in `p2_scalars.py` took the threshold over non-signal-loss
+positions; `event_grid` takes it over every non-NaN smoothed value (signal-loss positions inherit their
+neighbours' mean). Effect: fp 121 vs 122 on chb04 seed 2; the reproduction check stopped the run before
+any result. Fixed; nothing was reported from the stopped run.
 
 **Runtimes for 4 seeds** (estimated, not measured; based on the measured E12, E14 and E15 evaluation
 times of ~8–16 s per score through the D1 grid, plus the LedoitWolf fits):

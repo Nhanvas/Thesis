@@ -11,3 +11,9 @@ date,step,arm,best_le25,cell,le15,le10,val,no_chb12,subj_sens,subj_fa,seeds,gate
 2026-10-07,E16g,Eb_dt,0.5293,"(15, 0.01, 20.65)",0.4415,0.359,0.8,0.7132,0.6577,18.89,0.532|0.521|0.521|0.543,G1=F G2=F G3=F G4=P G5=F M=F,8,NOT adopted
 2026-10-07,E16g,Eb_h,0.5984,"(15, 0.01, 15.21)",0.4707,0.4707,0.8667,0.8015,0.7751,14.75,0.585|0.606|0.596|0.606,G1=F G2=F G3=F G4=P G5=P M=P,11,NOT adopted
 2026-10-07,E19,Eb_k9_p0.002,0.6277,"(3, 0.002, 25.72)",,,,,,,,sens_not_lower=P added_fa_le3=P,,ADOPTED
+2026-10-07,E21-1,E16e,0.6809,"(5, 0.0075, 24.25)",0.6144,0.5612,0.9,0.8456,0.8213,24.15,0.691|0.691|0.660|0.681,G1=P G2=P G3=P G4=P G5=P M=P,13,ADOPTED; grid changed after seeing E16e and Eb_h
+2026-10-07,E21-1,E16b,0.5957,"(5, 0.0075, 23.27)",0.5479,0.492,0.8333,0.7574,0.7552,23.71,0.617|0.606|0.574|0.585,G1=F G2=P G3=P G4=F G5=P M=F,11,NOT adopted; grid changed after seeing E16e and Eb_h
+2026-10-07,E21-1,E15tta,0.617,"(5, 0.01, 24.9)",0.5186,0.4973,0.8667,0.75,0.7487,26.28,0.617|0.638|0.564|0.617,G1=F G2=P G3=P G4=P G5=P M=P,13,NOT adopted; grid changed after seeing E16e and Eb_h
+2026-10-07,E21-2,Ea(C=E16e),0.5479,"(15, 0.015, 20.8)",0.4441,0.3511,0.7333,0.7316,0.7005,21.0,0.543|0.543|0.553|0.553,NI_pooled=F NI_subj=F NI_val=F,,inferior; grid changed after seeing E16e and Eb_h
+2026-10-07,E21-2,Eb(C=E16e),0.6356,"(15, 0.015, 22.29)",0.5452,0.4707,0.9333,0.8529,0.8146,21.85,0.628|0.638|0.638|0.638,NI_pooled=F NI_subj=P NI_val=P,,inferior; grid changed after seeing E16e and Eb_h
+2026-10-07,E21-2,Ec(C=E16e),0.6277,"(15, 0.015, 24.76)",0.5798,0.5266,0.8833,0.7978,0.7756,24.82,0.628|0.606|0.638|0.628,NI_pooled=F NI_subj=F NI_val=P,,inferior; grid changed after seeing E16e and Eb_h

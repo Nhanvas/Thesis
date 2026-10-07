@@ -1,6 +1,6 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. K, 2026-10-07** (rev. B–J same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. M, 2026-10-07** (rev. B–L same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
@@ -9,7 +9,9 @@ Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 
 (threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4). Rev. I: E19 on Eb;
 E21 design (finer grid, gates unchanged); E18 no-CPD control; freeze plan and test-look pre-registration (§6.5).
 Rev. J: validation definitions; E19 reading; E19b rule (author, 2026-10-07). Rev. K: E21, E19b,
-E21b design, freeze sequence and bootstrap script.
+E21b design, freeze sequence and bootstrap script. Rev. L: E21b, E18, bootstrap results; open items before the freeze. Rev. M: the three open items
+approved by the author and scripted (E17b, E18d, matched-budget bootstrap after CPD); literature lead on
+onset/offset latency (unverified).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -171,6 +173,9 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E19** short-seizure branch on Eb (coarse grid; run before E21 by the author) | main D1 cell 15/0.02: 0.617 @ 22.84, val (at that cell) 0.933, short 1/3. Union p_s 0.001: 0.625 @ 23.99; **0.002: 0.628 @ 25.72 (+2.88 FA/day)**; 0.005: 0.649 @ 32.09. Short seizures caught unchanged (1/3) | ADOPTED under the rule as written (p_s 0.002). **+0.011 ≈ one seizure of 94; short seizures caught 1.00/3 at every p_s, even at +9 FA/day — the branch has not yet done what it is for.** Caveats: the union runs at 25.7 FA/day, above the 25 budget used everywhere else (the rule capped only the added FA); the +0.011 comes from non-short seizures on this set. To be re-run on the E21 final scalar (§6.5) |
 | **E21** finer top-p grid (gates unchanged; grid changed after seeing E16e and Eb_h), 4 seeds (`results/e21_fine_grid/`) | Stage 1 vs S9 base 0.612: **E16e 0.681 @ 24.25 (cell 5/0.0075), ≤ 15 0.614, ≤ 10 0.561, val 0.900, without chb12 0.846, subject-mean 0.821 @ 24.1, seeds 0.691/0.691/0.660/0.681, 13/15 subjects, short 1.5/3 — all gates pass**; E16b 0.596 not adopted; E15 TTA (4 seeds) 0.617, G1 fail. Stage 2 (C' = E16e): Ea 0.548, Eb 0.636 (val 0.933, without chb12 0.853, subject-mean 0.815), Ec 0.628 — none non-inferior on pooled (floor 0.661) | **C' = E16e adopted; final scalar = C (E16e) alone, D1 5/0.0075.** E15 TTA: negative with 4 seeds in this configuration. Eb loses to C pooled (−0.045) but is higher without chb12 (+0.007) and on validation (+0.033): both are reported. Drift per component: gamma IQR/MAD 1.54 (L 0.69, S9 0.85, recon 0.74); 57.5 % of the final tail sits in gamma's top-quartile files (≈ 0.18 for the others); gamma's top files carry more flagged windows (0.660 vs 0.395) |
 | **E19b** short branch on C (E16e), fine grid, total cap 25 | best eligible union = main cell, p_s 0.001, +0.000 FA, +0.000 sensitivity → NOT adopted. Short seizures (3 × 4 seeds): every miss of the short branch is "below threshold"; 3-window-smoothed peak percentiles chb02 0.97–0.99 (caught by main), chb21 0.98–0.995 (main 2/4 seeds), chb12 0.81–0.91 (never caught) | mechanism: short-seizure peaks sit at the 0.81–0.995 percentile, below a short-branch threshold of top 0.1–0.5 %; a lower threshold would cost FA unless a discriminating feature is added (inference, not measured). No evidence-backed fix on 12 seed-instances; short seizures reported descriptively. E19 on Eb (coarse grid) is superseded (Eb not final) |
+| **E21b** C (E16e) + L + gamma_dt, fine grid | 0.609 @ 16.98 (cell 15/0.01), ≤ 15 0.559, ≤ 10 0.492, val 0.867, without chb12 0.812, subject-mean 0.768 @ 15.9. Tail share in gamma's top files: Eb 0.575 → E21b 0.387 (C alone 0.400); flagged share in the tail: Eb 0.945, E21b 0.900, **C 0.889** | inferior (pooled and subject-mean fail). Gamma's drift was removed (mechanism confirmed) but the ensemble is below C at every FA level. Final scalar = **C (E16e)**, D1 5/0.0075. First score whose top-2 % tail is below 0.95 flagged (base rate ≈ 0.46) |
+| **E18** kernel CPD localizer on C, fine grid (`results/e18_cpd_localizer/`) | detector 0.681 @ 24.25; after CPD 0.662 @ 23.70 (guard −0.02 passed by 0.001). Matched pairs n = 249 (≈ 62 seizures × 4 seeds). Onset |error| median: detector 16 s, **CPD 8 s**, no-CPD control 12 s; offset: detector 24 s, **CPD 12 s**, control 40 s. Events ≤ 30 s (n = 69): onset 20 → 12 s, offset 12 → 8 s. Bias: onset +8 s (late), offset −4 s. CPD used on 96 % of matched events; fallback 14 % of all events | **ADOPTED as the onset/offset localizer** — halves both errors; beats the no-CPD control (so the gain is the change point detection itself, not only the unsmoothed score). Caveat: −0.019 sensitivity (≈ 1.8 seizures of 94) from boundaries moved off the detected seizure; mechanism not yet measured |
+| **Bootstrap** final (C, 5/0.0075) − E (V2_LW, 15/0.02), subjects resampled, B = 10,000 (`results/p2_bootstrap/`) | E 4-seed 0.489 @ 20.06 (2-seed reproduction 0.489 @ 19.78 exact). Pooled sensitivity +0.191 [+0.095, +0.285]; subject-mean +0.171 [+0.063, +0.297]; FA/day +4.19 [−1.08, +8.18]. Without chb12: +0.184 [+0.065, +0.305]; FA +3.87 [−1.71, +7.98] | gain not carried by one subject. Confound: the final system spends ~4 more FA/day than E's coarse-grid cell; a matched-budget reference (E re-selected on the fine grid at ≤ 25) is still owed. Descriptive only: every choice was made on these 15 subjects |
 
 Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E21; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
@@ -275,7 +280,8 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E19 | 1 (p_s rule on Eb) | adopted, superseded (Eb not final) | 3 p_s values |
 | E21 | 3 stage 1 + 3 stage 2 (fine grid, decided after seeing E16e/Eb_h) | E16e adopted; final C | — |
 | E19b | 1 (union vs re-selected main) | not adopted | 3 p_s × fine cells |
-| E21b | 1 (C + L + gamma_dt, non-inferiority) | pending | — |
+| E21b | 1 (C + L + gamma_dt, non-inferiority) | inferior | — |
+| E18 | 1 (CPD localizer on C) | adopted | no-CPD control |
 
 Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16 and about
 24 after E17. From E16 on, `results/p2_ledger.csv` is the complete list.
@@ -347,6 +353,31 @@ C alone. Gate = E17 stage-2 non-inferiority (pooled ≥ C − 0.02, subject-mean
 C − 0.067). If non-inferior it becomes the final scalar (E17 rule: a combination with gamma is
 preferred within 0.02; it restores the ensemble of readouts); otherwise the final scalar stays C.
 Mechanism reported: share of the tail in gamma's top files, before (Eb) and after (E21b).
+
+**Measured runtimes (2026-10-07).** Cache-only steps on 4 seeds: E21b 124 s, E18 44 s, bootstrap 44 s,
+E21 317 s, E19b 124 s. Earlier estimates (10–70 min) were 3–10× too high.
+
+**Open before the freeze (proposed 2026-10-07, author decision pending).**
+1. E17b was pre-registered for "no cross-readout combination passes" (§6.3) and that condition now
+   holds (E21 stage 2, E21b): rank ensemble of the latent family {S6, S9, S12, channel mean} with the
+   E16e correction, same non-inferiority gate vs C.
+2. E18 sensitivity loss (−0.019): measure which seizures lose overlap after CPD; fix to test:
+   accept a CPD segment only if it overlaps the detector event, else keep the detector boundaries.
+3. Bootstrap at a matched FA budget: add E re-selected on the fine grid at ≤ 25 FA/day.
+
+**Scripts for the open items (approved 2026-10-07).** `src/e17b_latent_family.py` (family {S6, S9,
+S12, channel mean}, each E16e-corrected; S9e must reproduce C); `src/e18_cpd_localizer.py --overlap`
+(E18d) plus a lost-seizure table in every E18 run (`lost_<arm>.csv`); `src/p2_bootstrap.py --cpd
+plain|overlap` (final system scored after the localizer) with a second reference E_fine (E re-selected
+on the fine grid at ≤ 25 FA/day). Order: E17b → E18 (plain, re-run for the diagnostic; the ledger then
+holds a duplicate E18 row) → E18d → bootstrap with the chosen localizer.
+
+**Literature lead (Perplexity, 2026-10-07; NOT verified, not citable yet).** Onset/offset latency is
+rarely reported on scalp EEG; leads: Shoeb & Guttag ICML 2010 (CHB-MIT, onset mean 4.6 s / median 3 s,
+patient-specific, 1-s epochs); "ScoreNet" (CHB-MIT onset/offset latency; the two Perplexity answers give
+different venues, DOIs and values — must be checked against the PDF); an IRBM 2019 paper (onset 3.9 s,
+offset 49.3 s); UPCON 2019 (onset ~3–6 s, offset ~4–8 s). All supervised and at 1–2 s resolution; our
+windows are 4 s. doi.org and Crossref are not reachable from the container; verification needs the PDFs.
 
 **Freeze plan (fixed now).** E21 (done) → E19b (done, not adopted) → E21b → E18 on the final scalar (C, or E21b if
 adopted; fine grid) → subject-level bootstrap vs E (`src/p2_bootstrap.py`) → freeze → test look #6.

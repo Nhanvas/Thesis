@@ -1,0 +1,2 @@
+date,step,arm,best_le25,cell,le15,le10,val,no_chb12,subj_sens,subj_fa,seeds,gates,n_subj_ok,verdict
+2026-10-07,E16,a,0.1915,"(5, 0.02, 24.29)",0.117,0.0771,0.2167,0.2353,0.2444,27.97,0.170|0.191|0.181|0.191,G1=F G2=F G3=F G4=F G5=F M=F,1,NOT adopted

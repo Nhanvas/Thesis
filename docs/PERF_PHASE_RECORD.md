@@ -1,6 +1,6 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. J, 2026-10-07** (rev. B–I same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. K, 2026-10-07** (rev. B–J same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
@@ -8,7 +8,8 @@ clarifications (order E19 before E18, short events in E18, branch ledger §6.4, 
 Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready. Rev. H: E16g arms dt, h; E19 stop
 (threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4). Rev. I: E19 on Eb;
 E21 design (finer grid, gates unchanged); E18 no-CPD control; freeze plan and test-look pre-registration (§6.5).
-Rev. J: validation definitions; E19 reading; E19b rule (author, 2026-10-07).
+Rev. J: validation definitions; E19 reading; E19b rule (author, 2026-10-07). Rev. K: E21, E19b,
+E21b design, freeze sequence and bootstrap script.
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -168,8 +169,10 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E17** rank ensemble, C = S9 base | Ea (C+recon+gamma) 0.535, inferior; **Eb (C+L+gamma) 0.617 @ 22.8, ≤ 15 0.545, ≤ 10 0.441, val 0.800, without chb12 0.824, subject-mean 0.791 @ 24.3**, non-inferior; Ec (C+L) 0.572, inferior. Percentile AUROC seizure-vs-flagged: C 0.908, L 0.858, gamma 0.651, recon 0.445 | **Eb chosen** (only non-inferior combination; it passed the validation margin exactly at the floor, 0.800 = 0.867 − 0.067). Final scalar = rank ensemble of three readouts: per-channel latent order statistic, graph-level latent, gamma-AEC |
 | **E16g** drift correction with the ensemble (reference Eb) | dt (detrend the final scalar): 0.529, seizure z 2.89 → 2.48, NOT adopted. h (detrend only the S9 component inside the ensemble): 0.598 @ 15.2 (cell 15/0.01), ≤ 15 0.471, ≤ 10 0.471, val 0.867, without chb12 0.801, subject-mean 0.775 @ 14.8, 11/15 subjects, seizure z 2.85 | neither adopted; candidate = **Eb**. dt hurts (the running median of the bounded percentile mix absorbs seizure elevation). h moves the operating point to much lower FA (subject-mean FP/day 24.3 → 14.8 at similar sensitivity) but its next grid step exceeds 25 FA/day |
 | **E19** short-seizure branch on Eb (coarse grid; run before E21 by the author) | main D1 cell 15/0.02: 0.617 @ 22.84, val (at that cell) 0.933, short 1/3. Union p_s 0.001: 0.625 @ 23.99; **0.002: 0.628 @ 25.72 (+2.88 FA/day)**; 0.005: 0.649 @ 32.09. Short seizures caught unchanged (1/3) | ADOPTED under the rule as written (p_s 0.002). **+0.011 ≈ one seizure of 94; short seizures caught 1.00/3 at every p_s, even at +9 FA/day — the branch has not yet done what it is for.** Caveats: the union runs at 25.7 FA/day, above the 25 budget used everywhere else (the rule capped only the added FA); the +0.011 comes from non-short seizures on this set. To be re-run on the E21 final scalar (§6.5) |
+| **E21** finer top-p grid (gates unchanged; grid changed after seeing E16e and Eb_h), 4 seeds (`results/e21_fine_grid/`) | Stage 1 vs S9 base 0.612: **E16e 0.681 @ 24.25 (cell 5/0.0075), ≤ 15 0.614, ≤ 10 0.561, val 0.900, without chb12 0.846, subject-mean 0.821 @ 24.1, seeds 0.691/0.691/0.660/0.681, 13/15 subjects, short 1.5/3 — all gates pass**; E16b 0.596 not adopted; E15 TTA (4 seeds) 0.617, G1 fail. Stage 2 (C' = E16e): Ea 0.548, Eb 0.636 (val 0.933, without chb12 0.853, subject-mean 0.815), Ec 0.628 — none non-inferior on pooled (floor 0.661) | **C' = E16e adopted; final scalar = C (E16e) alone, D1 5/0.0075.** E15 TTA: negative with 4 seeds in this configuration. Eb loses to C pooled (−0.045) but is higher without chb12 (+0.007) and on validation (+0.033): both are reported. Drift per component: gamma IQR/MAD 1.54 (L 0.69, S9 0.85, recon 0.74); 57.5 % of the final tail sits in gamma's top-quartile files (≈ 0.18 for the others); gamma's top files carry more flagged windows (0.660 vs 0.395) |
+| **E19b** short branch on C (E16e), fine grid, total cap 25 | best eligible union = main cell, p_s 0.001, +0.000 FA, +0.000 sensitivity → NOT adopted. Short seizures (3 × 4 seeds): every miss of the short branch is "below threshold"; 3-window-smoothed peak percentiles chb02 0.97–0.99 (caught by main), chb21 0.98–0.995 (main 2/4 seeds), chb12 0.81–0.91 (never caught) | mechanism: short-seizure peaks sit at the 0.81–0.995 percentile, below a short-branch threshold of top 0.1–0.5 %; a lower threshold would cost FA unless a discriminating feature is added (inference, not measured). No evidence-backed fix on 12 seed-instances; short seizures reported descriptively. E19 on Eb (coarse grid) is superseded (Eb not final) |
 
-Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E17 and E16g; seizure
+Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E21; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
 test expectation.
 
@@ -269,7 +272,10 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E16 | 6 (a–f) | none adopted (e: G1 only) | — |
 | E17 | 3 (Ea, Eb, Ec; non-inferiority) | Eb chosen | — |
 | E16g | 2 (dt, h) | none adopted | — |
-| E19 | 1 (p_s rule on Eb) | adopted (union above 25 FA/day) | 3 p_s values |
+| E19 | 1 (p_s rule on Eb) | adopted, superseded (Eb not final) | 3 p_s values |
+| E21 | 3 stage 1 + 3 stage 2 (fine grid, decided after seeing E16e/Eb_h) | E16e adopted; final C | — |
+| E19b | 1 (union vs re-selected main) | not adopted | 3 p_s × fine cells |
+| E21b | 1 (C + L + gamma_dt, non-inferiority) | pending | — |
 
 Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16 and about
 24 after E17. From E16 on, `results/p2_ledger.csv` is the complete list.
@@ -329,8 +335,23 @@ union is adopted only if its pooled sensitivity is strictly higher than the main
 main detector catches it, and per p_s the reason (below threshold / run > 30 s / merged into > 30 s and
 dropped / kept). The next fix of the short branch (e.g. S12) is chosen from these reasons.
 
-**Freeze plan (fixed now).** E21 → E19b on the E21 final scalar with the fine grid → E18 on the resulting
-events (`--main-cell` when a union is adopted) → freeze. Total cap 25 approved by the author. E18 reports a
+**E21 per-subject note.** The median of "top files with seizure" (0.083 vs 0.158 all files) hides
+disagreement: in chb01 (0.455 vs 0.167), chb12 (0.833 vs 0.476), chb20 (0.500 vs 0.207) and chb19
+(0.250 vs 0.100) the high-score files are richer in seizures than the patient's average, so the
+"drift" removed by E16e there may include peri-ictal state. The without-chb12 and per-subject numbers
+are reported for that reason. Validation for Eb vs C uses `val` (gate) and `val_at_cell` (descriptive).
+
+**E21b — gamma drift correction (author proposal 2026-10-07; `src/e21b_gamma_detrend.py`).** Rank
+ensemble C (E16e) + L + gamma_dt (gamma minus its ±15 min running median inside each file). Reference
+C alone. Gate = E17 stage-2 non-inferiority (pooled ≥ C − 0.02, subject-mean ≥ C − 0.02, `val` ≥
+C − 0.067). If non-inferior it becomes the final scalar (E17 rule: a combination with gamma is
+preferred within 0.02; it restores the ensemble of readouts); otherwise the final scalar stays C.
+Mechanism reported: share of the tail in gamma's top files, before (Eb) and after (E21b).
+
+**Freeze plan (fixed now).** E21 (done) → E19b (done, not adopted) → E21b → E18 on the final scalar (C, or E21b if
+adopted; fine grid) → subject-level bootstrap vs E (`src/p2_bootstrap.py`) → freeze → test look #6.
+If E21b is adopted, E19b is not re-run (its mechanism — short peaks below any affordable threshold —
+does not depend on the scalar). Total cap 25 approved by the author. E18 reports a
 no-CPD control (unsmoothed score above the detector threshold) beside CPD and the raw detector.
 
 **Test-look pre-registration (before the freeze).**

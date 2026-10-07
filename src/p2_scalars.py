@@ -6,7 +6,7 @@ subject_context(s)  loads one non-test subject (window flags, file ids, cached r
 ensemble_scalar(ctx, tag, parts, c_arm="S9base", c_k=9, detrend=False)
     percentile rank ensemble (E17 construction): each readout -> its percentile over the patient's
     non-signal-loss windows (signal-loss windows 0.5), equal mean of `parts` among
-    {"C", "L", "gamma", "recon"}. C = E16 arm `c_arm` with order statistic c_k.
+    {"C", "L", "gamma", "gamma_dt", "recon"}. C = E16 arm `c_arm` with order statistic c_k.
     detrend=True subtracts the centred running median over 451 windows (+-15 min) inside each file
     (the E16e location-only drift correction), applied to the final scalar.
 d1_events(ctx, sc, smooth, top, keep_max_s=None)  D1 events per file (seconds), identical to
@@ -81,6 +81,8 @@ def readout(ctx, tag, name, c_arm="S9base", c_k=9):
         return _full(ctx, LedoitWolf().fit(lat).mahalanobis(lat))
     if name == "gamma":
         return _full(ctx, ctx["z"]["zgamma_raw"][ctx["idx"]].astype(float))
+    if name == "gamma_dt":                     # E21b: gamma minus its +-15 min running median per file
+        return detrend_file(ctx, _full(ctx, ctx["z"]["zgamma_raw"][ctx["idx"]].astype(float)))
     if name == "C":
         if c_k == 9:
             v, _ = E16.c_scalar(c_arm, ctx["D"][tag], ctx["Z"][tag], ctx["wf"])

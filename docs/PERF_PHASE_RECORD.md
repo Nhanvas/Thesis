@@ -1,6 +1,6 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. O, 2026-10-07** (rev. B–N same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. P, 2026-10-07** (rev. B–O same day, rev. A 2026-10-06). **Stage P2 CLOSED; stage P3 opens.** Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
@@ -14,6 +14,8 @@ approved by the author and scripted (E17b, E18d, matched-budget bootstrap after 
 onset/offset latency (unverified). Rev. N: E17b adopted (final scalar), E18/E18d on it,
 matched-budget bootstrap; freeze candidate written down (§6.6), test look not yet run. Rev. O: reviewer
 points (E17b choice, CPD wording, decision count, headline seed), E20a and diagnostics, test-look scripts.
+Rev. P: E18 diagnostics, E20a, look #6 on test, author decision (not approved; phase 3, target pooled
+sensitivity ≥ 0.50); handoff in `docs/HANDOFF_P3.md`.
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -112,7 +114,12 @@ A local-contrast detector does not rescue missed seizures here.
 | 4 | veto screen, one-shot (commit 90a4dae, `results/veto_screen*`), plus the oracle bound Part B (`results/oracle_gate_bound/`) | 6/76, FA 19.2 → 17.9: did not transfer. Part B: test seizure peaks exceeded by 20–50 % of same-length non-ictal spans (4 % on val); 0.1–1 % once flagged windows are removed |
 | 5 | E9, frozen v2 (tag `e9-test-oneshot`; seeds 2, 3 added later, config unchanged) | §2 |
 
-Looks 2–4 informed the P1 diagnosis. Any P2 test look is #6 and is disclosed as such.
+| 6 | P2 frozen system (tag `p2-frozen`), `e22_test_oneshot.py`, 2026-10-07 | seed 42 after the localizer **26/76 (0.342) @ 22.2 FP/day**, precision 0.092, F1 0.145; 4 seeds 0.336 ± 0.008 @ 23.9 ± 1.2; subject-mean 0.498; short 4/18. E on the same look 3/76 @ 24.1 (reproduces E9 exactly) |
+
+Looks 2–4 informed the P1 diagnosis; look 5 (E9) the P2 diagnosis. Look 6 was reported as is; the author did
+not approve the result and opened stage P3 (target pooled sensitivity ≥ 0.50). Any P3 design that uses
+test information (per-subject results of look 6, test seizure durations) must be listed here, and the next
+look (#7) is then disclosed as test-informed.
 
 ## 4 · Diagnosis at the close of P1 (corrects HANDOVER §3)
 
@@ -181,6 +188,9 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E17b** latent-family rank ensemble {S6e, S9e, S12e, Smean_e} (E16e-corrected), fine grid | S9e reproduces C exactly. **E17b 0.668 @ 19.98 (cell 5/0.005), ≤ 15 0.622, ≤ 10 0.548, val 0.983 (at cell 0.967), without chb12 0.853, subject-mean 0.828 @ 19.5, seeds 0.681/0.660/0.660/0.670, short 2.0/3**; C 0.681 @ 24.25 (subject-mean 0.821 @ 24.1, val 0.900, short 1.5/3). Tail flagged share C 0.889 → E17b 0.834. Members alone (characterisation, not selectable): S6e 0.665, S12e 0.686, Smean_e 0.686 | **non-inferior → final scalar = E17b** (pre-registered rule; a deliberate choice: the author kept the non-inferiority rule although it trades up to 0.02 pooled sensitivity for the ensemble shape, and did not change it after seeing the result). C and S12e/Smean_e are reported beside E17b in the report. −0.013 pooled at ≤ 25 (≈ 1.2 seizures) but at 4.3 fewer FA/day, higher ≤ 15, subject-mean, validation and short seizures. S12e/Smean_e above C are post-hoc and are not used |
 | **E18 / E18d** on E17b (cell 5/0.005) | detector 0.668 @ 19.98 → CPD 0.662 @ 19.55 (both arms). Onset |error| 16 → 8 s (no-CPD control 8 s), offset 20 → 16 s (control 40 s), n = 243; bias onset +4 s, offset +4 s; events ≤ 30 s (n = 84): onset 20 → 10 s, offset 12 → 12 s. Lost-seizure table (E1 overlap rule): 0 | E18 adopted (localization rule passes); E18d ties → E18 (rule). **Wording (reviewer):** on E17b the onset gain equals the no-CPD control (8 s = 8 s) and the offset gain over the detector is 4 s (one window); on C the onset gain over the control was one window (8 vs 12 s). The report states only that CPD reduces the error relative to the detector's boundaries; the share due to CPD itself versus less smoothing is not separated. Control 1 has a +32 s offset bias because it takes the last supra-threshold window in the ±60 s segment (no 90 s merge); a stronger control 2 (contiguous run containing the event peak) is added. The −0.006 cannot come from seizures losing overlap (0 lost); hypothesis, not measured: SzCORE splits references > 300 s (e.g. chb11: 5 scored references) and CPD returns one compact segment that covers fewer of the split pieces. The lost-seizure table must use the scorer's split references to test it |
 | **Bootstrap** final (E17b, 5/0.005, after CPD) − E, B = 10,000 | final 0.662 @ 19.55 vs E 0.489 @ 20.06 — **matched FA budget** (E_fine re-selected on the fine grid = the same cell 15/0.02). Pooled +0.173 [+0.075, +0.287]; subject-mean +0.171 [+0.055, +0.303]; FA −0.51 [−6.80, +4.54]. Without chb12: pooled +0.184 [+0.050, +0.315], FA −0.99 [−7.62, +4.17] | the gain is not explained by a larger FA budget nor by chb12. Descriptive and optimistic: about 30 gated decisions were made on these 15 subjects |
+| **E18 diagnostics** on E17b (re-run, no ledger row) | control 2 (contiguous run, no merge): onset 12 s, offset 12 s (bias +0 s) vs CPD 8 s / 16 s and detector 16 s / 20 s. Split references: 95 pieces vs scorer n_ref 94 per seed (rule nearly right; one-piece mismatch unexplained); pieces covered by the detector but lost after CPD: 1.2 per seed, 4 of 5 in the 756-s chb11 seizure (its last 156-s piece) | the −0.006 after CPD is the long chb11 seizure: CPD returns one compact segment that drops the last split piece. **On offset, control 2 (12 s) beats CPD (16 s)**: the CPD gain over the detector is on onset only. Wording in the report: CPD halves the onset error relative to the detector boundaries; offset is not improved over a simple contiguous-run rule |
+| **E20a** multivariate kernel CPD (18-channel trajectory) as localizer | post-localizer sensitivity 0.657 (< E18 0.662 → FAIL); onset 8 s (= E18), **offset 8 s (E18 16 s)**, bias −4 s; CPD used on 98 % of matched events | **not adopted** by the pre-registered rule (sensitivity); its offset is the best of all localizers on non-test. Candidate for P3 together with a long-seizure fix |
+| **Look #6** (test, single shot, frozen: E17b + D1 5/0.005 + kernel CPD) | see §3. Per subject (seed 42, after localizer \| E): chb03 7/7 \| 1/7, chb06 2/10 \| 0/10, chb13 1/12 \| 2/12, chb14 6/8 \| 0/8, **chb15 0/20** \| 0/20, chb16 2/10 \| 0/10, chb17 3/3 \| 0/3, chb18 5/6 \| 0/6. Onset/offset on test (n = 103 pairs): detector 28 / 16 s, CPD 8 / 20 s (offset bias +16 s), control 2 20 / 12 s. Patient-level bootstrap, seed 42, computed from this table: final − E pooled +0.303 [0.094, 0.630], subject-mean +0.470 [0.19, 0.75]; 4-seed version in `p2_test_bootstrap.py` | FP/day matched the pre-registered 23.5. Sensitivity rose ×8.7 over E but halved from non-test (0.662 → 0.336), as rule 19 predicts. Four subjects (chb06, chb13, chb15, chb16: 52 of 76 seizures) hold 5 TPs; without chb15 pooled is 0.464. To reach 0.50 pooled: +12 seizures (38/76) |
 
 Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E21; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
@@ -289,6 +299,7 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E18 | 1 (CPD localizer on C) | adopted | no-CPD control |
 | E17b | 1 (latent family, non-inferiority) | adopted (final scalar) | 3 members alone |
 | E18 / E18d on E17b | 2 | E18 (tie) | no-CPD control |
+| E20a | 1 (multivariate localizer) | not adopted (sensitivity) | — |
 
 Together with P1 (E1–E10) the non-test set has carried about 39 gated decisions by E17b/E18 (P1 ≈ 12,
 P2 ≈ 27; reviewer's count from this table, 2026-10-07). From E16 on, `results/p2_ledger.csv` is the

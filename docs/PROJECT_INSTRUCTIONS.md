@@ -1,6 +1,10 @@
 # PROJECT INSTRUCTIONS — Claude agent spec
 ### Thesis: Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and Change Point Detection
 
+> **Rev. 2026-10-07 (P3).** Stage P2 closed; look #6 on test done (0.342 @ 22.2 FP/day, seed 42); not
+> approved by the author; stage P3 opens with target pooled test sensitivity ≥ 0.50. Start from
+> `docs/HANDOFF_P3.md`. Earlier header below kept for history.
+>
 > **Rev. 2026-10-06.** Replaces rev. 2026-09-25 in full. What changed: on 2026-10-05 the author
 > **re-opened performance work** after the honest continuous-timeline numbers (§5); stage P1 (E1–E10)
 > is closed and recorded in `docs/PERF_PHASE_RECORD.md`; stage P2 (patient-specific adaptation of the
@@ -22,7 +26,8 @@ For web-demo questions the demo stack wins inside its scope (§11).
 ═══════════════════════════════════════════════════════════════════════════════
 ## 1 · FIRST ACTIONS IN EVERY SESSION
 ═══════════════════════════════════════════════════════════════════════════════
-1. Read `docs/PERF_PHASE_RECORD.md` in full — the current state, the test-look log and the P2 plan.
+1. Read `docs/HANDOFF_P3.md`, then `docs/PERF_PHASE_RECORD.md` in full — the current state, the
+   test-look log (§3), the P2 log (§6) and the ledger `results/p2_ledger.csv`.
 2. If the session touches V1, its checkpoints or an offline number:
    `python src/verify_provenance.py | grep -a -i verdict` (~20 s, must print `VERDICT: PASS`).
    If it touches v2: check the sha256 in `docs/PROVENANCE_V2.md`.
@@ -157,6 +162,13 @@ moving average of 15 windows (60 s) within each file, threshold = the patient's 
 event = contiguous supra-threshold span, merge 90 s. Non-test: 0.489 @ 19.8 FA/day (V1 0.330 @ 23.7).
 TEST (E9): 3/76 @ 24.1 — event gain did not transfer; window macro AUROC 0.640 → 0.680.
 
+### P2 frozen system (tag `p2-frozen`, record §6.6) — current best, not approved
+v2 clean (4 seeds, headline 42) → per-patient per-channel LedoitWolf distance of the node latent →
+per-channel robust-z → order statistics 6/9/12 + channel mean, each minus ±15 min running median per
+file → patient percentiles, equal mean (one scalar) → D1 smooth 5, top 0.5 %, merge 90 s → kernel CPD
+(2 change points, ±60 s) as localizer. Non-test 0.662 @ 19.6; **test look #6: 0.342 (26/76) @ 22.2,
+4 seeds 0.336 ± 0.008, subject-mean 0.498, onset/offset 8/20 s**.
+
 ### Forbidden numbers
 0.750 / 0.829 / 0.791 / 39.77 / 71.25 (pre-rebuild) · every attribution number scored on the retired
 machine draft (0.6497, 0.3095, 0.7758, 0.8879, −0.1261, 0.6267, 0.6681, 0.2672, +0.3578, p = 0.984,
@@ -173,7 +185,12 @@ defense **05–06/11** (author-confirmed).
 **Priority order (author, 2026-10-05):** improve performance → fix the web demo → fix figures/tables →
 revise the full report → checks (Grammarly, rubric, paper-review protocol) → slides.
 
-**Performance phase.** P1 (E1–E10) closed — log, diagnosis and test looks in `PERF_PHASE_RECORD.md`.
+**Performance phase — current (2026-10-07).** P1 (E1–E10) and P2 (E11–E22) closed. Look #6 done and not
+approved. **P3 target: pooled test sensitivity ≥ 0.50 at the best achievable FP/day (sensitivity first).**
+Starting hypotheses H1–H5 and the test-information rule are in `HANDOFF_P3.md` §3. The paragraph below is
+the P2 plan as written on 2026-10-06 (history).
+
+**Performance phase (2026-10-06, history).** P1 (E1–E10) closed — log, diagnosis and test looks in `PERF_PHASE_RECORD.md`.
 Diagnosis in one line: the test score's top tail is owned by each patient's own high-amplitude
 non-seizure activity, because "normal" was learned from other patients; v2 lifted seizures but did not
 lower those states. **P2 (next):** E11 tail anatomy by branch (cache only) → E12 label-free
@@ -235,6 +252,9 @@ pipeline, the demo is rebuilt via Project 2 and the application run repeated und
 19. **The selection set is easier than test** (12 of 15 trained the GAE; Part B 4 % vs 20–50 %). Report
     validation-only figures beside the 15-subject figure, and never present a selection-set gain as a
     test expectation.
+20. **Test-informed design is disclosed.** Any design that uses look-#6 per-subject results or test
+    annotations is listed in record §3; the next look is then reported as test-informed.
+21. **Seed SD is not uncertainty.** Report patient-level bootstrap intervals beside seed spread.
 
 ═══════════════════════════════════════════════════════════════════════════════
 ## 7 · ATTRIBUTION — CLOSED
@@ -304,6 +324,10 @@ component or hybrid (title) · a feature-only system without the GAE (author) ·
 (Future Work) · feature selection with seizure labels · PELT as a segmenter detector (D2) · the kernel-CPD
 bump detector as pre-registered (E10) · keeping V1 over v2 for convenience · excluding hard test patients
 from the main result.
+**Performance phase P2** (details record §6.1): patient fine-tuning of the GAE in the E15 configuration ·
+short per-file baselines (10/30 min) and scale (median/MAD) drift corrections · detrending the final
+mixed scalar · cross-readout ensembles with recon or gamma (E17, E21, E21b) · a thresholded short-seizure
+branch (E19b) · E20b (CPD as detector) · coarse top-p grid · choosing S12e/Smean_e post hoc.
 **Phase B/C levers** (TE/directed connectivity, CPD smoothing variants, plateau/slope gating, scalar
 per-channel features of the band-power class, re-derived ensemble weights, artifact gate, learned graph,
 Deep-SVDD, CCM) were judged on the **offline** timeline. They are not automatically settled on the
@@ -351,3 +375,6 @@ through Boti. `PROJECT2_SETUP.md` describes Project 2.
 | precision/F1 must come from the scorer's counts | the E9 hand formula (negative precision) |
 | SzCORE's official aggregate is the mean of per-subject metrics | "SzCORE pools all recordings" |
 | the selection set over-predicts test | "a +0.16 gain on non-test will transfer" |
+| file-level drift of the latent readout owns most false alarms; a location-only ±15 min median correction helps | "high-amplitude artifacts own the tail" (alone) |
+| the non-test → test drop is about 2× (0.662 → 0.336, look #6) | "non-test numbers are test expectations" |
+| CPD halves onset error vs the detector; on offset a contiguous-run rule or multivariate CPD is better | "CPD improves both boundaries" |

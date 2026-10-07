@@ -13,6 +13,12 @@ Arms (one construction each, all fixed now; same gate for every arm):
   d  causal sliding baseline: inside each file, LW refitted every 225 windows (15 min) on the previous
      450 windows (30 min); the first 450 windows of the file use the patient fit.
   Arms b-d are run only if a is not adopted (author rule: no verdict before evidence-backed fixes).
+  Added 2026-10-07 after a-d (mechanism measured under S9 base: 84.5 % of the top-2 % non-ictal
+  windows sit in the patient's top-quartile files; drift IQR/MAD 0.85; arm b, location+scale per file,
+  better at <= 15 and <= 10 FA/day but seizure z 4.72 -> 4.08), location-only corrections of the S9
+  scalar, same gate:
+  e  S9 minus its centred running median over 451 windows (+-15 min) inside each file
+  f  S9 minus its median inside each file
 Common tail: per-channel robust-z over the patient's windows, 9th largest of 18, robust-z per patient.
 Detector: D1 grid of e1_normal_definition.event_grid; the cell of every score is re-selected by the
 same rule (highest 4-seed-mean pooled sensitivity at FA/day <= 25).
@@ -117,6 +123,24 @@ def arm_distances(arm, D, Z, wf):
     return out, base_mask
 
 
+def c_scalar(arm, D, Z, wf):
+    """per-dumped-window scalar of any arm (S9base, a-f)."""
+    if arm in ("S9base", "e", "f"):
+        v = s_from_d(D)
+        if arm == "S9base":
+            return v, None
+        out = v.copy()
+        for f in np.unique(wf):
+            w = np.flatnonzero(wf == f)
+            if arm == "f":
+                out[w] = v[w] - np.median(v[w])
+            else:
+                out[w] = v[w] - pd.Series(v[w]).rolling(451, min_periods=1, center=True).median().values
+        return out, None
+    Da, bm = arm_distances(arm, D, Z, wf)
+    return s_from_d(Da), (Da, bm)
+
+
 # ----------------------------------------------------------------------------- evaluation helpers
 def pooled_tables(gr):
     p = gr.groupby(["kind", "seed", "smooth", "top"])[["tp", "fp", "n_ref", "nonict_h", "tp_short",
@@ -192,7 +216,7 @@ def main():
     import e1_normal_definition as E1
     import e11_tail_anatomy as E11
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arms", nargs="+", default=["a"], choices=["a", "b", "c", "d"])
+    ap.add_argument("--arms", nargs="+", default=["a"], choices=["a", "b", "c", "d", "e", "f"])
     a = ap.parse_args()
     if set(E8.SUBJS) & TEST:
         raise SystemExit("TEST GUARD")
@@ -215,8 +239,8 @@ def main():
         for tag in TAGS:
             scores = {"S9base": (rz(full(s_from_d(D[tag])), ok), None)}
             for arm in a.arms:
-                Da, bm = arm_distances(arm, D[tag], Z[tag], wf)
-                scores[f"E16{arm}"] = (rz(full(s_from_d(Da)), ok), (Da, bm))
+                v_, extra_ = c_scalar(arm, D[tag], Z[tag], wf)
+                scores[f"E16{arm}"] = (rz(full(v_), ok), extra_)
             for kind, (v, extra) in scores.items():
                 for r_ in E1.event_grid(d, v):
                     r_.update(subject=s, score=f"{tag}|{kind}", nonict_h=nh); rows.append(r_)
@@ -228,9 +252,14 @@ def main():
                     meds = pd.Series(v[nonict]).groupby(fidx[nonict]).median()
                     mad = np.median(np.abs(v[nonict] - np.median(v[nonict]))) + 1e-9
                     topf = meds[meds >= meds.quantile(0.75)].index
+                    sz_files = np.unique(fidx[ict])
+                    in_top = np.isin(fidx, topf)
                     diag.append(dict(subject=s, seed=tag, kind=kind, drift_iqr_over_mad=float(
                         (meds.quantile(0.75) - meds.quantile(0.25)) / mad),
-                        tail_share_top_quartile_files=float(np.isin(fidx[T], topf).mean()) if T.any() else np.nan))
+                        tail_share_top_quartile_files=float(np.isin(fidx[T], topf).mean()) if T.any() else np.nan,
+                        top_files_with_seizure=float(np.isin(topf, sz_files).mean()) if len(topf) else np.nan,
+                        flag_share_top_files=float(fl5[nonict & in_top].mean()) if (nonict & in_top).any() else np.nan,
+                        flag_share_other_files=float(fl5[nonict & ~in_top].mean()) if (nonict & ~in_top).any() else np.nan))
                 elif extra is not None and extra[1].any():  # diagnostics (b), (c) for baseline arms
                     Da, bm = extra
                     inb, outb = bm, ~bm & nonict[idx]

@@ -1,9 +1,10 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. B, 2026-10-07** (rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. D, 2026-10-07** (rev. C/B same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
-Rev. B: §6 rewritten with E11–E14 and the queue; wording on flagged windows corrected (§6.0).
+Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules of 2026-10-07 (§6.2) and
+the pre-registered designs E16–E20 (§6.3), pending author approval.
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -157,25 +158,80 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E12** latent-only readout L vs frozen ensemble E (`results/e12_readout_composition/`) | reproduction of E8 exact. L 0.553 @ 23.8 vs E 0.489 @ 19.8 (≤ 15: 0.511 vs 0.378; ≤ 10: 0.426 vs 0.277); validation 0.867 vs 0.733; 9/15 subjects; subject-mean 0.676 vs 0.651. Tail flagged share 0.96 → 0.87 | **NOT adopted** (G1 +0.064 < +0.10). Without chb12 (26 of 94 seizures) L ≈ E at ≤ 25 (45.5/68 vs 45/68, computed from the per-subject table) |
 | **E13** recon trained on flagged windows (`all`) vs not (`clean`), 12 training subjects (`results/e13_recon_seen_artifacts/`) | recon seizure-vs-flagged ΔAUROC median −0.007, positive 4/12; latent 0.946 → 0.936 | rule B. **Scope:** a pooled 12-patient model, recon readout only — a diluted proxy, NOT patient-specific fine-tuning. Reading: "no support from this proxy", not "adaptation fails". Adaptation is **postponed, not tested** (author decision 2026-10-07) |
 | **E14** spatial-recruitment readout S9 = 9th largest of 18 per-channel latent anomalies (per-channel LedoitWolf on the v2 node latent, per patient) (`results/e14_spatial_recruitment/`) | reproduction exact. **S9 0.622 @ 24.6** (≤ 15: 0.521; ≤ 10: 0.426); validation 0.867; 12/15 subjects ≥ E; subject-mean 0.747 @ 25.4 FP/day (E 0.651 @ 20.8); short seizures 1/3. Characterisation: S12 0.617, channel mean 0.601, S6 0.543, S3 0.537, max 0.457. **Tail flagged share 0.95** (L 0.87) | G1–G3 pass; the pre-registered **mechanism check FAILED** (tail not cleaner). The script printed "ADOPTED" because the mechanism condition was not wired into its decision (coding error, corrected in the reading here). Reading: an empirical gain at ≤ 25 FA/day, not explained by the spread hypothesis; the per-channel modelling (mean 0.601 ≈ S9) seems to carry it. vs L: +0.069 at ≤ 25, +0.010 at ≤ 15, 0 at ≤ 10. Without chb12: S9 50.5/68, L 45.5/68, E 45/68 (computed). **Status: best candidate, not frozen, no test look** |
+| **E15** patient-specific fine-tuning of v2 (all windows of the patient, no labels; Adam 1e-4, batch 32, 2,000 steps) + S9 (`results/e15_patient_adaptation/`) | reproduction gates exact (E8 mean latent, E14 distances). S9-adapted 0.628 @ 24.5 vs S9 base 0.622 @ 24.6; per seed 0.617/0.638 vs 0.617/0.628; subject-mean 0.758 vs 0.747; without chb12 0.757 vs 0.743; validation 0.867 = 0.867; 13/15 subjects; seizure z 4.90 → 5.32, flagged z −0.00 → 0.11, tail flagged 0.95 → 0.96. Analysis only: 0/15 patients and 10/425 files have a seizure in their first 10 min | **Not selected in this configuration** (one configuration: lr 1e-4, 2,000 steps, all parameters, whole recording; G1 +0.006 < +0.05). Mechanism not seen: seizure z rose slightly, flagged z did not fall. This is not "fine-tuning does not work". Open hypothesis: the per-patient LedoitWolf fit of S9 already gives each patient its own normal at the readout level. Freeze rule → candidate = **S9 base**. Re-opening fine-tuning needs a different design with a mechanism argument (e.g. decoder-only, per-file) and is not a reason to hold E16–E18 |
 
-Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E14; seizure
+Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E15; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
 test expectation.
 
-### 6.2 Queue (each step: design approved by the author before it is coded)
+### 6.2 Binding rules for the rest of P2 (author, 2026-10-07)
 
-1. **E15 — patient-specific adaptation, tested as intended.** Per patient, fine-tune v2 clean (seeds 42
-   and 1) on every non-signal-loss window of that patient's recording (no labels, no flags, no buffer
-   mask), with a budget fixed before the run; recompute S9 from the adapted encoder. Compared with **S9**,
-   not E. Mechanism measured directly: z of flagged non-ictal windows falls, z of seizure windows does
-   not fall, tail flagged share falls below 0.95. Adoption logic includes the mechanism check.
-2. **E16 — CPD as the onset/offset localizer** (Objective 2 must have a measured role in the final
-   system; Chapter 2 currently rejects a threshold-only localizer). Detection by the frozen score;
-   non-parametric kernel CPD places onset and offset inside a fixed margin; metric = onset/offset error
-   on true positives vs the raw threshold boundaries, sensitivity and FA/day unchanged.
-3. Freeze the full system (score + detector + CPD localizer) → **one** disclosed test look (#6).
-4. Untested options kept on file: multivariate kernel CPD on the latent trajectory (temporal
-   evolution); cross-fitted base GAEs; running the DynaSD container on our 8 test patients.
+1. **No early verdict of failure.** When a result misses its gate or a problem is identified: measure the
+   mechanism, state a fix hypothesis, pre-register its gate, run it. "Failed" is written only after the
+   evidence-backed fixes have been tried. Gates stay fixed; the construction is redesigned once the
+   mechanism is known. Every design carries an "if not met" section (diagnostic + next fix).
+2. **Four seeds** (v2 clean 42, 1, 2, 3) for E16 onward; seeds 2 and 3 are dumped on the 15 non-test
+   subjects by `src/p2_dump_seeds23.py`. G1 becomes: 4-seed mean ≥ reference + 0.05 **and** ≥ 3/4 seeds
+   not lower than the reference of the same seed. The test look reports all four seeds.
+3. **Detector cell.** For every score the D1 cell is re-selected by the same rule: highest 4-seed-mean
+   pooled sensitivity at ≤ 25 FA/day on the 15 non-test subjects. All other figures are read at that cell.
+4. **Reporting.** Pooled and official subject-mean; validation-only and without-chb12 beside every number.
+5. **Freeze only when no evidence-backed improvement of event-level performance remains**; then one
+   test look (#6): 4 seeds, pooled and subject-mean, onset/offset error with n, short seizures caught.
+6. **Expectation for the test look, written now:** at best a moderate improvement over E9. The main P1
+   bottleneck is not solved (top-2 % tail still 95 % flagged under S9) and the non-test set is easier
+   (rule 19). This is not a reason to stop.
+7. Report, demo, attribution and the LiNDDA comparator wait until the system is frozen.
+
+### 6.3 Pre-registered designs (author approval pending; reference = candidate C)
+
+**E16 — per-recording baseline at the readout level.** Per file, per channel, LedoitWolf of the node
+latent fitted on the first min(150, n_file/2) non-signal-loss windows of that file (10 min; files with
+< 40 such windows use the patient-level fit); distances for every window of the file; per-channel
+robust-z over the patient (as S9); 9th largest of 18; robust-z. Only the covariance anchor changes vs S9.
+Gate vs S9 base: G1 (4-seed rule), G2 subject-mean ≥, G3 without chb12 ≥, G4 validation ≥, G5 ≥ 9/15
+subjects, M seizure z not more than 10 % lower. Always reported (mechanism): (a) drift under S9 base —
+spread of per-file medians of non-ictal scores relative to the patient MAD, and the share of top-2 %
+non-ictal windows that sit in the patient's top-quartile files; (b) fit noise — distance variance inside
+vs outside the baseline; (c) self-scoring bias — median z of baseline windows vs the rest.
+*If not met:* run, each with the same gate, (E16b) patient-level covariance + per-file median/MAD
+normalisation of the per-channel distances (drift in location/scale only), (E16c) baseline 30 min (450
+windows), (E16d) causal sliding baseline (refit every 15 min on the previous 30 min of the same file;
+the first 30 min use the patient-level fit). The best arm that passes becomes C; if none passes,
+C = S9 base and the diagnostics are recorded.
+
+**E17 — rank ensemble to one scalar.** Per patient, each readout → its percentile; equal mean.
+Combinations scored (all three, pre-listed, not a sweep): (a) C + recon + gamma, (b) C + L + gamma,
+(c) C + L. Non-inferiority vs C: pooled ≥ C − 0.02, subject-mean ≥ C − 0.02, validation ≥ C − 0.067.
+Choice: highest pooled sensitivity at ≤ 25 FA/day among the combinations that pass; ties within 0.02
+go to a combination containing gamma (independent, physiologically grounded readout). Always reported:
+percentile AUROC seizure-vs-flagged and tail ownership per component.
+*If none passes:* (E17b) rank ensemble of the latent family {S6, S9, S12, channel mean, L} (several
+spatial scales of the same GAE latent), same non-inferiority gate; if that fails, the author decides.
+
+**E18 — kernel CPD on the scalar as the onset/offset localizer.** For every D1 event, the unsmoothed
+scalar on the event ± 15 windows (60 s) inside the file; ruptures KernelCPD (rbf), exactly 2 change
+points (onset, offset), min segment 2 windows; no penalty to tune. **E18 cannot raise sensitivity or
+lower FA/day** (it only moves boundaries; SzCORE tolerates 30 s / 60 s); its detection gate (pooled
+sensitivity ≥ D1 − 0.02, FA/day ≤ D1 + 1) only guards against damage. Its value is the new metric —
+onset and offset error (s) on true positives, reported with n — and a measured role for CPD
+(Objective 2). Adopted if the median onset and offset errors are each not worse than the raw D1
+boundaries by more than 4 s and at least one improves. *If not met:* error by seizure duration and
+bias sign; then (E18b) CPD on the D1-smoothed score, (E18c) margin ± 30 windows.
+Note: the final structure is D1 detection + CPD localisation, not PELT + FP-budget; Chapter 2 Table 5
+must be rewritten (Decision #4, §7). chb06 stays inverted under every model (limitation).
+
+**E19 — short-seizure branch.** 23/76 test seizures last < 20 s (E9: 0/18 detected); the non-test set
+has 3, so the benefit cannot be gated there. Second detector on the same scalar: smoothing 3 windows,
+patient top-p_s, only events ≤ 30 s kept, union with the main D1 events (merge 90 s). p_s = the largest
+of {0.001, 0.002, 0.005} whose added FA/day (4-seed mean, non-test) is ≤ 3. Adopted if pooled
+sensitivity is not lower and the FA increase is ≤ 3/day; short seizures caught are reported
+descriptively (non-test and test). *If no p_s fits the budget:* describe the short false events
+(flagged share, duration); fix to test: the short branch scored with a broader spatial requirement
+(S12), same budget rule.
+
+**E20 — extension: multivariate kernel CPD on the trajectory of the percentile readouts.** Non-test
+only, own pre-registered gate, no separate test look. Designed after E18.
 
 ## 7 · Decisions open for the supervisor (08/10)
 
@@ -194,7 +250,8 @@ src: `diag_detector_ceiling`, `e1_normal_definition`, `e3_supervised_loso`, `e4_
 `e5_patient_density`, `e6_dump_gae`, `e6_gae_patient_density`, `e7_ensemble_cpd`, `c1_nodefeat`,
 `c1b_build_trainset`, `c1t_build_testset`, `retrain/train_gae_v2`, `e8_gae_v2_eval`, `e8_diagnostics`,
 `e9_test_oneshot`, `e10_kernel_cpd`, P2: `e11_tail_anatomy`, `e12_readout_composition`,
-`e13_recon_seen_artifacts`, `e14_spatial_recruitment` (per-node dump in `results/e14_spatial_recruitment/pernode/`, not committed). data: `trainset_v2/` (15 npz), `testset_v2/` (8 npz), `models_v2/`
+`e13_recon_seen_artifacts`, `e14_spatial_recruitment`, `e15_patient_adaptation`
+(node latents `{tag}_s0_Z`, `_s2000_Z`), `p2_seeds` (seeds 2, 3: recon, latents, distances) (per-node dump in `results/e14_spatial_recruitment/pernode/`, not committed). data: `trainset_v2/` (15 npz), `testset_v2/` (8 npz), `models_v2/`
 (clean 42, 1, 2, 3; all 42, 1; identity in `docs/PROVENANCE_V2.md`). results: `diag_detector_ceiling`,
 `e1_*` … `e7_*`, `e8_gae_v2` (+ `diag/`), `e9_test_oneshot` (tag `e9-test-oneshot`), `e10_kernel_cpd`.
 Kaggle: `Agent/gae_v2_train.ipynb`, dataset `nhn2mm/gae-v2`, GPU T4×2, ~3.3–3.8 h per seed (clean).

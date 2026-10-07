@@ -17,7 +17,15 @@ not lower; G2 subject-mean; G3 without chb12; G4 validation; G5 >= 9/15 subjects
 robust-z-scaled scalar not more than 10 % lower). Reproduction: Eb here must reproduce E17's Eb best
 cell value within 0.002, else STOP.
 If not adopted: the candidate stays Eb; record the curve at <= 15 / <= 10 as characterisation.
-Run:  python src/e16g_final_detrend.py        (estimated 10-25 min CPU, not measured)
+RESULT (2026-10-07): Eb_dt 0.529, NOT adopted; seizure z of the scalar 2.89 -> 2.48 (the running median
+of the percentile ensemble absorbs part of the seizure elevation).
+ARM h (added after that result, mechanism-driven, same gate, reference Eb): the drift correction is
+moved to where it was measured to work -- the S9 component only (E16e: S9 minus its +-15 min running
+median inside each file), then the same rank ensemble with L and gamma: Eb_h = pct(S9_e) + pct(L) +
+pct(gamma). Rationale: the measured drift lives in the latent readout (E16 diagnostics); E16e improved
+S9 at every FA level with seizure z 4.72 -> 4.62; correcting the mixed percentile scalar hurt.
+Run:  python src/e16g_final_detrend.py --arm dt     (done)
+      python src/e16g_final_detrend.py --arm h      (estimated 10-25 min CPU, not measured)
 """
 import sys
 import time
@@ -37,7 +45,12 @@ E17_EB = 0.617
 
 
 def main():
+    import argparse
     import e1_normal_definition as E1
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--arm", default="dt", choices=["dt", "h"])
+    arm = ap.parse_args().arm
+    kind_new = "Eb_dt" if arm == "dt" else "Eb_h"
     OUT.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     rows, mech = [], []
@@ -46,7 +59,8 @@ def main():
         d = E8.d_for_grid(ctx["z"])
         for tag in PS.TAGS:
             eb = PS.ensemble_scalar(ctx, tag, ("C", "L", "gamma"))
-            for kind, v in (("Eb", eb), ("Eb_dt", PS.detrend_file(ctx, eb))):
+            new = PS.detrend_file(ctx, eb) if arm == "dt" else PS.ensemble_scalar(ctx, tag, ("C", "L", "gamma"), c_arm="e")
+            for kind, v in (("Eb", eb), (kind_new, new)):
                 for r_ in E1.event_grid(d, v):
                     r_.update(subject=s, score=f"{tag}|{kind}", nonict_h=ctx["nh"]); rows.append(r_)
                 zz = E16.rz(v, ctx["ok"])
@@ -58,14 +72,14 @@ def main():
     gr.to_csv(OUT / "grid_per_subject.csv", index=False)
     M = pd.DataFrame(mech); M.to_csv(OUT / "mechanism.csv", index=False)
     med = M.groupby(["kind", "subject"])[["sz_median_z", "flag_median_z"]].mean().groupby("kind").median()
-    B, R = E16.summarise(gr, "Eb"), E16.summarise(gr, "Eb_dt")
-    lines = ["# E16g -- drift correction of the final ensemble scalar (Eb_dt vs Eb), 4 seeds, 15 non-test\n"]
+    B, R = E16.summarise(gr, "Eb"), E16.summarise(gr, kind_new)
+    lines = [f"# E16g arm {arm} -- drift correction ({kind_new} vs Eb), 4 seeds, 15 non-test\n"]
     if abs(B["best"] - E17_EB) > 0.002:
         lines.append(f"STOP: Eb reproduces {B['best']:.3f}, E17 gave {E17_EB}")
-        (OUT / "SUMMARY.md").write_text("\n".join(lines), encoding="utf-8"); print("\n".join(lines)); sys.exit(1)
+        (OUT / f"SUMMARY_{arm}.md").write_text("\n".join(lines), encoding="utf-8"); print("\n".join(lines)); sys.exit(1)
     lines += [f"Reproduction of E17 Eb: {B['best']:.3f} (E17 {E17_EB}) OK\n",
               "## Best <= 25 | <= 15 | <= 10 | val | no-chb12 | subject-mean sens @ FP/day | per seed | short\n", "```"]
-    for k, X in (("Eb", B), ("Eb_dt", R)):
+    for k, X in (("Eb", B), (kind_new, R)):
         if X["cell"] is None:
             lines.append(f"{k} never reaches FA/day <= 25"); continue
         lines.append(f"{k:6s} {X['best']:.3f} {X['cell']} | {X['le15']:.3f} | {X['le10']:.3f} | val {X['val']:.3f} | "
@@ -74,18 +88,18 @@ def main():
     lines += ["```", "", "```"] + [f"{k:6s} seizure z {med.loc[k, 'sz_median_z']:.2f}  flagged z {med.loc[k, 'flag_median_z']:.2f}"
                                     for k in med.index] + ["```"]
     if R["cell"] is None:
-        E16.ledger("E16g", "Eb_dt", dict(best=0.0, cell=None), {}, "NOT adopted"); verdict = "NOT adopted"
+        E16.ledger("E16g", kind_new, dict(best=0.0, cell=None), {}, "NOT adopted"); verdict = "NOT adopted"
     else:
-        g, ok_ = E16.gate(R, B, med.loc["Eb_dt", "sz_median_z"], med.loc["Eb", "sz_median_z"])
+        g, ok_ = E16.gate(R, B, med.loc[kind_new, "sz_median_z"], med.loc["Eb", "sz_median_z"])
         verdict = "ADOPTED" if ok_ else "NOT adopted"
-        E16.ledger("E16g", "Eb_dt", R, g, verdict)
+        E16.ledger("E16g", kind_new, R, g, verdict)
         lines.append("\n- " + " ".join(f"{k} {'pass' if v else 'FAIL'}" for k, v in g.items() if k != "n_ok")
                      + f" (subjects {g['n_ok']}/15)")
-        lines.append("  per subject 4-seed-mean TP (Eb_dt | Eb): " +
+        lines.append(f"  per subject 4-seed-mean TP ({kind_new} | Eb): " +
                      ", ".join(f"{s_} {R['tp'].get(s_, np.nan):.2f}|{B['tp'][s_]:.2f}" for s_ in B["tp"].index))
-    lines.append(f"\n**{verdict}: candidate scalar = {'Eb_dt' if verdict == 'ADOPTED' else 'Eb'}**")
+    lines.append(f"\n**{verdict}: candidate scalar = {kind_new if verdict == 'ADOPTED' else 'Eb'}**")
     lines.append(f"\nElapsed {time.time()-t0:.0f} s.")
-    (OUT / "SUMMARY.md").write_text("\n".join(lines), encoding="utf-8")
+    (OUT / f"SUMMARY_{arm}.md").write_text("\n".join(lines), encoding="utf-8")
     print("\n".join(lines))
 
 

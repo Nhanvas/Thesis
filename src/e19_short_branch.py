@@ -38,6 +38,10 @@ PARTS = ("C", "L", "gamma")
 
 
 def scalar(ctx, tag, which, c_k=9):
+    if which == "Eb_h":
+        if c_k != 9:
+            raise SystemExit("--short-k 12 is defined on Eb / Eb_dt only")
+        return PS.ensemble_scalar(ctx, tag, PARTS, c_arm="e")
     v = PS.ensemble_scalar(ctx, tag, PARTS, c_k=c_k)
     return PS.detrend_file(ctx, v) if which == "Eb_dt" else v
 
@@ -45,7 +49,7 @@ def scalar(ctx, tag, which, c_k=9):
 def main():
     import e1_normal_definition as E1
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scalar", default="Eb", choices=["Eb", "Eb_dt"])
+    ap.add_argument("--scalar", default="Eb", choices=["Eb", "Eb_dt", "Eb_h"])
     ap.add_argument("--short-k", type=int, default=9, choices=[9, 12])
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)

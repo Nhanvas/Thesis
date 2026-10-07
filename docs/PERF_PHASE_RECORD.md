@@ -117,6 +117,7 @@ A local-contrast detector does not rescue missed seizures here.
 
 | 6 | P2 frozen system (tag `p2-frozen`), `e22_test_oneshot.py`, 2026-10-07 | seed 42 after the localizer **26/76 (0.342) @ 22.2 FP/day**, precision 0.092, F1 0.145; 4 seeds 0.336 ± 0.008 @ 23.9 ± 1.2; subject-mean 0.498; short 4/18. E on the same look 3/76 @ 24.1 (reproduces E9 exactly) |
 | P3-T | 2026-10-07, stage P3, test **information** (not a look at results): (a) `p3_seizure_burden.py` read the test summaries (counts, durations, ictal minutes); (b) `p3_anatomy.py --include-test`: tier T-A (label-free test EEG and model outputs) and tier T-B (per-seizure anatomy joined to test annotations), section 9 | any P3 design motivated by (b) makes look #7 test-informed; it is reported as such |
+| 7 | P3 frozen system (tag `p3-frozen`), `e23_test_look7.py`, 2026-10-07 — **TEST-INFORMED** (record 9.2) | balanced point, seed 42 after the localizer **37/76 (0.487) @ 27.5 FP/day**, precision 0.104, F1 0.172, subject-mean 0.577; 4 seeds 0.477 ± 0.022 @ 29.2 ± 1.3, subject-mean 0.567; detector stage 38/76 (0.500) @ 28.4. Look #6 reproduced exactly (R2). No look #8 |
 
 Looks 2–4 informed the P1 diagnosis; look 5 (E9) the P2 diagnosis. Look 6 was reported as is; the author did
 not approve the result and opened stage P3 (target pooled sensitivity ≥ 0.50). Any P3 design that uses
@@ -698,3 +699,40 @@ on the balanced point only. Every result is reported as is: ≥ 0.50 → target 
 reported with the subject-mean and the bootstrap difference to look #6; balanced FP/day > 40 → flagged as
 above the acceptable level. Look #6 stays the clean held-out result; look #7 is labelled test-informed.
 No look #8. After look #7: record 9.8 and handoff; performance work closes.
+
+### 9.8 Look #7 (test-informed) and the close of P3
+
+**Balanced point (the target point), seed 42 after the CPD localizer: 37/76 = 0.487 @ 27.49 FP/day**, precision
+0.104, F1 0.172, subject-mean 0.577. 4 seeds: 0.477 ± 0.022 @ 29.15 ± 1.26, subject-mean 0.567 ± 0.019.
+Detector stage (before the localizer): seed 42 38/76 = 0.500 @ 28.35, 4 seeds 0.480 ± 0.025.
+**By the reading rule (9.7b) the target is not reached:** the frozen system's output is after the localizer,
+one seizure short on seed 42. FP/day stayed below the pre-registered expectation (35–40) and below 40.
+Per subject (seed 42): **only chb15 changed (0 → 11/20)**; FP rose in chb15 (14 → 53), chb14 (27 → 34) and
+chb18 (23 → 38); every other patient is identical to look #6 (budget 0.005). chb06 2/10, chb13 1/12,
+chb16 2/10 unchanged (32 seizures, 5 caught).
+Patient-level bootstrap vs look #6 (4-seed means, B = 10,000): pooled +0.141 [0.000, 0.333], subject-mean
++0.070 [0.000, 0.201], FP/day +5.27 [+0.37, +13.60]. The gain rests on one patient and on the cap 0.02,
+which binds only on test (disclosure 9.7b).
+Sensitivity-priority point (descriptive): seed 42 0.487 @ 36.83; 4 seeds 0.490 ± 0.022 @ 38.12 — about +9
+FP/day for no material gain.
+Localization (balanced, n = 146 matched pairs): onset |error| detector 32 s, CPD 12 s (bias +8), offset
+detector 20 s, CPD 24 s (bias +16), contiguous-run (hybrid) offset 16 s. CPD's role on test is the onset
+(32 → 12 s); its offset is late, as on non-test (9.7, 6.1). The hybrid was not adopted (non-test rule) and is
+not switched after the look.
+
+**How the report presents the test results (fixed).** Look #6 (P2 frozen, 0.342 @ 22.2, subject-mean
+0.498) is the clean held-out evaluation. Look #7 (P3 frozen, 0.487 @ 27.5, subject-mean 0.577) is the
+final system, labelled test-informed, with the bootstrap interval and the statement that its gain is
+chb15 at a budget cap that binds only on test. Both are reported; neither replaces the other.
+
+**What remains unsolved (Future Work, hypotheses, not findings).** chb06 (10 generalized seizures of
+12–20 s; inverted readout; its non-ictal tail is not high-amplitude, flagged 0.27–0.30), chb16 (10 seizures
+of 6–14 s, below the 4-s window with 20-s smoothing) and chb13 (12 seizures at the 2–5 % level under its own
+high-amplitude states, flagged 0.89 in its tail). Candidate directions, none tested: shorter or overlapping
+windows for short seizures (rebuild of graphs and retraining), a two-sided readout for seizures that are
+more regular than the background, and a representation that separates seizures from the patient's own
+high-amplitude states. Patient fine-tuning (E15), capacity (E1) and input normalisation (H7) lacked support.
+Any test of these would need a new evaluation set; the CHB-MIT test set is used up (looks 1–7).
+
+**P3 closed (tag `perf-p3-closed`).** Performance work stops here; next: report Chapters 2–5 and the demo
+(`docs/HANDOFF_REPORT.md`).

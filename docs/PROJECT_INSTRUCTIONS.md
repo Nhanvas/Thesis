@@ -1,6 +1,10 @@
 # PROJECT INSTRUCTIONS — Claude agent spec
 ### Thesis: Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and Change Point Detection
 
+> **Rev. 2026-10-07 night (P3 CLOSED).** Final system = P3 frozen (tag `p3-frozen`, record §9.7b–9.8).
+> Look #7 (test-informed): 0.487 (37/76) @ 27.5 FP/day, subject-mean 0.577 (seed 42); look #6 stays the clean
+> held-out result. Performance work is closed; next = report and demo, start from `docs/HANDOFF_REPORT.md`.
+>
 > **Rev. 2026-10-07 evening (P3 opened).** Record rev. Q §9: checks of the two closing P2 results, the
 > two-tier test-information policy, hypotheses H6–H8, the failure-anatomy step P3-A and the decision table.
 >
@@ -172,6 +176,13 @@ file → patient percentiles, equal mean (one scalar) → D1 smooth 5, top 0.5 %
 (2 change points, ±60 s) as localizer. Non-test 0.662 @ 19.6; **test look #6: 0.342 (26/76) @ 22.2,
 4 seeds 0.336 ± 0.008, subject-mean 0.498, onset/offset 8/20 s**.
 
+### P3 frozen system (tag `p3-frozen`, record §9.7b) — FINAL
+The P2 scalar and D1 (smooth 5, merge 90 s) with a label-free per-patient budget top-p_i = clip(q_i, 0.005,
+0.02), q_i = share of the patient's smoothed member-mean robust-z above k = 4.0677 (calibrated on non-test);
+kernel CPD localizer. Non-test 0.670 @ 23.3 after CPD. **Look #7 (test-informed): 0.487 (37/76) @ 27.5,
+4 seeds 0.477 ± 0.022 @ 29.2, subject-mean 0.577 / 0.567; gain = chb15 0 → 11/20 at the cap; onset/offset
+12/24 s.** Descriptive sensitivity point clip(q_i, 0.0075, 0.02): 0.487 @ 36.8.
+
 ### Forbidden numbers
 0.750 / 0.829 / 0.791 / 39.77 / 71.25 (pre-rebuild) · every attribution number scored on the retired
 machine draft (0.6497, 0.3095, 0.7758, 0.8879, −0.1261, 0.6267, 0.6681, 0.2672, +0.3578, p = 0.984,
@@ -188,7 +199,9 @@ defense **05–06/11** (author-confirmed).
 **Priority order (author, 2026-10-05):** improve performance → fix the web demo → fix figures/tables →
 revise the full report → checks (Grammarly, rubric, paper-review protocol) → slides.
 
-**Performance phase — current (2026-10-07).** P1 (E1–E10) and P2 (E11–E22) closed. Look #6 done and not
+**Performance phase — CLOSED (2026-10-07 night).** P1–P3 closed; final system and the two test looks to
+report: record §9.8. Next: report Chapters 2–5 and the demo (`docs/HANDOFF_REPORT.md`). History follows.
+P1 (E1–E10) and P2 (E11–E22) closed. Look #6 done and not
 approved. **P3 target: pooled test sensitivity ≥ 0.50 at the best achievable FP/day (sensitivity first).**
 Hypotheses H1–H8, the two-tier test-information policy and the P3 decision table are in record §9
 (they extend `HANDOFF_P3.md` §3). The paragraph below is
@@ -319,7 +332,7 @@ version wins); `EXHIBIT_SET_FINAL.md` rev 5 and `CAPTIONS.md` rev 11 until the p
 `results/attribution_v7/` (final attribution) · `results/attribution_v7/labels/source/` (never edit).
 **Tags:** `pre-cleanup` · `phase-c-final` · `repo-deps-fixed` · `exhibit-fixes-done` · `report-v1` ·
 `docs-reorg-done` · `attribution-v4-locked` · `attribution-v7-results` · `report-v2-pagecut` ·
-`demo-spec-v5` · `e9-test-oneshot` · `perf-p1-closed` · `p2-frozen` · `perf-p2-closed`.
+`demo-spec-v5` · `e9-test-oneshot` · `perf-p1-closed` · `p2-frozen` · `perf-p2-closed` · `p3-frozen` · `perf-p3-closed`.
 
 ═══════════════════════════════════════════════════════════════════════════════
 ## 10 · SETTLED — DO NOT RE-PROPOSE

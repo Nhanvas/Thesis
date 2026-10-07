@@ -1,12 +1,13 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. H, 2026-10-07** (rev. B–G same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. I, 2026-10-07** (rev. B–H same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
 clarifications (order E19 before E18, short events in E18, branch ledger §6.4, single-readout framing, runtimes).
 Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready. Rev. H: E16g arms dt, h; E19 stop
-(threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4).
+(threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4). Rev. I: E19 on Eb;
+E21 design (finer grid, gates unchanged); E18 no-CPD control; freeze plan and test-look pre-registration (§6.5).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -163,8 +164,9 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E15** patient-specific fine-tuning of v2 (all windows of the patient, no labels; Adam 1e-4, batch 32, 2,000 steps) + S9 (`results/e15_patient_adaptation/`) | reproduction gates exact (E8 mean latent, E14 distances). S9-adapted 0.628 @ 24.5 vs S9 base 0.622 @ 24.6; per seed 0.617/0.638 vs 0.617/0.628; subject-mean 0.758 vs 0.747; without chb12 0.757 vs 0.743; validation 0.867 = 0.867; 13/15 subjects; seizure z 4.90 → 5.32, flagged z −0.00 → 0.11, tail flagged 0.95 → 0.96. Analysis only: 0/15 patients and 10/425 files have a seizure in their first 10 min | **Not selected in this configuration** (one configuration: lr 1e-4, 2,000 steps, all parameters, whole recording; G1 +0.006 < +0.05). Mechanism not seen: seizure z rose slightly, flagged z did not fall. This is not "fine-tuning does not work". Open hypothesis: the per-patient LedoitWolf fit of S9 already gives each patient its own normal at the readout level. Freeze rule → candidate = **S9 base**. Re-opening fine-tuning needs a different design with a mechanism argument (e.g. decoder-only, per-file) and is not a reason to hold E16–E18 |
 | **E16** per-recording baseline, 4 seeds (`results/e16_recording_baseline/`); reference S9 base 4-seed 0.612 @ 24.6 (seeds 0.617/0.628/0.564/0.606), ≤ 15 0.513, ≤ 10 0.423, val 0.867, subject-mean 0.742 @ 25.7 | a (first 10 min of each file) 0.191; c (30 min) 0.295; d (causal sliding 30 min) 0.487; **b (patient covariance + per-file median/MAD) 0.582 @ 22.5, ≤ 15 0.548, ≤ 10 0.444, val 0.800, subject-mean 0.735 @ 22.7, seizure z 4.72 → 4.08**. Drift under S9 base: per-file median IQR / patient MAD 0.85; **84.5 % of the top-2 % non-ictal windows lie in the patient's top-quartile files** | none adopted (all fail G1). Mechanism: short baselines fit one state (fit-noise ratio 0.62, self-scoring −0.92 z), so everything else looks anomalous — longer baselines are monotonically better. File-level drift is real and owns the false-alarm tail; b (location + scale) helps at strict FA but lowers seizure z. Next (proposed): location-only corrections e, f |
 | **E16 e, f** location-only drift correction of S9 (same gate) | **e (minus ±15 min running median inside each file): 0.628 @ 22.3; ≤ 15 0.614; ≤ 10 0.487; val 0.867; without chb12 0.783; subject-mean 0.766 @ 22.2; every seed above its S9 (0.649/0.638/0.596/0.638 vs 0.617/0.628/0.564/0.606); 11/15 subjects; seizure z 4.62**. f (minus file median) 0.559. Drift diagnostics under S9 base: top-quartile files contain a seizure in 8.3 %; flagged share 0.459 in top files = 0.459 elsewhere | e: G1 FAIL only (+0.016 at ≤ 25); G2–G5 and M pass. The correction shifts the whole curve left (+0.10 at ≤ 15). The drift is a file-level shift of the latent readout, not more high-amplitude activity and not seizure files. Candidate C stays S9 base (rule) |
-| **E17** rank ensemble, C = S9 base | Ea (C+recon+gamma) 0.535, inferior; **Eb (C+L+gamma) 0.617 @ 22.8, ≤ 15 0.545, ≤ 10 0.441, val 0.800, without chb12 0.824, subject-mean 0.791 @ 24.3**, non-inferior; Ec (C+L) 0.572, inferior. Percentile AUROC seizure-vs-flagged: C 0.908, L 0.858, gamma 0.651, recon 0.445 | **Eb chosen** (only non-inferior combination). Final scalar = rank ensemble of three readouts: per-channel latent order statistic, graph-level latent, gamma-AEC |
+| **E17** rank ensemble, C = S9 base | Ea (C+recon+gamma) 0.535, inferior; **Eb (C+L+gamma) 0.617 @ 22.8, ≤ 15 0.545, ≤ 10 0.441, val 0.800, without chb12 0.824, subject-mean 0.791 @ 24.3**, non-inferior; Ec (C+L) 0.572, inferior. Percentile AUROC seizure-vs-flagged: C 0.908, L 0.858, gamma 0.651, recon 0.445 | **Eb chosen** (only non-inferior combination; it passed the validation margin exactly at the floor, 0.800 = 0.867 − 0.067). Final scalar = rank ensemble of three readouts: per-channel latent order statistic, graph-level latent, gamma-AEC |
 | **E16g** drift correction with the ensemble (reference Eb) | dt (detrend the final scalar): 0.529, seizure z 2.89 → 2.48, NOT adopted. h (detrend only the S9 component inside the ensemble): 0.598 @ 15.2 (cell 15/0.01), ≤ 15 0.471, ≤ 10 0.471, val 0.867, without chb12 0.801, subject-mean 0.775 @ 14.8, 11/15 subjects, seizure z 2.85 | neither adopted; candidate = **Eb**. dt hurts (the running median of the bounded percentile mix absorbs seizure elevation). h moves the operating point to much lower FA (subject-mean FP/day 24.3 → 14.8 at similar sensitivity) but its next grid step exceeds 25 FA/day |
+| **E19** short-seizure branch on Eb (coarse grid; run before E21 by the author) | main D1 cell 15/0.02: 0.617 @ 22.84, val (at that cell) 0.933, short 1/3. Union p_s 0.001: 0.625 @ 23.99; **0.002: 0.628 @ 25.72 (+2.88 FA/day)**; 0.005: 0.649 @ 32.09. Short seizures caught unchanged (1/3) | ADOPTED under the rule as written (p_s 0.002). Caveats: the union runs at 25.7 FA/day, above the 25 budget used everywhere else (the rule capped only the added FA); the +0.011 comes from non-short seizures on this set. To be re-run on the E21 final scalar (§6.5) |
 
 Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E17 and E16g; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
@@ -266,6 +268,7 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E16 | 6 (a–f) | none adopted (e: G1 only) | — |
 | E17 | 3 (Ea, Eb, Ec; non-inferiority) | Eb chosen | — |
 | E16g | 2 (dt, h) | none adopted | — |
+| E19 | 1 (p_s rule on Eb) | adopted (union above 25 FA/day) | 3 p_s values |
 
 Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16 and about
 24 after E17. From E16 on, `results/p2_ledger.csv` is the complete list.
@@ -296,6 +299,36 @@ times of ~8–16 s per score through the D1 grid, plus the LedoitWolf fits):
 | E17 | 3 combinations (+ E17b if needed) × 4 seeds | 10–30 min (+10–20) |
 | E19 | short branch, 3 p_s values × 4 seeds | 10–25 min |
 | E18 | CPD on the events only, 4 seeds | 5–15 min |
+
+### 6.5 E21, freeze plan and test-look pre-registration (2026-10-07)
+
+**E21 — finer top-p grid** (`src/e21_fine_grid.py`). Grid {0.05, 0.03, 0.02, 0.015, 0.01, 0.0075,
+0.005, 0.002, 0.001} for every score; gates unchanged (G1 at ≤ 25 with the seed rule, G2–G5, M); no new
+route through a gate; ≤ 15, ≤ 10, FA/day and subject-mean descriptive. Ledger note on every row:
+"grid changed after seeing E16e and Eb_h". Stage 1 re-scores S9 base, E16e, E16b and E15 (TTA; gated
+only if seeds 2 and 3 are adapted, `e15 adapt --tags clean_seed2 clean_seed3 --suffix _s23 --no-z`);
+C' = best passing arm (exact ties → lower FA), else S9 base. Stage 2 re-runs the E17 construction with
+C' (Eb_h is stage-2 Eb when C' = E16e; counted once). Diagnostics before any further drift arm: drift
+per component (S9, L, gamma, recon) and its share of the final scalar's tail; per-subject check of the
+0.459/0.459 flagged-share coincidence; share of top-quartile files with a seizure vs all files.
+Consistency with the author's binding rules: E21 fixes a measured construction defect (threshold grid
+resolution) with gates fixed, and keeps the short-seizure branch (requirement 2.6) in the pipeline.
+
+**Freeze plan (fixed now).** E21 → E19 re-run on the E21 final scalar with the fine grid → E18 on the
+resulting events → freeze. Open author decision for the E19 re-run: also require the union's total
+FA/day ≤ 25 (`--total-cap 25`; proposed, because every other step budgets 25 FA/day). E18 reports a
+no-CPD control (unsmoothed score above the detector threshold) beside CPD and the raw detector.
+
+**Test-look pre-registration (before the freeze).**
+1. On the non-test set: subject-level bootstrap (resampling subjects, 4-seed mean) of the difference in
+   pooled sensitivity at the frozen cells between the final system and E (E8/E9 V2_LW + D1 15/0.02),
+   with and without chb12; reported as a 95 % interval.
+2. Expected FA/day on test: about 1.2 × the non-test value of the frozen cell (E9: 19.8 non-test →
+   24.1 test with the same cell). Expected sensitivity: a moderate improvement over E9 at most
+   (§6.2 item 6).
+3. The look reports: 4 seeds; pooled and subject-mean sensitivity, precision, F1 and FP/day from the
+   scorer's counts; onset/offset error with n (detector, CPD, no-CPD control); short seizures caught;
+   E (frozen P1 system) on the same look as reference. Logged as look #6 in §3.
 
 ## 7 · Decisions open for the supervisor (08/10)
 

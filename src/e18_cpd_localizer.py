@@ -13,6 +13,9 @@ kept only if it spans >= 2 windows and its mean exceeds the means of both outer 
 the detector's own boundaries are kept (fallback, rate reported). Events are re-merged (90 s).
 E18 CANNOT raise sensitivity or lower FA/day: it only moves boundaries (SzCORE tolerates 30 s / 60 s).
 Detection guard: pooled sensitivity >= detector - 0.02 and FA/day <= detector + 1 (4-seed mean).
+No-CPD control (reviewer, 2026-10-07; reported, not gated): boundaries = first and last window of the
+UNSMOOTHED scalar above the detector's threshold inside the same segment -- separates the gain of
+looking at the unsmoothed score from the gain of change point detection itself.
 Localization metric: for every reference seizure matched by a detector event (E1 overlap rule, matched
 on the detector events so n is identical for both boundary sets), |onset error| and |offset error| in
 seconds, detector boundaries vs CPD boundaries; median, IQR, n, signed median bias; also split by event
@@ -36,18 +39,24 @@ sys.path.insert(0, str(ROOT / "src"))
 import p2_scalars as PS                # noqa: E402
 import e16_recording_baseline as E16   # noqa: E402
 import e8_gae_v2_eval as E8            # noqa: E402
+FINE = [0.05, 0.03, 0.02, 0.015, 0.01, 0.0075, 0.005, 0.002, 0.001]
 
 OUT = ROOT / "results" / "e18_cpd_localizer"
 PARTS = ("C", "L", "gamma")
 WIN = PS.WIN
 
 
-def scalar(ctx, tag, which):
-    if which == "Eb_h":
-        return PS.ensemble_scalar(ctx, tag, PARTS, c_arm="e")
-    v = PS.ensemble_scalar(ctx, tag, PARTS)
-    return PS.detrend_file(ctx, v) if which == "Eb_dt" else v
-
+def scalar(ctx, tag, a, c_k=9):
+    """final scalar from --c-arm / --parts (or the legacy --scalar names)."""
+    parts = tuple(a.parts.split(",")) if a.parts else PARTS
+    c_arm = a.c_arm
+    if a.scalar == "Eb_h":
+        c_arm = "e"
+    if parts == ("C",):
+        v = E16.rz(PS.readout(ctx, tag, "C", c_arm=c_arm, c_k=c_k), ctx["ok"])
+    else:
+        v = PS.ensemble_scalar(ctx, tag, parts, c_arm=c_arm, c_k=c_k)
+    return PS.detrend_file(ctx, v) if a.scalar == "Eb_dt" else v
 
 def cpd_event(x, ok, a_w, b_w, margin):
     """x, ok: per-file arrays. a_w, b_w: event in windows [a_w, b_w). Returns (a, b, used_cpd)."""
@@ -69,6 +78,16 @@ def cpd_event(x, ok, a_w, b_w, margin):
     return s0 + b1, s0 + b2, True
 
 
+def thr_event(x, ok, a_w, b_w, margin, thr):
+    """non-CPD control: first and last window of the unsmoothed scalar above the detector threshold,
+    inside the same segment; the detector's boundaries if none."""
+    s0, s1 = max(0, a_w - margin), min(len(x), b_w + margin)
+    above = np.flatnonzero(ok[s0:s1] & (np.nan_to_num(x[s0:s1], nan=-np.inf) > thr))
+    if not len(above):
+        return a_w, b_w
+    return s0 + above[0], s0 + above[-1] + 1
+
+
 def match_errors(refs, hyp):
     """for each reference, the first hypothesis overlapping it (E1 rule) -> (ref, hyp) pairs (seconds)."""
     pairs = []
@@ -84,11 +103,18 @@ def main():
     import e1_normal_definition as E1
     ap = argparse.ArgumentParser()
     ap.add_argument("--scalar", default="Eb", choices=["Eb", "Eb_dt", "Eb_h"])
+    ap.add_argument("--c-arm", default="S9base", choices=["S9base", "e", "b"], help="C of the final scalar (E21)")
+    ap.add_argument("--parts", default=None, help="comma list, e.g. C,L,gamma or C (E21 final scalar)")
+    ap.add_argument("--fine", action="store_true", help="E21 fine top-p grid")
     ap.add_argument("--short-p", type=float, default=None, help="E19 short branch p_s, if E19 adopted it")
     ap.add_argument("--input", default="raw", choices=["raw", "smoothed"])
     ap.add_argument("--margin", type=int, default=15)
     a = ap.parse_args()
-    arm = f"{a.scalar}_{a.input}_m{a.margin}" + (f"_short{a.short_p}" if a.short_p else "")
+    if a.fine:
+        E1.TOPS = FINE
+    spec = f"{a.scalar}" if not a.parts else f"{a.parts.replace(',', '+')}_C{a.c_arm}"
+    spec += "_fine" if a.fine else ""
+    arm = f"{spec}_{a.input}_m{a.margin}" + (f"_short{a.short_p}" if a.short_p else "")
     OUT.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     ctxs, X, rows = {}, {}, []
@@ -96,7 +122,7 @@ def main():
         ctx = PS.subject_context(s); ctxs[s] = ctx
         d = E8.d_for_grid(ctx["z"])
         for tag in PS.TAGS:
-            X[(s, tag)] = scalar(ctx, tag, a.scalar)
+            X[(s, tag)] = scalar(ctx, tag, a)
             for r_ in E1.event_grid(d, X[(s, tag)]):
                 r_.update(subject=s, score=f"{tag}|main", nonict_h=ctx["nh"]); rows.append(r_)
     gr = pd.DataFrame(rows); gr["kind"] = "main"; gr["seed"] = gr.score.str.split("|").str[0]
@@ -134,6 +160,7 @@ def main():
                             merged.append((e0, e1)); mk.append(k)
                     det[f], kind[f] = merged, mk
             xin = x if a.input == "raw" else PS.smoothed(ctx, x, sm_)
+            thr = np.nanquantile(PS.smoothed(ctx, x, sm_), 1 - top_)
             loc, lk = {}, {}
             for f in det:
                 m = np.flatnonzero(ctx["fidx"] == f)
@@ -153,8 +180,11 @@ def main():
                 a_w, b_w, used = cpd_event(xin[np.flatnonzero(ctx["fidx"] == f)],
                                            ctx["ok"][np.flatnonzero(ctx["fidx"] == f)], h0 // WIN, h1 // WIN, a.margin)
                 c0, c1 = a_w * WIN, b_w * WIN
+                mf = np.flatnonzero(ctx["fidx"] == f)
+                t_a, t_b = thr_event(x[mf], ctx["ok"][mf], h0 // WIN, h1 // WIN, a.margin, thr)
                 err_rows.append(dict(subject=s, seed=tag, ref_dur=rb - ra, ev_dur=h1 - h0, used_cpd=used,
-                                     det_on=h0 - ra, det_off=h1 - rb, cpd_on=c0 - ra, cpd_off=c1 - rb))
+                                     det_on=h0 - ra, det_off=h1 - rb, cpd_on=c0 - ra, cpd_off=c1 - rb,
+                                     thr_on=t_a * WIN - ra, thr_off=t_b * WIN - rb))
         print(f"{s}: done ({time.time()-t0:.0f}s)", flush=True)
 
     Dd, Ee, Fb = pd.DataFrame(det_rows), pd.DataFrame(err_rows), pd.DataFrame(fb)
@@ -181,7 +211,9 @@ def main():
             continue
         lines += [f"{lab} (n = {len(df)})",
                   f"  onset   detector {stats('det_on', df)} | cpd {stats('cpd_on', df)}",
-                  f"  offset  detector {stats('det_off', df)} | cpd {stats('cpd_off', df)}"]
+                  f"          no-CPD control (unsmoothed > threshold) {stats('thr_on', df)}",
+                  f"  offset  detector {stats('det_off', df)} | cpd {stats('cpd_off', df)}",
+                  f"          no-CPD control (unsmoothed > threshold) {stats('thr_off', df)}"]
     lines.append("```")
     guard = P.loc["cpd", "sens"] >= P.loc["detector", "sens"] - 0.02 and P.loc["cpd", "fa_day"] <= P.loc["detector", "fa_day"] + 1
     don, doff = Ee.det_on.abs().median(), Ee.det_off.abs().median()

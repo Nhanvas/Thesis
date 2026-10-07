@@ -31,27 +31,40 @@ sys.path.insert(0, str(ROOT / "src"))
 import p2_scalars as PS                # noqa: E402
 import e16_recording_baseline as E16   # noqa: E402
 import e8_gae_v2_eval as E8            # noqa: E402
+FINE = [0.05, 0.03, 0.02, 0.015, 0.01, 0.0075, 0.005, 0.002, 0.001]
 
 OUT = ROOT / "results" / "e19_short_branch"
 PSET = [0.001, 0.002, 0.005]
 PARTS = ("C", "L", "gamma")
 
 
-def scalar(ctx, tag, which, c_k=9):
-    if which == "Eb_h":
-        if c_k != 9:
-            raise SystemExit("--short-k 12 is defined on Eb / Eb_dt only")
-        return PS.ensemble_scalar(ctx, tag, PARTS, c_arm="e")
-    v = PS.ensemble_scalar(ctx, tag, PARTS, c_k=c_k)
-    return PS.detrend_file(ctx, v) if which == "Eb_dt" else v
-
+def scalar(ctx, tag, a, c_k=9):
+    """final scalar from --c-arm / --parts (or the legacy --scalar names)."""
+    parts = tuple(a.parts.split(",")) if a.parts else PARTS
+    c_arm = a.c_arm
+    if a.scalar == "Eb_h":
+        c_arm = "e"
+    if parts == ("C",):
+        v = E16.rz(PS.readout(ctx, tag, "C", c_arm=c_arm, c_k=c_k), ctx["ok"])
+    else:
+        v = PS.ensemble_scalar(ctx, tag, parts, c_arm=c_arm, c_k=c_k)
+    return PS.detrend_file(ctx, v) if a.scalar == "Eb_dt" else v
 
 def main():
     import e1_normal_definition as E1
     ap = argparse.ArgumentParser()
     ap.add_argument("--scalar", default="Eb", choices=["Eb", "Eb_dt", "Eb_h"])
+    ap.add_argument("--c-arm", default="S9base", choices=["S9base", "e", "b"], help="C of the final scalar (E21)")
+    ap.add_argument("--parts", default=None, help="comma list, e.g. C,L,gamma or C (E21 final scalar)")
+    ap.add_argument("--fine", action="store_true", help="E21 fine top-p grid")
     ap.add_argument("--short-k", type=int, default=9, choices=[9, 12])
+    ap.add_argument("--total-cap", type=float, default=None,
+                    help="also require the union's FA/day <= this cap (proposed 25, author decision)")
     a = ap.parse_args()
+    if a.fine:
+        E1.TOPS = FINE
+    spec = f"{a.scalar}" if not a.parts else f"{a.parts.replace(',', '+')}_C{a.c_arm}"
+    spec += "_fine" if a.fine else ""
     OUT.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     ctxs, X, rows = {}, {}, []
@@ -59,7 +72,7 @@ def main():
         ctx = PS.subject_context(s); ctxs[s] = ctx
         d = E8.d_for_grid(ctx["z"])
         for tag in PS.TAGS:
-            X[(s, tag)] = scalar(ctx, tag, a.scalar)
+            X[(s, tag)] = scalar(ctx, tag, a)
             for r_ in E1.event_grid(d, X[(s, tag)]):
                 r_.update(subject=s, score=f"{tag}|main", nonict_h=ctx["nh"]); rows.append(r_)
         print(f"{s}: grid ({time.time()-t0:.0f}s)", flush=True)
@@ -82,7 +95,7 @@ def main():
             k0, n0 = PS.caught(refs, main)
             out.append(dict(subject=s, seed=tag, arm="main", p_s=np.nan, tp=tp, fp=fp, n_ref=nr, nonict_h=h,
                             short_caught=k0, short_n=n0))
-            xs = X[(s, tag)] if a.short_k == 9 else scalar(ctx, tag, a.scalar, c_k=12)
+            xs = X[(s, tag)] if a.short_k == 9 else scalar(ctx, tag, a, c_k=12)
             for p in PSET:
                 short = PS.d1_events(ctx, xs, 3, p, keep_max_s=30)
                 uni = {f: PS.merge(main.get(f, []) + short.get(f, [])) for f in set(main) | set(short)}
@@ -91,7 +104,7 @@ def main():
                 out.append(dict(subject=s, seed=tag, arm="union", p_s=p, tp=tp, fp=fp, n_ref=nr, nonict_h=h,
                                 short_caught=k1, short_n=n1))
         print(f"{s}: union ({time.time()-t0:.0f}s)", flush=True)
-    U = pd.DataFrame(out); U.to_csv(OUT / f"per_subject_{a.scalar}_k{a.short_k}.csv", index=False)
+    U = pd.DataFrame(out); U.to_csv(OUT / f"per_subject_{spec}_k{a.short_k}{'_cap' if a.total_cap else ''}.csv", index=False)
 
     def pooled(df):
         q = df.groupby(["arm", "p_s", "seed"], dropna=False)[["tp", "fp", "n_ref", "nonict_h", "short_caught",
@@ -101,7 +114,7 @@ def main():
 
     P, V = pooled(U), pooled(U[U.subject.isin(E8.VAL)])
     m0 = P[P.arm == "main"].iloc[0]
-    lines = [f"# E19 -- short-seizure branch on {a.scalar} (short branch k = {a.short_k}), 4 seeds, 15 non-test\n",
+    lines = [f"# E19 -- short-seizure branch on {spec} (short branch k = {a.short_k}, total cap {a.total_cap}), 4 seeds, 15 non-test\n",
              f"Main D1 cell (re-selected): smooth {sm_}, top {top_}; reproduction of event_grid exact.\n",
              "```", "arm    p_s     sens   FA/day  added FA  short caught  val sens"]
     lines.append(f"main   -       {m0.sens:.3f}  {m0.fa_day:6.2f}  {0:8.2f}  {m0.short_caught:.2f}/{m0.short_n:.0f}"
@@ -112,24 +125,24 @@ def main():
         added = r.fa_day - m0.fa_day
         lines.append(f"union  {p:<6}  {r.sens:.3f}  {r.fa_day:6.2f}  {added:8.2f}  {r.short_caught:.2f}/{r.short_n:.0f}"
                      f"      {V[(V.arm == 'union') & (V.p_s == p)].sens.iloc[0]:.3f}")
-        if added <= 3:
+        if added <= 3 and (a.total_cap is None or r.fa_day <= a.total_cap):
             cand.append((p, r, added))
     lines.append("```")
     if cand:
         p, r, added = max(cand, key=lambda x: x[0])
         ok_ = r.sens >= m0.sens and added <= 3
         verdict = "ADOPTED" if ok_ else "NOT adopted"
-        E16.ledger("E19", f"{a.scalar}_k{a.short_k}_p{p}",
+        E16.ledger("E19", f"{spec}_k{a.short_k}_p{p}" + ("_cap" if a.total_cap else ""),
                    dict(best=float(r.sens), cell=(3, p, round(float(r.fa_day), 2))),
                    dict(sens_not_lower=r.sens >= m0.sens, added_fa_le3=added <= 3), verdict)
         lines.append(f"\np_s = {p} (largest within the +3 FA/day budget): union sens {r.sens:.3f} vs main {m0.sens:.3f}, "
                      f"added FA/day {added:.2f} -> **{verdict}**")
     else:
-        E16.ledger("E19", f"{a.scalar}_k{a.short_k}", dict(best=0.0, cell=None), {}, "no p_s within budget")
+        E16.ledger("E19", f"{spec}_k{a.short_k}", dict(best=0.0, cell=None), {}, "no p_s within budget")
         lines.append("\nNo p_s fits the +3 FA/day budget -> describe the short false events; run --short-k 12 "
                      "(pre-registered fallback)" if a.short_k == 9 else "\nNo p_s fits the budget with k = 12 either.")
     lines.append(f"\nElapsed {time.time()-t0:.0f} s.")
-    (OUT / f"SUMMARY_{a.scalar}_k{a.short_k}.md").write_text("\n".join(lines), encoding="utf-8")
+    (OUT / f"SUMMARY_{spec}_k{a.short_k}{'_cap' if a.total_cap else ''}.md").write_text("\n".join(lines), encoding="utf-8")
     print("\n".join(lines))
 
 

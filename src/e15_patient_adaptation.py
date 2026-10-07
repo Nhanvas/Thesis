@@ -48,6 +48,8 @@ Run:
   python src/e15_patient_adaptation.py adapt --smoke     (chb01, 2,048 windows, 50 steps; ~1-2 min)
   python src/e15_patient_adaptation.py adapt             (estimated 1.75-3.5 h CPU, not measured; ~1.4 GB of latents)
   python src/e15_patient_adaptation.py eval              (estimated 10-30 min CPU, not measured)
+  E21 (4-seed rule): python src/e15_patient_adaptation.py adapt --tags clean_seed2 clean_seed3 --suffix _s23 --no-z
+     (same arm, seeds 2 and 3; reproduction gate against results/p2_seeds; estimated 1.5-3 h, not measured)
 """
 import argparse
 import json
@@ -72,6 +74,7 @@ DUMP = OUT / "pernode"
 BASE_DUMP = ROOT / "results" / "e14_spatial_recruitment" / "pernode"
 CKPT = ROOT / "data" / "models_v2"
 TAGS = ["clean_seed42", "clean_seed1"]
+KEEP_Z = True
 STEPS, SAVE_AT, LR, BATCH, K = 2000, (500, 1000, 2000), 1e-4, 32, 9
 
 
@@ -131,15 +134,19 @@ def adapt_subject(subj, smoke=False):
         model.load_state_dict(torch.load(str(ck), map_location="cpu"), strict=True)
         # base pass over every window: reproduction gates (E8 mean latent, E14 per-channel distances)
         D0, lat0, Z0 = per_channel_d(model, adj, xn, fa, meta["out_x"], G, T2)
-        err = float(np.abs(lat0 - cache[f"{tag}_lat"][:len(idx)]).max())
+        lat_src = cache if tag in ("clean_seed42", "clean_seed1") else np.load(ROOT / "results" / "p2_seeds" / f"{subj}.npz")
+        err = float(np.abs(lat0 - lat_src[f"{tag}_lat"][:len(idx)]).max())
         if err > 1e-4:
             raise SystemExit(f"STOP {subj} {tag}: base latent differs from E8 cache by {err:.2e}")
         if not smoke:
-            e14 = np.load(BASE_DUMP / f"{subj}.npz")[f"{tag}_d"]
+            base_src = BASE_DUMP / f"{subj}.npz" if tag in ("clean_seed42", "clean_seed1") \
+                else ROOT / "results" / "p2_seeds" / f"{subj}.npz"
+            e14 = np.load(base_src)[f"{tag}_d"]
             rel = float(np.abs(D0 - e14).max() / (np.abs(e14).max() + 1e-9))
             if rel > 1e-3:
                 raise SystemExit(f"STOP {subj} {tag}: base per-channel distances differ from E14 by {rel:.2e}")
-        res[f"{tag}_s0_Z"] = Z0.astype(np.float16)
+        if KEEP_Z:
+            res[f"{tag}_s0_Z"] = Z0.astype(np.float16)
         seed = 10_000 + 100 * snum + int(tag.split("seed")[1])
         T2.set_seed(seed)
         rng = np.random.default_rng(seed)
@@ -156,7 +163,7 @@ def adapt_subject(subj, smoke=False):
             if step in save_at:
                 D, _, Zs = per_channel_d(model, adj, xn, fa, meta["out_x"], G, T2)
                 res[f"{tag}_s{step}_d"] = D
-                if step == save_at[-1]:
+                if step == save_at[-1] and KEEP_Z:
                     res[f"{tag}_s{step}_Z"] = Zs.astype(np.float16)
                 print(f"  {subj} {tag}: step {step}, mean loss last 100 {np.mean(losses[-100:]):.5f} "
                       f"({time.time()-t0:.0f}s)", flush=True)
@@ -319,13 +326,23 @@ def evaluate():
 
 
 def main():
+    global TAGS, DUMP
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     s1 = sub.add_parser("adapt"); s1.add_argument("--smoke", action="store_true")
     s1.add_argument("--subjects", nargs="+", default=E8.SUBJS)
+    s1.add_argument("--tags", nargs="+", default=None, help="e.g. clean_seed2 clean_seed3 (E21, 4-seed rule)")
+    s1.add_argument("--suffix", default="", help="dump folder suffix, e.g. _s23")
+    s1.add_argument("--no-z", action="store_true", help="do not keep node latents")
     sub.add_parser("eval")
     a = ap.parse_args()
     if a.cmd == "adapt":
+        if a.tags:
+            TAGS = a.tags
+        if a.suffix:
+            DUMP = OUT / f"pernode{a.suffix}"
+        if a.no_z:
+            globals()["KEEP_Z"] = False
         subs = ["chb01"] if a.smoke else a.subjects
         guard(subs)
         for s in subs:

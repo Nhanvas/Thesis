@@ -185,8 +185,11 @@ def summarise(gr, kind):
     seeds = {t: best(P[P.seed == t], kind)[0] for t in TAGS}
     tp = gr[(gr.kind == kind) & (gr.smooth == c[0]) & (gr.top == c[1])].groupby("subject").tp.mean()
     sh = A[(A.kind == kind) & (A.smooth == c[0]) & (A.top == c[1])]
+    # two validation quantities (record 6.5): `val` = best cell re-selected on the 3 validation subjects
+    # alone at THEIR FA/day <= 25 (the definition used by every gate G4 since E12); `val_at_cell` =
+    # sensitivity of the 3 validation subjects at the cell selected on all 15 (descriptive only).
     return dict(best=b, cell=c, le15=best(A, kind, 15)[0], le10=best(A, kind, 10)[0],
-                val=best(Av, kind)[0], x12=at(Ax, kind, c), subj=float(sm.sens), subj_fa=float(sm.fa_day),
+                val=best(Av, kind)[0], val_at_cell=at(Av, kind, c), x12=at(Ax, kind, c), subj=float(sm.sens), subj_fa=float(sm.fa_day),
                 subj_f1=float(sm.f1), seeds=seeds, tp=tp,
                 short=f"{float(sh.tp_short.iloc[0]):.1f}/{int(sh.n_short.iloc[0])}")
 

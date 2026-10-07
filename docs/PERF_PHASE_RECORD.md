@@ -1,6 +1,6 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. I, 2026-10-07** (rev. B–H same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. J, 2026-10-07** (rev. B–I same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
@@ -8,6 +8,7 @@ clarifications (order E19 before E18, short events in E18, branch ledger §6.4, 
 Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready. Rev. H: E16g arms dt, h; E19 stop
 (threshold rule fixed to match event_grid); E18 ready; grid-resolution observation (§6.4). Rev. I: E19 on Eb;
 E21 design (finer grid, gates unchanged); E18 no-CPD control; freeze plan and test-look pre-registration (§6.5).
+Rev. J: validation definitions; E19 reading; E19b rule (author, 2026-10-07).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -166,7 +167,7 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E16 e, f** location-only drift correction of S9 (same gate) | **e (minus ±15 min running median inside each file): 0.628 @ 22.3; ≤ 15 0.614; ≤ 10 0.487; val 0.867; without chb12 0.783; subject-mean 0.766 @ 22.2; every seed above its S9 (0.649/0.638/0.596/0.638 vs 0.617/0.628/0.564/0.606); 11/15 subjects; seizure z 4.62**. f (minus file median) 0.559. Drift diagnostics under S9 base: top-quartile files contain a seizure in 8.3 %; flagged share 0.459 in top files = 0.459 elsewhere | e: G1 FAIL only (+0.016 at ≤ 25); G2–G5 and M pass. The correction shifts the whole curve left (+0.10 at ≤ 15). The drift is a file-level shift of the latent readout, not more high-amplitude activity and not seizure files. Candidate C stays S9 base (rule) |
 | **E17** rank ensemble, C = S9 base | Ea (C+recon+gamma) 0.535, inferior; **Eb (C+L+gamma) 0.617 @ 22.8, ≤ 15 0.545, ≤ 10 0.441, val 0.800, without chb12 0.824, subject-mean 0.791 @ 24.3**, non-inferior; Ec (C+L) 0.572, inferior. Percentile AUROC seizure-vs-flagged: C 0.908, L 0.858, gamma 0.651, recon 0.445 | **Eb chosen** (only non-inferior combination; it passed the validation margin exactly at the floor, 0.800 = 0.867 − 0.067). Final scalar = rank ensemble of three readouts: per-channel latent order statistic, graph-level latent, gamma-AEC |
 | **E16g** drift correction with the ensemble (reference Eb) | dt (detrend the final scalar): 0.529, seizure z 2.89 → 2.48, NOT adopted. h (detrend only the S9 component inside the ensemble): 0.598 @ 15.2 (cell 15/0.01), ≤ 15 0.471, ≤ 10 0.471, val 0.867, without chb12 0.801, subject-mean 0.775 @ 14.8, 11/15 subjects, seizure z 2.85 | neither adopted; candidate = **Eb**. dt hurts (the running median of the bounded percentile mix absorbs seizure elevation). h moves the operating point to much lower FA (subject-mean FP/day 24.3 → 14.8 at similar sensitivity) but its next grid step exceeds 25 FA/day |
-| **E19** short-seizure branch on Eb (coarse grid; run before E21 by the author) | main D1 cell 15/0.02: 0.617 @ 22.84, val (at that cell) 0.933, short 1/3. Union p_s 0.001: 0.625 @ 23.99; **0.002: 0.628 @ 25.72 (+2.88 FA/day)**; 0.005: 0.649 @ 32.09. Short seizures caught unchanged (1/3) | ADOPTED under the rule as written (p_s 0.002). Caveats: the union runs at 25.7 FA/day, above the 25 budget used everywhere else (the rule capped only the added FA); the +0.011 comes from non-short seizures on this set. To be re-run on the E21 final scalar (§6.5) |
+| **E19** short-seizure branch on Eb (coarse grid; run before E21 by the author) | main D1 cell 15/0.02: 0.617 @ 22.84, val (at that cell) 0.933, short 1/3. Union p_s 0.001: 0.625 @ 23.99; **0.002: 0.628 @ 25.72 (+2.88 FA/day)**; 0.005: 0.649 @ 32.09. Short seizures caught unchanged (1/3) | ADOPTED under the rule as written (p_s 0.002). **+0.011 ≈ one seizure of 94; short seizures caught 1.00/3 at every p_s, even at +9 FA/day — the branch has not yet done what it is for.** Caveats: the union runs at 25.7 FA/day, above the 25 budget used everywhere else (the rule capped only the added FA); the +0.011 comes from non-short seizures on this set. To be re-run on the E21 final scalar (§6.5) |
 
 Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E17 and E16g; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
@@ -314,9 +315,22 @@ per component (S9, L, gamma, recon) and its share of the final scalar's tail; pe
 Consistency with the author's binding rules: E21 fixes a measured construction defect (threshold grid
 resolution) with gates fixed, and keeps the short-seizure branch (requirement 2.6) in the pipeline.
 
-**Freeze plan (fixed now).** E21 → E19 re-run on the E21 final scalar with the fine grid → E18 on the
-resulting events → freeze. Open author decision for the E19 re-run: also require the union's total
-FA/day ≤ 25 (`--total-cap 25`; proposed, because every other step budgets 25 FA/day). E18 reports a
+**Validation — two quantities, one gate definition (author, 2026-10-07).** `val` = best D1 cell re-selected
+on the 3 validation subjects alone at their own FA/day ≤ 25 — the definition of every gate G4 since E12
+(E12, E14, E15, E16, E16g, E17, E21). `val_at_cell` = sensitivity of the 3 validation subjects at the cell
+selected on all 15 subjects — descriptive only. Same Eb, cell 15/0.02: `val` 0.800 (E17, E16g), `val_at_cell`
+0.933 (printed by E19 as "val sens"). Gates use `val` only; reports show both, labelled.
+
+**E19b — re-run rule (author decisions 2026-10-07; `src/e19b_short_branch_fine.py`).** On the E21 final
+scalar and fine grid: the main-only reference is re-selected on the same grid at ≤ 25; unions over every
+main cell and p_s are eligible only with total FA/day ≤ 25 and ≤ 3 added over their own main cell; the
+union is adopted only if its pooled sensitivity is strictly higher than the main-only reference. For the
+3 short selection-set seizures: percentile of the 3-window-smoothed peak inside the patient, whether the
+main detector catches it, and per p_s the reason (below threshold / run > 30 s / merged into > 30 s and
+dropped / kept). The next fix of the short branch (e.g. S12) is chosen from these reasons.
+
+**Freeze plan (fixed now).** E21 → E19b on the E21 final scalar with the fine grid → E18 on the resulting
+events (`--main-cell` when a union is adopted) → freeze. Total cap 25 approved by the author. E18 reports a
 no-CPD control (unsmoothed score above the detector threshold) beside CPD and the raw detector.
 
 **Test-look pre-registration (before the freeze).**

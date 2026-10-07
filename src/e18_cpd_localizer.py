@@ -109,6 +109,7 @@ def main():
     ap.add_argument("--short-p", type=float, default=None, help="E19 short branch p_s, if E19 adopted it")
     ap.add_argument("--input", default="raw", choices=["raw", "smoothed"])
     ap.add_argument("--margin", type=int, default=15)
+    ap.add_argument("--main-cell", default=None, help="smooth,top of the main detector when E19b adopted a union")
     a = ap.parse_args()
     if a.fine:
         E1.TOPS = FINE
@@ -130,6 +131,8 @@ def main():
     if Mn["cell"] is None:
         raise SystemExit("STOP: the scalar never reaches FA/day <= 25")
     sm_, top_ = Mn["cell"][0], Mn["cell"][1]
+    if a.main_cell:
+        sm_, top_ = int(a.main_cell.split(",")[0]), float(a.main_cell.split(",")[1])
 
     det_rows, err_rows, fb = [], [], []
     for s in E8.SUBJS:

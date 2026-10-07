@@ -24,3 +24,5 @@ date,step,arm,best_le25,cell,le15,le10,val,no_chb12,subj_sens,subj_fa,seeds,gate
 2026-10-07,E18,family_Ce_fine_raw_m15,0.6622,"(5, 0.005, 19.55)",,,,,,,,detection_guard=P localization=P,,ADOPTED
 2026-10-07,E18,family_Ce_fine_raw_m15_ovl,0.6622,"(5, 0.005, 19.57)",,,,,,,,detection_guard=P localization=P,,ADOPTED
 2026-10-07,E20a,family_Ce_fine_raw_m15_multi,0.6569,"(5, 0.005, 19.61)",,,,,,,,detection_guard=P localization=P,,ADOPTED
+2026-10-07,P3-L2,per-patient budget k-calibrated,0.6569,"('5', 'p_i')",,,0.9833,0.8382,0.8142,19.76,0.670|0.649|0.660|0.649,pooled=P subj=P val=P fa=P mech_chb12=P,,ADOPTED
+2026-10-07,P3-L6,hybrid localizer on L2,0.6543,"('5', 'L2')",,,,,,,,rule=P,,ADOPTED

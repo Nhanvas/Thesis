@@ -1,0 +1,9 @@
+set,subject,point,seed,det_on,det_off,cpd_on,cpd_off,hyb_on,hyb_off
+siena,PN16,balanced,clean_seed42,148,28,148,28,148,28
+siena,PN16,balanced,clean_seed42,136,28,136,28,136,28
+siena,PN16,balanced,clean_seed2,148,32,148,32,148,32
+siena,PN16,balanced,clean_seed3,148,28,148,28,148,28
+siena,PN16,sensitivity,clean_seed42,148,28,148,28,148,28
+siena,PN16,sensitivity,clean_seed42,136,28,136,28,136,28
+siena,PN16,sensitivity,clean_seed2,148,32,148,32,148,32
+siena,PN16,sensitivity,clean_seed3,148,28,148,28,148,28

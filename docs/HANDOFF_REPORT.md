@@ -35,6 +35,16 @@ labelled test-informed, with its bootstrap interval and the statement that the g
 0 → 11/20) at a budget cap that binds only on test. Report pooled and subject-mean side by side; the
 official SzCORE aggregate is the subject-mean. Offline-protocol numbers (RoR) are never merged with these.
 
+## 2b · External validation (clean; record 9.9)
+
+| set | seed 42 | 4 seeds | comparator, same data (SzCORE benchmark) |
+|---|---|---|---|
+| chb24 (16 seizures) | 14/16 (0.875) @ 29.5 FP/day | 0.828 @ 28.4 | — |
+| Siena (14 patients, 47 seizures) | 33/47 (0.702) @ 44.0; subject-mean 0.748 | subject-mean 0.633, F1 0.226 @ 41.0 | DynaSD (unsupervised) 0.664, F1 0.170 @ 77.7 |
+
+Report it as external validation of the final system on unseen patients (adults for Siena), with the
+caveats of record 9.9 (own scorer implementation and signal path; label-free z-score statistics).
+
 ## 3 · Disclosures the report must carry
 
 The 7 looks at the test set (record section 3); the test-informed design of P3 (record 9.2, 9.7b); about 40

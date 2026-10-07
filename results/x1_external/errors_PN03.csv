@@ -1,0 +1,17 @@
+set,subject,point,seed,det_on,det_off,cpd_on,cpd_off,hyb_on,hyb_off
+siena,PN03,balanced,clean_seed42,36,-8,28,0,28,-8
+siena,PN03,balanced,clean_seed42,52,40,56,60,56,48
+siena,PN03,balanced,clean_seed1,40,-8,28,0,28,8
+siena,PN03,balanced,clean_seed1,48,40,40,48,40,48
+siena,PN03,balanced,clean_seed2,36,-8,28,0,28,8
+siena,PN03,balanced,clean_seed2,48,40,40,48,40,56
+siena,PN03,balanced,clean_seed3,36,-8,28,-8,28,-8
+siena,PN03,balanced,clean_seed3,48,44,36,48,36,48
+siena,PN03,sensitivity,clean_seed42,36,-8,28,0,28,-8
+siena,PN03,sensitivity,clean_seed42,52,40,56,60,56,48
+siena,PN03,sensitivity,clean_seed1,40,-8,28,0,28,8
+siena,PN03,sensitivity,clean_seed1,48,40,40,48,40,48
+siena,PN03,sensitivity,clean_seed2,36,-8,28,0,28,8
+siena,PN03,sensitivity,clean_seed2,48,40,40,48,40,56
+siena,PN03,sensitivity,clean_seed3,36,-8,28,-8,28,-8
+siena,PN03,sensitivity,clean_seed3,48,44,36,48,36,48

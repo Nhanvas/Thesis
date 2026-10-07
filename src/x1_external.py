@@ -20,6 +20,13 @@ PRE-REGISTRATION (nothing below may change after the first result):
     (T3=T7, T4=T8, T5=P7, T6=P8), resampled to 256 Hz with scipy resample_poly, notch at the site's mains
     frequency (50 Hz; CHB-MIT 60 Hz). A file missing any needed electrode is skipped (CHB-MIT rule).
   * Labels (seizure times) are read only to score. Scorer = the thesis SzCORE path (e10.score_events).
+  * Label sources (amended 2026-10-07 after the label-only inventory, BEFORE any recording was scored):
+    chb24: every present chb24_*.edf is scored (its summary lists only the 12 files with seizures; the
+    other files are seizure-free; same glob convention as preprocessing.py); Siena: seizure times from the
+    SzCORE benchmark's own converter, esl-epfl/epilepsy2bids load_annotations/siena.py (commit d3fb175),
+    copied verbatim below -- it corrects the published typos (PN00-3 end time, PN01/PN06/PN11 file names,
+    PN10-7.8.9 start time, PN12 layout). The first parser of this script missed 6 seizures and read PN00-3
+    as 3,660 s.
   * Reported as is: per set (chb24; Siena) and per subject, 4 seeds, pooled and subject-mean sensitivity,
     precision, F1, FP/day, onset/offset error, short seizures. No gate, no tuning, one run.
 GATES before any external result (STOP otherwise):
@@ -75,40 +82,114 @@ def chb_subject(data, subj):
         raise SystemExit(f"STOP: {subj}-summary.txt not found under {data}")
     sz = P.parse_summary(summ[0])                     # insertion order = summary order
     edfs = {p.name: p for p in find(data, f"{subj}_*.edf")}
-    files = [(edfs[f], sz[f]) for f in sz if f in edfs]
+    files = [(edfs[f], sz.get(f, [])) for f in sorted(edfs)]          # every present file (preprocessing glob)
+    missing = [f for f in sz if f not in edfs]
+    if missing:
+        raise SystemExit(f"STOP {subj}: summary lists files that are not present: {missing}")
     return files, dict(kind="chb", notch=60.0, summary=str(summ[0]), listed=len(sz), present=len(files))
 
 
-TIME_RE = re.compile(r"(\d{1,2})[.:](\d{2})[.:](\d{2})")
+# ---- verbatim from esl-epfl/epilepsy2bids, src/epilepsy2bids/load_annotations/siena.py, commit d3fb175
+# (functions _parseTimeStamp, _substractTimeStamps, _loadSeizures, _correctEdfFileNameTypos; only imports
+#  adapted). This is the SzCORE benchmark's own conversion of the Siena annotations.
+import os
+import time as _time
 
 
-def _secs(s):
-    m = TIME_RE.search(s)
-    return None if m is None else int(m.group(1)) * 3600 + int(m.group(2)) * 60 + int(m.group(3))
+def _parseTimeStamp(string: str) -> float:
+    timeStamp = re.findall(".*[ |:]([0-9]+.[0-9]+.[0-9]+).*", string)[0]
+    return _time.mktime(_time.strptime(timeStamp.replace(":", "."), "%H.%M.%S"))
+
+
+def _substractTimeStamps(time1: float, time2: float) -> float:
+    difference = time1 - time2
+    if difference < 0:
+        difference += 24 * 60 * 60  # Correct for day shift
+    return difference
+
+
+def _loadSeizures(edfFile: str) -> list:
+    subject = os.path.basename(os.path.dirname(edfFile))
+    correctedEdfFileName = _correctEdfFileNameTypos(edfFile)
+    seizures = []
+    summaryFile = Path(os.path.dirname(edfFile)) / f"Seizures-list-{subject}.txt"
+    with open(summaryFile, "r") as summary:
+        line = summary.readline()
+        while line:
+            if re.search(r"File name: {} *\n".format(correctedEdfFileName), line):
+                firstLine = summary.readline()
+                if correctedEdfFileName == "PN01.edf":
+                    registrationStart = _parseTimeStamp(firstLine)
+                    _ = summary.readline()
+                    _ = summary.readline()
+                    for _ in range(2):
+                        _ = summary.readline()
+                        start = _parseTimeStamp(summary.readline())
+                        end = _parseTimeStamp(summary.readline())
+                        _ = summary.readline()
+                        seizures.append((_substractTimeStamps(start, registrationStart),
+                                         (_substractTimeStamps(end, registrationStart))))
+                elif correctedEdfFileName == "PN00-3.edf":  # seizure last 1hour
+                    registrationStart = _parseTimeStamp(firstLine)
+                    _ = summary.readline()
+                    start = _parseTimeStamp(summary.readline())
+                    end = _parseTimeStamp(summary.readline())
+                    end = _parseTimeStamp("Seizure end time: 18.29.29\n")  # correct time
+                    seizures.append((_substractTimeStamps(start, registrationStart),
+                                     (_substractTimeStamps(end, registrationStart))))
+                elif correctedEdfFileName == "PN10-7.8.9.edf":  # seizure last 1hour
+                    if firstLine == "Registration start time:1 6.49.25\n":  # extra space
+                        firstLine = "Registration start time:16.49.25\n"
+                    registrationStart = _parseTimeStamp(firstLine)
+                    _ = summary.readline()
+                    start = _parseTimeStamp(summary.readline())
+                    end = _parseTimeStamp(summary.readline())
+                    seizures.append((_substractTimeStamps(start, registrationStart),
+                                     (_substractTimeStamps(end, registrationStart))))
+                elif "Seizure start time: " in firstLine:  # PN12 exception
+                    start = _parseTimeStamp(firstLine)
+                    end = _parseTimeStamp(summary.readline())
+                    seizures.append((_substractTimeStamps(start, registrationStart),
+                                     (_substractTimeStamps(end, registrationStart))))
+                elif "Registration start time:" in firstLine:  # Standard format
+                    registrationStart = _parseTimeStamp(firstLine)
+                    _ = summary.readline()
+                    start = _parseTimeStamp(summary.readline())
+                    end = _parseTimeStamp(summary.readline())
+                    seizures.append((_substractTimeStamps(start, registrationStart),
+                                     (_substractTimeStamps(end, registrationStart))))
+                else:
+                    raise ValueError("Unknown format for Siena summary file.")
+            line = summary.readline()
+    return seizures
+
+
+def _correctEdfFileNameTypos(filename: str) -> str:
+    correctedEdfFileName = os.path.basename(filename)
+    if correctedEdfFileName == "PN01-1.edf":
+        correctedEdfFileName = "PN01.edf"
+    elif correctedEdfFileName == "PN06-1.edf":
+        correctedEdfFileName = "PNO6-1.edf"  # big o instead of 0
+    elif correctedEdfFileName == "PN06-2.edf":
+        correctedEdfFileName = "PNO6-2.edf"  # big o instead of 0
+    elif correctedEdfFileName == "PN06-4.edf":
+        correctedEdfFileName = "PNO6-4.edf"  # big o instead of 0
+    elif correctedEdfFileName == "PN11-1.edf":
+        correctedEdfFileName = "PN11-.edf"
+    return correctedEdfFileName
+# ---- end of the verbatim copy
 
 
 def siena_subject(data, subj):
     lists = find(data, f"Seizures-list-{subj}.txt")
     if not lists:
         raise SystemExit(f"STOP: Seizures-list-{subj}.txt not found under {data}")
-    sz, fname, reg0, on = {}, None, None, None
-    for line in lists[0].read_text(errors="ignore").splitlines():
-        low = line.strip().lower()
-        if low.startswith("file name"):
-            fname = line.split(":", 1)[1].strip(); sz.setdefault(fname, []); reg0 = on = None
-        elif "registration start" in low:
-            reg0 = _secs(line)
-        elif "start time" in low and "registration" not in low:
-            on = _secs(line)
-        elif "end time" in low and "registration" not in low and on is not None and reg0 is not None:
-            off = _secs(line)
-            a, b = (on - reg0) % 86400, (off - reg0) % 86400
-            if b > a:
-                sz[fname].append((a, b))
-            on = None
-    edfs = {p.name: p for p in find(data, f"{subj}-*.edf")} | {p.name: p for p in find(data, f"{subj}.edf")}
-    files = [(edfs[f], sz.get(f, [])) for f in sorted(edfs)]
-    return files, dict(kind="siena", notch=50.0, summary=str(lists[0]), listed=len(sz), present=len(files))
+    edfs = sorted(p for p in lists[0].parent.glob(f"{subj}*.edf"))
+    files = []
+    for p in edfs:
+        sz = _loadSeizures(str(p))
+        files.append((p, [(int(math.floor(a)), int(math.ceil(b))) for a, b in sz]))
+    return files, dict(kind="siena", notch=50.0, summary=str(lists[0]), listed=len(edfs), present=len(files))
 
 
 def subject_files(data, subj):
@@ -218,6 +299,9 @@ def build_subject(data_root, subj, stats_mode="labelfree", stats_json=None, max_
         res = pool.map(file_features, jobs)
     kept = [r for r in res if not r["skipped"]]
     skipped = [r["file"] for r in res if r["skipped"]]
+    if not kept:
+        print(f"{subj}: every file lacks a needed electrode -> subject not scored ({skipped})", flush=True)
+        return None, dict(meta, skipped=skipped, hours=0.0)
     for k, r in enumerate(kept):
         r["file_idx"] = k
     out = {k: np.concatenate([r[k] for r in kept]) for k in ("adj", "bp5", "f7", "is_ictal", "is_signal_loss")}
@@ -282,6 +366,9 @@ def cmd_inventory(a):
         n_sz = sum(len(v) for _, v in files)
         total += n_sz if meta["kind"] == "siena" else 0
         durs = [b - a_ for _, v in files for a_, b in v]
+        for p_, v in files:
+            if v:
+                print(f"    {p_.name}: {v}")
         print(f"{s:6s} {meta['kind']:5s} files present {meta['present']:3d} (listed {meta['listed']:3d}) seizures {n_sz:3d} "
               f"durations s {sorted(durs)[:12]}")
     print(f"Siena seizures parsed in present files: {total} (published total, to verify: {EXPECTED['siena_total']}); chb24 (to verify: {EXPECTED['chb24']})")
@@ -344,6 +431,9 @@ def cmd_run(a):
             z = dict(np.load(fz, allow_pickle=True)); meta = json.loads(str(z.pop("meta")))
         else:
             z, meta = build_subject(a.data, s, "labelfree", procs=a.procs)
+            if z is None:
+                pd.DataFrame([dict(subject=s, not_scored="no file with all electrodes")]).to_csv(OUT / f"notscored_{s}.csv", index=False)
+                continue
             np.savez(fz, **z, meta=json.dumps({k: v for k, v in meta.items()}))
         idx, D = model_outputs(z)
         rows, er = [], []
@@ -357,10 +447,12 @@ def cmd_run(a):
 def cmd_report(a):
     import e22_test_oneshot as E22
     R = pd.concat([pd.read_csv(p) for p in sorted(OUT.glob("rows_*.csv"))], ignore_index=True)
+    ns = sorted(p.stem.replace("notscored_", "") for p in OUT.glob("notscored_*.csv"))
     Er = pd.concat([pd.read_csv(p) for p in sorted(OUT.glob("errors_*.csv")) if p.stat().st_size > 2], ignore_index=True) \
         if any(p.stat().st_size > 2 for p in OUT.glob("errors_*.csv")) else pd.DataFrame()
     L = ["# X1 -- external validation of the P3 frozen system (no tuning, one run)\n",
-         "Gates R-feat and R-model passed before any external recording was scored.\n"]
+         "Gates R-feat and R-model passed before any external recording was scored.\n",
+         f"Subjects not scored (no file with all 19 electrodes): {ns or 'none'}\n"]
     for set_name in ("chb24", "siena", "chb03-labelfree"):
         Q = R[R.set == set_name]
         if not len(Q):

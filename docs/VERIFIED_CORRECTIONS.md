@@ -225,3 +225,19 @@ Settled by code reading and runs during the performance phase; full log in `PERF
   removing flagged windows (oracle) does.
 - **Benchmark rows are read from `esl-epfl/szcore/results/*/chbmit.json`.** A Perplexity row
   "ESL_RF 34.1 % / 1.08 FP/day" is not in that repository and is not cited.
+
+## Stage P2 findings (2026-10-07; details in PERF_PHASE_RECORD rev. P–Q)
+
+| correct | what it replaces |
+|---|---|
+| E14 was **not adopted**: its pre-registered mechanism check failed; the "ADOPTED" line was a coding error (`results/e14_spatial_recruitment/ERRATUM.md`) | "S9 adopted at E14" |
+| two validation quantities: `val` (cell re-selected on the 3 validation subjects; every gate G4) and `val_at_cell` (descriptive) — same Eb: 0.800 vs 0.933 | comparing the two as one number |
+| the D1 threshold is the quantile over every non-NaN smoothed value (`event_grid`), not over non-signal-loss positions only | the first `p2_scalars` rebuild (stopped E19 by 1 FP) |
+| file-level drift is a shift of the latent readout per file (top files carry no more flagged windows and rarely seizures); location-only correction helps, scale correction and short baselines hurt | "drift = more high-amplitude activity" |
+| E15 patient fine-tuning is negative in **one** configuration (lr 1e-4, 2,000 steps, all parameters) | "fine-tuning does not work" |
+| E19's +0.011 is about one seizure; it caught no extra short seizure | "the short branch works" |
+| on E17b, CPD halves the **onset** error; on offset the contiguous-run control (12 s) and multivariate CPD (8 s) beat 1-D CPD (16 s) | "CPD improves both boundaries" |
+| non-test: 93 annotated seizures, scorer 94 (chb11 split +2, a chb12 merge −1); the E18 table's 95 pieces lacked the merge | "one-piece mismatch unexplained" |
+| "short" (< 20 s) is 23 test seizures by annotation, 18 by whole-window runs (`short_refs`) | mixing the two counts |
+| a seizure is caught by one supra-threshold window, so ictal minutes above the top-p budget do not cap sensitivity by themselves (chb08 2.60, caught 5/5 by E) | "chb15 fails because its ictal time exceeds the budget" |
+| cache-only steps took 44–317 s on 4 seeds | estimates of 10–70 min (3–10× too high) |

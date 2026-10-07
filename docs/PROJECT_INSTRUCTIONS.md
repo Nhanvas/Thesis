@@ -1,6 +1,9 @@
 # PROJECT INSTRUCTIONS — Claude agent spec
 ### Thesis: Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and Change Point Detection
 
+> **Rev. 2026-10-07 evening (P3 opened).** Record rev. Q §9: checks of the two closing P2 results, the
+> two-tier test-information policy, hypotheses H6–H8, the failure-anatomy step P3-A and the decision table.
+>
 > **Rev. 2026-10-07 (P3).** Stage P2 closed; look #6 on test done (0.342 @ 22.2 FP/day, seed 42); not
 > approved by the author; stage P3 opens with target pooled test sensitivity ≥ 0.50. Start from
 > `docs/HANDOFF_P3.md`. Earlier header below kept for history.
@@ -27,7 +30,7 @@ For web-demo questions the demo stack wins inside its scope (§11).
 ## 1 · FIRST ACTIONS IN EVERY SESSION
 ═══════════════════════════════════════════════════════════════════════════════
 1. Read `docs/HANDOFF_P3.md`, then `docs/PERF_PHASE_RECORD.md` in full — the current state, the
-   test-look log (§3), the P2 log (§6) and the ledger `results/p2_ledger.csv`.
+   test-look log (§3), the P2 log (§6), the P3 log and decision table (§9) and the ledger `results/p2_ledger.csv`.
 2. If the session touches V1, its checkpoints or an offline number:
    `python src/verify_provenance.py | grep -a -i verdict` (~20 s, must print `VERDICT: PASS`).
    If it touches v2: check the sha256 in `docs/PROVENANCE_V2.md`.
@@ -187,7 +190,8 @@ revise the full report → checks (Grammarly, rubric, paper-review protocol) →
 
 **Performance phase — current (2026-10-07).** P1 (E1–E10) and P2 (E11–E22) closed. Look #6 done and not
 approved. **P3 target: pooled test sensitivity ≥ 0.50 at the best achievable FP/day (sensitivity first).**
-Starting hypotheses H1–H5 and the test-information rule are in `HANDOFF_P3.md` §3. The paragraph below is
+Hypotheses H1–H8, the two-tier test-information policy and the P3 decision table are in record §9
+(they extend `HANDOFF_P3.md` §3). The paragraph below is
 the P2 plan as written on 2026-10-06 (history).
 
 **Performance phase (2026-10-06, history).** P1 (E1–E10) closed — log, diagnosis and test looks in `PERF_PHASE_RECORD.md`.
@@ -254,6 +258,8 @@ pipeline, the demo is rebuilt via Project 2 and the application run repeated und
     test expectation.
 20. **Test-informed design is disclosed.** Any design that uses look-#6 per-subject results or test
     annotations is listed in record §3; the next look is then reported as test-informed.
+    In P3, label-free reads of test EEG (tier T-A) and annotation-guided anatomy (tier T-B) are logged
+    separately (record §9.2); look #6 stays the clean held-out result in the report.
 21. **Seed SD is not uncertainty.** Report patient-level bootstrap intervals beside seed spread.
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -292,7 +298,8 @@ If the GAE changes to v2, the attribution study stays a V1 result and is reporte
 ═══════════════════════════════════════════════════════════════════════════════
 ## 9 · FILES AND SOURCES OF TRUTH
 ═══════════════════════════════════════════════════════════════════════════════
-**Performance phase:** `docs/PERF_PHASE_RECORD.md` · `docs/PROVENANCE_V2.md` · the E8/E9/E10 summaries
+**Performance phase:** `docs/PERF_PHASE_RECORD.md` · `docs/HANDOFF_P3.md` (P2 code map §5) ·
+`results/p2_ledger.csv` (every P2/P3 arm) · `docs/PROVENANCE_V2.md` · the E8/E9/E10 summaries
 and the v2 code listed in its §8. `HANDOVER_PERF_2026-10-06.md` and the chat audits are archived.
 **Canonical docs (`docs/`):** `RESULTS_OF_RECORD_phaseB.md` · `PROVENANCE.md` · `REPO_MAP.md` ·
 `PROJECT_STATUS.md` · `VERIFIED_CORRECTIONS.md` · `VERIFIED_NUMBERS.md` · `ATTRIBUTION_SPEC.md` ·
@@ -312,7 +319,7 @@ version wins); `EXHIBIT_SET_FINAL.md` rev 5 and `CAPTIONS.md` rev 11 until the p
 `results/attribution_v7/` (final attribution) · `results/attribution_v7/labels/source/` (never edit).
 **Tags:** `pre-cleanup` · `phase-c-final` · `repo-deps-fixed` · `exhibit-fixes-done` · `report-v1` ·
 `docs-reorg-done` · `attribution-v4-locked` · `attribution-v7-results` · `report-v2-pagecut` ·
-`demo-spec-v5` · `e9-test-oneshot` · `perf-p1-closed`.
+`demo-spec-v5` · `e9-test-oneshot` · `perf-p1-closed` · `p2-frozen` · `perf-p2-closed`.
 
 ═══════════════════════════════════════════════════════════════════════════════
 ## 10 · SETTLED — DO NOT RE-PROPOSE
@@ -378,3 +385,6 @@ through Boti. `PROJECT2_SETUP.md` describes Project 2.
 | file-level drift of the latent readout owns most false alarms; a location-only ±15 min median correction helps | "high-amplitude artifacts own the tail" (alone) |
 | the non-test → test drop is about 2× (0.662 → 0.336, look #6) | "non-test numbers are test expectations" |
 | CPD halves onset error vs the detector; on offset a contiguous-run rule or multivariate CPD is better | "CPD improves both boundaries" |
+| non-test has 93 annotated seizures, the scorer counts 94 (chb11 split +2, a chb12 merge −1) | "95 pieces vs 94, one unexplained" |
+| "short" is 23 test seizures by annotation, 18 by whole-window runs | mixing the two counts |
+| one supra-threshold window catches a seizure; ictal minutes above the top-p budget do not cap sensitivity (chb08 2.60, 5/5 by E) | "chb15 fails because its ictal time exceeds the budget" |

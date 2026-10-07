@@ -23,3 +23,4 @@ date,step,arm,best_le25,cell,le15,le10,val,no_chb12,subj_sens,subj_fa,seeds,gate
 2026-10-07,E17b,latent family (E16e),0.6676,"(5, 0.005, 19.98)",0.6223,0.5479,0.9833,0.8529,0.8283,19.52,0.681|0.660|0.660|0.670,NI_pooled=P NI_subj=P NI_val=P,,non-inferior
 2026-10-07,E18,family_Ce_fine_raw_m15,0.6622,"(5, 0.005, 19.55)",,,,,,,,detection_guard=P localization=P,,ADOPTED
 2026-10-07,E18,family_Ce_fine_raw_m15_ovl,0.6622,"(5, 0.005, 19.57)",,,,,,,,detection_guard=P localization=P,,ADOPTED
+2026-10-07,E20a,family_Ce_fine_raw_m15_multi,0.6569,"(5, 0.005, 19.61)",,,,,,,,detection_guard=P localization=P,,ADOPTED

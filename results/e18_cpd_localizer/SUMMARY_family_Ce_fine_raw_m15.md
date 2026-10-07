@@ -15,18 +15,24 @@ cpd       sens 0.662  FA/day 19.55
 all (n = 243)
   onset   detector median  16.0 s  IQR [12.0, 28.0]  bias +16.0 s | cpd median   8.0 s  IQR [4.0, 12.0]  bias  +4.0 s
           no-CPD control (unsmoothed > threshold) median   8.0 s  IQR [4.0, 18.0]  bias  +4.0 s
+          no-CPD control 2 (contiguous run, no merge) median  12.0 s  IQR [4.0, 24.0]  bias +12.0 s
   offset  detector median  20.0 s  IQR [8.0, 56.0]  bias  -4.0 s | cpd median  16.0 s  IQR [4.0, 44.0]  bias  +4.0 s
           no-CPD control (unsmoothed > threshold) median  40.0 s  IQR [16.0, 90.0]  bias +32.0 s
+          no-CPD control 2 (contiguous run, no merge) median  12.0 s  IQR [4.0, 40.0]  bias  +0.0 s
 events <= 30 s (n = 84)
   onset   detector median  20.0 s  IQR [12.0, 32.0]  bias +20.0 s | cpd median  10.0 s  IQR [4.0, 17.0]  bias  +4.0 s
           no-CPD control (unsmoothed > threshold) median  12.0 s  IQR [4.0, 24.0]  bias  +4.0 s
+          no-CPD control 2 (contiguous run, no merge) median  16.0 s  IQR [8.0, 24.0]  bias +12.0 s
   offset  detector median  12.0 s  IQR [8.0, 48.0]  bias  -8.0 s | cpd median  12.0 s  IQR [4.0, 41.0]  bias  +0.0 s
           no-CPD control (unsmoothed > threshold) median  32.0 s  IQR [8.0, 57.0]  bias +10.0 s
+          no-CPD control 2 (contiguous run, no merge) median  12.0 s  IQR [4.0, 40.0]  bias  -4.0 s
 events > 30 s (n = 159)
   onset   detector median  16.0 s  IQR [12.0, 20.0]  bias +16.0 s | cpd median   8.0 s  IQR [4.0, 12.0]  bias  +4.0 s
           no-CPD control (unsmoothed > threshold) median   8.0 s  IQR [4.0, 16.0]  bias  +8.0 s
+          no-CPD control 2 (contiguous run, no merge) median   8.0 s  IQR [4.0, 18.0]  bias  +8.0 s
   offset  detector median  24.0 s  IQR [8.0, 64.0]  bias  +0.0 s | cpd median  20.0 s  IQR [4.0, 46.0]  bias  +4.0 s
           no-CPD control (unsmoothed > threshold) median  52.0 s  IQR [24.0, 104.0]  bias +44.0 s
+          no-CPD control 2 (contiguous run, no merge) median   8.0 s  IQR [4.0, 36.0]  bias  +0.0 s
 ```
 
 - detection guard -> pass
@@ -37,4 +43,17 @@ events > 30 s (n = 159)
 ## Seizure-seed pairs caught by the detector but lost after CPD: 0 (0.0 per seed)
 
 
-Elapsed 141 s.
+## Split-reference diagnostic (references > 300 s cut into 300-s pieces)
+
+```
+pieces per seed 95.0 vs scorer n_ref per seed 94.0 (equal if the split rule is right)
+pieces covered by the detector but not after CPD: 5 (1.2 per seed), of which in seizures > 300 s: 4
+subject         seed  ref_on  ref_dur  piece_on  piece_dur  long  det_cover  cpd_cover
+  chb12  clean_seed3    3412       36      3412         36 False       True      False
+  chb11 clean_seed42    1452      756      2052        156  True       True      False
+  chb11  clean_seed1    1452      756      2052        156  True       True      False
+  chb11  clean_seed2    1452      756      2052        156  True       True      False
+  chb11  clean_seed3    1452      756      2052        156  True       True      False
+```
+
+Elapsed 63 s.

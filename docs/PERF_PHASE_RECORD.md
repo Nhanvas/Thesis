@@ -1,10 +1,10 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. D, 2026-10-07** (rev. C/B same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. E, 2026-10-07** (rev. B–D same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
-Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules of 2026-10-07 (§6.2) and
-the pre-registered designs E16–E20 (§6.3), pending author approval.
+Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
+clarifications (order E19 before E18, short events in E18, branch ledger §6.4, single-readout framing, runtimes).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -183,7 +183,10 @@ test expectation.
    (rule 19). This is not a reason to stop.
 7. Report, demo, attribution and the LiNDDA comparator wait until the system is frozen.
 
-### 6.3 Pre-registered designs (author approval pending; reference = candidate C)
+### 6.3 Pre-registered designs (approved 2026-10-07; reference = candidate C)
+
+**Order:** E16 → E17 → **E19 → E18** → (E20). E19 runs before E18 so that the localizer is designed on
+the final event set, short events included.
 
 **E16 — per-recording baseline at the readout level.** Per file, per channel, LedoitWolf of the node
 latent fitted on the first min(150, n_file/2) non-signal-loss windows of that file (10 min; files with
@@ -215,8 +218,12 @@ points (onset, offset), min segment 2 windows; no penalty to tune. **E18 cannot 
 lower FA/day** (it only moves boundaries; SzCORE tolerates 30 s / 60 s); its detection gate (pooled
 sensitivity ≥ D1 − 0.02, FA/day ≤ D1 + 1) only guards against damage. Its value is the new metric —
 onset and offset error (s) on true positives, reported with n — and a measured role for CPD
-(Objective 2). Adopted if the median onset and offset errors are each not worse than the raw D1
-boundaries by more than 4 s and at least one improves. *If not met:* error by seizure duration and
+(Objective 2). Short events: the CPD segment is always the event ± 15 windows, so it holds at least 31 windows even
+for a 1-window event; when the two change points enclose < 2 windows or the inner segment is not above
+both outer segments (no bump), the detector's own boundaries are kept (fallback). The fallback rate is
+reported overall and for short-branch events separately; onset/offset errors are reported separately
+for events ≤ 30 s and longer ones. Adopted if the median onset and offset errors are each not worse
+than the raw detector boundaries by more than 4 s and at least one improves. *If not met:* error by seizure duration and
 bias sign; then (E18b) CPD on the D1-smoothed score, (E18c) margin ± 30 windows.
 Note: the final structure is D1 detection + CPD localisation, not PELT + FP-budget; Chapter 2 Table 5
 must be rewritten (Decision #4, §7). chb06 stays inverted under every model (limitation).
@@ -232,6 +239,40 @@ descriptively (non-test and test). *If no p_s fits the budget:* describe the sho
 
 **E20 — extension: multivariate kernel CPD on the trajectory of the percentile readouts.** Non-test
 only, own pre-registered gate, no separate test look. Designed after E18.
+
+### 6.4 Branch ledger, single-readout framing, runtimes
+
+**Ledger.** Every arm, adopted or not, is one row of `results/p2_ledger.csv` (written by the scripts from
+E16 on). Gates are identical for every arm of a step. The number of arms tried is reported with the
+chosen result as a measure of its optimism. Arms evaluated on the 15 non-test subjects before E16
+(selection arms with a gate; characterisation readouts counted separately):
+
+| step | gated arms | verdict | characterisation only |
+|---|---|---|---|
+| E11 | 0 (descriptive) | rule R3 | — |
+| E12 | 1 (L) | not adopted | RL, LG, L2 |
+| E13 | 0 (proxy rule) | rule B | — |
+| E14 | 1 (S9) | gates passed, mechanism check failed → not adopted as written | S1, S3, S6, S12, mean |
+| E15 | 1 (S9 adapted, 2,000 steps) | not selected | 500 and 1,000 steps |
+
+Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16.
+
+**If E17 leaves C alone** (every cross-readout ensemble inferior, E17b included): the final score is
+C, described as an ensemble over channels — the 9th order statistic of 18 per-channel anomaly scores of
+the GAE latent. The report states plainly that ensembles across readouts (recon, gamma, graph-level
+latent) were tested and were inferior, with their numbers.
+
+**Runtimes for 4 seeds** (estimated, not measured; based on the measured E12, E14 and E15 evaluation
+times of ~8–16 s per score through the D1 grid, plus the LedoitWolf fits):
+
+| step | content | estimate |
+|---|---|---|
+| seed 2/3 dump | done | — |
+| E16 arm a | 4 seeds × (S9 base + arm a), ~1,700 per-file × 18-channel fits | 10–30 min |
+| E16 arms b, c, d | only if a fails; 4 seeds × 3 arms; d refits every 15 min | 30–90 min |
+| E17 | 3 combinations (+ E17b if needed) × 4 seeds | 10–30 min (+10–20) |
+| E19 | short branch, 3 p_s values × 4 seeds | 10–25 min |
+| E18 | CPD on the events only, 4 seeds | 5–15 min |
 
 ## 7 · Decisions open for the supervisor (08/10)
 

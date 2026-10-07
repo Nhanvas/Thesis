@@ -1,6 +1,6 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. M, 2026-10-07** (rev. B–L same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
+**Rev. O, 2026-10-07** (rev. B–N same day, rev. A 2026-10-06). Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
 Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
@@ -11,7 +11,9 @@ E21 design (finer grid, gates unchanged); E18 no-CPD control; freeze plan and te
 Rev. J: validation definitions; E19 reading; E19b rule (author, 2026-10-07). Rev. K: E21, E19b,
 E21b design, freeze sequence and bootstrap script. Rev. L: E21b, E18, bootstrap results; open items before the freeze. Rev. M: the three open items
 approved by the author and scripted (E17b, E18d, matched-budget bootstrap after CPD); literature lead on
-onset/offset latency (unverified).
+onset/offset latency (unverified). Rev. N: E17b adopted (final scalar), E18/E18d on it,
+matched-budget bootstrap; freeze candidate written down (§6.6), test look not yet run. Rev. O: reviewer
+points (E17b choice, CPD wording, decision count, headline seed), E20a and diagnostics, test-look scripts.
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -176,6 +178,9 @@ high gamma" or "eye artifacts sit on frontal-polar channels" are unmeasured hypo
 | **E21b** C (E16e) + L + gamma_dt, fine grid | 0.609 @ 16.98 (cell 15/0.01), ≤ 15 0.559, ≤ 10 0.492, val 0.867, without chb12 0.812, subject-mean 0.768 @ 15.9. Tail share in gamma's top files: Eb 0.575 → E21b 0.387 (C alone 0.400); flagged share in the tail: Eb 0.945, E21b 0.900, **C 0.889** | inferior (pooled and subject-mean fail). Gamma's drift was removed (mechanism confirmed) but the ensemble is below C at every FA level. Final scalar = **C (E16e)**, D1 5/0.0075. First score whose top-2 % tail is below 0.95 flagged (base rate ≈ 0.46) |
 | **E18** kernel CPD localizer on C, fine grid (`results/e18_cpd_localizer/`) | detector 0.681 @ 24.25; after CPD 0.662 @ 23.70 (guard −0.02 passed by 0.001). Matched pairs n = 249 (≈ 62 seizures × 4 seeds). Onset |error| median: detector 16 s, **CPD 8 s**, no-CPD control 12 s; offset: detector 24 s, **CPD 12 s**, control 40 s. Events ≤ 30 s (n = 69): onset 20 → 12 s, offset 12 → 8 s. Bias: onset +8 s (late), offset −4 s. CPD used on 96 % of matched events; fallback 14 % of all events | **ADOPTED as the onset/offset localizer** — halves both errors; beats the no-CPD control (so the gain is the change point detection itself, not only the unsmoothed score). Caveat: −0.019 sensitivity (≈ 1.8 seizures of 94) from boundaries moved off the detected seizure; mechanism not yet measured |
 | **Bootstrap** final (C, 5/0.0075) − E (V2_LW, 15/0.02), subjects resampled, B = 10,000 (`results/p2_bootstrap/`) | E 4-seed 0.489 @ 20.06 (2-seed reproduction 0.489 @ 19.78 exact). Pooled sensitivity +0.191 [+0.095, +0.285]; subject-mean +0.171 [+0.063, +0.297]; FA/day +4.19 [−1.08, +8.18]. Without chb12: +0.184 [+0.065, +0.305]; FA +3.87 [−1.71, +7.98] | gain not carried by one subject. Confound: the final system spends ~4 more FA/day than E's coarse-grid cell; a matched-budget reference (E re-selected on the fine grid at ≤ 25) is still owed. Descriptive only: every choice was made on these 15 subjects |
+| **E17b** latent-family rank ensemble {S6e, S9e, S12e, Smean_e} (E16e-corrected), fine grid | S9e reproduces C exactly. **E17b 0.668 @ 19.98 (cell 5/0.005), ≤ 15 0.622, ≤ 10 0.548, val 0.983 (at cell 0.967), without chb12 0.853, subject-mean 0.828 @ 19.5, seeds 0.681/0.660/0.660/0.670, short 2.0/3**; C 0.681 @ 24.25 (subject-mean 0.821 @ 24.1, val 0.900, short 1.5/3). Tail flagged share C 0.889 → E17b 0.834. Members alone (characterisation, not selectable): S6e 0.665, S12e 0.686, Smean_e 0.686 | **non-inferior → final scalar = E17b** (pre-registered rule; a deliberate choice: the author kept the non-inferiority rule although it trades up to 0.02 pooled sensitivity for the ensemble shape, and did not change it after seeing the result). C and S12e/Smean_e are reported beside E17b in the report. −0.013 pooled at ≤ 25 (≈ 1.2 seizures) but at 4.3 fewer FA/day, higher ≤ 15, subject-mean, validation and short seizures. S12e/Smean_e above C are post-hoc and are not used |
+| **E18 / E18d** on E17b (cell 5/0.005) | detector 0.668 @ 19.98 → CPD 0.662 @ 19.55 (both arms). Onset |error| 16 → 8 s (no-CPD control 8 s), offset 20 → 16 s (control 40 s), n = 243; bias onset +4 s, offset +4 s; events ≤ 30 s (n = 84): onset 20 → 10 s, offset 12 → 12 s. Lost-seizure table (E1 overlap rule): 0 | E18 adopted (localization rule passes); E18d ties → E18 (rule). **Wording (reviewer):** on E17b the onset gain equals the no-CPD control (8 s = 8 s) and the offset gain over the detector is 4 s (one window); on C the onset gain over the control was one window (8 vs 12 s). The report states only that CPD reduces the error relative to the detector's boundaries; the share due to CPD itself versus less smoothing is not separated. Control 1 has a +32 s offset bias because it takes the last supra-threshold window in the ±60 s segment (no 90 s merge); a stronger control 2 (contiguous run containing the event peak) is added. The −0.006 cannot come from seizures losing overlap (0 lost); hypothesis, not measured: SzCORE splits references > 300 s (e.g. chb11: 5 scored references) and CPD returns one compact segment that covers fewer of the split pieces. The lost-seizure table must use the scorer's split references to test it |
+| **Bootstrap** final (E17b, 5/0.005, after CPD) − E, B = 10,000 | final 0.662 @ 19.55 vs E 0.489 @ 20.06 — **matched FA budget** (E_fine re-selected on the fine grid = the same cell 15/0.02). Pooled +0.173 [+0.075, +0.287]; subject-mean +0.171 [+0.055, +0.303]; FA −0.51 [−6.80, +4.54]. Without chb12: pooled +0.184 [+0.050, +0.315], FA −0.99 [−7.62, +4.17] | the gain is not explained by a larger FA budget nor by chb12. Descriptive and optimistic: about 30 gated decisions were made on these 15 subjects |
 
 Caution (rule 19 and multiple looks): the 15 non-test subjects have now been used for E1–E21; seizure
 peaks are out-ranked by ~4–5 % of non-ictal spans there vs 20–50 % on test. A pass on this set is not a
@@ -282,9 +287,12 @@ chosen result as a measure of its optimism. Arms evaluated on the 15 non-test su
 | E19b | 1 (union vs re-selected main) | not adopted | 3 p_s × fine cells |
 | E21b | 1 (C + L + gamma_dt, non-inferiority) | inferior | — |
 | E18 | 1 (CPD localizer on C) | adopted | no-CPD control |
+| E17b | 1 (latent family, non-inferiority) | adopted (final scalar) | 3 members alone |
+| E18 / E18d on E17b | 2 | E18 (tie) | no-CPD control |
 
-Together with P1 (E1–E10) the non-test set has carried about 15 gated decisions before E16 and about
-24 after E17. From E16 on, `results/p2_ledger.csv` is the complete list.
+Together with P1 (E1–E10) the non-test set has carried about 39 gated decisions by E17b/E18 (P1 ≈ 12,
+P2 ≈ 27; reviewer's count from this table, 2026-10-07). From E16 on, `results/p2_ledger.csv` is the
+complete list. The report states this count beside the selected result.
 
 **If E17 leaves C alone** (every cross-readout ensemble inferior, E17b included): the final score is
 C, described as an ensemble over channels — the 9th order statistic of 18 per-channel anomaly scores of
@@ -395,6 +403,37 @@ no-CPD control (unsmoothed score above the detector threshold) beside CPD and th
 3. The look reports: 4 seeds; pooled and subject-mean sensitivity, precision, F1 and FP/day from the
    scorer's counts; onset/offset error with n (detector, CPD, no-CPD control); short seizures caught;
    E (frozen P1 system) on the same look as reference. Logged as look #6 in §3.
+
+### 6.6 Freeze candidate (written 2026-10-07, before any test look; author decision pending)
+
+1. GAE v2 clean, seeds 42, 1, 2, 3 (`data/models_v2/`, identity in `PROVENANCE_V2.md`). **Headline
+   model = seed 42** (as E9; the one the demo runs), reported with the 4-seed mean ± SD.
+2. Readout per seed: per patient and channel, LedoitWolf Mahalanobis of the 16-d node latent fitted on
+   all non-signal-loss windows of the patient (label-free); per-channel robust-z; order statistics
+   k = 6, 9, 12 of 18 and the channel mean; each minus its centred ±15 min running median inside each
+   file (non-causal: post-hoc review triage, not a real-time alarm); each → patient percentile; equal
+   mean = the ensemble anomaly score (one scalar).
+3. Detection: D1, per-file centred moving average of 5 windows (20 s), threshold = the patient's own
+   top 0.5 % of time, contiguous supra-threshold runs, merge 90 s.
+4. Localization: kernel CPD (ruptures KernelCPD, rbf, min_size 2, exactly 2 change points) on the
+   unsmoothed score over each event ± 15 windows; accepted when the inner segment spans ≥ 2 windows and
+   is above both outer segments, else the detector's boundaries.
+5. Non-test reference (4 seeds): 0.662 @ 19.55 FA/day after CPD; subject-mean 0.828 @ 19.5 (detector);
+   onset/offset |error| 8 s / 16 s. Expected on test (pre-registered): FA/day ≈ 1.2 × 19.6 ≈ 23.5;
+   sensitivity a moderate improvement over E9 at most (§6.2 item 6).
+6. Before the freeze (approved by author and reviewer 2026-10-07; no other new arm): E20a — kernel CPD
+   on the 18-channel trajectory as localizer only (`e18_cpd_localizer.py --multi`), replaces E18 only
+   if post-localizer sensitivity ≥ E18's on E17b (0.662) and the median onset and offset errors are each
+   not worse, one better by ≥ 4 s; E20b (CPD as detector) is not run. Diagnostics in the same re-run:
+   control 2 and the split-reference table (`--no-ledger`).
+7. Test look: `src/p2_test_dump.py` (label-free per-node outputs of the 8 test subjects, 4 seeds;
+   reproduction gate against the E9 cache), then `src/e22_test_oneshot.py --localizer kernel1d|multi`
+   (R1 non-test reproduction of the exact code path, R2 E = E9 on test; refuses without the git tag
+   `p2-frozen` and `--confirm-look-6`; records file hashes). Sequence: E20a + diagnostics → choose the
+   localizer by the E20a rule → `--repro-only` → freeze, tag `p2-frozen` → test dump → look #6.
+8. Timing of look #6 relative to the supervisor meeting (08/10 08:00): author decision. Points that the
+   supervisor may comment on are §7 items 3 (label-free per-patient fitting under "unsupervised") and
+   4 (role of CPD).
 
 ## 7 · Decisions open for the supervisor (08/10)
 

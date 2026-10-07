@@ -18,3 +18,5 @@ date,step,arm,best_le25,cell,le15,le10,val,no_chb12,subj_sens,subj_fa,seeds,gate
 2026-10-07,E21-2,Eb(C=E16e),0.6356,"(15, 0.015, 22.29)",0.5452,0.4707,0.9333,0.8529,0.8146,21.85,0.628|0.638|0.638|0.638,NI_pooled=F NI_subj=P NI_val=P,,inferior; grid changed after seeing E16e and Eb_h
 2026-10-07,E21-2,Ec(C=E16e),0.6277,"(15, 0.015, 24.76)",0.5798,0.5266,0.8833,0.7978,0.7756,24.82,0.628|0.606|0.638|0.628,NI_pooled=F NI_subj=F NI_val=P,,inferior; grid changed after seeing E16e and Eb_h
 2026-10-07,E19b,C_Ce_fine_cap25_main5/0.0075_p0.001,0.6809,"(5, 0.0075, 24.25)",,,,,,,,strictly_higher=F total_le25=P added_le3=P,,NOT adopted
+2026-10-07,E21b,C+L+gamma_dt,0.609,"(15, 0.01, 16.98)",0.5585,0.492,0.8667,0.8125,0.7684,15.93,0.606|0.606|0.628|0.596,NI_pooled=F NI_subj=F NI_val=P,,inferior
+2026-10-07,E18,C_Ce_fine_raw_m15,0.6622,"(5, 0.0075, 23.7)",,,,,,,,detection_guard=P localization=P,,ADOPTED

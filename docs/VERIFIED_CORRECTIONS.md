@@ -256,3 +256,22 @@ Settled by code reading and runs during the performance phase; full log in `PERF
 | CHB-MIT z-score statistics (`stats.json`) exclude annotated seizure and buffer windows, test included; X1 and the demo use label-free statistics | "no label anywhere in the pipeline" |
 | both GAE readouts fail the anatomical-prior test of channel attribution (A4 reconstruction 0.5694 / −0.1694; A5 latent 0.5473 / −0.1914) | "the negative is specific to the reconstruction readout" |
 | processing time: 9.76 s/h (entry 6) was superseded by 10.83 s/h (earlier demo); the final system's time is measured on the rebuilt demo | quoting 9.76 or 10.83 s/h for the final system |
+
+## 15 · Reference verification (2026-10-08; details in `Thesis_Reference_Sheet.md` groups K–M, flags 6–10)
+
+- **Benchmark training data.** `datasets` in `esl-epfl/szcore` algorithm cards means training data. SeizureTransformer
+  (0.685 @ 0.99 on Siena) declares Siena as training data — not "trained on other corpora" (record 9.9 and the
+  08/10 briefing were wrong). Five more Siena entries are in-sample. DynaSD declares CHB-MIT (hyperparameters tuned
+  on a subset), so its CHB-MIT row is not out-of-sample; its Siena row is.
+- **DynaSD's paper** (Ojemann et al., medRxiv 2026, method NDD) reports no CHB-MIT, Siena or SzCORE number; its
+  threshold is tuned on labelled intracranial data. Benchmark numbers are cited to the repository.
+- **The "RF / Transformer / XGBoost CHB-MIT" rows** are Table 2 of the SzCORE arXiv preprint (v1–v3), not the
+  Epilepsia paper; the Transformer 76.5 % / 40.6 FP/day is TUH.
+- **Ingolfsson et al. 2024:** 22.9 → 1.0 FP/h is TUAR artifact data through the CHB-MIT-trained detector, not a
+  CHB-MIT false-alarm reduction.
+- **Ali et al. 2024** is supervised, leave-one-subject-out, Random Forest, ≥ 70 % coverage, events ≤ 10 s dropped,
+  4.79 false detections/h (LOO).
+- **Search-lead errors:** Karpov et al. is 2022; the ICASSP 2024 paper is Hassan et al.; the 2026 Frontiers paper
+  excluded three cases (chb06, chb12, chb16); the ScoreNet Neural Networks DOI is an unrelated paper; IRBM 2019
+  abstract gives 6.3 s / −1.17 s, not 3.9 s / 49.26 s; the CEP 2026 paper's title differs and it is supervised.
+- **Siena hours:** PhysioNet states about 128 h; our X1 summary sums to about 140 h (open item).

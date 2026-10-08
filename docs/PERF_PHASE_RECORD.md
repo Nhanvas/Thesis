@@ -768,7 +768,7 @@ FP/day above 70 in PN06, PN07, PN16.
 subject-mean).** DynaSD (the only unsupervised entry): sensitivity 0.664, precision 0.126, F1 0.170, 77.7
 FP/day. Ours (4-seed mean): 0.633, 0.160, 0.226, 41.0 FP/day — similar sensitivity at about half the false
 alarms. Supervised entries range from 0.29 to 1.00 sensitivity (e.g. Zhu 2023 0.674 / 15.3 FP/day; EventNet
-0.587 / 8.2; SeizureTransformer 0.685 / 1.0, trained on other corpora). Caveats: same annotations and the
+0.587 / 8.2; SeizureTransformer 0.685 / 1.0, which declares Siena among its training data and is therefore not an out-of-sample comparator; corrected 2026-10-08, VERIFIED_CORRECTIONS 15). Caveats: same annotations and the
 same scoring definitions, but our own scorer implementation and our own signal path (the benchmark feeds the
 BIDS-converted recordings to each algorithm); not run inside the benchmark.
 

@@ -144,20 +144,19 @@ evaluation, test-informed" (look #7), "external validation" (X1), "earlier syste
 titles; figures and tables numbered consecutively; "Section", not "§"; numeric citations [n]; no
 appendix; body ≤ 50 pages measured by building the document.
 
-## 7 · Literature leads (NOT verified; check the PDF before citing — account `norn`)
+## 7 · Literature (verified 2026-10-08)
 
-- Problem framing: Karpov et al. 2023 (artifacts and seizures are both rare high-amplitude peaks);
-  Tanaka et al., ICASSP 2024 (two-stage anomaly screening + artifact separation); Ingolfsson et al. 2024
-  (artifact detector trained on TUAR cut false alarms).
-- Unsupervised / adaptation: DynaSD (Ojemann et al., medRxiv preprint 2026; benchmark entry verified from
-  the SzCORE repository); NeuroAdapt-Bench 2026; Tress et al. 2021.
-- Protocol row (computed from the seed-42 per-patient table): a 2026 Frontiers in Neuroinformatics paper
-  excluded chb06 and chb16 as too short for 4-s windows; under that exclusion look #7 is 33/56 = 0.589 and
-  look #6 22/56 = 0.393 (FP/day not computed). Mirzaei & Singh (ISBI 2025) excluded chb06/12/13/14/16/24
-  with seizure-tuned thresholds. Such rows only beside the full result.
-- Onset/offset latency: Shoeb & Guttag ICML 2010; "ScoreNet" (conflicting venues/values in the leads);
-  IRBM 2019; UPCON 2019 — all supervised, 1–2 s resolution.
-- Sci Rep 2024 gives a chb06 mean seizure duration of 153.6 s, inconsistent with the summary files (≈ 15 s).
+The leads that stood here were checked against online full text, abstracts, Crossref and the cloned
+benchmark repository; the results are groups K, L and M of `docs/Thesis_Reference_Sheet.md` (flags 6–10).
+Corrections to the old leads: Karpov et al. is 2022 and does not say that artifacts and seizures are both
+rare high-amplitude peaks (M4); the ICASSP 2024 paper is Hassan et al., metadata only (M5); the Frontiers in
+Neuroinformatics 2026 paper (Yin & Yin, M3) excluded chb06, chb12 and chb16; under that exclusion our seed-42
+rows would also drop chb12, which is not a test patient, so the computed 33/56 and 22/56 stand; ScoreNet has
+one DOI, 10.1109/TNSRE.2021.3129467 (M6); the IRBM 2019 abstract gives 6.3 s onset / −1.17 s offset latency (M7);
+the DynaSD preprint (K4) has no CHB-MIT or Siena number — those come from the benchmark (K3).
+Benchmark training data (flag 6): SeizureTransformer and five other Siena entries trained on Siena;
+DynaSD was tuned on a CHB-MIT subset. Not identified, not cited: NeuroAdapt-Bench 2026, Tress et al. 2021,
+the persistent-homology paper, the Sci Rep 2024 chb06-duration paper.
 
 ## 8 · Code and results of the final system
 

@@ -73,3 +73,4 @@ results/p2_test/
 results/e6_gae_dump/
 results/e15_patient_adaptation/pernode_s23/
 results/*/smoke/
+results/veto_screen*/*.npy

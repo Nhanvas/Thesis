@@ -1,0 +1,384 @@
+====================================================================================================
+chb17/chb17a_03.edf
+====================================================================================================
+
+(1) EDF header channel list (28 channels), header order:
+  [ 0] FP1-F7               
+  [ 1] F7-T7                
+  [ 2] T7-P7                
+  [ 3] P7-O1                
+  [ 4] --0                  
+  [ 5] FP1-F3               
+  [ 6] F3-C3                
+  [ 7] C3-P3                
+  [ 8] P3-O1                
+  [ 9] --1                  
+  [10] FZ-CZ                
+  [11] CZ-PZ                
+  [12] --2                  
+  [13] FP2-F4               
+  [14] F4-C4                
+  [15] C4-P4                
+  [16] P4-O2                
+  [17] --3                  
+  [18] FP2-F8               
+  [19] F8-T8                
+  [20] T8-P8-0              
+  [21] P8-O2                
+  [22] --4                  
+  [23] P7-T7                
+  [24] T7-FT9               
+  [25] FT9-FT10             
+  [26] FT10-T8              
+  [27] T8-P8-1              
+  -> 0 label(s) appear more than once in the header (0 channels total under those labels)
+
+(2) Application cached raw.npy: F:\Study\Thesis\Code\web_demo\backend\uploads\chb17\chb17a_03.raw.npy
+    shape=(900, 18, 1024)  dtype=float32
+    thesis preprocessing.open_edf() channel order after pick+reorder: ['FP1-F7', 'F7-T7', 'T7-P7', 'P7-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1', 'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T8', 'T8-P8', 'P8-O2', 'FZ-CZ', 'CZ-PZ']
+    matches preprocessing.COMMON_CHANNELS exactly: True
+    comparing first 15360 samples (60.0 s)
+
+(3) Pearson correlation matrix, app raw channel (row) x thesis channel (col):
+app\thesis      FP1-F7     F7-T7     T7-P7     P7-O1    FP1-F3     F3-C3     C3-P3     P3-O1    FP2-F4     F4-C4     C4-P4     P4-O2    FP2-F8     F8-T8     T8-P8     P8-O2     FZ-CZ     CZ-PZ
+app[0]           1.000     0.015    -0.064    -0.047     0.838     0.321     0.267     0.015     0.818     0.469     0.026     0.220     0.483     0.522    -0.032     0.031     0.550     0.312
+app[1]           0.015     1.000    -0.458    -0.172     0.314     0.363     0.062     0.201     0.258     0.103     0.219    -0.027     0.497    -0.020    -0.088    -0.027     0.297     0.130
+app[2]          -0.064    -0.458     1.000     0.075     0.081     0.259     0.288     0.023     0.040     0.138    -0.080     0.136     0.044    -0.036     0.089     0.065     0.173     0.266
+app[3]          -0.047    -0.172     0.075     1.000    -0.035     0.204     0.490     0.336    -0.025     0.358    -0.098     0.441    -0.047     0.151    -0.031     0.321     0.263     0.444
+app[4]           0.838     0.314     0.081    -0.035     1.000     0.490     0.219     0.063     0.900     0.431     0.082     0.195     0.747     0.387    -0.029    -0.015     0.635     0.270
+app[5]           0.321     0.363     0.259     0.204     0.490     1.000     0.352    -0.006     0.406     0.542     0.224     0.185     0.480     0.152     0.033     0.156     0.787     0.662
+app[6]           0.267     0.062     0.288     0.490     0.219     0.352     1.000     0.204     0.232     0.532    -0.206     0.400     0.119     0.384    -0.148     0.234     0.472     0.789
+app[7]           0.015     0.201     0.023     0.336     0.063    -0.006     0.204     1.000     0.159     0.213     0.208     0.458     0.216     0.043     0.058     0.317     0.164     0.206
+app[8]           0.818     0.258     0.040    -0.025     0.900     0.406     0.232     0.159     1.000     0.430     0.019     0.140     0.735     0.430    -0.003    -0.036     0.602     0.247
+app[9]           0.469     0.103     0.138     0.358     0.431     0.542     0.532     0.213     0.430     1.000    -0.082     0.149     0.323     0.352     0.119     0.016     0.749     0.650
+app[10]          0.026     0.219    -0.080    -0.098     0.082     0.224    -0.206     0.208     0.019    -0.082     1.000     0.178     0.036     0.018     0.187     0.181     0.180     0.192
+app[11]          0.220    -0.027     0.136     0.441     0.195     0.185     0.400     0.458     0.140     0.149     0.178     1.000     0.054     0.192     0.014     0.657     0.244     0.402
+app[12]          0.483     0.497     0.044    -0.047     0.747     0.480     0.119     0.216     0.735     0.323     0.036     0.054     1.000     0.112    -0.140    -0.150     0.505     0.177
+app[13]          0.522    -0.020    -0.036     0.151     0.387     0.152     0.384     0.043     0.430     0.352     0.018     0.192     0.112     1.000    -0.644    -0.001     0.331     0.346
+app[14]         -0.032    -0.088     0.089    -0.031    -0.029     0.033    -0.148     0.058    -0.003     0.119     0.187     0.014    -0.140    -0.644     1.000    -0.064     0.059    -0.003
+app[15]          0.031    -0.027     0.065     0.321    -0.015     0.156     0.234     0.317    -0.036     0.016     0.181     0.657    -0.150    -0.001    -0.064     1.000     0.198     0.275
+app[16]          0.550     0.297     0.173     0.263     0.635     0.787     0.472     0.164     0.602     0.749     0.180     0.244     0.505     0.331     0.059     0.198     1.000     0.653
+app[17]          0.312     0.130     0.266     0.444     0.270     0.662     0.789     0.206     0.247     0.650     0.192     0.402     0.177     0.346    -0.003     0.275     0.653     1.000
+
+    Best-matching application channel per thesis channel (by |r|), COMMON_CHANNELS order:
+      FP1-F7       -> app[0]  r=+1.0000  (index-aligned)
+      F7-T7        -> app[1]  r=+1.0000  (index-aligned)
+      T7-P7        -> app[2]  r=+1.0000  (index-aligned)
+      P7-O1        -> app[3]  r=+1.0000  (index-aligned)
+      FP1-F3       -> app[4]  r=+1.0000  (index-aligned)
+      F3-C3        -> app[5]  r=+1.0000  (index-aligned)
+      C3-P3        -> app[6]  r=+1.0000  (index-aligned)
+      P3-O1        -> app[7]  r=+1.0000  (index-aligned)
+      FP2-F4       -> app[8]  r=+1.0000  (index-aligned)
+      F4-C4        -> app[9]  r=+1.0000  (index-aligned)
+      C4-P4        -> app[10]  r=+1.0000  (index-aligned)
+      P4-O2        -> app[11]  r=+1.0000  (index-aligned)
+      FP2-F8       -> app[12]  r=+1.0000  (index-aligned)
+      F8-T8        -> app[13]  r=+1.0000  (index-aligned)
+      T8-P8        -> app[14]  r=+1.0000  (index-aligned)
+      P8-O2        -> app[15]  r=+1.0000  (index-aligned)
+      FZ-CZ        -> app[16]  r=+1.0000  (index-aligned)
+      CZ-PZ        -> app[17]  r=+1.0000  (index-aligned)
+
+    Diagonal (app[j] vs thesis[j], same index both sides): min=1.0000 max=1.0000 mean=1.0000
+
+====================================================================================================
+chb17/chb17b_57.edf
+====================================================================================================
+
+(1) EDF header channel list (28 channels), header order:
+  [ 0] FP1-F7               
+  [ 1] F7-T7                
+  [ 2] T7-P7                
+  [ 3] P7-O1                
+  [ 4] --0                  
+  [ 5] FP1-F3               
+  [ 6] F3-C3                
+  [ 7] C3-P3                
+  [ 8] P3-O1                
+  [ 9] --1                  
+  [10] FZ-CZ                
+  [11] CZ-PZ                
+  [12] --2                  
+  [13] FP2-F4               
+  [14] F4-C4                
+  [15] C4-P4                
+  [16] P4-O2                
+  [17] --3                  
+  [18] FP2-F8               
+  [19] F8-T8                
+  [20] T8-P8-0              
+  [21] P8-O2                
+  [22] --4                  
+  [23] P7-T7                
+  [24] T7-FT9               
+  [25] FT9-FT10             
+  [26] FT10-T8              
+  [27] T8-P8-1              
+  -> 0 label(s) appear more than once in the header (0 channels total under those labels)
+
+(2) Application cached raw.npy: F:\Study\Thesis\Code\web_demo\backend\uploads\chb17\chb17b_57.raw.npy
+    shape=(900, 18, 1024)  dtype=float32
+    thesis preprocessing.open_edf() channel order after pick+reorder: ['FP1-F7', 'F7-T7', 'T7-P7', 'P7-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1', 'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T8', 'T8-P8', 'P8-O2', 'FZ-CZ', 'CZ-PZ']
+    matches preprocessing.COMMON_CHANNELS exactly: True
+    comparing first 15360 samples (60.0 s)
+
+(3) Pearson correlation matrix, app raw channel (row) x thesis channel (col):
+app\thesis      FP1-F7     F7-T7     T7-P7     P7-O1    FP1-F3     F3-C3     C3-P3     P3-O1    FP2-F4     F4-C4     C4-P4     P4-O2    FP2-F8     F8-T8     T8-P8     P8-O2     FZ-CZ     CZ-PZ
+app[0]           1.000     0.007     0.028    -0.037     0.848     0.360     0.120    -0.075     0.531     0.154     0.129     0.037     0.485     0.517     0.098     0.017     0.180     0.074
+app[1]           0.007     1.000    -0.219    -0.197     0.366     0.412    -0.205     0.186     0.355     0.022     0.141     0.063     0.609    -0.111    -0.027    -0.027     0.130    -0.142
+app[2]           0.028    -0.219     1.000     0.059     0.145     0.208     0.393    -0.266     0.075    -0.014    -0.226     0.135     0.206     0.026    -0.236    -0.072    -0.054     0.157
+app[3]          -0.037    -0.197     0.059     1.000    -0.011     0.115     0.171     0.034    -0.085     0.117    -0.050     0.143     0.001     0.080    -0.042     0.040     0.055     0.251
+app[4]           0.848     0.366     0.145    -0.011     1.000     0.413     0.098    -0.078     0.582     0.076     0.133     0.091     0.672     0.316     0.043    -0.031     0.167     0.025
+app[5]           0.360     0.412     0.208     0.115     0.413     1.000     0.035    -0.052     0.393     0.116     0.150     0.215     0.560     0.238    -0.004     0.056     0.236     0.159
+app[6]           0.120    -0.205     0.393     0.171     0.098     0.035     1.000    -0.920     0.091     0.020    -0.190     0.053     0.103     0.140    -0.140    -0.044     0.031     0.094
+app[7]          -0.075     0.186    -0.266     0.034    -0.078    -0.052    -0.920     1.000    -0.041     0.072     0.108    -0.032     0.010    -0.051     0.060     0.036    -0.023    -0.033
+app[8]           0.531     0.355     0.075    -0.085     0.582     0.393     0.091    -0.041     1.000    -0.445     0.096     0.076     0.696     0.394    -0.042     0.014     0.142     0.028
+app[9]           0.154     0.022    -0.014     0.117     0.076     0.116     0.020     0.072    -0.445     1.000    -0.004    -0.057     0.137     0.224     0.005    -0.002     0.169     0.020
+app[10]          0.129     0.141    -0.226    -0.050     0.133     0.150    -0.190     0.108     0.096    -0.004     1.000    -0.215     0.063     0.053     0.338     0.143    -0.001    -0.048
+app[11]          0.037     0.063     0.135     0.143     0.091     0.215     0.053    -0.032     0.076    -0.057    -0.215     1.000     0.088     0.013    -0.126     0.735     0.057    -0.228
+app[12]          0.485     0.609     0.206     0.001     0.672     0.560     0.103     0.010     0.696     0.137     0.063     0.088     1.000     0.237    -0.187    -0.061     0.209     0.026
+app[13]          0.517    -0.111     0.026     0.080     0.316     0.238     0.140    -0.051     0.394     0.224     0.053     0.013     0.237     1.000    -0.238     0.001     0.216     0.147
+app[14]          0.098    -0.027    -0.236    -0.042     0.043    -0.004    -0.140     0.060    -0.042     0.005     0.338    -0.126    -0.187    -0.238     1.000    -0.221    -0.048     0.008
+app[15]          0.017    -0.027    -0.072     0.040    -0.031     0.056    -0.044     0.036     0.014    -0.002     0.143     0.735    -0.061     0.001    -0.221     1.000     0.054    -0.321
+app[16]          0.180     0.130    -0.054     0.055     0.167     0.236     0.031    -0.023     0.142     0.169    -0.001     0.057     0.209     0.216    -0.048     0.054     1.000    -0.146
+app[17]          0.074    -0.142     0.157     0.251     0.025     0.159     0.094    -0.033     0.028     0.020    -0.048    -0.228     0.026     0.147     0.008    -0.321    -0.146     1.000
+
+    Best-matching application channel per thesis channel (by |r|), COMMON_CHANNELS order:
+      FP1-F7       -> app[0]  r=+1.0000  (index-aligned)
+      F7-T7        -> app[1]  r=+1.0000  (index-aligned)
+      T7-P7        -> app[2]  r=+1.0000  (index-aligned)
+      P7-O1        -> app[3]  r=+1.0000  (index-aligned)
+      FP1-F3       -> app[4]  r=+1.0000  (index-aligned)
+      F3-C3        -> app[5]  r=+1.0000  (index-aligned)
+      C3-P3        -> app[6]  r=+1.0000  (index-aligned)
+      P3-O1        -> app[7]  r=+1.0000  (index-aligned)
+      FP2-F4       -> app[8]  r=+1.0000  (index-aligned)
+      F4-C4        -> app[9]  r=+1.0000  (index-aligned)
+      C4-P4        -> app[10]  r=+1.0000  (index-aligned)
+      P4-O2        -> app[11]  r=+1.0000  (index-aligned)
+      FP2-F8       -> app[12]  r=+1.0000  (index-aligned)
+      F8-T8        -> app[13]  r=+1.0000  (index-aligned)
+      T8-P8        -> app[14]  r=+1.0000  (index-aligned)
+      P8-O2        -> app[15]  r=+1.0000  (index-aligned)
+      FZ-CZ        -> app[16]  r=+1.0000  (index-aligned)
+      CZ-PZ        -> app[17]  r=+1.0000  (index-aligned)
+
+    Diagonal (app[j] vs thesis[j], same index both sides): min=1.0000 max=1.0000 mean=1.0000
+
+====================================================================================================
+chb17/chb17c_02.edf
+====================================================================================================
+
+(1) EDF header channel list (28 channels), header order:
+  [ 0] FP1-F7               
+  [ 1] F7-T7                
+  [ 2] T7-P7                
+  [ 3] P7-O1                
+  [ 4] --0                  
+  [ 5] FP1-F3               
+  [ 6] F3-C3                
+  [ 7] C3-P3                
+  [ 8] P3-O1                
+  [ 9] --1                  
+  [10] FZ-CZ                
+  [11] CZ-PZ                
+  [12] --2                  
+  [13] FP2-F4               
+  [14] F4-C4                
+  [15] C4-P4                
+  [16] P4-O2                
+  [17] --3                  
+  [18] FP2-F8               
+  [19] F8-T8                
+  [20] T8-P8-0              
+  [21] P8-O2                
+  [22] --4                  
+  [23] P7-T7                
+  [24] T7-FT9               
+  [25] FT9-FT10             
+  [26] FT10-T8              
+  [27] T8-P8-1              
+  -> 0 label(s) appear more than once in the header (0 channels total under those labels)
+
+(2) Application cached raw.npy: F:\Study\Thesis\Code\web_demo\backend\uploads\chb17\chb17c_02.raw.npy
+    shape=(900, 18, 1024)  dtype=float32
+    thesis preprocessing.open_edf() channel order after pick+reorder: ['FP1-F7', 'F7-T7', 'T7-P7', 'P7-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1', 'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T8', 'T8-P8', 'P8-O2', 'FZ-CZ', 'CZ-PZ']
+    matches preprocessing.COMMON_CHANNELS exactly: True
+    comparing first 15360 samples (60.0 s)
+
+(3) Pearson correlation matrix, app raw channel (row) x thesis channel (col):
+app\thesis      FP1-F7     F7-T7     T7-P7     P7-O1    FP1-F3     F3-C3     C3-P3     P3-O1    FP2-F4     F4-C4     C4-P4     P4-O2    FP2-F8     F8-T8     T8-P8     P8-O2     FZ-CZ     CZ-PZ
+app[0]           1.000     0.173     0.040    -0.018     0.890     0.479     0.106    -0.066     0.293     0.201     0.095    -0.184     0.271    -0.011     0.179    -0.076     0.259    -0.059
+app[1]           0.173     1.000     0.534    -0.489     0.170     0.636     0.440    -0.068     0.158     0.350     0.333     0.220     0.259     0.259     0.247     0.250     0.428     0.582
+app[2]           0.040     0.534     1.000    -0.008     0.150     0.490     0.589     0.038     0.223     0.372     0.358     0.235     0.235     0.266     0.332     0.300     0.368     0.631
+app[3]          -0.018    -0.489    -0.008     1.000    -0.001    -0.102    -0.038     0.478     0.033     0.090     0.259    -0.098     0.032     0.117     0.232    -0.120     0.157     0.058
+app[4]           0.890     0.170     0.150    -0.001     1.000     0.395     0.140    -0.232     0.595     0.248    -0.038    -0.197     0.438     0.003     0.115    -0.004     0.151    -0.101
+app[5]           0.479     0.636     0.490    -0.102     0.395     1.000     0.095    -0.032     0.184     0.386     0.331    -0.017     0.253     0.197     0.294     0.086     0.555     0.366
+app[6]           0.106     0.440     0.589    -0.038     0.140     0.095     1.000    -0.308     0.218     0.534     0.162     0.304     0.316     0.279     0.228     0.336     0.099     0.706
+app[7]          -0.066    -0.068     0.038     0.478    -0.232    -0.032    -0.308     1.000    -0.415    -0.294     0.547     0.003    -0.301     0.050     0.295    -0.181     0.378     0.047
+app[8]           0.293     0.158     0.223     0.033     0.595     0.184     0.218    -0.415     1.000     0.462    -0.258    -0.158     0.739     0.210    -0.037     0.049    -0.004     0.024
+app[9]           0.201     0.350     0.372     0.090     0.248     0.386     0.534    -0.294     0.462     1.000     0.125    -0.080     0.608     0.702     0.193    -0.102     0.300     0.559
+app[10]          0.095     0.333     0.358     0.259    -0.038     0.331     0.162     0.547    -0.258     0.125     1.000     0.117    -0.182     0.296     0.758     0.074     0.581     0.608
+app[11]         -0.184     0.220     0.235    -0.098    -0.197    -0.017     0.304     0.003    -0.158    -0.080     0.117     1.000    -0.011    -0.036     0.305     0.612    -0.251     0.302
+app[12]          0.271     0.259     0.235     0.032     0.438     0.253     0.316    -0.301     0.739     0.608    -0.182    -0.011     1.000     0.418    -0.185    -0.166     0.010     0.203
+app[13]         -0.011     0.259     0.266     0.117     0.003     0.197     0.279     0.050     0.210     0.702     0.296    -0.036     0.418     1.000     0.110    -0.431     0.251     0.436
+app[14]          0.179     0.247     0.332     0.232     0.115     0.294     0.228     0.295    -0.037     0.193     0.758     0.305    -0.185     0.110     1.000     0.235     0.389     0.479
+app[15]         -0.076     0.250     0.300    -0.120    -0.004     0.086     0.336    -0.181     0.049    -0.102     0.074     0.612    -0.166    -0.431     0.235     1.000    -0.063     0.308
+app[16]          0.259     0.428     0.368     0.157     0.151     0.555     0.099     0.378    -0.004     0.300     0.581    -0.251     0.010     0.251     0.389    -0.063     1.000     0.413
+app[17]         -0.059     0.582     0.631     0.058    -0.101     0.366     0.706     0.047     0.024     0.559     0.608     0.302     0.203     0.436     0.479     0.308     0.413     1.000
+
+    Best-matching application channel per thesis channel (by |r|), COMMON_CHANNELS order:
+      FP1-F7       -> app[0]  r=+1.0000  (index-aligned)
+      F7-T7        -> app[1]  r=+1.0000  (index-aligned)
+      T7-P7        -> app[2]  r=+1.0000  (index-aligned)
+      P7-O1        -> app[3]  r=+1.0000  (index-aligned)
+      FP1-F3       -> app[4]  r=+1.0000  (index-aligned)
+      F3-C3        -> app[5]  r=+1.0000  (index-aligned)
+      C3-P3        -> app[6]  r=+1.0000  (index-aligned)
+      P3-O1        -> app[7]  r=+1.0000  (index-aligned)
+      FP2-F4       -> app[8]  r=+1.0000  (index-aligned)
+      F4-C4        -> app[9]  r=+1.0000  (index-aligned)
+      C4-P4        -> app[10]  r=+1.0000  (index-aligned)
+      P4-O2        -> app[11]  r=+1.0000  (index-aligned)
+      FP2-F8       -> app[12]  r=+1.0000  (index-aligned)
+      F8-T8        -> app[13]  r=+1.0000  (index-aligned)
+      T8-P8        -> app[14]  r=+1.0000  (index-aligned)
+      P8-O2        -> app[15]  r=+1.0000  (index-aligned)
+      FZ-CZ        -> app[16]  r=+1.0000  (index-aligned)
+      CZ-PZ        -> app[17]  r=+1.0000  (index-aligned)
+
+    Diagonal (app[j] vs thesis[j], same index both sides): min=1.0000 max=1.0000 mean=1.0000
+
+====================================================================================================
+chb03/chb03_01.edf
+====================================================================================================
+
+(1) EDF header channel list (23 channels), header order:
+  [ 0] FP1-F7               
+  [ 1] F7-T7                
+  [ 2] T7-P7                
+  [ 3] P7-O1                
+  [ 4] FP1-F3               
+  [ 5] F3-C3                
+  [ 6] C3-P3                
+  [ 7] P3-O1                
+  [ 8] FP2-F4               
+  [ 9] F4-C4                
+  [10] C4-P4                
+  [11] P4-O2                
+  [12] FP2-F8               
+  [13] F8-T8                
+  [14] T8-P8-0              
+  [15] P8-O2                
+  [16] FZ-CZ                
+  [17] CZ-PZ                
+  [18] P7-T7                
+  [19] T7-FT9               
+  [20] FT9-FT10             
+  [21] FT10-T8              
+  [22] T8-P8-1              
+  -> 0 label(s) appear more than once in the header (0 channels total under those labels)
+
+(2) Application cached raw.npy: F:\Study\Thesis\Code\web_demo\backend\uploads\chb03\chb03_01.raw.npy
+    shape=(900, 18, 1024)  dtype=float32
+    thesis preprocessing.open_edf() channel order after pick+reorder: ['FP1-F7', 'F7-T7', 'T7-P7', 'P7-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1', 'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T8', 'T8-P8', 'P8-O2', 'FZ-CZ', 'CZ-PZ']
+    matches preprocessing.COMMON_CHANNELS exactly: True
+    comparing first 15360 samples (60.0 s)
+
+(3) Pearson correlation matrix, app raw channel (row) x thesis channel (col):
+app\thesis      FP1-F7     F7-T7     T7-P7     P7-O1    FP1-F3     F3-C3     C3-P3     P3-O1    FP2-F4     F4-C4     C4-P4     P4-O2    FP2-F8     F8-T8     T8-P8     P8-O2     FZ-CZ     CZ-PZ
+app[0]           1.000    -0.184    -0.226    -0.060     0.603     0.243    -0.014     0.026     0.601     0.428     0.273     0.162     0.291     0.795     0.340     0.052     0.323     0.169
+app[1]          -0.184     1.000     0.186     0.216     0.500     0.462     0.210     0.042     0.526     0.377    -0.084     0.115     0.783    -0.165    -0.184    -0.061     0.415     0.222
+app[2]          -0.226     0.186     1.000    -0.241     0.015     0.019     0.241     0.179    -0.028    -0.027     0.301     0.010     0.045    -0.117     0.115     0.201     0.041     0.140
+app[3]          -0.060     0.216    -0.241     1.000     0.107     0.209     0.158     0.219     0.139     0.251    -0.021     0.240     0.192    -0.013     0.069     0.267     0.212     0.284
+app[4]           0.603     0.500     0.015     0.107     1.000     0.136     0.041     0.074     0.823     0.522     0.107     0.157     0.739     0.455     0.126    -0.029     0.469     0.177
+app[5]           0.243     0.462     0.019     0.209     0.136     1.000     0.200    -0.085     0.460     0.462     0.067     0.117     0.483     0.223     0.056     0.067     0.485     0.298
+app[6]          -0.014     0.210     0.241     0.158     0.041     0.200     1.000    -0.643     0.100     0.150     0.166     0.053     0.139     0.015     0.070     0.178     0.164     0.390
+app[7]           0.026     0.042     0.179     0.219     0.074    -0.085    -0.643     1.000     0.030     0.024     0.153     0.222     0.061     0.051     0.107     0.148    -0.028    -0.013
+app[8]           0.601     0.526    -0.028     0.139     0.823     0.460     0.100     0.030     1.000     0.497     0.101     0.143     0.851     0.513     0.122    -0.035     0.559     0.210
+app[9]           0.428     0.377    -0.027     0.251     0.522     0.462     0.150     0.024     0.497     1.000     0.001     0.158     0.525     0.473     0.207     0.039     0.508     0.337
+app[10]          0.273    -0.084     0.301    -0.021     0.107     0.067     0.166     0.153     0.101     0.001     1.000    -0.062     0.025     0.334     0.508     0.263     0.109     0.326
+app[11]          0.162     0.115     0.010     0.240     0.157     0.117     0.053     0.222     0.143     0.158    -0.062     1.000     0.146     0.186     0.331     0.481     0.085     0.148
+app[12]          0.291     0.783     0.045     0.192     0.739     0.483     0.139     0.061     0.851     0.525     0.025     0.146     1.000     0.124    -0.081    -0.094     0.503     0.255
+app[13]          0.795    -0.165    -0.117    -0.013     0.455     0.223     0.015     0.051     0.513     0.473     0.334     0.186     0.124     1.000     0.449     0.023     0.327     0.201
+app[14]          0.340    -0.184     0.115     0.069     0.126     0.056     0.070     0.107     0.122     0.207     0.508     0.331    -0.081     0.449     1.000     0.028     0.107     0.221
+app[15]          0.052    -0.061     0.201     0.267    -0.029     0.067     0.178     0.148    -0.035     0.039     0.263     0.481    -0.094     0.023     0.028     1.000     0.118     0.164
+app[16]          0.323     0.415     0.041     0.212     0.469     0.485     0.164    -0.028     0.559     0.508     0.109     0.085     0.503     0.327     0.107     0.118     1.000     0.026
+app[17]          0.169     0.222     0.140     0.284     0.177     0.298     0.390    -0.013     0.210     0.337     0.326     0.148     0.255     0.201     0.221     0.164     0.026     1.000
+
+    Best-matching application channel per thesis channel (by |r|), COMMON_CHANNELS order:
+      FP1-F7       -> app[0]  r=+1.0000  (index-aligned)
+      F7-T7        -> app[1]  r=+1.0000  (index-aligned)
+      T7-P7        -> app[2]  r=+1.0000  (index-aligned)
+      P7-O1        -> app[3]  r=+1.0000  (index-aligned)
+      FP1-F3       -> app[4]  r=+1.0000  (index-aligned)
+      F3-C3        -> app[5]  r=+1.0000  (index-aligned)
+      C3-P3        -> app[6]  r=+1.0000  (index-aligned)
+      P3-O1        -> app[7]  r=+1.0000  (index-aligned)
+      FP2-F4       -> app[8]  r=+1.0000  (index-aligned)
+      F4-C4        -> app[9]  r=+1.0000  (index-aligned)
+      C4-P4        -> app[10]  r=+1.0000  (index-aligned)
+      P4-O2        -> app[11]  r=+1.0000  (index-aligned)
+      FP2-F8       -> app[12]  r=+1.0000  (index-aligned)
+      F8-T8        -> app[13]  r=+1.0000  (index-aligned)
+      T8-P8        -> app[14]  r=+1.0000  (index-aligned)
+      P8-O2        -> app[15]  r=+1.0000  (index-aligned)
+      FZ-CZ        -> app[16]  r=+1.0000  (index-aligned)
+      CZ-PZ        -> app[17]  r=+1.0000  (index-aligned)
+
+    Diagonal (app[j] vs thesis[j], same index both sides): min=1.0000 max=1.0000 mean=1.0000
+
+====================================================================================================
+(4) Channel selection/ordering code -- read from source, not re-derived
+====================================================================================================
+
+web_demo/backend/pipeline_demo.py, process_file_phase_a() (the function that produced the
+cached .raw.npy files being compared above):
+
+    raw = preprocessing.open_edf(edf_path)
+    ...
+    data = raw.get_data()  # [18, n_total_samples], float64
+    ...
+    raw_windows = np.ascontiguousarray(
+        data[:, :usable].reshape(N_CH, n_windows, preprocessing.WIN_SAMPLES).transpose(1, 0, 2)
+    )
+
+-- i.e. the application calls preprocessing.open_edf() DIRECTLY (imported, never copied) and
+takes raw.get_data() with no further channel selection, renaming or reordering of its own.
+N_CH = len(preprocessing.COMMON_CHANNELS) (18), same constant.
+
+src/dataprep/preprocessing.py, open_edf() (the thesis's own reader, called by both sides):
+
+    raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+    raw.rename_channels({ch: ch.upper().strip() for ch in raw.ch_names})
+
+    rename_map: dict = {}
+    seen: set = set()
+    for ch in raw.ch_names:
+        m = re.match(r"^(.*)-(\d+)$", ch)
+        if m:
+            base = m.group(1)
+            if base not in seen:
+                rename_map[ch] = base
+                seen.add(base)
+    if rename_map:
+        raw.rename_channels(rename_map)
+
+    missing = set(COMMON_CHANNELS) - set(raw.ch_names)
+    if missing:
+        return None
+
+    raw.pick(COMMON_CHANNELS)
+    raw.reorder_channels(COMMON_CHANNELS)
+    return raw
+
+Both the application and this diagnostic's own "thesis" extraction call this SAME function --
+there is no separate application-side channel-selection code to diverge from it; any
+difference measured above must come from either (a) the app's cached .raw.npy having been
+generated by a DIFFERENT historical version of this exact function (code drift over time,
+not a live divergence -- this file is unchanged and read-only in this check), or (b) this
+function's own duplicate-label handling picking a different one of two identically-labelled
+channels than intended, which is a property of the EDF header itself, not of app-vs-thesis
+code divergence. Every quoted line above is what is on disk right now; nothing here proposes
+or makes an edit to any file, in web_demo/ or elsewhere.

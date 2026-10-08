@@ -1,0 +1,95 @@
+====================================================================================================
+chb16
+====================================================================================================
+
+(b) Scope T z-score stats source: ch_mean_T/ch_std_T loaded directly from data/processed/chb16_stats.json ('ch_mean_uV'/'ch_std_uV' fields, *1e-6). continuous_eval.process_subject does this same load verbatim (src/continuous_eval.py, `stats = json.loads((PROCESSED_DIR / f'{subj}_stats.json').read_text())`), so this is identical to Scope T's actual stats by construction, not approximately equal.
+
+[Scope T fresh recompute: filter+GAE/adjacency/gamma over all 19 files in 456.3s]
+
+(a) per-branch comparison vs committed offline components (results/phaseB/tier2/ens_test_tf/components/), inter = background_mask windows, ictal = is_ictal windows:
+
+  zrecon / inter: n_mine=6428 n_off=6428 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9977  Pearson(cross-scale)=0.9988  max_abs_diff(cross-scale)=19.48
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9977  Pearson=0.9988  max_abs_diff=1.241
+
+  zrecon / ictal: n_mine=28 n_off=28 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=1.0000  Pearson(cross-scale)=0.9999  max_abs_diff(cross-scale)=16.19
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=1.0000  Pearson=0.9999  max_abs_diff=0.1883
+
+  zlatent / inter: n_mine=6428 n_off=6428 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9821  Pearson(cross-scale)=0.9856  max_abs_diff(cross-scale)=49.83
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9821  Pearson=0.9856  max_abs_diff=2.102
+
+  zlatent / ictal: n_mine=28 n_off=28 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9858  Pearson(cross-scale)=0.9965  max_abs_diff(cross-scale)=35.44
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9858  Pearson=0.9965  max_abs_diff=0.6649
+
+  zgamma / inter: n_mine=6428 n_off=6428 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=1.0000  Pearson(cross-scale)=1.0000  max_abs_diff(cross-scale)=39.17
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=1.0000  Pearson=1.0000  max_abs_diff=0.2151
+
+  zgamma / ictal: n_mine=28 n_off=28 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=1.0000  Pearson(cross-scale)=1.0000  max_abs_diff(cross-scale)=21.63
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=1.0000  Pearson=1.0000  max_abs_diff=0.1216
+
+  ==> FIRST branch/stage where chb16 departs from good agreement (rho_after<0.99 or count mismatch): ('zlatent', 'inter', np.float64(0.9821125174156511), True)
+====================================================================================================
+chb17
+====================================================================================================
+
+(b) Scope T z-score stats source: ch_mean_T/ch_std_T loaded directly from data/processed/chb17_stats.json ('ch_mean_uV'/'ch_std_uV' fields, *1e-6). continuous_eval.process_subject does this same load verbatim (src/continuous_eval.py, `stats = json.loads((PROCESSED_DIR / f'{subj}_stats.json').read_text())`), so this is identical to Scope T's actual stats by construction, not approximately equal.
+
+[Scope T fresh recompute: filter+GAE/adjacency/gamma over all 21 files in 440.6s]
+
+(a) per-branch comparison vs committed offline components (results/phaseB/tier2/ens_test_tf/components/), inter = background_mask windows, ictal = is_ictal windows:
+
+  zrecon / inter: n_mine=9304 n_off=9304 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9987  Pearson(cross-scale)=0.9925  max_abs_diff(cross-scale)=48.68
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9987  Pearson=0.9925  max_abs_diff=46.98
+
+  zrecon / ictal: n_mine=74 n_off=74 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9932  Pearson(cross-scale)=0.9985  max_abs_diff(cross-scale)=3.397
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9932  Pearson=0.9985  max_abs_diff=0.2728
+
+  zlatent / inter: n_mine=9304 n_off=9304 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9096  Pearson(cross-scale)=0.9076  max_abs_diff(cross-scale)=77.31
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9096  Pearson=0.9076  max_abs_diff=17.88
+
+  zlatent / ictal: n_mine=74 n_off=74 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9380  Pearson(cross-scale)=0.9038  max_abs_diff(cross-scale)=27.33
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9380  Pearson=0.9038  max_abs_diff=2.965
+
+  zgamma / inter: n_mine=9304 n_off=9304 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=0.9978  Pearson(cross-scale)=0.9902  max_abs_diff(cross-scale)=21.05
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=0.9978  Pearson=0.9902  max_abs_diff=28.01
+
+  zgamma / ictal: n_mine=74 n_off=74 count_match=True
+    BEFORE robust-z (mine=raw, offline=robust-z'd -- cross-scale, Spearman still valid): rho=1.0000  Pearson(cross-scale)=1.0000  max_abs_diff(cross-scale)=11.13
+    AFTER  robust-z (both robust-z'd -- apples-to-apples): rho=1.0000  Pearson=1.0000  max_abs_diff=0.1268
+
+  ==> FIRST branch/stage where chb17 departs from good agreement (rho_after<0.99 or count mismatch): ('zlatent', 'inter', np.float64(0.909594124707878), True)
+
+====================================================================================================
+(c) Filtering convention: offline committed arrays vs Scope T (from the code)
+====================================================================================================
+
+Offline committed arrays (results/phaseB/tier2/ens_test_tf/components/, and the
+ens_seed42_{subj}_{inter,ictal}.npy ensembles behind them) trace back to
+data/processed/{subj}_interictal.npy / {subj}_ictal.npy, written by
+src/dataprep/preprocessing.py `write_windows()`:
+
+    window = filter_window(raw, start, end)   # per WINDOW, one 4 s window + FILTER_PAD (3 s)
+                                               # padding each side, sosfiltfilt+filtfilt,
+                                               # re-read from `raw` via raw.get_data(start,stop)
+                                               # for EVERY window independently
+
+Scope T (src/continuous_eval.py `filter_file()`) filters the WHOLE recording in one
+sosfiltfilt/filtfilt pass (matching the application's own convention, per Amendment-driving
+G1 work) -- NOT per-window-with-padding. This is a real, confirmed algorithmic difference
+between what produced the offline committed arrays and what Scope T's own windows are filtered
+with. (Scope T's ARTIFACT MASK, separately, already uses the per-window filter_window
+convention -- see continuous_eval.compute_artifact_flags -- only the SCORED SIGNAL itself
+differs in filtering method from the offline arrays.)
+
+
+Total diagnostic wall-clock: 898.7s (15.0 min)

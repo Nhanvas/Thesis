@@ -1,0 +1,53 @@
+[recompute done in 258.9s]
+med_r=0.0192326 mad_r=0.00454008 (background-only fit, n=9304)
+
+Top-20 |mine-offline| positions in the zrecon/inter set (n=9304):
+ bg_pos  global_idx fname             local_idx     mine_z      off_z     mine_raw     diff
+   5088       11523 chb17b_69.edf           717     3.0019    48.7033    0.0328614  45.7015
+   5089       11524 chb17b_69.edf           718     3.0019    48.7033    0.0328614  45.7015
+   5090       11525 chb17b_69.edf           719     3.0019    48.7033    0.0328614  45.7015
+   5093       11528 chb17b_69.edf           722     3.0019    48.7033    0.0328614  45.7015
+   5094       11529 chb17b_69.edf           723     3.0019    48.7033    0.0328614  45.7015
+   5095       11530 chb17b_69.edf           724     3.0019    48.7033    0.0328614  45.7015
+   5065       11500 chb17b_69.edf           694     3.0019    48.7033    0.0328614  45.7015
+   5066       11501 chb17b_69.edf           695     3.0019    48.7033    0.0328614  45.7015
+   5067       11502 chb17b_69.edf           696     3.0019    48.7033    0.0328614  45.7015
+   5069       11504 chb17b_69.edf           698     3.0019    48.7033    0.0328614  45.7015
+   5070       11505 chb17b_69.edf           699     3.0019    48.7033    0.0328614  45.7015
+   5071       11506 chb17b_69.edf           700     3.0019    48.7033    0.0328614  45.7015
+   5073       11508 chb17b_69.edf           702     3.0019    48.7033    0.0328614  45.7015
+   5228       11663 chb17b_69.edf           857     3.0019    48.7033    0.0328614  45.7015
+   5230       11665 chb17b_69.edf           859     3.0019    48.7033    0.0328614  45.7015
+   5231       11666 chb17b_69.edf           860     3.0019    48.7033    0.0328614  45.7015
+   5116       11551 chb17b_69.edf           745     3.0019    48.7033    0.0328614  45.7015
+   5117       11552 chb17b_69.edf           746     3.0019    48.7033    0.0328614  45.7015
+   5119       11554 chb17b_69.edf           748     3.0019    48.7033    0.0328614  45.7015
+   5120       11555 chb17b_69.edf           749     3.0019    48.7033    0.0328614  45.7015
+
+Per-file mean/max |diff| for the zrecon/inter set:
+  chb17a_03.edf    n=  250  mean|diff|=  0.0098  max|diff|=  0.1050
+  chb17a_04.edf    n=  569  mean|diff|=  0.0084  max|diff|=  0.1736
+  chb17a_05.edf    n=  425  mean|diff|=  0.0108  max|diff|=  0.1025
+  chb17a_06.edf    n=  594  mean|diff|=  0.0127  max|diff|=  0.1485
+  chb17a_08.edf    n=  266  mean|diff|=  0.0130  max|diff|=  0.1570
+  chb17b_57.edf    n=  413  mean|diff|=  0.0094  max|diff|=  0.2065
+  chb17b_58.edf    n=  482  mean|diff|=  0.0071  max|diff|=  0.2378
+  chb17b_59.edf    n=  390  mean|diff|=  0.0059  max|diff|=  0.0814
+  chb17b_60.edf    n=  301  mean|diff|=  0.0065  max|diff|=  0.0917
+  chb17b_63.edf    n=  271  mean|diff|=  0.0078  max|diff|=  0.1062
+  chb17b_67.edf    n=  522  mean|diff|=  0.0090  max|diff|=  0.1479
+  chb17b_68.edf    n=  207  mean|diff|=  0.0099  max|diff|=  0.2112
+  chb17b_69.edf    n=  581  mean|diff|= 41.9251  max|diff|= 45.7015
+  chb17c_02.edf    n=  476  mean|diff|=  0.0105  max|diff|=  0.1883
+  chb17c_03.edf    n=  629  mean|diff|=  0.0100  max|diff|=  0.2724
+  chb17c_04.edf    n=  536  mean|diff|=  0.0106  max|diff|=  0.1407
+  chb17c_05.edf    n=  597  mean|diff|=  0.0106  max|diff|=  0.1732
+  chb17c_06.edf    n=  560  mean|diff|=  0.0105  max|diff|=  0.1397
+  chb17c_07.edf    n=  613  mean|diff|=  0.0097  max|diff|=  0.1549
+  chb17c_08.edf    n=  505  mean|diff|=  0.0107  max|diff|=  0.1820
+  chb17c_13.edf    n=  117  mean|diff|=  0.0042  max|diff|=  0.1220
+
+Overall: mine_inter range [-2.79,18.4], offline range [-2.79,48.7]
+raw zrecon (pre-robust-z) at the single worst position: 0.0328614 (background pool range [0.00655986,0.102732])
+
+Total wall-clock: 258.9s

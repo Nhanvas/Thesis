@@ -1,0 +1,143 @@
+{
+  "T": {
+    "operating_point": {
+      "mag_pct": 80.0,
+      "pen_mult": 5.0,
+      "merge_s": 300
+    },
+    "per_patient": [
+      {
+        "subject": "chb03",
+        "n_seizures": 7,
+        "detected": 0,
+        "false_alarms": 31,
+        "sensitivity": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fp_per_day": 19.639,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb06",
+        "n_seizures": 10,
+        "detected": 0,
+        "false_alarms": 19,
+        "sensitivity": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fp_per_day": 6.838,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb13",
+        "n_seizures": 12,
+        "detected": 1,
+        "false_alarms": 25,
+        "sensitivity": 0.0833,
+        "precision": 0.0385,
+        "f1": 0.0526,
+        "fp_per_day": 18.27,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb14",
+        "n_seizures": 8,
+        "detected": 0,
+        "false_alarms": 12,
+        "sensitivity": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fp_per_day": 11.1,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb15",
+        "n_seizures": 20,
+        "detected": 2,
+        "false_alarms": 49,
+        "sensitivity": 0.1,
+        "precision": 0.0392,
+        "f1": 0.0563,
+        "fp_per_day": 29.82,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb16",
+        "n_seizures": 10,
+        "detected": 0,
+        "false_alarms": 6,
+        "sensitivity": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fp_per_day": 7.591,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      },
+      {
+        "subject": "chb17",
+        "n_seizures": 3,
+        "detected": 0,
+        "false_alarms": 13,
+        "sensitivity": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "fp_per_day": 15.346,
+        "n_signal_loss": 534,
+        "excluded_h": 0.5933
+      },
+      {
+        "subject": "chb18",
+        "n_seizures": 6,
+        "detected": 2,
+        "false_alarms": 26,
+        "sensitivity": 0.3333,
+        "precision": 0.0714,
+        "f1": 0.1176,
+        "fp_per_day": 17.557,
+        "n_signal_loss": 0,
+        "excluded_h": 0.0
+      }
+    ],
+    "pooled": {
+      "tp": 5,
+      "fp": 181,
+      "n_ref": 76,
+      "fn": 71,
+      "sensitivity": 0.06578947368421052,
+      "precision": 0.026881720430107527,
+      "f1": 0.03816793893129771,
+      "fp_per_day": 15.64672405719843,
+      "n_inter_h": 277.63
+    },
+    "latency_s": {
+      "n": 5,
+      "mean": -47.2,
+      "median": 0.0,
+      "min": -484.0,
+      "max": 140.0,
+      "values": [
+        112,
+        -484,
+        140,
+        -4,
+        0
+      ]
+    },
+    "window_auroc_macro": 0.6208090862632997,
+    "window_auroc_per_subject": {
+      "chb03": 0.7814472326213937,
+      "chb06": 0.3453162635267109,
+      "chb13": 0.560270710214884,
+      "chb14": 0.6378785508464874,
+      "chb15": 0.7058658633358307,
+      "chb16": 0.5687048132280091,
+      "chb17": 0.6153047429332477,
+      "chb18": 0.7516845133998338
+    }
+  }
+}

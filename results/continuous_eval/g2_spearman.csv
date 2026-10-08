@@ -1,0 +1,9 @@
+subject,fit,n_mine_ictal,n_off_ictal,ictal_count_match,n_flagged_ictal,rho_ictal,rho_ictal_a2,n_mine_inter,n_off_inter,inter_count_match,n_flagged_inter,rho_inter,rho_inter_a2,g2_pass
+chb03,A2,106,106,True,0,0.9996,0.9996,17204,17204,True,0,0.9997,0.9997,True
+chb06,A2,45,45,True,0,0.9983,0.9983,19826,19826,True,0,0.9995,0.9995,True
+chb13,A2,144,144,True,0,0.9994,0.9994,12452,12452,True,0,0.9997,0.9997,True
+chb14,A2,49,49,True,0,0.9993,0.9993,13983,13983,True,0,0.9995,0.9995,True
+chb15,A2,515,515,True,0,0.9999,0.9999,17026,17026,True,0,0.9997,0.9997,True
+chb16,A2,28,28,True,0,0.9995,0.9995,6428,6428,True,0,0.9997,0.9997,True
+chb17,C1,74,74,True,0,0.9901,0.9947,9304,9304,True,534,0.9837,0.9894,False
+chb18,A2,83,83,True,0,0.9997,0.9997,14853,14853,True,0,0.9996,0.9996,True

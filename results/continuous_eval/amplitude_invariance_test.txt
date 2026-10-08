@@ -1,0 +1,45 @@
+# Amplitude-invariance test (validation patients, one file each)
+
+## chb10  chb10_20.edf  windows=1803  artifact=1089  background=633  (98s)
+
+| variant | branch | Spearman vs original | AUROC artifact vs background |
+|---|---|---|---|
+| orig | zrecon | 1.0000 | 0.485 |
+| orig | latent | 1.0000 | 0.727 |
+| orig | zgamma | 1.0000 | 0.786 |
+| gain | zrecon | 0.9998 | 0.484 |
+| gain | latent | 0.9991 | 0.727 |
+| gain | zgamma | 1.0000 | 0.786 |
+| chunit | zrecon | 0.8707 | 0.453 |
+| chunit | latent | 0.5430 | 0.577 |
+| chunit | zgamma | 1.0000 | 0.786 |
+
+## chb11  chb11_53.edf  windows=900  artifact=720  background=180  (37s)
+
+| variant | branch | Spearman vs original | AUROC artifact vs background |
+|---|---|---|---|
+| orig | zrecon | 1.0000 | 0.902 |
+| orig | latent | 1.0000 | 0.587 |
+| orig | zgamma | 1.0000 | 0.637 |
+| gain | zrecon | 0.9998 | 0.902 |
+| gain | latent | 0.9970 | 0.587 |
+| gain | zgamma | 1.0000 | 0.637 |
+| chunit | zrecon | 0.8850 | 0.893 |
+| chunit | latent | 0.4024 | 0.621 |
+| chunit | zgamma | 1.0000 | 0.637 |
+
+## chb22  chb22_15.edf  windows=900  artifact=827  background=73  (37s)
+
+| variant | branch | Spearman vs original | AUROC artifact vs background |
+|---|---|---|---|
+| orig | zrecon | 1.0000 | 0.900 |
+| orig | latent | 1.0000 | 0.820 |
+| orig | zgamma | 1.0000 | 0.795 |
+| gain | zrecon | 0.9999 | 0.901 |
+| gain | latent | 0.9977 | 0.825 |
+| gain | zgamma | 1.0000 | 0.795 |
+| chunit | zrecon | 0.8874 | 0.879 |
+| chunit | latent | 0.6141 | 0.767 |
+| chunit | zgamma | 1.0000 | 0.795 |
+
+Reading: Spearman 1.0000 under 'gain' = the input is exactly invariant to a common gain, so a window-wise z-score changes nothing. If artifact-vs-background AUROC stays high under 'chunit', amplitude is not what makes artifact windows look anomalous and amplitude normalization will not remove them.

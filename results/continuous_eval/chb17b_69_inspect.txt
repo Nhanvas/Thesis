@@ -1,0 +1,81 @@
+Inspecting chb17b_69.edf, flagged local windows: [694, 695, 696, 698, 699, 700, 702, 717, 718, 719, 722, 723, 724, 745, 746, 748, 749, 857, 859, 860]
+n_windows in file = 900, n_times=921600, duration_s=3600.0
+
+(1) preprocessing.filter_window per-window (Scope T convention) -- flagged windows:
+  local= 694  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 695  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 696  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 698  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 699  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 700  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 702  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 717  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 718  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 719  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 722  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 723  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 724  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 745  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 746  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 748  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 749  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 857  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 859  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 860  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+
+(1b) preprocessing.filter_window per-window -- normal reference windows:
+  local=   0  mean=+1.3013e-06 std=2.4398e-05 min=-1.2972e-04 max=+1.9199e-04 ptp=3.2170e-04 n_unique/ch0=18427
+  local=  50  mean=-4.4888e-07 std=6.6494e-05 min=-6.9066e-04 max=+4.9094e-04 ptp=1.1816e-03 n_unique/ch0=18431
+  local= 100  mean=-3.0612e-06 std=4.3086e-05 min=-4.8835e-04 max=+5.0040e-04 ptp=9.8875e-04 n_unique/ch0=18430
+  local= 200  mean=-8.7798e-07 std=6.4887e-05 min=-4.3339e-04 max=+3.5523e-04 ptp=7.8862e-04 n_unique/ch0=18430
+  local= 300  mean=-1.3163e-07 std=3.2017e-05 min=-2.0486e-04 max=+4.0111e-04 ptp=6.0596e-04 n_unique/ch0=18426
+  local= 400  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+  local= 500  mean=-6.2732e-23 std=3.8936e-22 min=-9.5320e-22 max=+6.1118e-22 ptp=1.5644e-21 n_unique/ch0=1
+
+(1c) RAW (unfiltered) samples, channel 0, flagged windows -- looking for flat-lining:
+  local= 694  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+  local= 695  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+  local= 696  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+  local= 698  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+  local= 699  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+  local= 700  ch0 mean=+1.9536e-07 std=5.2940e-23 n_unique=1  first5=[1.95360195e-07 1.95360195e-07 1.95360195e-07 1.95360195e-07
+ 1.95360195e-07]
+
+(2) Scope W (whole-file filter_file) -- same flagged windows:
+  local= 694  mean=+1.5385e-26 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 695  mean=-6.8160e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 696  mean=+6.0680e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 698  mean=-6.4889e-25 std=3.1542e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 699  mean=+4.9269e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 700  mean=+4.3878e-26 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 702  mean=+6.2558e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+  local= 717  mean=+6.2558e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22 ptp=9.6100e-22
+
+(3) application cached raw.npy shape=(900, 18, 1024) dtype=float32
+    flagged windows, channel 0 (app's own RAW, unfiltered):
+      local= 694  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 695  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 696  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 698  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 699  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 700  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 702  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+      local= 717  mean=+1.9536e-07 std=4.2633e-14 n_unique=1
+
+    application cached filtered.npy shape=(900, 18, 1024)
+    flagged windows (app's whole-file-filtered, should match Scope W above):
+      local= 694  mean=+1.5385e-26 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 695  mean=-6.8160e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 696  mean=+6.0680e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 698  mean=-6.4889e-25 std=3.1542e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 699  mean=+4.9269e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 700  mean=+4.3878e-26 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 702  mean=+6.2558e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+      local= 717  mean=+6.2558e-25 std=3.1764e-22 min=-4.8050e-22 max=+4.8050e-22
+
+Total wall-clock: 2.9s

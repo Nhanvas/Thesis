@@ -1,0 +1,124 @@
+====================================================================================================
+chb17  (target file chb17a_03.edf, 21 files total)
+====================================================================================================
+
+(a) filtered windows -- app.filtered.npy (n=900) vs Scope W filter_file() (n=900), compared on 900 windows:
+    max abs diff = 0.000000e+00   Pearson r (flattened) = 1.00000000
+    scale (max abs value, app array) = 1.595714e-03
+
+    [Scope W: filtered all 21 files of chb17 (pass 1, stats) in 40.6s]
+
+(b) subject-wide z-score statistics (chb17, n_windows app=18906 Scope W=18906):
+    channel          app mean         W mean        app std          W std
+    FP1-F7       7.981411e-10   7.981411e-10   5.981069e-05   5.981069e-05
+    F7-T7        1.261286e-09   1.261286e-09   4.634352e-05   4.634352e-05
+    T7-P7       -4.870140e-10  -4.870140e-10   2.958582e-05   2.958582e-05
+    P7-O1       -5.041263e-10  -5.041263e-10   3.023529e-05   3.023529e-05
+    FP1-F3       6.966932e-10   6.966932e-10   5.880696e-05   5.880696e-05
+    F3-C3        6.979089e-10   6.979089e-10   3.170127e-05   3.170127e-05
+    C3-P3       -1.135351e-10  -1.135351e-10   3.438948e-05   3.438948e-05
+    P3-O1       -2.179896e-10  -2.179896e-10   2.831867e-05   2.831867e-05
+    FP2-F4      -5.059418e-10  -5.059418e-10   5.904769e-05   5.904769e-05
+    F4-C4       -5.720315e-10  -5.720315e-10   2.901203e-05   2.901203e-05
+    C4-P4        9.283275e-10   9.283275e-10   2.331266e-05   2.331266e-05
+    P4-O2       -9.827784e-10  -9.827784e-10   2.764285e-05   2.764285e-05
+    FP2-F8      -4.822945e-10  -4.822945e-10   5.971679e-05   5.971679e-05
+    F8-T8        1.443212e-09   1.443212e-09   3.925173e-05   3.925173e-05
+    T8-P8       -1.488551e-09  -1.488551e-09   3.329692e-05   3.329692e-05
+    P8-O2       -6.039364e-10  -6.039364e-10   3.007910e-05   3.007910e-05
+    FZ-CZ        5.391993e-10   5.391993e-10   2.660469e-05   2.660469e-05
+    CZ-PZ        1.131243e-09   1.131243e-09   2.837438e-05   2.837438e-05
+    max relative mean diff = 0.0000
+    max relative std diff  = 0.0000
+
+    Subsampling, from the code (neither of these two paths subsamples -- both sum
+    every window of every file, in file order, over the FULL concatenation):
+      pipeline_demo.process_subject_phase_b: `for f in filenames_sorted:
+          f64 = filtered_by_filename[f].astype(np.float64)
+          per_file_axis2_sum.append(f64.sum(axis=2))` -- every window, no skip,
+      offset 0, iterated over filenames_sorted = sorted(filtered_by_filename.keys()).
+      Scope W (src/continuous_eval.py process_subject): the same per-file
+      sum(axis=2)/sumsq(axis=2) reduction, every window, no skip, offset 0, over
+      fnames_sorted = [e['fname'] for e in edfs] (evaluation_protocol.parse_summary_
+      edf_list's own sort, filtered to files present on disk).
+      (The 1-in-10 subsample, preprocessing.STATS_SUBSAMPLE=10, belongs to a THIRD,
+      unrelated path -- preprocessing.compute_subject_stats, used only for Scope T's
+      committed data/processed/{subj}_stats.json -- not compared at this stage.)
+    [app-way: GAE/adjacency/gamma pass over all 21 files in 183.2s]
+    [Scope W-way: filter (pass 2) + GAE/adjacency/gamma pass over all 21 files in 193.9s]
+
+(c) raw branch scores per window, target file chb17a_03.edf (window range [0:900], n=900), app-way vs Scope W-way, BEFORE robust-z:
+    zrecon  : Pearson(app,W) = +0.999883   max abs diff = 0.001412   (app range [0.008267,0.06989], W range [0.008267,0.06989])
+    zlatent : Pearson(app,W) = +0.997441   max abs diff = 3.493   (app range [3.327,52.31], W range [3.327,52.33])
+    zgamma  : Pearson(app,W) = +1.000000   max abs diff = 0   (app range [0.1799,0.8171], W range [0.1799,0.8171])
+
+(d) robust-z medians/MADs per branch, computed subject-wide (app-way pooled over all chb17 windows vs Scope W-way, same pooling rule -- unmasked, whole recording, matching each path's own fitting scope):
+    zrecon  : app  median=+0.0237085 mad=0.00710695   |   W  median=+0.0237027 mad=0.00710819   |   rel.diff median=0.0002 mad=0.0002
+    zlatent : app  median=+14.7452 mad=3.779   |   W  median=+14.7339 mad=3.77606   |   rel.diff median=0.0008 mad=0.0008
+    zgamma  : app  median=+0.294669 mad=0.0774927   |   W  median=+0.294669 mad=0.0774927   |   rel.diff median=0.0000 mad=0.0000
+
+Peak-amplitude ratio (max/median per-window peak |amplitude|, app filtered windows, whole subject chb17, n=18906): 12.74   (max=2.4569e-03, median=1.9279e-04)
+
+====================================================================================================
+chb03  (target file chb03_01.edf, 38 files total)
+====================================================================================================
+
+(a) filtered windows -- app.filtered.npy (n=900) vs Scope W filter_file() (n=900), compared on 900 windows:
+    max abs diff = 0.000000e+00   Pearson r (flattened) = 1.00000000
+    scale (max abs value, app array) = 2.369329e-03
+
+    [Scope W: filtered all 38 files of chb03 (pass 1, stats) in 69.4s]
+
+(b) subject-wide z-score statistics (chb03, n_windows app=34201 Scope W=34201):
+    channel          app mean         W mean        app std          W std
+    FP1-F7       1.799907e-09   1.799907e-09   6.365023e-05   6.365023e-05
+    F7-T7        1.173094e-10   1.173094e-10   5.456546e-05   5.456546e-05
+    T7-P7       -3.503586e-10  -3.503586e-10   3.560897e-05   3.560897e-05
+    P7-O1        1.330613e-10   1.330613e-10   2.591060e-05   2.591060e-05
+    FP1-F3       7.699041e-10   7.699041e-10   5.837098e-05   5.837098e-05
+    F3-C3        5.808783e-10   5.808783e-10   2.936914e-05   2.936914e-05
+    C3-P3        3.483444e-10   3.483444e-10   2.652260e-05   2.652260e-05
+    P3-O1        1.384719e-12   1.384719e-12   2.966963e-05   2.966963e-05
+    FP2-F4       5.111380e-10   5.111380e-10   5.801984e-05   5.801984e-05
+    F4-C4        1.796252e-09   1.796252e-09   4.078949e-05   4.078949e-05
+    C4-P4        1.591748e-09   1.591748e-09   4.043586e-05   4.043586e-05
+    P4-O2       -2.142549e-09  -2.142549e-09   2.741465e-05   2.741465e-05
+    FP2-F8       5.831656e-10   5.831656e-10   6.880591e-05   6.880591e-05
+    F8-T8        8.566168e-10   8.566168e-10   4.549293e-05   4.549293e-05
+    T8-P8        9.664152e-10   9.664152e-10   3.682061e-05   3.682061e-05
+    P8-O2       -6.551113e-10  -6.551113e-10   2.192914e-05   2.192914e-05
+    FZ-CZ        1.495630e-09   1.495630e-09   3.065658e-05   3.065658e-05
+    CZ-PZ       -1.568992e-09  -1.568992e-09   3.450268e-05   3.450268e-05
+    max relative mean diff = 0.0000
+    max relative std diff  = 0.0000
+
+    Subsampling, from the code (neither of these two paths subsamples -- both sum
+    every window of every file, in file order, over the FULL concatenation):
+      pipeline_demo.process_subject_phase_b: `for f in filenames_sorted:
+          f64 = filtered_by_filename[f].astype(np.float64)
+          per_file_axis2_sum.append(f64.sum(axis=2))` -- every window, no skip,
+      offset 0, iterated over filenames_sorted = sorted(filtered_by_filename.keys()).
+      Scope W (src/continuous_eval.py process_subject): the same per-file
+      sum(axis=2)/sumsq(axis=2) reduction, every window, no skip, offset 0, over
+      fnames_sorted = [e['fname'] for e in edfs] (evaluation_protocol.parse_summary_
+      edf_list's own sort, filtered to files present on disk).
+      (The 1-in-10 subsample, preprocessing.STATS_SUBSAMPLE=10, belongs to a THIRD,
+      unrelated path -- preprocessing.compute_subject_stats, used only for Scope T's
+      committed data/processed/{subj}_stats.json -- not compared at this stage.)
+    [app-way: GAE/adjacency/gamma pass over all 38 files in 318.3s]
+    [Scope W-way: filter (pass 2) + GAE/adjacency/gamma pass over all 38 files in 359.2s]
+
+(c) raw branch scores per window, target file chb03_01.edf (window range [0:900], n=900), app-way vs Scope W-way, BEFORE robust-z:
+    zrecon  : Pearson(app,W) = +0.999911   max abs diff = 0.00255   (app range [0.008042,0.08181], W range [0.008042,0.08237])
+    zlatent : Pearson(app,W) = +0.997595   max abs diff = 2.876   (app range [4.023,62.71], W range [4.019,62.71])
+    zgamma  : Pearson(app,W) = +1.000000   max abs diff = 0   (app range [0.1466,0.9783], W range [0.1466,0.9783])
+
+(d) robust-z medians/MADs per branch, computed subject-wide (app-way pooled over all chb03 windows vs Scope W-way, same pooling rule -- unmasked, whole recording, matching each path's own fitting scope):
+    zrecon  : app  median=+0.02059 mad=0.00695809   |   W  median=+0.0205967 mad=0.00695877   |   rel.diff median=0.0003 mad=0.0001
+    zlatent : app  median=+14.9614 mad=3.76019   |   W  median=+14.959 mad=3.75445   |   rel.diff median=0.0002 mad=0.0015
+    zgamma  : app  median=+0.24324 mad=0.0592707   |   W  median=+0.24324 mad=0.0592707   |   rel.diff median=0.0000 mad=0.0000
+
+Peak-amplitude ratio (max/median per-window peak |amplitude|, app filtered windows, whole subject chb03, n=34201): 13.62   (max=2.4987e-03, median=1.8342e-04)
+
+====================================================================================================
+Total diagnostic wall-clock: 1235.2s (20.6 min)

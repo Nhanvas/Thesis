@@ -1,0 +1,133 @@
+====================================================================================================
+(1) git history / diff for web_demo/backend/ since szscan-frozen-v2
+====================================================================================================
+
+git log -5 --format='%h %ci %s' -- web_demo/backend/
+0ffd99b 2026-09-29 21:22:46 +0700 Phase A concurrency 4 -> 2: chb06 exceeds memory at 4 on the target laptop
+66f7c89 2026-09-29 13:41:47 +0700 Freeze web_demo build for report handback (Part 0)
+c2160aa 2026-09-27 22:03:13 +0700 Filter toolbar collapsed to single preprocessed toggle (C24); disk cleanup on delete + Phase-A concurrency cap; chb13 completed to full 33-file real set; per-stage timing instrumentation
+99d31c5 2026-09-26 19:54:30 +0700 Step 9 phase 2: all 8 allowlisted subjects real & processed; fixed pipeline_demo.py whole-subject-array OOM bug (chunked mean/std, bit-identical)
+f34db2c 2026-09-26 15:43:37 +0700 Step 9 phase 1 + 1b: DB cleaned to real data only (chb13, chb16); real PELT/Phase A+B timing measured; C23 added
+
+szscan-frozen-v2 points to: 0ffd99b 2026-09-29 21:22:46 +0700 Phase A concurrency 4 -> 2: chb06 exceeds memory at 4 on the target laptop
+szscan-frozen-v1 points to: 66f7c89 2026-09-29 13:41:47 +0700 Freeze web_demo build for report handback (Part 0)
+current HEAD:               7e8c966 2026-09-30 21:30:57 +0700 Continuous eval: amendment A1 (gate scope)
+
+git diff --stat szscan-frozen-v2 -- web_demo/backend/  (whole directory)
+  -> (empty above = no changes anywhere under web_demo/backend/ since the freeze)
+
+git diff --stat szscan-frozen-v2 -- pipeline_demo.py pipeline_worker.py upload_manager.py
+  -> (empty -- no changes)
+
+git diff szscan-frozen-v2 -- pipeline_demo.py pipeline_worker.py upload_manager.py  (full diff)
+[end of diff -- empty means byte-identical to the frozen tag]
+
+====================================================================================================
+(2) App-way fused score reproduction vs stored uploads/{subj}/{stem}.score.npy
+====================================================================================================
+
+--- chb17 (21 files, target chb17a_03.edf) ---
+    [app-way GAE/adjacency/gamma pass over all 21 files in 273.5s]
+    recomputed (app-way, all 21 files) vs stored chb17a_03.score.npy (n=900, recomputed n=900):
+      Pearson r = 1.00000000   max abs diff = 0   (stored range [-1.395,4.105])
+
+--- chb03 (38 files, target chb03_01.edf) ---
+    [app-way GAE/adjacency/gamma pass over all 38 files in 705.6s]
+    recomputed (app-way, all 38 files) vs stored chb03_01.score.npy (n=900, recomputed n=900):
+      Pearson r = 1.00000000   max abs diff = 0   (stored range [-1.793,8.949])
+
+====================================================================================================
+(3) Orphan files / draft dirs / mtimes
+====================================================================================================
+
+szscan.db 'files' rows for chb17: 21
+  ['chb17a_03.edf', 'chb17a_04.edf', 'chb17a_05.edf', 'chb17a_06.edf', 'chb17a_08.edf', 'chb17b_57.edf', 'chb17b_58.edf', 'chb17b_59.edf', 'chb17b_60.edf', 'chb17b_63.edf', 'chb17b_67.edf', 'chb17b_68.edf', 'chb17b_69.edf', 'chb17c_02.edf', 'chb17c_03.edf', 'chb17c_04.edf', 'chb17c_05.edf', 'chb17c_06.edf', 'chb17c_07.edf', 'chb17c_08.edf', 'chb17c_13.edf']
+
+Stems present in uploads/chb17/ but NOT among the 21 DB filenames: NONE
+
+_draft_* (or any 'draft'-named) directories under uploads/: NONE FOUND
+
+mtimes of all 21 chb17*.score.npy and *.filtered.npy:
+  file                           score.npy mtime        filtered.npy mtime
+  chb17a_03                      2026-09-30T03:41:19.619849 2026-09-30T03:37:13.526960
+  chb17a_04                      2026-09-30T03:41:19.742361 2026-09-30T03:37:16.422286
+  chb17a_05                      2026-09-30T03:41:19.758319 2026-09-30T03:37:19.544313
+  chb17a_06                      2026-09-30T03:41:19.794624 2026-09-30T03:37:24.715377
+  chb17a_08                      2026-09-30T03:41:19.798429 2026-09-30T03:37:29.309937
+  chb17b_57                      2026-09-30T03:41:19.812006 2026-09-30T03:37:33.615812
+  chb17b_58                      2026-09-30T03:41:19.815280 2026-09-30T03:37:39.315682
+  chb17b_59                      2026-09-30T03:41:19.855689 2026-09-30T03:37:43.900541
+  chb17b_60                      2026-09-30T03:41:19.860308 2026-09-30T03:37:48.756898
+  chb17b_63                      2026-09-30T03:41:19.866086 2026-09-30T03:37:54.811196
+  chb17b_67                      2026-09-30T03:41:19.870074 2026-09-30T03:37:56.752789
+  chb17b_68                      2026-09-30T03:41:19.874338 2026-09-30T03:38:08.140258
+  chb17b_69                      2026-09-30T03:41:19.878329 2026-09-30T03:38:08.137259
+  chb17c_02                      2026-09-30T03:41:19.944562 2026-09-30T03:38:16.513059
+  chb17c_03                      2026-09-30T03:41:19.958464 2026-09-30T03:38:19.591986
+  chb17c_04                      2026-09-30T03:41:19.984941 2026-09-30T03:38:21.378103
+  chb17c_05                      2026-09-30T03:41:19.988931 2026-09-30T03:38:23.922072
+  chb17c_06                      2026-09-30T03:41:20.050675 2026-09-30T03:38:25.455595
+  chb17c_07                      2026-09-30T03:41:20.053908 2026-09-30T03:38:27.757166
+  chb17c_08                      2026-09-30T03:41:20.056883 2026-09-30T03:38:32.166206
+  chb17c_13                      2026-09-30T03:41:20.144614 2026-09-30T03:38:34.507328
+
+szscan.db subjects.created_at for all 8 subjects (for comparison):
+  ('chb06', 'frozen build szscan-frozen-v2', '2026-09-29 20:05:09')
+  ('chb03', 'frozen build szscan-frozen-v2', '2026-09-29 20:12:51')
+  ('chb13', 'frozen build szscan-frozen-v2', '2026-09-29 20:19:14')
+  ('chb14', 'frozen build szscan-frozen-v2', '2026-09-29 20:24:30')
+  ('chb15', 'frozen build szscan-frozen-v2', '2026-09-29 20:33:05')
+  ('chb16', 'frozen build szscan-frozen-v2', '2026-09-29 20:37:09')
+  ('chb17', 'frozen build szscan-frozen-v2', '2026-09-29 20:41:20')
+  ('chb18', 'frozen build szscan-frozen-v2', '2026-09-29 20:48:31')
+
+Note on the ~7h gap between subjects.created_at (2026-09-29 evening, local time, no UTC offset
+stored) and the file mtimes (2026-09-30 03:37-03:41, ~7h later): db `files.start_time` rows carry
+an explicit +00:00 (UTC) offset while `created_at` does not, so this is consistent with
+created_at being recorded in UTC and ls/stat reporting mtimes in local time (UTC+7) -- i.e. the
+same moment, not a real 7-hour processing gap. Not independently confirmed (the machine's
+configured timezone was not checked), but it reduces to a display-convention question, not a
+second batch or a delayed run: FOR THIS check what matters is that Phase A (.filtered/.raw/
+.bandpass.npy) and Phase B (.score/.pernode.npy) times are internally consistent (A before B,
+tight ~2 min / ~<1s windows respectively, no fragmentation -- see below).
+
+====================================================================================================
+Interpretation
+====================================================================================================
+
+(1) No code drift: web_demo/backend/ (pipeline_demo.py, pipeline_worker.py, upload_manager.py
+    explicitly) is byte-identical to szscan-frozen-v2 right now. Whatever produced chb17's
+    score.npy files used the same code that is on disk today.
+
+(2) No staleness: recomputing chb17a_03's fused score "the application's way" (subject-wide
+    z-score + LedoitWolf + robust-z fit over ALL 21 of chb17's CURRENTLY-cached .filtered.npy
+    files, then the rlg ensemble) reproduces the STORED chb17a_03.score.npy EXACTLY -- Pearson
+    r = 1.00000000, max abs diff = 0, not just close. Same result for the chb03_01 control
+    (r = 1.00000000, diff = 0, 38 files). The stored score.npy files are not stale relative to
+    the current filtered.npy cache or the current algorithm -- there is no hidden earlier/partial
+    run behind them.
+
+(3) No orphaned files, no draft directories, no fragmented upload: the 21 files on disk match the
+    21 rows in szscan.db exactly (0 orphans); no _draft_* directory exists anywhere under
+    uploads/; the DB rows for chb17 have contiguous ids (478-498, no other subject's rows
+    interleaved) under one memo ("frozen build szscan-frozen-v2"); the Phase A outputs
+    (.filtered.npy) for all 21 files fall in a tight ~81-second window (03:37:13-03:38:34) and
+    every one of the Phase B outputs (.score.npy) falls within under 1 second of each other
+    (03:41:19.62-03:41:20.14) -- consistent with ONE subject-wide Phase B call over the complete
+    21-file set, not an incremental multi-session build.
+
+CONCLUSION: none of these three checks explains the earlier G1 near-misses for chb17 (or chb03).
+The application's stored chb17 scores are current, complete, and produced by exactly the code on
+disk. Per src/continuous_eval.py's chb17_stage_check.txt (a separate, earlier diagnostic): with
+filtering and subject-wide z-score stats proven bit-identical/numerically-identical between the
+app's own cached data and an independent recomputation, a small residual divergence still appears
+specifically in the GAE/LedoitWolf branch scores (zrecon, zlatent -- not zgamma, which is exact)
+BETWEEN TWO SEPARATE COMPUTATIONAL PASSES of the same code on the same inputs. This diagnostic's
+finding that a SINGLE pass (app-way, right here) reproduces the stored score.npy exactly is
+consistent with that residual being ordinary run-to-run floating-point non-determinism in the
+PyTorch GCNConv/LedoitWolf path (present at comparable magnitude on both chb17 and chb03), not a
+staleness, code-drift, or fragmented-upload artifact -- none of which chb17 has, per checks (1)
+and (3) above.
+
+====================================================================================================
+Total diagnostic wall-clock: 1042.2s (17.4 min)

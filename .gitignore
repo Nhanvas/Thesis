@@ -53,6 +53,15 @@ archive/scaffolding/checkpoints/
 web_demo/cache/
 web_demo/backend/.env
 web_demo/backend/szscan.db
+web_demo/backend/szscan.db.bak*
 web_demo/backend/uploads/
 web_demo/frontend/node_modules/
 web_demo/frontend/dist/
+# v2 inputs and large caches (identity in docs/PROVENANCE_V2.md)
+data/trainset_v2/
+data/testset_v2/
+results/app_eval_v3/cache/
+results/continuous_eval/cache/
+results/continuous_eval/artifact_feature_explore/*.csv
+results/e14_spatial_recruitment/pernode/
+results/e15_patient_adaptation/pernode/

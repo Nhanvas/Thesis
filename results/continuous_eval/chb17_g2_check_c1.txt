@@ -1,0 +1,45 @@
+====================================================================================================
+chb16  (Scope T recomputed with filter_file_per_window -- Correction C1)
+====================================================================================================
+
+[Scope T (per-window filter) recompute over all 19 files in 235.4s]
+
+per-branch comparison vs committed offline components, inter=background_mask, ictal=is_ictal:
+  zrecon   / inter : n_mine=6428 n_off=6428 count_match=True  rho=0.9999  Pearson=0.9999  max_abs_diff=0.4984  (mine range [-3.04,19.6], off range [-3.03,19.6])
+  zrecon   / ictal : n_mine=28 n_off=28 count_match=True  rho=0.9995  Pearson=1.0000  max_abs_diff=0.1401  (mine range [-1.71,16.3], off range [-1.71,16.3])
+  zlatent  / inter : n_mine=6428 n_off=6428 count_match=True  rho=0.9989  Pearson=0.9990  max_abs_diff=1  (mine range [-3.22,13.6], off range [-3.22,13.6])
+  zlatent  / ictal : n_mine=28 n_off=28 count_match=True  rho=1.0000  Pearson=0.9998  max_abs_diff=0.2065  (mine range [-1.31,8.1], off range [-1.31,8.09])
+  zgamma   / inter : n_mine=6428 n_off=6428 count_match=True  rho=1.0000  Pearson=1.0000  max_abs_diff=0.2151  (mine range [-3.73,40.3], off range [-3.72,40.1])
+  zgamma   / ictal : n_mine=28 n_off=28 count_match=True  rho=1.0000  Pearson=1.0000  max_abs_diff=0.1216  (mine range [0.3,22.4], off range [0.293,22.2])
+
+  ==> FIRST branch/stage where chb16 departs from good agreement (rho<0.99 or count mismatch): None
+====================================================================================================
+chb17  (Scope T recomputed with filter_file_per_window -- Correction C1)
+====================================================================================================
+
+[Scope T (per-window filter) recompute over all 21 files in 257.2s]
+
+per-branch comparison vs committed offline components, inter=background_mask, ictal=is_ictal:
+  zrecon   / inter : n_mine=9304 n_off=9304 count_match=True  rho=0.9973  Pearson=0.4991  max_abs_diff=45.7  (mine range [-2.79,18.4], off range [-2.79,48.7])
+  zrecon   / ictal : n_mine=74 n_off=74 count_match=True  rho=0.9997  Pearson=0.9999  max_abs_diff=0.1059  (mine range [-1.76,3.45], off range [-1.76,3.43])
+  zlatent  / inter : n_mine=9304 n_off=9304 count_match=True  rho=0.9197  Pearson=0.9351  max_abs_diff=6.004  (mine range [-3.38,13.3], off range [-3.64,12.9])
+  zlatent  / ictal : n_mine=74 n_off=74 count_match=True  rho=0.9539  Pearson=0.9520  max_abs_diff=1.749  (mine range [-1.96,5.84], off range [-2.59,7.18])
+  zgamma   / inter : n_mine=9304 n_off=9304 count_match=True  rho=1.0000  Pearson=1.0000  max_abs_diff=0.2297  (mine range [-5.95,22.3], off range [-5.95,22])
+  zgamma   / ictal : n_mine=74 n_off=74 count_match=True  rho=1.0000  Pearson=1.0000  max_abs_diff=0.1319  (mine range [0.617,11.9], off range [0.599,11.8])
+
+  ==> FIRST branch/stage where chb17 departs from good agreement (rho<0.99 or count mismatch): ('zlatent', 'inter', np.float64(0.9196898116282975), True)
+
+  Top-10 largest |mine-offline| positions for zlatent/inter (position, mine, off, |diff|):
+    pos=  8790  mine=   +8.1196  off=   +2.1152  diff=    6.0044
+    pos=  3262  mine=   +3.7386  off=   +8.0779  diff=    4.3393
+    pos=  4642  mine=   +5.3939  off=   +1.1446  diff=    4.2493
+    pos=  5772  mine=   +3.2179  off=   -0.8320  diff=    4.0499
+    pos=  7923  mine=   +2.3676  off=   -1.6484  diff=    4.0160
+    pos=  4255  mine=   +2.2212  off=   -1.7345  diff=    3.9556
+    pos=  1340  mine=   +2.4952  off=   -1.4136  diff=    3.9088
+    pos=   306  mine=   +2.8619  off=   -1.0361  diff=    3.8980
+    pos=  8453  mine=   +4.1845  off=   +0.3169  diff=    3.8676
+    pos=  8136  mine=   +4.0424  off=   +0.2046  diff=    3.8377
+  distribution of |diff| for zlatent/inter: p50=0.305 p90=0.9782 p99=2.32 max=6.004
+
+Total diagnostic wall-clock: 493.0s (8.2 min)

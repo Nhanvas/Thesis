@@ -560,3 +560,35 @@ against the retired draft. Restore point for the v3 state: `git tag attribution-
 
 **Retired numbers — never quote:** 0.6497 · 0.3095 · 0.7758 · 0.8879 · −0.1261 · 0.6267 · 0.6681 ·
 0.2672 · +0.3578 · p = 0.984 (draft labels) · 0.262 / 0.303 (MAP@K era) · p = 8.9e-11 (untraced).
+
+### A5 (2026-10-08) -- attribution of the final system. Written before any A5 number.
+Script: `src/attribution_v8.py` (its docstring is the full text).
+```
+PRE-REGISTRATION (A5, written 2026-10-08 before any number of this script exists)
+---------------------------------------------------------------------------------
+Why. The final system (tag p3-frozen) no longer uses the reconstruction readout that A4 scored. Its
+anomaly score is built from a per-channel quantity: the per-patient LedoitWolf Mahalanobis distance of
+each channel's 16-d GAE v2 node latent, robust-z per channel. That per-channel z is what the system
+ranks (order statistics 6/9/12 and the mean are taken over it) and what the rebuilt web demo shows.
+A5 scores THAT quantity against the same final channel annotation, with the A4 method unchanged.
+
+Score (one construction, fixed now).
+  D_i(w)  = results/p2_test/{subj}.npz  clean_seed{N}_d[:, i]  (per-channel LW distance, fitted on all
+            dumped windows of the patient, label-free; the look-#6/#7 cache)
+  z_i(w)  = (D_i(w) - median_w D_i) / (MAD_w D_i + 1e-9), over all dumped windows of the patient
+            (identical to e16_recording_baseline.rz inside s_from_d: the system's per-channel z,
+            before the order statistic and before the +-15 min drift correction)
+  s_i     = p95 over the seizure's dumped windows of |z_i(w)|   (A4 aggregation, unchanged)
+  Seizure windows = windows of the labelled file with start in [floor(onset/4), ceil(offset/4)),
+  onset/offset from results/attribution_v6/seizure_blocks.csv (the A4 alignment, edf_file + onset_s).
+Primary: seed 42, p95. Labels, L1 / L2 / L3, D7, Holm over {L2, L3}, bootstrap and permutation settings,
+descriptive panels (without chb15, n_win >= 3, mean aggregation, seeds 1/2/3, per subject) and the
+interpretation table of spec 4.7 are those of A4, executed by attribution_pipeline.cmd_eval7 itself;
+in the sentences of 4.7 "reconstruction anomaly" reads "latent anomaly".
+Not done (and never added after seeing a result): any other per-channel quantity, the drift-corrected
+variant, another aggregation, another seed as primary, any channel or seizure subset as primary.
+Reporting. One run, reported as is, whatever the outcome. The A4 result stays in the thesis as the
+attribution of the earlier reconstruction readout; A5 is the attribution of the final system. Not a
+detection look (no event metric); it reuses the 76 test annotations already used by A4 and is logged in
+PERF_PHASE_RECORD section 3 as an attribution read.
+```

@@ -1,4 +1,4 @@
-# ATTRIBUTION_SPEC — Channel Attribution (v4 rev. B, 2026-09-19 — method LOCKED, results FINAL)
+# ATTRIBUTION_SPEC — Channel Attribution (v4 rev. B, 2026-09-19 — method LOCKED, results FINAL) · A5 (final system) 2026-10-08
 
 > **Single source for the channel-attribution study.** Supersedes v3 rev. B (2026-09-02). Self-contained:
 > a later session can execute or defend this chapter from this file alone.
@@ -592,3 +592,11 @@ attribution of the earlier reconstruction readout; A5 is the attribution of the 
 detection look (no event metric); it reuses the 76 test annotations already used by A4 and is logged in
 PERF_PHASE_RECORD section 3 as an attribution read.
 ```
+
+<!-- report-phase-2026-10-08 -->
+#### A5 result (2026-10-08, `results/attribution_v8/`, tag `attribution-a5-results`)
+
+L1 macro-AUROC 0.5473 [0.4992, 0.5971], p = 0.018 (pass, weak) · L2 Δ vs prior −0.1914 [−0.2618, −0.1182]
+(fail, significantly below) · L3 T = −0.0017, p = 0.53 (fail) · D7 −0.0754 · without chb15 0.4864.
+Interpretation row of 4.7: "L1 passes, L2 fails", with "latent anomaly" for "reconstruction anomaly".
+The A4 result (section 9.3) stands as the attribution of the earlier reconstruction readout.

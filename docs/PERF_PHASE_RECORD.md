@@ -1,8 +1,8 @@
 # PERF_PHASE_RECORD — performance phase (re-opened 2026-10-05)
 
-**Rev. P, 2026-10-07** (rev. B–O same day, rev. A 2026-10-06). **Stage P2 CLOSED; stage P3 opens.** Single source for the performance phase. Supersedes
+**Rev. R, 2026-10-08** (rev. P–Q 2026-10-07) (rev. B–O same day, rev. A 2026-10-06). **Performance phase CLOSED (P1–P3, X1); report phase since 2026-10-08 (rev. R, section 10).** Single source for the performance phase. Supersedes
 `HANDOVER_PERF_2026-10-06.md` (archived) and the chat audits `audit_1`–`audit_7`.
-Stage **P1** (E1–E10) is CLOSED. Stage **P2** (E11 onward) is running; its log and queue are in §6.
+Stages **P1** (E1–E10), **P2** (E11–E22) and **P3** (section 9) are CLOSED; external validation X1 in 9.9; report-phase decisions and the final-system attribution (A5) in section 10.
 Rev. B: §6 rewritten with E11–E14; wording on flagged windows corrected (§6.0). Rev. C: E15, author decisions on the ensemble and CPD. Rev. D: binding rules (§6.2), designs E16–E20 (§6.3). Rev. E: designs approved with four
 clarifications (order E19 before E18, short events in E18, branch ledger §6.4, single-readout framing, runtimes).
 Rev. F: E16 arms a–d (4 seeds) and the drift mechanism. Rev. G: E16 e, f; E17 (Eb chosen); E16g proposed; E19 ready. Rev. H: E16g arms dt, h; E19 stop
@@ -16,7 +16,7 @@ matched-budget bootstrap; freeze candidate written down (§6.6), test look not y
 points (E17b choice, CPD wording, decision count, headline seed), E20a and diagnostics, test-look scripts.
 Rev. P: E18 diagnostics, E20a, look #6 on test, author decision (not approved; phase 3, target pooled
 sensitivity ≥ 0.50); handoff in `docs/HANDOFF_P3.md`. Rev. Q: stage P3 opened -- checks of the burden table and the 4-seed bootstrap, test-information
-policy (two tiers), hypotheses H6-H8, P3-A anatomy script, decision table (section 9).
+policy (two tiers), hypotheses H6-H8, P3-A anatomy script, decision table (section 9). Rev. R (2026-10-08): look-#6 subject-mean by seed (0.508 seed 42, 0.498 4 seeds); X1 hours; section 7 resolved; section 10 (report phase, A5).
 
 Authority: for every number in this file the primary source is the `SUMMARY.md` / CSV named beside it.
 `RESULTS_OF_RECORD_phaseB.md` stays authoritative for the **offline-protocol** numbers of the locked
@@ -115,10 +115,11 @@ A local-contrast detector does not rescue missed seizures here.
 | 4 | veto screen, one-shot (commit 90a4dae, `results/veto_screen*`), plus the oracle bound Part B (`results/oracle_gate_bound/`) | 6/76, FA 19.2 → 17.9: did not transfer. Part B: test seizure peaks exceeded by 20–50 % of same-length non-ictal spans (4 % on val); 0.1–1 % once flagged windows are removed |
 | 5 | E9, frozen v2 (tag `e9-test-oneshot`; seeds 2, 3 added later, config unchanged) | §2 |
 
-| 6 | P2 frozen system (tag `p2-frozen`), `e22_test_oneshot.py`, 2026-10-07 | seed 42 after the localizer **26/76 (0.342) @ 22.2 FP/day**, precision 0.092, F1 0.145; 4 seeds 0.336 ± 0.008 @ 23.9 ± 1.2; subject-mean 0.498; short 4/18. E on the same look 3/76 @ 24.1 (reproduces E9 exactly) |
+| 6 | P2 frozen system (tag `p2-frozen`), `e22_test_oneshot.py`, 2026-10-07 | seed 42 after the localizer **26/76 (0.342) @ 22.2 FP/day**, precision 0.092, F1 0.145; 4 seeds 0.336 ± 0.008 @ 23.9 ± 1.2; subject-mean 0.508 (seed 42; 4 seeds 0.498 ± 0.010); short 4/18. E on the same look 3/76 @ 24.1 (reproduces E9 exactly) |
 | P3-T | 2026-10-07, stage P3, test **information** (not a look at results): (a) `p3_seizure_burden.py` read the test summaries (counts, durations, ictal minutes); (b) `p3_anatomy.py --include-test`: tier T-A (label-free test EEG and model outputs) and tier T-B (per-seizure anatomy joined to test annotations), section 9 | any P3 design motivated by (b) makes look #7 test-informed; it is reported as such |
 | 7 | P3 frozen system (tag `p3-frozen`), `e23_test_look7.py`, 2026-10-07 — **TEST-INFORMED** (record 9.2) | balanced point, seed 42 after the localizer **37/76 (0.487) @ 27.5 FP/day**, precision 0.104, F1 0.172, subject-mean 0.577; 4 seeds 0.477 ± 0.022 @ 29.2 ± 1.3, subject-mean 0.567; detector stage 38/76 (0.500) @ 28.4. Look #6 reproduced exactly (R2). No look #8 |
 | X1 | 2026-10-07, external validation of the P3 frozen system on data never used by the thesis: chb24 and Siena (14 patients), `x1_external.py` (tags `x1-prereg`, `x1-prereg-v2`), one run, no tuning | chb24 seed 42 14/16 @ 29.5 FP/day; Siena seed 42 33/47 (0.702) @ 44.0, subject-mean 0.748; 4 seeds Siena pooled 0.617, subject-mean 0.633 @ 41.0. Not a look at the CHB-MIT test set |
+| A5 | 2026-10-08, channel attribution of the final system (`src/attribution_v8.py`, tags `attribution-a5-prereg`, `attribution-a5-results`): per-channel latent anomaly against the 76 test channel annotations already used by A4; no event metric | section 10.2 |
 
 Looks 2–4 informed the P1 diagnosis; look 5 (E9) the P2 diagnosis. Look 6 was reported as is; the author did
 not approve the result and opened stage P3 (target pooled sensitivity ≥ 0.50). Any P3 design that uses
@@ -450,7 +451,9 @@ no-CPD control (unsmoothed score above the detector threshold) beside CPD and th
    supervisor may comment on are §7 items 3 (label-free per-patient fitting under "unsupervised") and
    4 (role of CPD).
 
-## 7 · Decisions open for the supervisor (08/10)
+## 7 · Decisions for the supervisor meeting (08/10) — RESOLVED, see section 10.1
+
+The list below is kept as it was asked.
 
 1. How the report presents the offline protocol vs the continuous timeline (and the application tier).
 2. Disclosure of the test looks in §3.
@@ -501,8 +504,7 @@ CPD with a measured localization role.
 +0.455 [0.187, 0.724], FP/day −0.95 [−12.0, +5.1]; without chb15 pooled 0.455 [0.240, 0.750].
 Consistent with the seed-42 values of §6.1. Reading: with 8 patients the interval of the current system
 already contains 0.50; chb15 (20) and chb13 (12) hold 42 % of the test seizures (computed), so the pooled
-target is mostly a statement about two patients. The official SzCORE aggregate (subject-mean) of look #6
-is 0.498.
+target is mostly a statement about two patients. The official SzCORE aggregate (subject-mean) of look #6 is 0.498 (4-seed mean; seed 42 0.508).
 
 ### 9.2 Test-information policy for P3 (author decision 2026-10-07)
 
@@ -721,8 +723,7 @@ detector 20 s, CPD 24 s (bias +16), contiguous-run (hybrid) offset 16 s. CPD's r
 (32 → 12 s); its offset is late, as on non-test (9.7, 6.1). The hybrid was not adopted (non-test rule) and is
 not switched after the look.
 
-**How the report presents the test results (fixed).** Look #6 (P2 frozen, 0.342 @ 22.2, subject-mean
-0.498) is the clean held-out evaluation. Look #7 (P3 frozen, 0.487 @ 27.5, subject-mean 0.577) is the
+**How the report presents the test results (fixed).** Look #6 (P2 frozen, 0.342 @ 22.2, subject-mean 0.508 seed 42; 4 seeds 0.336 / 0.498) is the clean held-out evaluation. Look #7 (P3 frozen, 0.487 @ 27.5, subject-mean 0.577) is the
 final system, labelled test-informed, with the bootstrap interval and the statement that its gain is
 chb15 at a budget cap that binds only on test. Both are reported; neither replaces the other.
 
@@ -741,7 +742,7 @@ Any test of these would need a new evaluation set; the CHB-MIT test set is used 
 ### 9.9 External validation X1 (chb24 and Siena; clean, never used before)
 
 **Design.** The P3 frozen system unchanged (code path = `e23_test_look7.evaluate`), run once on CHB-MIT chb24
-(outside the 23-subject splits) and the Siena Scalp EEG database (14 adult patients, 47 seizures, 140 h),
+(outside the 23-subject splits) and the Siena Scalp EEG database (14 adult patients, 47 seizures, ~141 h by the per-patient hours of the X1 summary),
 pre-registered in `src/x1_external.py` before any of these recordings was processed. Declared, label-free
 adaptations: z-score statistics from every 10th window of the whole recording; Siena: 18 bipolar channels
 derived from the referential montage, 512 → 256 Hz, notch at 50 Hz. Label sources fixed after a label-only
@@ -755,7 +756,7 @@ scoring: R-feat (chb03 file rebuilt on Kaggle: f7/bp5 exact, 0.045 % adjacency e
 
 | set | seed 42 | 4 seeds pooled | 4 seeds subject-mean (official) | onset / offset (CPD) |
 |---|---|---|---|---|
-| chb24 (16 seizures, 21.1 h) | 14/16 = 0.875 @ 29.5 FP/day, precision 0.350, F1 0.500 | 0.828 ± 0.060 @ 28.4 | (one subject) | 4 / 4 s (n = 53) |
+| chb24 (16 seizures, 21.3 h) | 14/16 = 0.875 @ 29.5 FP/day, precision 0.350, F1 0.500 | 0.828 ± 0.060 @ 28.4 | (one subject) | 4 / 4 s (n = 53) |
 | Siena (47 seizures, 140 h) | 33/47 = 0.702 @ 44.0, subject-mean 0.748 @ 41.5 | 0.617 ± 0.060 @ 43.8 | sens 0.633 ± 0.079, precision 0.160, F1 0.226, 41.0 FP/day | 20 / 28 s (n = 116) |
 
 Siena subject-level bootstrap (4-seed means): subject-mean sensitivity [0.477, 0.777], pooled [0.495, 0.726],
@@ -776,3 +777,71 @@ of Siena's seizures (adult patients; the GAE was trained on children), at 28 and
 test patients are the hard case (look #6 0.342, look #7 0.487); the external sets indicate that the method
 generalises, while the false-alarm rate on Siena is above the 40 FP/day level flagged for the test look.
 This is the clean held-out evidence for the final system; it does not replace looks #6 and #7.
+
+<!-- report-phase-2026-10-08 -->
+## 10 · Report phase (opened 2026-10-08)
+
+### 10.1 Author decisions (08/10; the supervisor reviewed the briefing and asked for the report with the current numbers)
+
+1. **Offline protocol.** Not reported as a result (no table, no figure). One short paragraph (Methods,
+   evaluation, or Discussion) states that an earlier evaluation rebuilt the timeline from the annotations
+   and filled it with resampled windows from which high-amplitude windows had been removed, and that on
+   the continuous recording the same earlier system at the same operating point fell from 0.618 @ 27.4
+   FP/day to 23/76 (0.303) @ 73.3 FP/day. The continuous timeline is the protocol of record.
+2. Label-free per-patient fitting on the whole recording is part of the unsupervised system (P2 decision;
+   DynaSD as precedent).
+3. Kernel CPD is the onset/offset localizer on the scalar ensemble anomaly score (decision 2026-10-07);
+   the onset gain is measured, the offset is not better than a contiguous-run rule, and both are stated.
+4. Test results: look #6 is the clean held-out evaluation, look #7 the final system labelled
+   test-informed, side by side (9.8); X1 is the clean external evidence for the final system.
+5. Aggregation: pooled and subject-mean side by side (subject-mean = SzCORE's official aggregate);
+   headline seed 42 with the 4-seed mean ± SD and the patient-level bootstrap. Look #6 subject-mean:
+   **seed 42 0.508, 4 seeds 0.498 ± 0.010** (`results/e22_test_oneshot/SUMMARY.md`); earlier text that
+   paired 0.342 with 0.498 mixed the two.
+6. The web demo is rebuilt on the final system (seed 42) and its application tier re-run:
+   `docs/DEMO_REBUILD_BRIEF.md`.
+7. Channel attribution re-run on the final system (A5, 10.2); A4 stays as the attribution of the earlier
+   reconstruction readout.
+Order of work and fallback: `docs/HANDOFF_REPORT.md` section 0.
+
+### 10.2 Attribution A5 — final system (`src/attribution_v8.py`, `results/attribution_v8/`)
+
+Pre-registered in `ATTRIBUTION_SPEC.md` A5 and committed with tag `attribution-a5-prereg` before scoring;
+one run (70 s), gates G1 (alignment of the 76 annotations to the v2 test windows), G2 (cache), G3 (A4
+order confirmation) passed. Score: per-channel robust-z of the per-channel latent distance (the system's
+own per-channel quantity), p95 of |z| over the seizure. Method, labels and tests of A4.
+
+| test | value | interval / p | verdict |
+|---|---|---|---|
+| L1 macro-AUROC, 62 focal | 0.5473 | [0.4992, 0.5971], permutation p 0.018 | pass (the registered criterion is the permutation p; the bootstrap lower bound touches 0.5) |
+| L2 Δ vs anatomical prior (0.7387) | −0.1914 | [−0.2618, −0.1182] | fail, significantly below the prior |
+| L3 matched − swapped | −0.0017 | p 0.53 | fail |
+| D7 subject-constant control | −0.0754 | — | control higher |
+
+Descriptive: without chb15 0.4864 (p 0.71); seeds 1/2/3 0.543 / 0.588 / 0.545; mean aggregation 0.556;
+n_win ≥ 3 0.549; per subject only chb15 above chance (0.675, p 0.001). Reading (spec 4.7, "L1 passes,
+L2 fails"): weak concentration on annotated channels, far below a fixed anatomical rule, no
+seizure-specific information — the same pre-registered negative as A4 (0.5694, L2 −0.1694), now on a
+second readout. The demo panel becomes `Channel-level latent anomaly — Event N`, neutral.
+
+### 10.3 Ledger note
+
+`results/p2_ledger.csv` `verdict` records the outcome of each step's own gate, not the final selection:
+E20a, E18 (`_ovl`) and P3-L6 read "ADOPTED" but were not chosen (E20a lost on sensitivity, E18d tied →
+E18, L6 was not adopted on L2f). This record (6.1, 9.7, 9.7b) is the selection of record.
+
+### 10.4 Normalisation statistics (disclosure)
+
+CHB-MIT inputs of the v2 system (`c1b_build_trainset`, `c1t_build_testset`) are z-scored with
+`data/processed/{subj}_stats.json`, computed by the inherited preprocessing after excluding annotated
+seizure windows and the 4-h post-seizure buffer — for every subject, test included. The detection
+system uses no labels, but this normalisation step does. X1 and the web demo use label-free statistics
+(every 10th window of the whole recording). Effect on CHB-MIT not measured; a descriptive comparison of
+the two sets of statistics on the 8 test patients is an open item (HANDOFF section 9).
+
+### 10.5 Repo state (08/10)
+
+Commit `e13e629`: continuous-evaluation results (look #2 evidence) and the v2 checkpoints; v2 inputs and
+large caches gitignored. `results/x1_external/SUMMARY.md` restored from git (it had been deleted in the
+working tree). Look #4 evidence (`results/veto_screen*`, `results/oracle_gate_bound/`) committed by
+`report_phase_sync` follow-up command. `web_demo/*` changes belong to Project 2.

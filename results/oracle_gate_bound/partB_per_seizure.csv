@@ -1,0 +1,891 @@
+set,subject,k,ref,group,n_win,e
+val,chb10,1,all,mid (5-14),9,0.4896319205029406
+val,chb10,1,all,long (>=15),18,0.059616605306588855
+val,chb10,1,all,long (>=15),17,0.006727254264825344
+val,chb10,1,all,long (>=15),15,0.2758463178196213
+val,chb10,1,all,long (>=15),20,0.050341622006045084
+val,chb10,1,all,long (>=15),23,0.022973316391359577
+val,chb10,1,all,long (>=15),15,0.20458813378673302
+val,chb10,1,oracleV1,mid (5-14),9,0.23960657067531943
+val,chb10,1,oracleV1,long (>=15),18,0.004214802589818434
+val,chb10,1,oracleV1,long (>=15),17,0.0008631194151096366
+val,chb10,1,oracleV1,long (>=15),15,0.04707404963711115
+val,chb10,1,oracleV1,long (>=15),20,0.0036575144141627325
+val,chb10,1,oracleV1,long (>=15),23,0.0029733163913595595
+val,chb10,1,oracleV1,long (>=15),15,0.02261076993351263
+val,chb10,3,all,mid (5-14),9,0.5071993510444128
+val,chb10,3,all,long (>=15),18,0.03189031357115657
+val,chb10,3,all,long (>=15),17,0.004721770917952894
+val,chb10,3,all,long (>=15),15,0.12866061005938179
+val,chb10,3,all,long (>=15),20,0.04391557237560639
+val,chb10,3,all,long (>=15),23,0.008665819567979627
+val,chb10,3,all,long (>=15),15,0.19697507993706542
+val,chb10,3,oracleV1,mid (5-14),9,0.21547353477996345
+val,chb10,3,oracleV1,long (>=15),18,0.001878887901485382
+val,chb10,3,oracleV1,long (>=15),17,0.0
+val,chb10,3,oracleV1,long (>=15),15,0.002867583616708136
+val,chb10,3,oracleV1,long (>=15),20,0.0020827512636204526
+val,chb10,3,oracleV1,long (>=15),23,0.000584498094027941
+val,chb10,3,oracleV1,long (>=15),15,0.00779069177282643
+val,chb10,5,all,mid (5-14),9,0.4497312918272156
+val,chb10,5,all,long (>=15),18,0.0323981211120985
+val,chb10,5,all,long (>=15),17,0.006321080422420744
+val,chb10,5,all,long (>=15),15,0.09605136273663906
+val,chb10,5,all,long (>=15),20,0.04998603032689031
+val,chb10,5,all,long (>=15),23,0.018932655654383734
+val,chb10,5,all,long (>=15),15,0.19717809470638992
+val,chb10,5,oracleV1,mid (5-14),9,0.1318698032853377
+val,chb10,5,oracleV1,long (>=15),18,0.0004824171638948549
+val,chb10,5,oracleV1,long (>=15),17,0.0
+val,chb10,5,oracleV1,long (>=15),15,0.0017510023854235834
+val,chb10,5,oracleV1,long (>=15),20,0.0010667750374641072
+val,chb10,5,oracleV1,long (>=15),23,0.0
+val,chb10,5,oracleV1,long (>=15),15,0.004720093386793911
+val,chb10,9,all,mid (5-14),9,0.4252687081727844
+val,chb10,9,all,long (>=15),18,0.07274343023993901
+val,chb10,9,all,long (>=15),17,0.03592099918765235
+val,chb10,9,all,long (>=15),15,0.09653352281378469
+val,chb10,9,all,long (>=15),20,0.09423179497599754
+val,chb10,9,all,long (>=15),23,0.01646759847522239
+val,chb10,9,all,long (>=15),15,0.223037100949094
+val,chb10,9,oracleV1,mid (5-14),9,0.08735550598255937
+val,chb10,9,oracleV1,long (>=15),18,0.0
+val,chb10,9,oracleV1,long (>=15),17,0.0
+val,chb10,9,oracleV1,long (>=15),15,0.0004060295386489887
+val,chb10,9,oracleV1,long (>=15),20,0.0005333875187321091
+val,chb10,9,oracleV1,long (>=15),23,0.0
+val,chb10,9,oracleV1,long (>=15),15,0.0033497436938537684
+val,chb10,15,all,mid (5-14),9,0.333781180287974
+val,chb10,15,all,long (>=15),18,0.07916719563285513
+val,chb10,15,all,long (>=15),17,0.03861190089358246
+val,chb10,15,all,long (>=15),15,0.1617266406131046
+val,chb10,15,all,long (>=15),20,0.07353127936806281
+val,chb10,15,all,long (>=15),23,0.020889453621346865
+val,chb10,15,all,long (>=15),15,0.2040552200172563
+val,chb10,15,oracleV1,mid (5-14),9,0.017339282092881714
+val,chb10,15,oracleV1,long (>=15),18,0.0
+val,chb10,15,oracleV1,long (>=15),17,0.0
+val,chb10,15,oracleV1,long (>=15),15,0.0003806526924833298
+val,chb10,15,oracleV1,long (>=15),20,0.0
+val,chb10,15,oracleV1,long (>=15),23,0.0
+val,chb10,15,oracleV1,long (>=15),15,0.002207785616403557
+val,chb11,1,all,mid (5-14),6,0.32243097284551614
+val,chb11,1,all,mid (5-14),9,0.33113943313676997
+val,chb11,1,all,long (>=15),189,0.4631578947368421
+val,chb11,1,oracleV1,mid (5-14),6,0.004449684338632354
+val,chb11,1,oracleV1,mid (5-14),9,0.003385961575042784
+val,chb11,1,oracleV1,long (>=15),189,0.007923868712371385
+val,chb11,3,all,mid (5-14),6,0.21251996653228877
+val,chb11,3,all,mid (5-14),9,0.218641810918775
+val,chb11,3,all,long (>=15),189,0.1829481452709264
+val,chb11,3,oracleV1,mid (5-14),6,0.000798661291549374
+val,chb11,3,oracleV1,mid (5-14),9,0.0008369792657408892
+val,chb11,3,oracleV1,long (>=15),189,0.0
+val,chb11,5,all,mid (5-14),6,0.16943028827869477
+val,chb11,5,all,mid (5-14),9,0.17245577325470796
+val,chb11,5,all,long (>=15),189,0.11520683627888906
+val,chb11,5,oracleV1,mid (5-14),6,0.0003803149007378659
+val,chb11,5,oracleV1,mid (5-14),9,0.0004184896328705001
+val,chb11,5,oracleV1,long (>=15),189,0.0
+val,chb11,9,all,mid (5-14),6,0.10580360538525901
+val,chb11,9,all,mid (5-14),9,0.109339927715427
+val,chb11,9,all,long (>=15),189,0.04086230335987573
+val,chb11,9,oracleV1,mid (5-14),6,0.0003042519205902483
+val,chb11,9,oracleV1,mid (5-14),9,0.0
+val,chb11,9,oracleV1,long (>=15),189,0.0
+val,chb11,15,all,mid (5-14),6,0.1460409218833194
+val,chb11,15,all,mid (5-14),9,0.08822522351150841
+val,chb11,15,all,long (>=15),189,0.014760147601476037
+val,chb11,15,oracleV1,mid (5-14),6,0.0003042519205902483
+val,chb11,15,oracleV1,mid (5-14),9,0.0
+val,chb11,15,oracleV1,long (>=15),189,0.0
+val,chb22,1,all,long (>=15),16,0.09644782512369843
+val,chb22,1,all,long (>=15),20,0.0581910884504544
+val,chb22,1,all,long (>=15),19,0.1526043590690802
+val,chb22,1,oracleV1,long (>=15),16,0.0
+val,chb22,1,oracleV1,long (>=15),20,0.0
+val,chb22,1,oracleV1,long (>=15),19,0.0
+val,chb22,3,all,long (>=15),16,0.04238977918912934
+val,chb22,3,all,long (>=15),20,0.028818443804034533
+val,chb22,3,all,long (>=15),19,0.06420391577391948
+val,chb22,3,oracleV1,long (>=15),16,0.0
+val,chb22,3,oracleV1,long (>=15),20,0.0
+val,chb22,3,oracleV1,long (>=15),19,0.0
+val,chb22,5,all,long (>=15),16,0.07432981316003251
+val,chb22,5,all,long (>=15),20,0.020690164782383835
+val,chb22,5,all,long (>=15),19,0.03420760990025862
+val,chb22,5,oracleV1,long (>=15),16,0.0
+val,chb22,5,oracleV1,long (>=15),20,0.0
+val,chb22,5,oracleV1,long (>=15),19,0.0
+val,chb22,9,all,long (>=15),16,0.0437929251901632
+val,chb22,9,all,long (>=15),20,0.010936229956402865
+val,chb22,9,all,long (>=15),19,0.024159586257849974
+val,chb22,9,oracleV1,long (>=15),16,0.0
+val,chb22,9,oracleV1,long (>=15),20,0.0
+val,chb22,9,oracleV1,long (>=15),19,0.0
+val,chb22,15,all,long (>=15),16,0.05176870245919796
+val,chb22,15,all,long (>=15),20,0.005615901869504225
+val,chb22,15,all,long (>=15),19,0.016328038418913948
+val,chb22,15,oracleV1,long (>=15),16,0.0
+val,chb22,15,oracleV1,long (>=15),20,0.0
+val,chb22,15,oracleV1,long (>=15),19,0.0
+test,chb03,1,all,mid (5-14),14,0.08761678386319371
+test,chb03,1,all,long (>=15),17,0.41682360326428125
+test,chb03,1,all,long (>=15),18,0.24296903400641134
+test,chb03,1,all,mid (5-14),14,0.42256775940048197
+test,chb03,1,all,mid (5-14),13,0.033169411531733695
+test,chb03,1,all,long (>=15),16,0.1283236994219653
+test,chb03,1,all,mid (5-14),14,0.06975669340728274
+test,chb03,1,oracleV1,mid (5-14),14,0.0004621834868442365
+test,chb03,1,oracleV1,long (>=15),17,0.020418277331747503
+test,chb03,1,oracleV1,long (>=15),18,0.006543507716712416
+test,chb03,1,oracleV1,mid (5-14),14,0.02337327919183918
+test,chb03,1,oracleV1,mid (5-14),13,0.0004290570645896219
+test,chb03,1,oracleV1,long (>=15),16,0.000528488852188258
+test,chb03,1,oracleV1,mid (5-14),14,0.0004621834868442365
+test,chb03,3,all,mid (5-14),14,0.10943844706348416
+test,chb03,3,all,long (>=15),17,0.23550401427297052
+test,chb03,3,all,long (>=15),18,0.12849069698271587
+test,chb03,3,all,mid (5-14),14,0.2600442375623122
+test,chb03,3,all,mid (5-14),13,0.034687613452589194
+test,chb03,3,all,long (>=15),16,0.1195045417010735
+test,chb03,3,all,mid (5-14),14,0.04704367633950679
+test,chb03,3,oracleV1,mid (5-14),14,0.0
+test,chb03,3,oracleV1,long (>=15),17,0.0011233356460832455
+test,chb03,3,oracleV1,long (>=15),18,0.0
+test,chb03,3,oracleV1,mid (5-14),14,0.0014525766729391876
+test,chb03,3,oracleV1,mid (5-14),13,0.0
+test,chb03,3,oracleV1,long (>=15),16,0.0
+test,chb03,3,oracleV1,mid (5-14),14,0.0
+test,chb03,5,all,mid (5-14),14,0.1788319963025321
+test,chb03,5,all,long (>=15),17,0.2060329732051409
+test,chb03,5,all,long (>=15),18,0.11619683399980174
+test,chb03,5,all,mid (5-14),14,0.2270971575715559
+test,chb03,5,all,mid (5-14),13,0.035116670517178816
+test,chb03,5,all,long (>=15),16,0.12402972749793562
+test,chb03,5,all,mid (5-14),14,0.03971476676240471
+test,chb03,5,oracleV1,mid (5-14),14,0.0
+test,chb03,5,oracleV1,long (>=15),17,0.0
+test,chb03,5,oracleV1,long (>=15),18,0.0
+test,chb03,5,oracleV1,mid (5-14),14,0.0
+test,chb03,5,oracleV1,mid (5-14),13,0.0
+test,chb03,5,oracleV1,long (>=15),16,0.0
+test,chb03,5,oracleV1,mid (5-14),14,0.0
+test,chb03,9,all,mid (5-14),14,0.265260308342412
+test,chb03,9,all,long (>=15),17,0.1582581689628969
+test,chb03,9,all,long (>=15),18,0.08225651872170259
+test,chb03,9,all,mid (5-14),14,0.17784160311643726
+test,chb03,9,all,mid (5-14),13,0.036205815373444694
+test,chb03,9,all,long (>=15),16,0.059256812551610194
+test,chb03,9,all,mid (5-14),14,0.07857119276352709
+test,chb03,9,oracleV1,mid (5-14),14,0.0005282096992506036
+test,chb03,9,oracleV1,long (>=15),17,0.0
+test,chb03,9,oracleV1,long (>=15),18,0.0
+test,chb03,9,oracleV1,mid (5-14),14,0.0
+test,chb03,9,oracleV1,mid (5-14),13,0.0
+test,chb03,9,oracleV1,long (>=15),16,0.0
+test,chb03,9,oracleV1,mid (5-14),14,0.0
+test,chb03,15,all,mid (5-14),14,0.2968868640850417
+test,chb03,15,all,long (>=15),17,0.10404070439752866
+test,chb03,15,all,long (>=15),18,0.07039227998281505
+test,chb03,15,all,mid (5-14),14,0.17173417846885208
+test,chb03,15,all,mid (5-14),13,0.040133337733918584
+test,chb03,15,all,long (>=15),16,0.04502064409578865
+test,chb03,15,all,mid (5-14),14,0.07361922683305278
+test,chb03,15,oracleV1,mid (5-14),14,0.0006602621240632267
+test,chb03,15,oracleV1,long (>=15),17,0.0
+test,chb03,15,oracleV1,long (>=15),18,0.0
+test,chb03,15,oracleV1,mid (5-14),14,0.0
+test,chb03,15,oracleV1,mid (5-14),13,0.0
+test,chb03,15,oracleV1,long (>=15),16,0.0
+test,chb03,15,oracleV1,mid (5-14),14,0.0
+test,chb06,1,all,short (<=4 windows),4,0.8039872005389247
+test,chb06,1,all,short (<=4 windows),4,0.09334343817102442
+test,chb06,1,all,short (<=4 windows),4,0.4320028630373458
+test,chb06,1,all,mid (5-14),6,0.5004001010781671
+test,chb06,1,all,mid (5-14),6,0.47717318059299196
+test,chb06,1,all,short (<=4 windows),4,0.9796008589112037
+test,chb06,1,all,short (<=4 windows),4,0.4330133468064502
+test,chb06,1,all,short (<=4 windows),4,0.4879584017515052
+test,chb06,1,all,short (<=4 windows),4,0.8106816555092418
+test,chb06,1,all,mid (5-14),5,0.15125802716075376
+test,chb06,1,oracleV1,short (<=4 windows),4,0.27346217001389417
+test,chb06,1,oracleV1,short (<=4 windows),4,0.0051997810618500395
+test,chb06,1,oracleV1,short (<=4 windows),4,0.05728179866110905
+test,chb06,1,oracleV1,mid (5-14),6,0.0742924528301887
+test,chb06,1,oracleV1,mid (5-14),6,0.0668168800539084
+test,chb06,1,oracleV1,short (<=4 windows),4,0.9873689528861943
+test,chb06,1,oracleV1,short (<=4 windows),4,0.05770283356490258
+test,chb06,1,oracleV1,short (<=4 windows),4,0.07629152456738664
+test,chb06,1,oracleV1,short (<=4 windows),4,0.2804092459264873
+test,chb06,1,oracleV1,mid (5-14),5,0.009537846089062052
+test,chb06,3,all,short (<=4 windows),4,0.7665361458464907
+test,chb06,3,all,short (<=4 windows),4,0.6031114479390342
+test,chb06,3,all,short (<=4 windows),4,0.7879457707043914
+test,chb06,3,all,mid (5-14),6,0.8404228436657681
+test,chb06,3,all,mid (5-14),6,0.6561868261455526
+test,chb06,3,all,short (<=4 windows),4,0.8896888552060966
+test,chb06,3,all,short (<=4 windows),4,0.4841901393625532
+test,chb06,3,all,short (<=4 windows),4,0.4129299818954991
+test,chb06,3,all,short (<=4 windows),4,0.6575512609995369
+test,chb06,3,all,mid (5-14),5,0.3845667965048952
+test,chb06,3,oracleV1,short (<=4 windows),4,0.4104879794534967
+test,chb06,3,oracleV1,short (<=4 windows),4,0.07144962317376113
+test,chb06,3,oracleV1,short (<=4 windows),4,0.2199275819965475
+test,chb06,3,oracleV1,mid (5-14),6,0.9419011118598383
+test,chb06,3,oracleV1,mid (5-14),6,0.0849688342318059
+test,chb06,3,oracleV1,short (<=4 windows),4,0.9702959875373669
+test,chb06,3,oracleV1,short (<=4 windows),4,0.032251273630584
+test,chb06,3,oracleV1,short (<=4 windows),4,0.058060713233127004
+test,chb06,3,oracleV1,short (<=4 windows),4,0.3533324912635257
+test,chb06,3,oracleV1,mid (5-14),5,0.012632908727234438
+test,chb06,5,all,short (<=4 windows),4,0.8068923413751
+test,chb06,5,all,short (<=4 windows),4,0.5352195697023283
+test,chb06,5,all,short (<=4 windows),4,0.7716727716727717
+test,chb06,5,all,mid (5-14),6,0.8806224730458221
+test,chb06,5,all,mid (5-14),6,0.8106047843665768
+test,chb06,5,all,short (<=4 windows),4,0.9352448317965559
+test,chb06,5,all,short (<=4 windows),4,0.37516315102522
+test,chb06,5,all,short (<=4 windows),4,0.39474127405161885
+test,chb06,5,all,short (<=4 windows),4,0.8513746789608858
+test,chb06,5,all,mid (5-14),5,0.6491209601010632
+test,chb06,5,oracleV1,short (<=4 windows),4,0.3724053724053724
+test,chb06,5,oracleV1,short (<=4 windows),4,0.031093427645151772
+test,chb06,5,oracleV1,short (<=4 windows),4,0.18251863079449282
+test,chb06,5,oracleV1,mid (5-14),6,0.9331620619946092
+test,chb06,5,oracleV1,mid (5-14),6,0.20131401617250677
+test,chb06,5,oracleV1,short (<=4 windows),4,0.9297082228116711
+test,chb06,5,oracleV1,short (<=4 windows),4,0.007220748600058946
+test,chb06,5,oracleV1,short (<=4 windows),4,0.035072207486000595
+test,chb06,5,oracleV1,short (<=4 windows),4,0.8650793650793651
+test,chb06,5,oracleV1,mid (5-14),5,0.07211285398462997
+test,chb06,9,all,short (<=4 windows),4,0.5564186771083323
+test,chb06,9,all,short (<=4 windows),4,0.5920803334596438
+test,chb06,9,all,short (<=4 windows),4,0.6766030903961938
+test,chb06,9,all,mid (5-14),6,0.7749115566037736
+test,chb06,9,all,mid (5-14),6,0.7236986185983827
+test,chb06,9,all,short (<=4 windows),4,0.8841311944760221
+test,chb06,9,all,short (<=4 windows),4,0.45865437244747587
+test,chb06,9,all,short (<=4 windows),4,0.38459433287019495
+test,chb06,9,all,short (<=4 windows),4,0.8812471053850364
+test,chb06,9,all,mid (5-14),5,0.84158332456048
+test,chb06,9,oracleV1,short (<=4 windows),4,0.16403519851795711
+test,chb06,9,oracleV1,short (<=4 windows),4,0.03349332659677484
+test,chb06,9,oracleV1,short (<=4 windows),4,0.07231274472653781
+test,chb06,9,oracleV1,mid (5-14),6,0.44042705525606474
+test,chb06,9,oracleV1,mid (5-14),6,0.0934130727762803
+test,chb06,9,oracleV1,short (<=4 windows),4,0.8313544692855037
+test,chb06,9,oracleV1,short (<=4 windows),4,0.012946823291650866
+test,chb06,9,oracleV1,short (<=4 windows),4,0.05675550503136706
+test,chb06,9,oracleV1,short (<=4 windows),4,0.7829986105848175
+test,chb06,9,oracleV1,mid (5-14),5,0.3103063480366355
+test,chb06,15,all,short (<=4 windows),4,0.49250557871247524
+test,chb06,15,all,short (<=4 windows),4,0.6343732895457033
+test,chb06,15,all,short (<=4 windows),4,0.5629447181171319
+test,chb06,15,all,mid (5-14),6,0.5034956199460916
+test,chb06,15,all,mid (5-14),6,0.5676802560646901
+test,chb06,15,all,short (<=4 windows),4,0.8495010736390047
+test,chb06,15,all,short (<=4 windows),4,0.49694749694749696
+test,chb06,15,all,short (<=4 windows),4,0.4227400951538882
+test,chb06,15,all,short (<=4 windows),4,0.7917771883289124
+test,chb06,15,all,mid (5-14),5,0.6393725655332141
+test,chb06,15,oracleV1,short (<=4 windows),4,0.07578628268283438
+test,chb06,15,oracleV1,short (<=4 windows),4,0.039008883836470054
+test,chb06,15,oracleV1,short (<=4 windows),4,0.01911498463222605
+test,chb06,15,oracleV1,mid (5-14),6,0.3042873989218329
+test,chb06,15,oracleV1,mid (5-14),6,0.017857142857142905
+test,chb06,15,oracleV1,short (<=4 windows),4,0.7104332449160036
+test,chb06,15,oracleV1,short (<=4 windows),4,0.013494168666582484
+test,chb06,15,oracleV1,short (<=4 windows),4,0.032545998063239434
+test,chb06,15,oracleV1,short (<=4 windows),4,0.28615637236326896
+test,chb06,15,oracleV1,mid (5-14),5,0.03766712285503737
+test,chb13,1,all,mid (5-14),12,0.29125556970082744
+test,chb13,1,all,long (>=15),18,0.4246651785714286
+test,chb13,1,all,mid (5-14),9,0.5218203497615262
+test,chb13,1,all,long (>=15),17,0.8290564233343959
+test,chb13,1,all,mid (5-14),6,0.21454097839898345
+test,chb13,1,all,mid (5-14),5,0.11245633534455379
+test,chb13,1,all,mid (5-14),5,0.25543823436011437
+test,chb13,1,all,long (>=15),17,0.59344118584635
+test,chb13,1,all,mid (5-14),6,0.6983005082592122
+test,chb13,1,all,long (>=15),17,0.7085989799171183
+test,chb13,1,all,long (>=15),17,0.3352725533949633
+test,chb13,1,all,long (>=15),15,0.5933418286078369
+test,chb13,1,oracleV1,mid (5-14),12,0.01042329726288993
+test,chb13,1,oracleV1,long (>=15),18,0.019371811224489832
+test,chb13,1,oracleV1,mid (5-14),9,0.05647853736089026
+test,chb13,1,oracleV1,long (>=15),17,0.3508128785463819
+test,chb13,1,oracleV1,mid (5-14),6,0.006591486658195644
+test,chb13,1,oracleV1,mid (5-14),5,0.0032153064464909287
+test,chb13,1,oracleV1,mid (5-14),5,0.010082565893934636
+test,chb13,1,oracleV1,long (>=15),17,0.07670545106789928
+test,chb13,1,oracleV1,mid (5-14),6,0.20445520965692499
+test,chb13,1,oracleV1,long (>=15),17,0.16440867070449472
+test,chb13,1,oracleV1,long (>=15),17,0.014384762511954086
+test,chb13,1,oracleV1,long (>=15),15,0.0762583625358394
+test,chb13,3,all,mid (5-14),12,0.4152609802673456
+test,chb13,3,all,long (>=15),18,0.32286352040816324
+test,chb13,3,all,mid (5-14),9,0.5610095389507155
+test,chb13,3,all,long (>=15),17,0.7721947720752311
+test,chb13,3,all,mid (5-14),6,0.0976413595933926
+test,chb13,3,all,mid (5-14),5,0.13746427437281672
+test,chb13,3,all,mid (5-14),5,0.1444109241028898
+test,chb13,3,all,long (>=15),17,0.5247449792795664
+test,chb13,3,all,mid (5-14),6,0.6569250317662008
+test,chb13,3,all,long (>=15),17,0.6020879821485496
+test,chb13,3,all,long (>=15),17,0.4952582084794389
+test,chb13,3,all,long (>=15),15,0.574904428161835
+test,chb13,3,oracleV1,mid (5-14),12,0.018021960534691295
+test,chb13,3,oracleV1,long (>=15),18,0.006576849489795866
+test,chb13,3,oracleV1,mid (5-14),9,0.06371224165341816
+test,chb13,3,oracleV1,long (>=15),17,0.2000717245776219
+test,chb13,3,oracleV1,mid (5-14),6,0.0006353240152477957
+test,chb13,3,oracleV1,mid (5-14),5,0.0020641473483645756
+test,chb13,3,oracleV1,mid (5-14),5,0.0022626230549380733
+test,chb13,3,oracleV1,long (>=15),17,0.04191903092126237
+test,chb13,3,oracleV1,mid (5-14),6,0.12595298602287164
+test,chb13,3,oracleV1,long (>=15),17,0.0763069811922219
+test,chb13,3,oracleV1,long (>=15),17,0.03367070449474019
+test,chb13,3,oracleV1,long (>=15),15,0.06725868110863331
+test,chb13,5,all,mid (5-14),12,0.4107256524506684
+test,chb13,5,all,long (>=15),18,0.37615593112244894
+test,chb13,5,all,mid (5-14),9,0.5619236883942766
+test,chb13,5,all,long (>=15),17,0.6965651896716608
+test,chb13,5,all,mid (5-14),6,0.10304161372299869
+test,chb13,5,all,mid (5-14),5,0.20121467132422988
+test,chb13,5,all,mid (5-14),5,0.15576373451889491
+test,chb13,5,all,long (>=15),17,0.5351848900223143
+test,chb13,5,all,mid (5-14),6,0.6649857052096569
+test,chb13,5,all,long (>=15),17,0.580729996812241
+test,chb13,5,all,long (>=15),17,0.4783630857507173
+test,chb13,5,all,long (>=15),15,0.5675772539025168
+test,chb13,5,oracleV1,mid (5-14),12,0.017186505410566544
+test,chb13,5,oracleV1,long (>=15),18,0.008888711734693855
+test,chb13,5,oracleV1,mid (5-14),9,0.06486486486486487
+test,chb13,5,oracleV1,long (>=15),17,0.12507969397513552
+test,chb13,5,oracleV1,mid (5-14),6,0.0007544472681066949
+test,chb13,5,oracleV1,mid (5-14),5,0.00400920927278503
+test,chb13,5,oracleV1,mid (5-14),5,0.002461098761511571
+test,chb13,5,oracleV1,long (>=15),17,0.036579534587185214
+test,chb13,5,oracleV1,mid (5-14),6,0.12198221092757311
+test,chb13,5,oracleV1,long (>=15),17,0.06554829454893207
+test,chb13,5,oracleV1,long (>=15),17,0.023987886515779433
+test,chb13,5,oracleV1,long (>=15),15,0.059692577253902535
+test,chb13,9,all,mid (5-14),12,0.3411441756842776
+test,chb13,9,all,long (>=15),18,0.29257015306122447
+test,chb13,9,all,mid (5-14),9,0.5567170111287758
+test,chb13,9,all,long (>=15),17,0.6452821166719795
+test,chb13,9,all,mid (5-14),6,0.09430590851334175
+test,chb13,9,all,mid (5-14),5,0.33157351540171487
+test,chb13,9,all,mid (5-14),5,0.20141314703080337
+test,chb13,9,all,long (>=15),17,0.5398071405801721
+test,chb13,9,all,mid (5-14),6,0.6375476493011436
+test,chb13,9,all,long (>=15),17,0.5741950908511316
+test,chb13,9,all,long (>=15),17,0.2612368504941026
+test,chb13,9,all,long (>=15),15,0.5590554316661357
+test,chb13,9,oracleV1,mid (5-14),12,0.014560789306174438
+test,chb13,9,oracleV1,long (>=15),18,0.01052295918367352
+test,chb13,9,oracleV1,mid (5-14),9,0.08815580286168523
+test,chb13,9,oracleV1,long (>=15),17,0.09511475932419511
+test,chb13,9,oracleV1,mid (5-14),6,0.0007544472681066949
+test,chb13,9,oracleV1,mid (5-14),5,0.011471895839949231
+test,chb13,9,oracleV1,mid (5-14),5,0.004723721816449644
+test,chb13,9,oracleV1,long (>=15),17,0.03566305387312718
+test,chb13,9,oracleV1,mid (5-14),6,0.09791931385006358
+test,chb13,9,oracleV1,long (>=15),17,0.05694134523430028
+test,chb13,9,oracleV1,long (>=15),17,0.004861332483264258
+test,chb13,9,oracleV1,long (>=15),15,0.048940745460337665
+test,chb13,15,all,mid (5-14),12,0.3128182686187142
+test,chb13,15,all,long (>=15),18,0.28121014030612246
+test,chb13,15,all,mid (5-14),9,0.5911764705882353
+test,chb13,15,all,long (>=15),17,0.65074115396876
+test,chb13,15,all,mid (5-14),6,0.08493487928843713
+test,chb13,15,all,mid (5-14),5,0.3183947284852334
+test,chb13,15,all,mid (5-14),5,0.20665290568434425
+test,chb13,15,all,long (>=15),17,0.53155881415365
+test,chb13,15,all,mid (5-14),6,0.6667328462515882
+test,chb13,15,all,long (>=15),17,0.567859419827861
+test,chb13,15,all,long (>=15),17,0.2175645521198597
+test,chb13,15,all,long (>=15),15,0.5502946798343422
+test,chb13,15,oracleV1,mid (5-14),12,0.010980267345639727
+test,chb13,15,oracleV1,long (>=15),18,0.013392857142857095
+test,chb13,15,oracleV1,mid (5-14),9,0.11744833068362481
+test,chb13,15,oracleV1,long (>=15),17,0.09276378705769839
+test,chb13,15,oracleV1,mid (5-14),6,0.0023427573062261287
+test,chb13,15,oracleV1,mid (5-14),5,0.010598602731025752
+test,chb13,15,oracleV1,mid (5-14),5,0.005080978088282007
+test,chb13,15,oracleV1,long (>=15),17,0.036459993624481934
+test,chb13,15,oracleV1,mid (5-14),6,0.1094345616264295
+test,chb13,15,oracleV1,long (>=15),17,0.05467006694293908
+test,chb13,15,oracleV1,long (>=15),17,0.00458240357029005
+test,chb13,15,oracleV1,long (>=15),15,0.046591271105447585
+test,chb14,1,all,short (<=4 windows),4,0.7974499442478304
+test,chb14,1,all,mid (5-14),5,0.0782773170376837
+test,chb14,1,all,mid (5-14),6,0.2648100528843821
+test,chb14,1,all,mid (5-14),5,0.19666327173965759
+test,chb14,1,all,mid (5-14),11,0.15069758397744393
+test,chb14,1,all,mid (5-14),6,0.746640143612634
+test,chb14,1,all,mid (5-14),7,0.15206523321846332
+test,chb14,1,all,mid (5-14),5,0.05897473204326109
+test,chb14,1,oracleV1,short (<=4 windows),4,0.54132932564115
+test,chb14,1,oracleV1,mid (5-14),5,0.012658227848101222
+test,chb14,1,oracleV1,mid (5-14),6,0.08898161176071029
+test,chb14,1,oracleV1,mid (5-14),5,0.059847713274164605
+test,chb14,1,oracleV1,mid (5-14),11,0.027465849982985735
+test,chb14,1,oracleV1,mid (5-14),6,0.47319392557372275
+test,chb14,1,oracleV1,mid (5-14),7,0.03431539096248115
+test,chb14,1,oracleV1,mid (5-14),5,0.007905330035404279
+test,chb14,3,all,short (<=4 windows),4,0.29408057400494503
+test,chb14,3,all,mid (5-14),5,0.06164217469324407
+test,chb14,3,all,mid (5-14),6,0.25651351220222207
+test,chb14,3,all,mid (5-14),5,0.11242058295746638
+test,chb14,3,all,mid (5-14),11,0.07452238588303928
+test,chb14,3,all,mid (5-14),6,0.40221241084857595
+test,chb14,3,all,mid (5-14),7,0.18196379168082322
+test,chb14,3,all,mid (5-14),5,0.27911149910276933
+test,chb14,3,oracleV1,short (<=4 windows),4,0.07082949532166583
+test,chb14,3,oracleV1,mid (5-14),5,0.002230952034531275
+test,chb14,3,oracleV1,mid (5-14),6,0.040609383338993776
+test,chb14,3,oracleV1,mid (5-14),5,0.00732334254813527
+test,chb14,3,oracleV1,mid (5-14),11,0.0033056244227310794
+test,chb14,3,oracleV1,mid (5-14),6,0.2481684537382951
+test,chb14,3,oracleV1,mid (5-14),7,0.017958549725768047
+test,chb14,3,oracleV1,mid (5-14),5,0.0558707987778263
+test,chb14,5,all,short (<=4 windows),4,0.4593009162747854
+test,chb14,5,all,mid (5-14),5,0.04801396769969446
+test,chb14,5,all,mid (5-14),6,0.11066906021056722
+test,chb14,5,all,mid (5-14),5,0.163344488093506
+test,chb14,5,all,mid (5-14),11,0.1545865538865393
+test,chb14,5,all,mid (5-14),6,0.4161855319974771
+test,chb14,5,all,mid (5-14),7,0.08930738242003589
+test,chb14,5,all,mid (5-14),5,0.2733886221446239
+test,chb14,5,oracleV1,short (<=4 windows),4,0.1481553303922044
+test,chb14,5,oracleV1,mid (5-14),5,0.0004849895727241371
+test,chb14,5,oracleV1,mid (5-14),6,0.0046577070496336415
+test,chb14,5,oracleV1,mid (5-14),5,0.010572772685387255
+test,chb14,5,oracleV1,mid (5-14),11,0.007000145836371541
+test,chb14,5,oracleV1,mid (5-14),6,0.23521420600650134
+test,chb14,5,oracleV1,mid (5-14),7,0.0019900014560986223
+test,chb14,5,oracleV1,mid (5-14),5,0.04069062515155919
+test,chb14,9,all,short (<=4 windows),4,0.06641780191011781
+test,chb14,9,all,mid (5-14),5,0.024152480721664538
+test,chb14,9,all,mid (5-14),6,0.06108388724467517
+test,chb14,9,all,mid (5-14),5,0.2074785392114069
+test,chb14,9,all,mid (5-14),11,0.13810704389674788
+test,chb14,9,all,mid (5-14),6,0.5636310707874437
+test,chb14,9,all,mid (5-14),7,0.05819540843566473
+test,chb14,9,all,mid (5-14),5,0.15553615597264658
+test,chb14,9,oracleV1,short (<=4 windows),4,0.0006302419159354145
+test,chb14,9,oracleV1,mid (5-14),5,0.0016004655899898301
+test,chb14,9,oracleV1,mid (5-14),6,0.00033962447236912663
+test,chb14,9,oracleV1,mid (5-14),5,0.0578592560259954
+test,chb14,9,oracleV1,mid (5-14),11,0.0026250546886393833
+test,chb14,9,oracleV1,mid (5-14),6,0.3212362330794236
+test,chb14,9,oracleV1,mid (5-14),7,0.0009221957967285865
+test,chb14,9,oracleV1,mid (5-14),5,0.02939036810708573
+test,chb14,15,all,short (<=4 windows),4,0.12619382362922382
+test,chb14,15,all,mid (5-14),5,0.02206702555895046
+test,chb14,15,all,mid (5-14),6,0.04788705060404641
+test,chb14,15,all,mid (5-14),5,0.5137009554294583
+test,chb14,15,all,mid (5-14),11,0.4417869816732293
+test,chb14,15,all,mid (5-14),6,0.7628450827228179
+test,chb14,15,all,mid (5-14),7,0.0703781002766587
+test,chb14,15,all,mid (5-14),5,0.28328240942819727
+test,chb14,15,oracleV1,short (<=4 windows),4,0.0028118485480196354
+test,chb14,15,oracleV1,mid (5-14),5,0.004316407197245242
+test,chb14,15,oracleV1,mid (5-14),6,0.0
+test,chb14,15,oracleV1,mid (5-14),5,0.292400213395412
+test,chb14,15,oracleV1,mid (5-14),11,0.056778960672791756
+test,chb14,15,oracleV1,mid (5-14),6,0.551016447528019
+test,chb14,15,oracleV1,mid (5-14),7,0.0008736591758481405
+test,chb14,15,oracleV1,mid (5-14),5,0.0595567195305301
+test,chb15,1,all,long (>=15),32,0.6068601583113457
+test,chb15,1,all,mid (5-14),9,0.4511631320173186
+test,chb15,1,all,long (>=15),40,0.34641084027026015
+test,chb15,1,all,mid (5-14),9,0.8186688192558891
+test,chb15,1,all,long (>=15),15,0.030187012222058662
+test,chb15,1,all,long (>=15),52,0.26893156450824907
+test,chb15,1,all,long (>=15),48,0.3628932468409014
+test,chb15,1,all,long (>=15),31,0.47255236963304115
+test,chb15,1,all,long (>=15),16,0.18402151092121255
+test,chb15,1,all,long (>=15),31,0.5297132669737037
+test,chb15,1,all,long (>=15),17,0.5141519864376797
+test,chb15,1,all,long (>=15),28,0.22347880900292927
+test,chb15,1,all,long (>=15),35,0.41255955926146515
+test,chb15,1,all,long (>=15),19,0.26372491145218413
+test,chb15,1,all,long (>=15),15,0.10333529671624209
+test,chb15,1,all,long (>=15),45,0.31807292056599534
+test,chb15,1,all,long (>=15),18,0.1752645746524577
+test,chb15,1,all,long (>=15),19,0.37356109799291615
+test,chb15,1,all,mid (5-14),8,0.26696981920862517
+test,chb15,1,all,long (>=15),28,0.3778041455003893
+test,chb15,1,oracleV1,long (>=15),32,0.084321230814969
+test,chb15,1,oracleV1,mid (5-14),9,0.06435752550084395
+test,chb15,1,oracleV1,long (>=15),40,0.001530478927918133
+test,chb15,1,oracleV1,mid (5-14),9,0.4985690173919425
+test,chb15,1,oracleV1,long (>=15),15,0.0
+test,chb15,1,oracleV1,long (>=15),52,0.0
+test,chb15,1,oracleV1,long (>=15),48,0.00179984251378007
+test,chb15,1,oracleV1,long (>=15),31,0.023064923488337552
+test,chb15,1,oracleV1,long (>=15),16,0.0005893403071935976
+test,chb15,1,oracleV1,long (>=15),31,0.04958401426236814
+test,chb15,1,oracleV1,long (>=15),17,0.06921205867177715
+test,chb15,1,oracleV1,long (>=15),28,0.0
+test,chb15,1,oracleV1,long (>=15),35,0.009157236450268003
+test,chb15,1,oracleV1,long (>=15),19,0.002139905548996457
+test,chb15,1,oracleV1,long (>=15),15,0.0
+test,chb15,1,oracleV1,long (>=15),45,0.0
+test,chb15,1,oracleV1,long (>=15),18,0.0
+test,chb15,1,oracleV1,long (>=15),19,0.012654958677685957
+test,chb15,1,oracleV1,mid (5-14),8,0.008544501081814482
+test,chb15,1,oracleV1,long (>=15),28,0.007304683154733205
+test,chb15,3,all,long (>=15),32,0.5013192612137203
+test,chb15,3,all,mid (5-14),9,0.5297570998752477
+test,chb15,3,all,long (>=15),40,0.22998245548546048
+test,chb15,3,all,mid (5-14),9,0.792067219490717
+test,chb15,3,all,long (>=15),15,0.030555146517449616
+test,chb15,3,all,long (>=15),52,0.3099703107970987
+test,chb15,3,all,long (>=15),48,0.3534815703625933
+test,chb15,3,all,long (>=15),31,0.49335165651463375
+test,chb15,3,all,long (>=15),16,0.14729824302920913
+test,chb15,3,all,long (>=15),31,0.4606670628435596
+test,chb15,3,all,long (>=15),17,0.3860101717402521
+test,chb15,3,all,long (>=15),28,0.3090585487040677
+test,chb15,3,all,long (>=15),35,0.3034916617033949
+test,chb15,3,all,long (>=15),19,0.24645808736717822
+test,chb15,3,all,long (>=15),15,0.18852157266970992
+test,chb15,3,all,long (>=15),45,0.17279329190686532
+test,chb15,3,all,long (>=15),18,0.1842619565618201
+test,chb15,3,all,long (>=15),19,0.3917502951593861
+test,chb15,3,all,mid (5-14),8,0.1998973193003044
+test,chb15,3,all,long (>=15),28,0.29923245207460414
+test,chb15,3,oracleV1,long (>=15),32,0.008547326173399261
+test,chb15,3,oracleV1,mid (5-14),9,0.05731268804579148
+test,chb15,3,oracleV1,long (>=15),40,0.0
+test,chb15,3,oracleV1,mid (5-14),9,0.42716665443604607
+test,chb15,3,oracleV1,long (>=15),15,0.0
+test,chb15,3,oracleV1,long (>=15),52,0.0
+test,chb15,3,oracleV1,long (>=15),48,0.0
+test,chb15,3,oracleV1,long (>=15),31,0.008282573168919893
+test,chb15,3,oracleV1,long (>=15),16,0.0
+test,chb15,3,oracleV1,long (>=15),31,0.004716981132075526
+test,chb15,3,oracleV1,long (>=15),17,0.00456991228716741
+test,chb15,3,oracleV1,long (>=15),28,0.0010753086877526297
+test,chb15,3,oracleV1,long (>=15),35,0.0
+test,chb15,3,oracleV1,long (>=15),19,0.0007378984651711384
+test,chb15,3,oracleV1,long (>=15),15,0.0
+test,chb15,3,oracleV1,long (>=15),45,0.0
+test,chb15,3,oracleV1,long (>=15),18,0.0
+test,chb15,3,oracleV1,long (>=15),19,0.005054604486422698
+test,chb15,3,oracleV1,mid (5-14),8,0.0006234185338662712
+test,chb15,3,oracleV1,long (>=15),28,0.0010753086877526297
+test,chb15,5,all,long (>=15),32,0.48504217919655135
+test,chb15,5,all,mid (5-14),9,0.4831217435972701
+test,chb15,5,all,long (>=15),40,0.3123670163126656
+test,chb15,5,all,mid (5-14),9,0.7756659572906729
+test,chb15,5,all,long (>=15),15,0.03777057870711231
+test,chb15,5,all,long (>=15),52,0.37006276072005717
+test,chb15,5,all,long (>=15),48,0.35078180659192326
+test,chb15,5,all,long (>=15),31,0.4461447036101619
+test,chb15,5,all,long (>=15),16,0.21952926442962906
+test,chb15,5,all,long (>=15),31,0.41390580894369333
+test,chb15,5,all,long (>=15),17,0.35074076804009724
+test,chb15,5,all,long (>=15),28,0.3039044829248396
+test,chb15,5,all,long (>=15),35,0.2585988683740321
+test,chb15,5,all,long (>=15),19,0.20092975206611574
+test,chb15,5,all,long (>=15),15,0.19327050508025323
+test,chb15,5,all,long (>=15),45,0.1648573781537771
+test,chb15,5,all,long (>=15),18,0.20015487296729229
+test,chb15,5,all,long (>=15),19,0.3379943919716647
+test,chb15,5,all,mid (5-14),8,0.18181818181818177
+test,chb15,5,all,long (>=15),28,0.20642218843857763
+test,chb15,5,oracleV1,long (>=15),32,0.003864877921884835
+test,chb15,5,oracleV1,mid (5-14),9,0.027518896308798668
+test,chb15,5,oracleV1,long (>=15),40,0.0
+test,chb15,5,oracleV1,mid (5-14),9,0.37972407719967716
+test,chb15,5,oracleV1,long (>=15),15,0.0
+test,chb15,5,oracleV1,long (>=15),52,0.0
+test,chb15,5,oracleV1,long (>=15),48,0.0
+test,chb15,5,oracleV1,long (>=15),31,0.0025256276927647647
+test,chb15,5,oracleV1,long (>=15),16,0.0
+test,chb15,5,oracleV1,long (>=15),31,0.0025256276927647647
+test,chb15,5,oracleV1,long (>=15),17,0.001474165253924964
+test,chb15,5,oracleV1,long (>=15),28,0.0
+test,chb15,5,oracleV1,long (>=15),35,0.0
+test,chb15,5,oracleV1,long (>=15),19,0.0
+test,chb15,5,oracleV1,long (>=15),15,0.0
+test,chb15,5,oracleV1,long (>=15),45,0.0
+test,chb15,5,oracleV1,long (>=15),18,0.0
+test,chb15,5,oracleV1,long (>=15),19,0.001586481700118103
+test,chb15,5,oracleV1,mid (5-14),8,0.0
+test,chb15,5,oracleV1,long (>=15),28,0.0
+test,chb15,9,all,long (>=15),32,0.4693225314950389
+test,chb15,9,all,mid (5-14),9,0.4474939458428121
+test,chb15,9,all,long (>=15),40,0.24483929971256857
+test,chb15,9,all,mid (5-14),9,0.8453438027445512
+test,chb15,9,all,long (>=15),15,0.04108378736563101
+test,chb15,9,all,long (>=15),52,0.3431921530309294
+test,chb15,9,all,long (>=15),48,0.28456260077243245
+test,chb15,9,all,long (>=15),31,0.42675679690982027
+test,chb15,9,all,long (>=15),16,0.23676746841504293
+test,chb15,9,all,long (>=15),31,0.37943841925419697
+test,chb15,9,all,long (>=15),17,0.27869094125451466
+test,chb15,9,all,long (>=15),28,0.2597797471170603
+test,chb15,9,all,long (>=15),35,0.17119565217391308
+test,chb15,9,all,long (>=15),19,0.137987012987013
+test,chb15,9,all,long (>=15),15,0.192018848475924
+test,chb15,9,all,long (>=15),45,0.18473459609193676
+test,chb15,9,all,long (>=15),18,0.1367307054094915
+test,chb15,9,all,long (>=15),19,0.28350059031877217
+test,chb15,9,all,mid (5-14),8,0.17712420697495324
+test,chb15,9,all,long (>=15),28,0.12925952018984765
+test,chb15,9,oracleV1,long (>=15),32,0.001449329220706841
+test,chb15,9,oracleV1,mid (5-14),9,0.010457180597343463
+test,chb15,9,oracleV1,long (>=15),40,0.0
+test,chb15,9,oracleV1,mid (5-14),9,0.6091582886915682
+test,chb15,9,oracleV1,long (>=15),15,0.0
+test,chb15,9,oracleV1,long (>=15),52,0.0
+test,chb15,9,oracleV1,long (>=15),48,0.0
+test,chb15,9,oracleV1,long (>=15),31,0.0014113801812509763
+test,chb15,9,oracleV1,long (>=15),16,0.0
+test,chb15,9,oracleV1,long (>=15),31,0.0012628138463823824
+test,chb15,9,oracleV1,long (>=15),17,0.0
+test,chb15,9,oracleV1,long (>=15),28,0.0
+test,chb15,9,oracleV1,long (>=15),35,0.0
+test,chb15,9,oracleV1,long (>=15),19,0.0
+test,chb15,9,oracleV1,long (>=15),15,0.0
+test,chb15,9,oracleV1,long (>=15),45,0.0
+test,chb15,9,oracleV1,long (>=15),18,0.0
+test,chb15,9,oracleV1,long (>=15),19,0.0
+test,chb15,9,oracleV1,mid (5-14),8,0.0
+test,chb15,9,oracleV1,long (>=15),28,0.0
+test,chb15,15,all,long (>=15),32,0.48128878813779774
+test,chb15,15,all,mid (5-14),9,0.45369487047772805
+test,chb15,15,all,long (>=15),40,0.2263242375601926
+test,chb15,15,all,mid (5-14),9,0.9232406252293242
+test,chb15,15,all,long (>=15),15,0.04726844352819903
+test,chb15,15,all,long (>=15),52,0.3036566575218911
+test,chb15,15,all,long (>=15),48,0.20833177097004008
+test,chb15,15,all,long (>=15),31,0.437862130441242
+test,chb15,15,all,long (>=15),16,0.2884084128328852
+test,chb15,15,all,long (>=15),31,0.31800623978606446
+test,chb15,15,all,long (>=15),17,0.20767303014667948
+test,chb15,15,all,long (>=15),28,0.21965960918091143
+test,chb15,15,all,long (>=15),35,0.1545562835020846
+test,chb15,15,all,long (>=15),19,0.09507821723730814
+test,chb15,15,all,long (>=15),15,0.19124576645560298
+test,chb15,15,all,long (>=15),45,0.17747248633675228
+test,chb15,15,all,long (>=15),18,0.11884656513883252
+test,chb15,15,all,long (>=15),19,0.2615112160566706
+test,chb15,15,all,mid (5-14),8,0.2131724669038102
+test,chb15,15,all,long (>=15),28,0.14965330564722457
+test,chb15,15,oracleV1,long (>=15),32,0.004831097402356099
+test,chb15,15,oracleV1,mid (5-14),9,0.014126366771849974
+test,chb15,15,oracleV1,long (>=15),40,0.0
+test,chb15,15,oracleV1,mid (5-14),9,0.8699640419754898
+test,chb15,15,oracleV1,long (>=15),15,0.0
+test,chb15,15,oracleV1,long (>=15),52,0.0
+test,chb15,15,oracleV1,long (>=15),48,0.0
+test,chb15,15,oracleV1,long (>=15),31,0.00263705244391621
+test,chb15,15,oracleV1,long (>=15),16,0.0
+test,chb15,15,oracleV1,long (>=15),31,0.0
+test,chb15,15,oracleV1,long (>=15),17,0.0
+test,chb15,15,oracleV1,long (>=15),28,0.0
+test,chb15,15,oracleV1,long (>=15),35,0.0
+test,chb15,15,oracleV1,long (>=15),19,0.0
+test,chb15,15,oracleV1,long (>=15),15,0.0
+test,chb15,15,oracleV1,long (>=15),45,0.0
+test,chb15,15,oracleV1,long (>=15),18,0.0
+test,chb15,15,oracleV1,long (>=15),19,0.0
+test,chb15,15,oracleV1,mid (5-14),8,0.0
+test,chb15,15,oracleV1,long (>=15),28,0.0
+test,chb16,1,all,short (<=4 windows),3,0.24615270790174604
+test,chb16,1,all,short (<=4 windows),3,0.34048535069547203
+test,chb16,1,all,short (<=4 windows),4,0.30009623214153525
+test,chb16,1,all,short (<=4 windows),2,0.3973970272868447
+test,chb16,1,all,short (<=4 windows),3,0.32687185557857357
+test,chb16,1,all,short (<=4 windows),2,0.228129852843304
+test,chb16,1,all,short (<=4 windows),3,0.4261615862681266
+test,chb16,1,all,short (<=4 windows),3,0.23231725362533295
+test,chb16,1,all,short (<=4 windows),3,0.2552530334418467
+test,chb16,1,all,short (<=4 windows),2,0.18723655993492572
+test,chb16,1,oracleV1,short (<=4 windows),3,0.0008878366380585812
+test,chb16,1,oracleV1,short (<=4 windows),3,0.004217224030778288
+test,chb16,1,oracleV1,short (<=4 windows),4,0.0017765933821896063
+test,chb16,1,oracleV1,short (<=4 windows),2,0.01279301930045107
+test,chb16,1,oracleV1,short (<=4 windows),3,0.003773305711749053
+test,chb16,1,oracleV1,short (<=4 windows),2,0.0013310655919543946
+test,chb16,1,oracleV1,short (<=4 windows),3,0.010728026043207994
+test,chb16,1,oracleV1,short (<=4 windows),3,0.0004439183190293461
+test,chb16,1,oracleV1,short (<=4 windows),3,0.0011097957975731987
+test,chb16,1,oracleV1,short (<=4 windows),2,0.00029579235376764323
+test,chb16,3,all,short (<=4 windows),3,0.5338117786327317
+test,chb16,3,all,short (<=4 windows),3,0.6212636874815034
+test,chb16,3,all,short (<=4 windows),4,0.361610777999852
+test,chb16,3,all,short (<=4 windows),2,0.5288767285365673
+test,chb16,3,all,short (<=4 windows),3,0.5082124889020421
+test,chb16,3,all,short (<=4 windows),2,0.3814981882718331
+test,chb16,3,all,short (<=4 windows),3,0.45753181414619715
+test,chb16,3,all,short (<=4 windows),3,0.6043208049718851
+test,chb16,3,all,short (<=4 windows),3,0.36645457235868595
+test,chb16,3,all,short (<=4 windows),2,0.4104118908526214
+test,chb16,3,oracleV1,short (<=4 windows),3,0.0028114826871855625
+test,chb16,3,oracleV1,short (<=4 windows),3,0.007250665877478579
+test,chb16,3,oracleV1,short (<=4 windows),4,0.0005921977940631651
+test,chb16,3,oracleV1,short (<=4 windows),2,0.003845300598979473
+test,chb16,3,oracleV1,short (<=4 windows),3,0.0028114826871855625
+test,chb16,3,oracleV1,short (<=4 windows),2,0.000961325149744896
+test,chb16,3,oracleV1,short (<=4 windows),3,0.0017016868896123638
+test,chb16,3,oracleV1,short (<=4 windows),3,0.0059928973068955615
+test,chb16,3,oracleV1,short (<=4 windows),3,0.0004439183190293461
+test,chb16,3,oracleV1,short (<=4 windows),2,0.0013310655919543946
+test,chb16,5,all,short (<=4 windows),3,0.5577093814738088
+test,chb16,5,all,short (<=4 windows),3,0.543725954424386
+test,chb16,5,all,short (<=4 windows),4,0.5816122584943371
+test,chb16,5,all,short (<=4 windows),2,0.5458847888782075
+test,chb16,5,all,short (<=4 windows),3,0.5117638354542764
+test,chb16,5,all,short (<=4 windows),2,0.4604747467277971
+test,chb16,5,all,short (<=4 windows),3,0.5068807339449541
+test,chb16,5,all,short (<=4 windows),3,0.6249630068067475
+test,chb16,5,all,short (<=4 windows),3,0.4493193252441551
+test,chb16,5,all,short (<=4 windows),2,0.4285291725208903
+test,chb16,5,oracleV1,short (<=4 windows),3,0.0009618230245634907
+test,chb16,5,oracleV1,short (<=4 windows),3,0.0019236460491269813
+test,chb16,5,oracleV1,short (<=4 windows),4,0.0011103708638685594
+test,chb16,5,oracleV1,short (<=4 windows),2,0.0025142350070250785
+test,chb16,5,oracleV1,short (<=4 windows),3,0.0008138502515536716
+test,chb16,5,oracleV1,short (<=4 windows),2,0.00044368853065146485
+test,chb16,5,oracleV1,short (<=4 windows),3,0.0005918910920390541
+test,chb16,5,oracleV1,short (<=4 windows),3,0.0032554010062149086
+test,chb16,5,oracleV1,short (<=4 windows),3,0.00022195915951461753
+test,chb16,5,oracleV1,short (<=4 windows),2,0.00036974044220960955
+test,chb16,9,all,short (<=4 windows),3,0.475288546907369
+test,chb16,9,all,short (<=4 windows),3,0.4174311926605505
+test,chb16,9,all,short (<=4 windows),4,0.7633429565474869
+test,chb16,9,all,short (<=4 windows),2,0.5818975079494195
+test,chb16,9,all,short (<=4 windows),3,0.4902337969813554
+test,chb16,9,all,short (<=4 windows),2,0.4087850329068994
+test,chb16,9,all,short (<=4 windows),3,0.33012725658478836
+test,chb16,9,all,short (<=4 windows),3,0.6370227878070436
+test,chb16,9,all,short (<=4 windows),3,0.44169872743415206
+test,chb16,9,all,short (<=4 windows),2,0.3372772313835687
+test,chb16,9,oracleV1,short (<=4 windows),3,0.0
+test,chb16,9,oracleV1,short (<=4 windows),3,0.0
+test,chb16,9,oracleV1,short (<=4 windows),4,0.00910504108372201
+test,chb16,9,oracleV1,short (<=4 windows),2,0.0017747541226059704
+test,chb16,9,oracleV1,short (<=4 windows),3,0.00022195915951461753
+test,chb16,9,oracleV1,short (<=4 windows),2,0.0
+test,chb16,9,oracleV1,short (<=4 windows),3,0.0
+test,chb16,9,oracleV1,short (<=4 windows),3,0.0006658774785439636
+test,chb16,9,oracleV1,short (<=4 windows),3,0.0
+test,chb16,9,oracleV1,short (<=4 windows),2,0.0
+test,chb16,15,all,short (<=4 windows),3,0.424681858538029
+test,chb16,15,all,short (<=4 windows),3,0.24622669428825095
+test,chb16,15,all,short (<=4 windows),4,0.7442445776889481
+test,chb16,15,all,short (<=4 windows),2,0.520520594542631
+test,chb16,15,all,short (<=4 windows),3,0.45309263095590413
+test,chb16,15,all,short (<=4 windows),2,0.39037195888486287
+test,chb16,15,all,short (<=4 windows),3,0.45760580053270195
+test,chb16,15,all,short (<=4 windows),3,0.7249926013613495
+test,chb16,15,all,short (<=4 windows),3,0.5540840485350695
+test,chb16,15,all,short (<=4 windows),2,0.29268653405309475
+test,chb16,15,oracleV1,short (<=4 windows),3,0.0
+test,chb16,15,oracleV1,short (<=4 windows),3,0.0
+test,chb16,15,oracleV1,short (<=4 windows),4,0.0016285439336738428
+test,chb16,15,oracleV1,short (<=4 windows),2,0.0017008060341640041
+test,chb16,15,oracleV1,short (<=4 windows),3,0.00022195915951461753
+test,chb16,15,oracleV1,short (<=4 windows),2,0.0
+test,chb16,15,oracleV1,short (<=4 windows),3,0.0
+test,chb16,15,oracleV1,short (<=4 windows),3,0.0010358094110684002
+test,chb16,15,oracleV1,short (<=4 windows),3,0.00022195915951461753
+test,chb16,15,oracleV1,short (<=4 windows),2,0.0
+test,chb17,1,all,long (>=15),23,0.4127136873089551
+test,chb17,1,all,long (>=15),29,0.5103765026083011
+test,chb17,1,all,long (>=15),22,0.7673589496915851
+test,chb17,1,oracleV1,long (>=15),23,0.013472206498358452
+test,chb17,1,oracleV1,long (>=15),29,0.024155137219324163
+test,chb17,1,oracleV1,long (>=15),22,0.19212268688812173
+test,chb17,3,all,long (>=15),23,0.2165742103475603
+test,chb17,3,all,long (>=15),29,0.2999546382399637
+test,chb17,3,all,long (>=15),22,0.6896044366476147
+test,chb17,3,oracleV1,long (>=15),23,0.0013585418317672016
+test,chb17,3,oracleV1,long (>=15),29,0.0017010660013608847
+test,chb17,3,oracleV1,long (>=15),22,0.0749816082847603
+test,chb17,5,all,long (>=15),23,0.17185554171855544
+test,chb17,5,all,long (>=15),29,0.2341233839872987
+test,chb17,5,all,long (>=15),22,0.6394657914096542
+test,chb17,5,oracleV1,long (>=15),23,0.0
+test,chb17,5,oracleV1,long (>=15),29,0.0
+test,chb17,5,oracleV1,long (>=15),22,0.04736574047875053
+test,chb17,9,all,long (>=15),23,0.2168006339861882
+test,chb17,9,all,long (>=15),29,0.26604672261283735
+test,chb17,9,all,long (>=15),22,0.5665214192745176
+test,chb17,9,oracleV1,long (>=15),23,0.0
+test,chb17,9,oracleV1,long (>=15),29,0.001644363801315496
+test,chb17,9,oracleV1,long (>=15),22,0.024333654009393912
+test,chb17,15,all,long (>=15),23,0.25800973621646095
+test,chb17,15,all,long (>=15),29,0.3276253118621002
+test,chb17,15,all,long (>=15),22,0.44672061569803634
+test,chb17,15,oracleV1,long (>=15),23,0.0013585418317672016
+test,chb17,15,oracleV1,long (>=15),29,0.0018144704014515511
+test,chb17,15,oracleV1,long (>=15),22,0.013185445079508806
+test,chb18,1,all,mid (5-14),13,0.09731044735775107
+test,chb18,1,all,mid (5-14),8,0.8115169108215756
+test,chb18,1,all,long (>=15),18,0.40492457552594197
+test,chb18,1,all,mid (5-14),14,0.3369719499831024
+test,chb18,1,all,long (>=15),17,0.09329771405383469
+test,chb18,1,all,mid (5-14),13,0.15248682254358692
+test,chb18,1,oracleV1,mid (5-14),13,0.0004392485471009788
+test,chb18,1,oracleV1,mid (5-14),8,0.22031323837170058
+test,chb18,1,oracleV1,long (>=15),18,0.0047013461408375035
+test,chb18,1,oracleV1,mid (5-14),14,0.00233186887461978
+test,chb18,1,oracleV1,long (>=15),17,0.0005748681184905013
+test,chb18,1,oracleV1,mid (5-14),13,0.0004392485471009788
+test,chb18,3,all,mid (5-14),13,0.03355183132855788
+test,chb18,3,all,mid (5-14),8,0.6702558563424019
+test,chb18,3,all,long (>=15),18,0.19694919840357172
+test,chb18,3,all,mid (5-14),14,0.2184521797904697
+test,chb18,3,all,long (>=15),17,0.13140808873258492
+test,chb18,3,all,mid (5-14),13,0.1487701040681173
+test,chb18,3,oracleV1,mid (5-14),13,0.0
+test,chb18,3,oracleV1,mid (5-14),8,0.06558428407479922
+test,chb18,3,oracleV1,long (>=15),18,0.0
+test,chb18,3,oracleV1,mid (5-14),14,0.0
+test,chb18,3,oracleV1,long (>=15),17,0.0
+test,chb18,3,oracleV1,mid (5-14),13,0.0
+test,chb18,5,all,mid (5-14),13,0.03084876334639819
+test,chb18,5,all,mid (5-14),8,0.7828934044420441
+test,chb18,5,all,long (>=15),18,0.17039843062977744
+test,chb18,5,all,mid (5-14),14,0.16397431564717813
+test,chb18,5,all,long (>=15),17,0.16623833355877182
+test,chb18,5,all,mid (5-14),13,0.15725097986214354
+test,chb18,5,oracleV1,mid (5-14),13,0.0
+test,chb18,5,oracleV1,mid (5-14),8,0.13670424627016808
+test,chb18,5,oracleV1,long (>=15),18,0.0
+test,chb18,5,oracleV1,mid (5-14),14,0.0
+test,chb18,5,oracleV1,long (>=15),17,0.0
+test,chb18,5,oracleV1,mid (5-14),13,0.0
+test,chb18,9,all,mid (5-14),13,0.08105825111501552
+test,chb18,9,all,mid (5-14),8,0.9016066968203605
+test,chb18,9,all,long (>=15),18,0.1409389163228032
+test,chb18,9,all,mid (5-14),14,0.0845217979046975
+test,chb18,9,all,long (>=15),17,0.1355336128770459
+test,chb18,9,all,mid (5-14),13,0.11741451547506421
+test,chb18,9,oracleV1,mid (5-14),13,0.0
+test,chb18,9,oracleV1,mid (5-14),8,0.44204415040842504
+test,chb18,9,oracleV1,long (>=15),18,0.0
+test,chb18,9,oracleV1,mid (5-14),14,0.0
+test,chb18,9,oracleV1,long (>=15),17,0.0
+test,chb18,9,oracleV1,mid (5-14),13,0.0
+test,chb18,15,all,mid (5-14),13,0.16292742262467896
+test,chb18,15,all,mid (5-14),8,0.9611489907513671
+test,chb18,15,all,long (>=15),18,0.11060001352905369
+test,chb18,15,all,mid (5-14),14,0.09391686380533959
+test,chb18,15,all,long (>=15),17,0.13786690112268363
+test,chb18,15,all,mid (5-14),13,0.13292336802270577
+test,chb18,15,oracleV1,mid (5-14),13,3.378834977696421e-05
+test,chb18,15,oracleV1,mid (5-14),8,0.8918179977047188
+test,chb18,15,oracleV1,long (>=15),18,0.0
+test,chb18,15,oracleV1,mid (5-14),14,0.0
+test,chb18,15,oracleV1,long (>=15),17,0.0
+test,chb18,15,oracleV1,mid (5-14),13,0.0

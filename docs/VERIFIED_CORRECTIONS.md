@@ -107,6 +107,8 @@ figure is also inconsistent with the checkpoint's own file size of 15,258 bytes.
 
 ## 6 · Processing time is 9.76 s per hour, and the variance belongs to one stage
 
+> **Superseded (2026-10-08):** the end-to-end figure of record became 10.83 s/h (earlier demo, median of 5 runs); neither applies to the final system (section 14).
+
 **Wrong statements, now retired:** 16.9 ms per analysis window; approximately 15 s per hour of EEG; and
 a fivefold run-to-run variation on the end-to-end figure.
 
@@ -241,3 +243,16 @@ Settled by code reading and runs during the performance phase; full log in `PERF
 | "short" (< 20 s) is 23 test seizures by annotation, 18 by whole-window runs (`short_refs`) | mixing the two counts |
 | a seizure is caught by one supra-threshold window, so ictal minutes above the top-p budget do not cap sensitivity by themselves (chb08 2.60, caught 5/5 by E) | "chb15 fails because its ictal time exceeds the budget" |
 | cache-only steps took 44–317 s on 4 seeds | estimates of 10–70 min (3–10× too high) |
+
+<!-- report-phase-2026-10-08 -->
+## 14 · Report phase (2026-10-08; details in PERF_PHASE_RECORD rev. R, section 10)
+
+| correct | what it replaces |
+|---|---|
+| look #6 subject-mean: seed 42 **0.508**, 4 seeds 0.498 ± 0.010 (`e22_test_oneshot/SUMMARY.md`) | "0.342 (seed 42), subject-mean 0.498" in the record, the instructions, HANDOFF rev 1 and the 08/10 briefing |
+| the ledger `verdict` column is each step's gate outcome; E20a, E18 `_ovl` and P3-L6 say ADOPTED but were not chosen | reading the ledger as the final selection |
+| the L2 floor 0.0025 cut chb21 (1.75 → 0.50) and chb20 (3.0 → 2.5) on non-test; L2f never lowers a budget below 0.005; the cap 0.02 binds only chb15, on test | "the per-patient budget helps generally" |
+| chb24's summary lists only its seizure files; X1 scored every present file (21.3 h). Siena labels come from the SzCORE converter (`epilepsy2bids` d3fb175), which fixes the published typos; a first parser missed 6 seizures and read PN00-3 as 3,660 s | "chb24 = 12 files"; "Siena 40 seizures" |
+| CHB-MIT z-score statistics (`stats.json`) exclude annotated seizure and buffer windows, test included; X1 and the demo use label-free statistics | "no label anywhere in the pipeline" |
+| both GAE readouts fail the anatomical-prior test of channel attribution (A4 reconstruction 0.5694 / −0.1694; A5 latent 0.5473 / −0.1914) | "the negative is specific to the reconstruction readout" |
+| processing time: 9.76 s/h (entry 6) was superseded by 10.83 s/h (earlier demo); the final system's time is measured on the rebuilt demo | quoting 9.76 or 10.83 s/h for the final system |

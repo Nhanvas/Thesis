@@ -65,3 +65,11 @@ results/continuous_eval/cache/
 results/continuous_eval/artifact_feature_explore/*.csv
 results/e14_spatial_recruitment/pernode/
 results/e15_patient_adaptation/pernode/
+# model-output caches (reproducible by their dump scripts)
+results/e8_gae_v2/scores/
+results/e9_test_oneshot/scores/
+results/p2_seeds/
+results/p2_test/
+results/e6_gae_dump/
+results/e15_patient_adaptation/pernode_s23/
+results/*/smoke/

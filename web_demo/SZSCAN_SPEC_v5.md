@@ -22,7 +22,7 @@ Channel Attribution Panel's window/aggregation/score definition, gradient mappin
 status persistence are recorded — see the note after §6.7) + **C21** (2026-09-25, after Step 7 fix
 round 2: C20 items 2-3's PROVISIONAL aggregation/score closed to the final p95-|robust-z| formula
 against a persisted whole-subject baseline, and §1.6 restructured into 3 numbered divergence items —
-see the note after §6.7 and §1.6).
+see the note after §6.7 and §1.6). + **C26-C28** (2026-09-28 → 10-02: mini-timeline paging past 1 h, Preprocessed toggle ON by default, Phase A cap 2 with the two timing figures; the signal-loss rule and two related points are recorded after §1.6 item 3).
 
 ---
 
@@ -217,6 +217,26 @@ item, matching the thesis report's own separate enumeration, rather than folded 
 Not separately measured against an AUROC/Spearman-style criterion the way item 1's `zlatent` row was —
 flagged here as a gap, not silently treated as harmless.
 
+#### Related points that are NOT fit divergences (recorded so they are not rediscovered)
+
+- **Signal-loss windows (v3 code, 2026-10-01).** A rule shared with the thesis evaluation, not a divergence
+  between the two: a 4 s window is *signal-loss* when the standard deviation of its **raw, unfiltered** signal
+  is below 1e-10 V on **all 18 channels** (a constant, flat recording — e.g. an electrode dropout). Such a
+  window has no defined anomaly score (its filtered signal is ~1e-22 V, so the score depends on floating-point
+  and hardware details). The application flags it from the raw windows in Phase A (persisted as
+  `{stem}.flag.npy`), excludes it from the LedoitWolf fit, the three per-branch robust-z fits, the attribution
+  baseline and the CPD background statistics (`inter_mask` given to `detect_events`; `cpd_pipeline_v14.py` is
+  untouched), and keeps it on the timeline with fused score 0 so it cannot create a change point. The z-score
+  mean/std are not masked. The rule uses no label. In the 8 test subjects it flags 534 windows (0.59 h), all
+  in `chb17b_69.edf`; the other seven subjects are unaffected. Not shown in the UI beyond the score being 0
+  on that stretch.
+- **Filtering.** The thesis filters each 4 s window separately (with a 3 s pad per side); the application
+  filters the whole continuous recording once (zero-phase), which differs only through edge effects at the true
+  file start/end. It is what makes `t_seconds = window_index × 4` exact (§1.3).
+- **Events across a file boundary.** PELT runs once on the concatenated subject timeline (§1.5); an event is
+  assigned to the file containing its onset and is **not split**, so its offset can run past that file's end.
+  The display and the export show it as stored.
+
 **Mandatory consequences to record (for all three items):**
 - **The demo's numbers WILL differ from the thesis's numbers.** They must never be forced to match,
   never adjusted to match.
@@ -269,6 +289,13 @@ EDF reading, gamma-AEC, GAE forward — all much smaller).
 > **Concurrency cap (C25, 2026-09-28):** Phase A concurrency is now capped at **4 workers**
 > (`ThreadPoolExecutor(max_workers=4)`, `upload_manager.py`), replacing the unbounded per-file
 > concurrency C23 measured above.
+
+> **Phase A cap and timing (C28, 2026-10-02):** the Phase A cap is now **2 workers**
+> (`_PHASE_A_MAX_CONCURRENCY = 2`, `upload_manager.py`) — `chb06` ran out of memory twice at 4. Two timing
+> figures are kept apart: **21.9 s per hour of EEG** = processing only, sequential (median of repeats on
+> `chb06_01.edf`, range 21.5-22.6), and **≈ 12.3 s per hour** = the whole 8-subject run end to end including
+> upload (57 min 27 s for 279.4 h, 231 files, peak memory 10.2 GB). Per-file timing of that run was not
+> logged. The live-upload scenario subject is `chb16`.
 
 ---
 

@@ -25,21 +25,17 @@ still the real spec. This is just "what happened and what exists," for continuit
 | 8 — Export `.txt` | **DONE** | initial build + **2** fix rounds (round 2: Export-button styling + a score-format false alarm traced to a stale server) — see §11 below |
 | 9 — cache 8 subjects + pick live-upload subject | **DONE** | phase 1 (inventory/cleanup), phase 1b (real `chb16` timing, C23) and phase 2 (the other 6 real subjects uploaded + processed; a real memory bug found and fixed on `chb06`) all closed — see §15 below |
 | 9+ — post-Step-9 stabilization (2026-09-27 → 09-28) | **DONE** | disk cleanup on Delete, Phase-A concurrency cap, file-count audit + `chb13` completed to its full 33 files, filter toggle collapsed to one, pre-freeze per-stage timing, operating-point criterion confirmed from code — see §16 below |
+| 9++ — pre-defense build state (2026-09-28 → 10-02) | **DONE (code); open items in §14** | chb06 diagnostics, 1 h mini-timeline paging (C26), score cache persisted in the live flow, Preprocessed ON by default (C27), one fixed operating point, freeze tags v1/v2, Phase A cap 2, clean 8-subject run on v2, v3 signal-loss code committed (not tagged) — see §17 |
 
-**Where to resume (2026-09-28):** all 9 build steps and the post-Step-9 stabilization pass (§16)
-are closed. All 8 allowlisted subjects (`chb03, chb06, chb13, chb14, chb15, chb16, chb17, chb18`) are
-real, full-file-set, processed subjects in the DB — `chb13` was completed to 33/33 files in §16 (the
-"8 subjects complete" statement at the end of §15.3 was true by subject count, but `chb13` still held
-only 2 of its 33 real files at that time). Boti is now in a **test-everything-then-lock** phase; nothing
-report-related (screenshots, Figure 3.6, final timing, egress evidence) starts until he says everything is
-tested and locked. The open list is §14 (top items: pending edits to the repo copy of
-`SZSCAN_SPEC_v5.md`, an Analysis-screen check on the long `chb06` files, the network-off run, then
-freeze + tag → final timing → Tier 2). **Boti has said he wants to raise further, important topics about
-the web demo once this update pass is finished — ask him first thing in the next chat.** Don't assume
-anything on `STEP8_9_PREDEFENSE_CHECKLIST.md` is done just because it is listed there.
-
-**Former open item (event id 86) — closed:** it was Boti's own event, drawn live while testing; it was
-deleted together with the old 2-file `chb13` (§16.4), so it is moot.
+**Where to resume (2026-10-02):** all 9 build steps, the stabilization pass (§16) and the pre-defense
+pass (§17) are closed on the code side. The database holds the 8 allowlisted subjects processed by the
+**frozen v2 build** (tag `szscan-frozen-v2`, commit `0ffd99b`: fixed operating point 50 / 2.0 / merge 90,
+Phase A cap 2). The repo HEAD additionally carries the **v3 code** (commit `3336bd7`: signal-loss rule,
+`FIXED_MERGE_S`, headless entry) — committed, **not tagged, not re-run**; it only changes the output of
+`chb17b_69.edf` (see §17.6). What is left is not code: §14 lists it (O4b visual review, defense rehearsal on
+`chb16` with the pre-built copies as insurance, screenshots confirmation, backing up the v2 database before
+any wipe, and the final SPEC/CLAUDE copies kept in sync). Don't assume anything on
+`STEP8_9_PREDEFENSE_CHECKLIST.md` is done just because it is listed there.
 
 ---
 
@@ -856,61 +852,48 @@ Figure 3.6 requirement).
 
 ---
 
-## 14 · Open items (rewritten 2026-09-28 — supersedes the "going into Step 9" list)
+## 14 · Open items (rewritten 2026-10-02 — supersedes the 2026-09-28 list; web-demo build only)
 
 **Open — to do:**
 
-1. [ ] **Repo copy of `SZSCAN_SPEC_v5.md` — four small edits** (Claude Code prompt drafted 2026-09-28,
-   not confirmed run): record O1 exactly (target, grid and `min_mag_pct` read from source, not typed),
-   close O4 = `chb16`, update C23's "concurrency not fixed" note (now capped at 4), and add the
-   Delete-removes-`uploads/{id}/` sentence to §5.6. The repo copy is the authority — it already carries
-   C24; the Claude-project copy may not.
-2. [ ] **Analysis-screen check on `chb06`** (files up to ~4 h). `MiniTimeline.jsx`'s `DOMAIN_SEC` is still
-   hardcoded to 3600 (§8.5) and pan/zoom was never exercised; `chb06` is now real data, so this can no
-   longer be assumed away. Also exercise the window-length control's larger options on a long file.
-3. [ ] **Network-off run (Boti, by hand):** turn the machine's network fully off, run the whole
-   Create-New → Process → Analysis flow, confirm it works. Chosen over packet capture; a capture is an
-   optional extra. Not done yet.
-4. [ ] **O4b — post-ictal flagging extent:** human visual review of where events land relative to known
-   seizure timing (eyes only, no labels into code). Unchanged since Step 3/4.
-5. [ ] **Freeze + tag**, then the **final per-stage timing on the frozen build**, plus **one end-to-end
-   measurement through the real HTTP upload flow**. Keep the two kinds of figure apart (§16.5): algorithm-
-   only cost vs. what a user actually waits for.
-6. [ ] **Tier 2 run** (`STEP8_9_PREDEFENSE_CHECKLIST.md §2`) after everything is locked. Pre-checks: re-run
-   the file-count audit (cheap), DB holds only the 8 real subjects, no leftover test events.
-7. [ ] **Report material** (screenshots, Figure 3.6, egress evidence, final timing) — only after Boti
-   says everything is tested and locked. Committee-facing wording rule: §13.
-8. [ ] **To Project #1 via Boti (methodological, `PROJECT2_SETUP.md §9.2(C)`):** the demo's operating point
-   uses the thesis's 40/day "balanced" number but calibrates the *total detected-event rate* per subject
-   (§16.6), not true FP/day. Whether that counts under divergence item 3 or is a fourth item is a
-   decision for Project #1 / the advisor; §1.6 has not been changed.
-9. [ ] **Keep the Claude project's copies in sync** (this file, `DEMO_BUILD_HANDOFF.md`,
-   `PROJECT2_SETUP.md` were regenerated 2026-09-28; SPEC after item 1; code copies after any further code
-   change). `PROJECT2_SETUP.md` is shared with Project #1 — Boti carries the new version across.
+1. [ ] **O4b — post-ictal flagging extent:** human visual review of where events land relative to the
+   recording (eyes only, no labels into code). Unchanged since Step 3/4. Prepared answer exists in SPEC §1.6
+   item 2.
+2. [ ] **Back up the v2 results before any database wipe:** copy `szscan.db` and the `*.score.npy` files
+   (not the whole `uploads/`, tens of GB) to a folder outside `web_demo/`.
+3. [ ] **Decide whether to tag the final defense build.** Current position: the evaluated build stays
+   `szscan-frozen-v2`; HEAD (v3 code) is additive and inert on 7 of 8 subjects (see §17.6). If any further
+   UI/code change is made, tag it separately (e.g. `szscan-demo-final`) and write down that it was not the
+   evaluated build.
+4. [ ] **Defense rehearsal:** live upload of `chb16` (~5.7 min measured before the freeze; check again on the
+   current build), pre-built copies of all 8 subjects as insurance, memo column clean (§17.4), network-off
+   run already passed (§16).
+5. [ ] **Screenshots (Figure 3.6 etc.):** images exist in `web_demo/report_handback/` (`fig3_6a`–`d`); Boti to
+   confirm they are final. No calendar date from `meas_date` may be visible; no internal step/phase/prompt
+   names in any caption (§13).
+6. [ ] **SPEC §1.6 and CLAUDE.md** — the updated copies delivered 2026-10-02 (signal-loss rule, filtering
+   difference, event assignment note, timing figures) have to replace the repo files.
+7. [ ] **Clean-up before submission:** delete the processed caches only after backups and handback files are
+   safe; keep CSVs, handback, screenshots.
+8. [ ] **Keep the Claude project's copies in sync** (this file, SPEC, CLAUDE.md, `pipeline_demo.py`,
+   `upload_manager.py`, `pipeline_worker.py`).
 
 **Low priority / known (carried):**
 - [ ] `--color-uncertain-bg` (`#FFFBEB`) is visually indistinguishable from white (§9.3). Left as-is.
 - [ ] `UI/B1a`/`B2a` show no avatar while shared `Header.jsx` renders one on Analysis (§9.3) — accepted.
 - [ ] `UI/` mockups still picture the old three filter buttons; the single toggle is a deliberate deviation
   (C24). Mockups were not modified.
-- [ ] `process_subject_events` re-runs `detect_events` at the chosen `pen_mult` although the calibration
-  loop already ran it once (one redundant PELT pass) — harmless, left alone. `MIN_MAG_PCT = 60` is a
-  duplicated literal in `pipeline_demo.py` that matches `cpd_pipeline_v14`'s default rather than importing it.
-- [ ] Commit hygiene: keep `web_demo/` commits separate from `docs/`/`src/figures/`/`figures/`/
-  `rank_readout.py`/`results/`; never `git add .`. `bme11/` stays untracked (Boti's own).
+- [ ] `MIN_MAG_PCT = 60` is a leftover constant in `pipeline_demo.py`, unused on the live path.
+- [ ] Attribution of an event that overlaps signal-loss windows is not masked (only the baseline is).
+- [ ] Commit hygiene: keep `web_demo/` commits separate from `docs/`/`src/`/`results/`; never `git add .`.
+  `bme11/` stays untracked (Boti's own).
 
-**Resolved since the previous version of this list:**
-- [x] Event id 86 — Boti's own event; moot after `chb13` was re-uploaded (§16.4).
-- [x] Filter stages — collapsed to one toggle (C24, §16.4).
-- [x] Synthetic `chb14`/`chb15`/`chb16` subjects — deleted in Step 9 phase 1 (§15.1); DB is real-only.
-- [x] A real `chb06` through the real flow — Step 9 phase 2 (§15.3).
-- [x] `DELETE /api/subjects/{id}` leaving `uploads/{id}/` on disk — fixed (§16.3).
-- [x] Unbounded Phase A concurrency — capped at 4 (§16.3).
-- [x] `chb13` holding 2 of 33 files — completed to 33/33 (§16.4).
-- [x] O4 — `chb16` chosen (§16.2).
-- [x] Operating-point criterion — confirmed by reading the code (§16.6).
-- [x] Step 7 / Step 8 hand-checks (Human test events, Accept fill, attribution wording, spec §1.6
-  restructure, `.6f` false alarm, Export button styling) — see §10 and §11.
+**Resolved (cumulative):** event id 86 (§16.4) · filter stages → one toggle (C24) · synthetic subjects deleted
+(§15.1) · real `chb06` through the real flow (§15.3) · Delete removes `uploads/{id}/` (§16.3) · Phase A
+concurrency capped (4, later 2 — §17.2) · `chb13` 33/33 (§16.4) · O4 = `chb16` (§16.2) · network-off run
+(§16) · mini-timeline past 1 h (C26, §17.3) · `chb06` flat-stripe / mismatch diagnostic (§17.4) · memo
+labels (§17.4, confirm in the app) · score cache in the live flow (§17.3) · one fixed operating point
+(§17.1) · Step 7 / Step 8 hand-checks (§10, §11).
 
 ---
 
@@ -1196,3 +1179,147 @@ route to Project #1: §14 item 8.
   `web_demo/`; keeping or deleting it is Boti's call.
 - Lesson kept: an audit of *counts* is what caught the `chb13` gap — "already processed" is not a
   completeness check.
+
+---
+
+## 17 · Pre-defense build state (2026-09-28 → 2026-10-02)
+
+Web-demo build only. Everything the demo displays is still free of evaluation metrics (CLAUDE.md). Reports
+in the repo: `CC_CHB06_DIAG2_REPORT.md`, `CC_FIX_SCORECACHE_REPORT.md`, `CC_FIX_OPPOINT_REPORT.md`,
+`CC_APP_V3_CODE_REPORT.md`, `REPORT_HANDBACK.md`.
+
+### 17.1 One fixed operating point
+`pipeline_demo.py` no longer calibrates per subject on the live path. `FIXED_MAG_PCT = 50`,
+`FIXED_PEN_MULT = 2.0` (lines ~109-110) and, since v3, `FIXED_MERGE_S = 90`, all passed to the single
+`cpd_pipeline_v14.detect_events` call. `calibrate_operating_point()` remains only in the dev `__main__` block.
+SPEC O1 records the change (old rule marked SUPERSEDED, 2026-09-29). `MIN_MAG_PCT = 60` is a leftover, unused
+on the live path.
+
+### 17.2 Freeze tags, concurrency, the clean run
+- `szscan-frozen-v1` (partial run, discarded) then **`szscan-frozen-v2`** (commit `0ffd99b`): Phase A cap
+  lowered **4 → 2** (`_PHASE_A_MAX_CONCURRENCY = 2`) because `chb06` ran out of memory twice at 4, the second
+  time on an idle rebooted machine. Runtime: pagefile on `F:`, `TMP/TEMP/TMPDIR` on `F:/tmp`.
+- Rule that holds: any code change after a freeze means a new tag and a full re-run of all 8 subjects from an
+  empty database.
+- Clean run on v2 (`chb06` first, then `chb03, 13, 14, 15, 16, 17, 18`): 8 subjects, 231 EDF files, 279.39 h,
+  **57 min 27 s end to end including upload** (3445 s, ≈ 12.3 s per hour of EEG), all `pen_mult = 2.0`, peak
+  memory **10.2 GB** (`chb06`). Per-file timing was **not logged** in that run (stated as a limitation).
+- Two kinds of timing figure that must not be mixed: **21.9 s/h** = processing only, sequential, repeated on
+  `chb06_01.edf` (median, range 21.5-22.6, adjacency + band power 14.2 s/h of it) vs **≈ 12.3 s/h** = what a
+  user waits for with two Phase A workers overlapping the upload. The pre-freeze 10.83 s/h (`chb16`) and the
+  old 9.76 s/h are superseded.
+- Events that cross a file boundary are not clipped by the app: the global event is assigned to the file of
+  its onset and its offset may run past that file's end (3 such events in the run). Export prints it as is.
+- Artifacts for the report: `web_demo/report_handback/` (`tier2/*.csv`, `files.csv`, timing and memory CSVs,
+  `scripts/`, `fig3_6a`-`d`).
+
+### 17.3 Analysis-screen changes
+- **Mini-timeline pages by 1 h following the playhead** (SPEC C26): fixes the blank score row and missing
+  event blocks on `chb06`'s 4-hour files (cause: `DOMAIN_SEC` hard-coded to 3600).
+- **Ensemble score cached in the live flow:** Process now writes `{stem}.score.npy`; `backfill_scores.py`
+  filled the subjects processed earlier (the mini-timeline score row reads it).
+- **Preprocessed toggle ON by default** (SPEC C27): raw stays dimmed underneath, toggle OFF shows raw alone.
+
+### 17.4 `chb06` diagnostic and memo cleanup
+Read-only diagnostic on `chb06_02.edf` (its only event: onset 6936 s = 01:05:10, 64 s):
+- The blank stripes across all 18 channels at ~01:05:21-26 and ~01:05:52-57 are **real raw flatlines**
+  (seconds 6981-6982 are bit-identical flat on every channel); the filtered signal rings down into and out of
+  them. They are in the data, not a drawing bug.
+- The event boundaries come from **two PELT change points at the first and last window of the span**
+  (6936 s and 6996 s), merged because they are 56 s apart (< `merge_s` 90 s); the score peak at 6980-6984 s is
+  inside the span but is not itself a change point. The event edges, the loudest raw moments and the top
+  attribution channel are three different quantities (score-timeline level shift; per-channel amplitude;
+  per-channel reconstruction z-score), so they have no reason to agree visually. This is by design, not a
+  bug; use it as the prepared answer if asked.
+- Memo column: internal labels ("Step 9 phase 2…", "CC_STEP9_PHASE1B timing run") were to be cleared; the
+  prompt was issued — **confirm in the Database screen that every memo is clean** (committee-facing rule, §13).
+
+### 17.5 What changed on the process side
+Evaluation of the demo's output is done outside the demo (the demo shows no metric, never scores itself).
+For the demo build this means: the exported file set and the database are the only interface, and the demo
+code never reads annotations. Nothing in this paragraph changes any guard.
+
+### 17.6 v3 code (commit `3336bd7`, not tagged, not re-run)
+- **Signal-loss rule** (`compute_signal_loss_flags`, `SIGNAL_LOSS_STD_V = 1e-10`): a 4 s window is flagged
+  when the standard deviation of its **raw** signal is below 1e-10 V on **all 18 channels**. Flag computed in
+  Phase A before the float32 cast, persisted as `{stem}.flag.npy`, passed to the Phase B worker (`flag_paths`)
+  and to stage 2 (`flag__{filename}` keys in the score `.npz`).
+- Flagged windows are excluded from the LedoitWolf fit, the three per-branch robust-z fits and the
+  attribution baseline; their fused score is set to 0; `inter_mask = ~flag` is given to `detect_events`
+  (the read-only `cpd_pipeline_v14` is untouched). z-score mean/std are **not** masked (matches the reference
+  implementation).
+- `process_subject_headless(edf_paths)` returns `(scores_by_filename, flag_by_filename)`; no database, no HTTP,
+  no annotation read; 2 Phase A workers; per-file cache directory.
+- Tests: `tests/test_signal_loss_v3.py` (flat segment excluded from every fit; bit-identical to frozen v2 when
+  no window is flagged, max abs diff 0; the three constants reach `detect_events`; headless equals the live
+  path; guards still importable) + the 4 guards: 9 passed.
+- **Effect on data:** only `chb17b_69.edf` has flagged windows in the 8 test subjects (534 windows, 0.59 h).
+  The other 7 subjects are unchanged, so the v2-built database remains valid for them; `chb16` (the live
+  scenario) has 0 flagged windows, so a live upload on HEAD gives the same events as v2.
+- **Decision recorded:** the evaluated build stays v2 (no tag, no re-run for v3). Known small gaps: the
+  all-False-mask equivalence of stage 2 is argued, not unit-tested; attribution of an event overlapping
+  flagged windows is not masked; Phase A transiently uses ~0.5 GB more on 4-hour files.
+
+---
+
+## 18 · State on 2026-10-03 — scope reset, v3 code verified, pending constants decision
+
+Append-only section. Where it disagrees with "Where to resume" or §14, this section wins.
+
+### 18.1 Code state
+
+- Evaluated build is still **`szscan-frozen-v2`** (commit `0ffd99b`, Phase A cap 2). The 8-subject
+  database and score caches shown in the defense come from that build.
+- v3 code is commit **`3336bd7`**: signal-loss rule (raw window std < 1e-10 V on all 18 channels →
+  `{stem}.flag.npy`; excluded from LedoitWolf, the three robust-z fits, the attribution baseline and the
+  CPD background statistics via `inter_mask`; score 0; z-score mean/std not masked),
+  `FIXED_MERGE_S`, `process_subject_headless` returning `(scores, flags)`. 9 tests pass; output is
+  bit-identical to v2 when no window is flagged. Among the 8 subjects only `chb17b_69.edf` is affected
+  (534 windows, 0.59 h).
+- v3 is **not tagged and not re-run**. No code change has been made since `3336bd7`.
+
+### 18.2 Pending decision (author and supervisor, not this project)
+
+The thesis side reported a candidate fixed operating point, written there as **40 / 10 / 300** (apparently
+in the order magnitude percentile / penalty multiplier / merge seconds — confirm the order and names
+against the file Project #1 hands over; not read from a file here). It has **not** been applied: the
+constants in `pipeline_demo.py` remain `FIXED_MAG_PCT=50`, `FIXED_PEN_MULT=2.0`, merge 90.
+
+Applying it is a pipeline-output change and therefore needs the full freeze procedure:
+guards 4/4 → commit `web_demo/` paths only → new tag (v3 tag also covers the signal-loss rule) → back up
+`szscan.db` and `*.score.npy` → wipe through the Delete endpoint → re-run all 8 subjects from an empty DB
+(budget: about 1 h 10 min per the estimate Project #1 gave; the clean v2 run measured 57 min 27 s end to
+end. Laptop plugged in and awake, nothing else heavy running).
+
+If the constants stay at 50 / 2.0 / 90, the only difference between v2 and v3 is the signal-loss rule on
+`chb17b_69.edf`; v2 stays the evaluated build and no re-run is needed.
+
+Do not re-run the 8 subjects twice: wait for the decision first.
+
+### 18.3 Project scope (Boti, 2026-10-03)
+
+This project concerns the web demo only. Thesis evaluation, report writing and offline results belong to
+Project #1; their numbers are not quoted or reasoned about here. Only the three flows in
+`PROJECT2_SETUP.md` §9.2(B) (checkpoint, operating point + merge window, attribution limits) cross over,
+as a new `THESIS_CONTEXT_FOR_DEMO.md`.
+
+### 18.4 Project knowledge hygiene (done on 2026-10-03)
+
+- Replaced: `Instructions`, `THESIS_CONTEXT_FOR_DEMO.md`, `DEMO_BUILD_HANDOFF.md`, `PROJECT2_SETUP.md`.
+- Removed: `STEP8_9_PREDEFENSE_CHECKLIST.md` and the five `CC_*` reports (conclusions already in this log).
+- Code copies in the project (`pipeline_demo.py`, `upload_manager.py`, `AnalysisScreen.jsx`, and possibly
+  `main.py`, `waveform_serving.py`) must be refreshed from the repo; `pipeline_worker.py`, `db.py`,
+  `attribution.py` and `tests/test_signal_loss_v3.py` added.
+
+### 18.5 Open items (web demo only)
+
+1. Decision on the constants (18.2) → freeze + re-run, or keep v2.
+2. O4b — visual review of post-ictal flagging (needs a human reader).
+3. Back up v2 `szscan.db` + `*.score.npy` before any wipe.
+4. Defense rehearsal on `chb16` (live), `chb03` (backup), with the pre-built copies; re-time `chb16`
+   end to end on the final build.
+5. Confirm the memo column is clean; confirm screenshots are final (no calendar dates, no internal step
+   or prompt names).
+6. Decide whether to tag a final defense build.
+7. Known small gaps: stage-2 all-False-mask equivalence not unit-tested; attribution of events that
+   overlap flagged windows is not masked; `MIN_MAG_PCT=60` leftover in `pipeline_demo.py`.

@@ -1,9 +1,10 @@
 # DEMO_BUILD_HANDOFF.md — SzScan build plan
 
-**Status: LOCKED to start coding.** This file collects the stack, folder structure, working process, and
-how to handle legacy code. Fully absorbs `WEB_DEMO_CODE_MIGRATION_NOTES.md` (→ `docs/archive/demo_v4/`).
+Rev. 2026-10-03. **All nine build steps are done.** This file is kept as the record of stack, folder
+structure and working process; current state and open items are in `BUILD_PROGRESS.md` §14 and §18.
 
 Behavior/logic: `SZSCAN_SPEC_v5.md`. Visuals: `SZSCAN_DESIGN_v2.md`. Locked mockups: `UI/`.
+What the demo may assume about the thesis: `THESIS_CONTEXT_FOR_DEMO.md`.
 
 ---
 
@@ -13,26 +14,22 @@ Behavior/logic: `SZSCAN_SPEC_v5.md`. Visuals: `SZSCAN_DESIGN_v2.md`. Locked mock
 |---|---|---|
 | Backend | **Python + FastAPI** | Python is mandatory: real inference uses torch/torch_geometric, can't be rewritten in JS. FastAPI is lightweight, low boilerplate |
 | Review storage | **SQLite** (1 `.db` file) | Built into Python, nothing to install, enough for a single-user demo |
-| Frontend | **React + Vite + Tailwind** | Tokens in `SZSCAN_DESIGN_v2.md §9` map straight onto the Tailwind config, almost copy-paste |
-| Waveform rendering | **Hand-written Canvas** | Ordinary chart libraries (recharts…) stutter when drawing 18 channels × thousands of points. Must render by hand |
-| Font | Inter + IBM Plex Mono | Google Fonts, free. **Downloaded and bundled with the app**, not loaded via CDN (the defense venue may have no internet) |
-| Running at the defense | 1 start command, runs entirely locally, **no internet needed** | Eliminates network/deploy risk |
+| Frontend | **React + Vite + Tailwind v3** | Tokens in `SZSCAN_DESIGN_v2.md §9` map straight onto the Tailwind config |
+| Waveform rendering | **Hand-written Canvas** | Ordinary chart libraries stutter when drawing 18 channels × thousands of points |
+| Font | Inter + IBM Plex Mono | **Bundled locally**, not loaded via CDN (the defense venue may have no internet) |
+| Running at the defense | 1 start command, entirely local, **no internet needed** | Network-off full run passed (2026-09-28) |
 
-**No Figma MCP.** The `.fig` file has real layers, but Dev Mode MCP is a paid tier and isn't needed: every
-hex/spacing value has already been measured directly from the PNGs and recorded in `SZSCAN_DESIGN_v2.md`.
-If more measurements are needed later, two free routes: read pixels from the PNG, or open Figma and copy
-values by hand via Inspect.
+**No Figma MCP.** Every hex/spacing value was measured directly from the PNGs and recorded in
+`SZSCAN_DESIGN_v2.md`.
 
-**The demo machine = the dev machine.** No need to package a portable build/installer.
+**The demo machine = the dev machine.** No portable build or installer.
 
 ---
 
 ## 2 · Folder structure
 
-Uses the **same repo**, `F:/Study/Thesis/Code` — because the demo reuses the exact single-source modules
-(`cpd_pipeline_v14.py`, `ensemble_recipe.py`, `gae_joint.py`, `edf_index.py`, `edf_order.py`), which must
-not be copied/duplicated. This is also a complete product in its own right, so it should live in the same
-place.
+Same repo, `F:/Study/Thesis/Code`, because the demo reuses the single-source modules
+(`cpd_pipeline_v14.py`, `ensemble_recipe.py`, `gae_joint.py`, `edf_order.py`), which must not be copied.
 
 ```
 web_demo/
@@ -40,22 +37,28 @@ web_demo/
 ├── SZSCAN_SPEC_v5.md          # behavior/logic/data boundaries
 ├── SZSCAN_DESIGN_v2.md        # visual tokens
 ├── DEMO_BUILD_HANDOFF.md      # this file
-├── PROJECT2_SETUP.md          # how to set up Claude project #2 + upload file list
+├── BUILD_PROGRESS.md          # history log (append-only sections)
+├── THESIS_CONTEXT_FOR_DEMO.md # what the demo may assume about the thesis
+├── PROJECT2_SETUP.md          # how the Claude project is set up + upload list (shared file)
 ├── UI/                        # locked PNGs + UI (figma).fig  ← MANDATORY REFERENCE
-├── backend/                   # created by Claude Code
+├── backend/
 │   ├── main.py                # FastAPI app
-│   ├── pipeline_demo.py       # ★ continuous label-free path (NEW code, see §4)
+│   ├── pipeline_demo.py       # ★ continuous label-free path (fixed operating point, signal-loss rule)
+│   ├── pipeline_worker.py     # Phase A worker process
+│   ├── upload_manager.py      # upload → Phase A (concurrency cap) → Phase B orchestration
 │   ├── db.py                  # SQLite schema + queries
-│   ├── export_txt.py          # generates the export file per SPEC §7
-│   ├── .env.example           # ADMIN_USER / ADMIN_PASS (the real .env file is NOT committed)
+│   ├── attribution.py         # channel-level reconstruction anomaly (p95 |robust-z| vs baseline)
+│   ├── waveform_serving.py    # decimated min/max envelope serving
+│   ├── edf_order.py           # display order of files (header time), not processing order
+│   ├── export_txt.py          # export file per SPEC §7
+│   ├── .env.example           # ADMIN_USER / ADMIN_PASS (the real .env is NOT committed)
 │   └── tests/
-│       └── test_guards.py     # ★ integrity tests, see CLAUDE.md
-├── frontend/                  # created by Claude Code
-└── cache/                     # precomputed demo-pipeline output (gitignored)
+│       ├── test_guards.py          # ★ four integrity guards
+│       └── test_signal_loss_v3.py  # signal-loss rule tests (9 tests pass at commit 3336bd7)
+├── frontend/
+├── report_handback/           # tier-2 CSVs, timing, memory, scripts, figures handed to the report side
+└── cache/                     # gitignored
 ```
-
-`web_demo/backend/` and `web_demo/frontend/` **do not exist** until coding starts — Claude Code creates
-them.
 
 ---
 
@@ -63,115 +66,133 @@ them.
 
 | File | Action | Reason |
 |---|---|---|
-| `edf_index.py` | **Does NOT exist, does NOT need to be rewritten** | Belonged to the v3 architecture and has been deleted from the repo. The v5 architecture derives each file's offset by construction — see `SZSCAN_SPEC_v5.md` §1.5. The old `WEB_DEMO_CODE_MIGRATION_NOTES.md` describes it as an available module; that document has been archived |
-| `web_demo/backend/edf_order.py` | **Keep entirely unchanged** | Independent concern: the **display** order of files in the UI (by the real time in the EDF header) differs from the **processing** order (by FILE NAME — the locked convention needed to match the thesis results). There are real mismatch cases like `chb03_24/25`. Moved from `docs/demo/` to here on 2026-09-03; demo-only, not shared with the thesis |
-| `src/cpd_pipeline_v14.py`, `ensemble_recipe.py`, `szcore_eval.py`, `retrain/gae_joint.py` | **Read-only, do not edit** | Single-source, shared with the thesis |
-| `src/szcore_eval.build_timeline_masked()` | **FORBIDDEN to call from the demo** | Requires ground truth — see `SZSCAN_SPEC_v5.md` §1.2 |
+| `edf_index.py` | **Does NOT exist, does NOT need to be rewritten** | Belonged to the v3 architecture and was deleted. The v5 architecture derives each file's offset by construction — `SZSCAN_SPEC_v5.md` §1.5 |
+| `web_demo/backend/edf_order.py` | **Keep unchanged** | **Display** order (real EDF header time) differs from **processing** order (FILE NAME — the locked convention). Real mismatch cases exist, e.g. `chb03_24/25` |
+| `src/cpd_pipeline_v14.py`, `ensemble_recipe.py`, `szcore_eval.py`, `retrain/gae_joint.py` | **Read-only** | Single-source, shared with the thesis |
+| `src/szcore_eval.build_timeline_masked()` | **FORBIDDEN to call from the demo** | Requires ground truth — `SZSCAN_SPEC_v5.md` §1.2 |
 
-Don't conflate the two concerns: "which file does this event belong to" (cumulative offset,
-`SZSCAN_SPEC_v5.md` §1.5) and "what position does this file show at in the UI" (`edf_order.py`).
+Two concerns, not to be conflated: "which file does this event belong to" (cumulative offset, SPEC §1.5)
+and "what position does this file show at in the UI" (`edf_order.py`).
 
-⚠️ **Before pulling parameters from `src/retrain/fp_budget_operating_point.py`**, check that the import
-chain actually runs — `evaluation_protocol.py` and `stat_validation.py` were mistakenly archived once and
-were only restored to `src/` on 2026-09-03 (tag `repo-deps-fixed`, details in `docs/REPO_MAP.md` §7.7).
+Operating-point constants are **not** pulled from `src/retrain/fp_budget_operating_point.py` any more:
+the live path uses one fixed point set in `pipeline_demo.py` (`FIXED_MAG_PCT`, `FIXED_PEN_MULT`; v3 code
+adds `FIXED_MERGE_S`). `calibrate_operating_point()` survives only in the dev `__main__`.
 
 ---
 
-## 4 · `pipeline_demo.py` — the new code, the core of the demo
+## 4 · `pipeline_demo.py` — the core of the demo
 
-No module in the repo does this yet. This is the **label-free twin** of the thesis path, and it must
-**never overwrite** any module in `src/`.
+The **label-free twin** of the thesis path; it never overwrites any module in `src/`.
 
 ```
-# stage 1 — runs as soon as 1 file finishes uploading
-def process_file(edf_path) -> np.ndarray:      # continuous ensemble score over time
-    read the 18 standard channels (drop EKG/EOG/Ref)
-    bandpass 0.5–60 + notch 60
-    cut into 4 s windows, do NOT drop any window     # ⇒ t_seconds = idx * 4, exact 1-1 mapping
-    z-score per-channel, stats fit on the subject's ENTIRE set of windows
-    CAR → wPLI + AEC → top-k 20% → node feat [adj-row 18 | band-power 5]
-    GAE seed42 forward → zrecon, Z
-    zlatent = Mahalanobis(Z, LedoitWolf fit on the ENTIRE Z)
-    zgamma  = gamma-AEC (continuous version — see O5 in SPEC §8)
-    robust-z per branch → equal-weight 1/3 ensemble
-    return score            # length exactly equals the file's window count
+# Phase A — per file, runs as soon as a file finishes uploading
+read 18 standard channels → bandpass 0.5–60 + notch 60 → 4 s windows, NONE dropped
+  (t_seconds = idx * 4, exact 1-1 mapping)
+flag signal-loss windows (raw std < 1e-10 V on all 18 channels) → {stem}.flag.npy
+z-score per channel (stats on the subject's entire set; not masked)
+CAR → wPLI + AEC → top-k 20 % → node feat [adj-row 18 | band-power 5]
+GAE (checkpoint by sha256) → zrecon, Z ; zgamma = continuous gamma-AEC
 
-# stage 2 — runs when "Process" is clicked
-def process_subject(files) -> dict[file -> list[Event]]:
-    files_sorted = sort by FILE NAME          # NOT display order
-    global_score = concat([score[f] for f in files_sorted])
-    events_global = cpd_pipeline_v14.detect_events(global_score, ...)   # label-free
-    op = FP-budget operating point (read the parameter from file, see SPEC §8 O1)
-    offsets = cumulative sum of len(score[f]) over files_sorted     # no lookup module needed
-    for ev in events_global:
-        file = f such that offsets[f] <= ev.onset_win < offsets[f] + len(score[f])
-        assign ev to that file's event list, local onset = ev.onset_win - offsets[file]
+# Phase B — when "Process" is clicked
+sort files by FILE NAME (not display order)
+zlatent = Mahalanobis(Z, LedoitWolf fit on all non-flagged windows)
+robust-z per branch (flagged windows excluded from the fit) → equal-weight 1/3 ensemble
+flagged windows → score 0
+cpd_pipeline_v14 on the concatenated score with the FIXED operating point; flagged windows excluded
+  from the background statistics (inter_mask)
+offsets = cumulative window counts over files; each event goes to the file holding its onset
+  (offset may run past that file's end — not clipped)
 ```
 
-**Four places where fitting differs from the thesis pipeline** — recorded and justified in
-`SZSCAN_SPEC_v5.md §1.6`. Read before writing, don't re-derive it from scratch.
+Divergences from the thesis pipeline are recorded in `SZSCAN_SPEC_v5.md` §1.6 — read it, do not
+re-derive them.
 
 ---
 
-## 5 · Waveform — important technical note
+## 5 · Waveform — technical note
 
-18 channels × 256 Hz × 1 hour = **16.6 million points/file**. Do not send this straight to the browser.
+18 channels × 256 Hz × 1 hour = 16.6 million points per file; never sent raw to the browser.
 
-- The backend serves the waveform for the **currently viewed time window**, **decimated** down to
-  ~2–4 points/pixel (min/max envelope, not naive subsampling — subsampling would lose sharp spikes, and
-  spikes are exactly what the clinician needs to see).
-- Changing the window length (`⊲▷ [X] hr`) → calls the backend again with a different decimation level.
-- Changing the amplitude (`⇕ [X] uV`) → **frontend-only**, just rescales, no backend call.
-- Toggling the filter → the backend returns **both series** (raw + filtered) in one call, the frontend
-  layers them itself.
+- The backend serves the currently viewed window, **decimated** to ~2–4 points per pixel as a min/max
+  envelope (naive subsampling would lose the spikes the clinician needs to see).
+- Changing window length → new backend call with a different decimation level.
+- Changing amplitude → **frontend-only**.
+- The filter control is a **single Preprocessed toggle** (C24), **ON by default** (C27); the backend can
+  return raw and preprocessed series in one call.
+- The mini-timeline pages by 1 h (C26).
 
 ---
 
-## 6 · Build order — lock each screen once it's built
+## 6 · Build order — status
 
-| # | Step | Done when |
+| # | Step | Status |
 |---|---|---|
-| 0 | Repo scaffold, Tailwind tokens from `SZSCAN_DESIGN_v2.md §9`, `test_guards.py` passing | tests green |
-| 1 | `pipeline_demo.py` + CLI runs on 1 file → prints the score length. **Measure real timing** | matches the ~15 s/hour estimate |
-| 2 | Log in + empty Database + footer | compare against `UI/A0c`, `A0a` |
-| 3 | Create new → upload → Process → subject appears in the table | compare against `UI/A1a–A2b`, `A4a` |
-| 4 | Analysis: EEG Panel + toolbar + scrub (no events yet) | compare against `UI/B1a`, `B1b`, `B1d` |
-| 5 | Mini-timeline + Event Panel + 3-panel sync | compare against `UI/B2a–B2d` |
-| 6 | Select Range creates a manual event | compare against `UI/B3a–B3c` |
-| 7 | Attribution Panel | compare against `UI/B2a` |
-| 8 | Export `.txt` | compare against `UI/Annotaiton (format_ ID-summary.txt).png` |
-| 9 | Build cache for 8 subjects + pick the subject for the live-upload scenario | have the measurements |
+| 0 | Scaffold, Tailwind tokens, `test_guards.py` | done |
+| 1 | `pipeline_demo.py` + CLI, real timing measured | done |
+| 2 | Log in + empty Database + footer | done |
+| 3 | Create new → upload → Process → subject in table | done |
+| 4 | Analysis: EEG Panel + toolbar + scrub | done |
+| 5 | Mini-timeline + Event Panel + 3-panel sync | done |
+| 6 | Select Range creates a manual event | done |
+| 7 | Attribution Panel | done |
+| 8 | Export `.txt` | done |
+| 9 | All 8 subjects built; live-upload subject chosen | done — live `chb16`, backup `chb03` |
 
-**Step 1 must finish before step 2.** If the label-free pipeline produces nonsensical results (e.g. zero
-events for every subject), it must be caught now — not after 8 UI screens have already been built.
+Post-step changes (C24, C26–C28) are in the SPEC. Frozen evaluated build: tag `szscan-frozen-v2`
+(commit `0ffd99b`, Phase A concurrency 2).
 
 ---
 
 ## 7 · Working process with Claude Code
 
-**Run autonomously within one step, stop between steps.** Within one step from §6, Claude Code does all
-the small work itself (creating files, editing, test-running, fixing its own errors) without asking
-line-by-line. Once a step is done, **stop**, so Boti can open the real app and compare it against the
-mockups before moving to the next step.
+**Autonomous within a task, stop between tasks.** Claude Code does the small work itself (files, edits,
+tests, fixing its own errors); at the end of a task it stops so Boti can compare the running app against
+the mockups.
 
-Reason for this pace: running the whole app freely and only reviewing it at the end means one small
-early misunderstanding repeats across all 9 steps; asking permission at every small step is too slow and
-wastes the point of automation. This level of autonomy is adjustable if it doesn't feel right.
+- Every prompt states an estimated duration and whether the laptop must stay plugged in and awake.
+- Long prompts live in a file (`web_demo/X.md`); the message to Claude Code is "Read and execute
+  web_demo/X.md".
+- Verification is against raw console output pasted by Boti, never a self-report.
+- Commits touch `web_demo/` paths only, by explicit path (never `git add .`). Two sessions at once only
+  on disjoint paths. Never run the demo on real data while another heavy job runs.
+- **Boti holds final decision-making authority** on every substantive choice.
 
-**Boti holds final decision-making authority** on every substantive choice, per the project's overall
-convention.
+### Freeze procedure
+
+Any change to code that affects pipeline output (constants, checkpoint, filters, concurrency, masks):
+guards 4/4 → commit `web_demo/` paths only → new tag → back up `szscan.db` and `*.score.npy` → wipe via
+the real Delete endpoint → re-run **all 8 subjects** from an empty DB. Never a single subject. UI-only
+changes need no re-run but are tagged separately and not described as the evaluated build.
 
 ---
 
-## 8 · Known risks
+## 8 · Measured figures (frozen v2 build)
+
+Two timing figures, never interchangeable:
+
+| Figure | Value | What it is |
+|---|---|---|
+| Processing only, sequential | **21.9 s per hour of EEG** | `chb06_01.edf` repeated, median, range 21.5–22.6 |
+| End to end, whole run | **≈ 12.3 s per hour** | 8 subjects, 231 EDF, 279.39 h in 57 min 27 s, including upload, two Phase A workers |
+
+Peak memory 10.2 GB (`chb06`). Earlier figures (9.76, 10.83, "~15 s/hour") are superseded. Per-file
+timing was not logged in the clean run.
+
+Runtime environment of that run: pagefile on `F:`, `TMP/TEMP/TMPDIR` on `F:/tmp`.
+
+---
+
+## 9 · Known risks
 
 | Risk | Handling |
 |---|---|
-| Label-free pipeline produces results far from the thesis (too many/too few events) | Caught at **step 1**, before building the UI. If the deviation is too large, adjust the **operating point** (label-free, legitimate) — **do not** touch the model, **do not** use labels to adjust |
-| A live upload + Process takes minutes, not seconds (measured end to end: `chb16` ~5.7 min — the fastest of the 8; the others ~10–20 min) | Use `chb16` for the live scenario — chosen by measured total time, not by file count; pre-built copies of all 8 subjects are the insurance |
-| Committee asks why the demo's numbers differ from the report | Prepared answer in `SZSCAN_SPEC_v5.md §1.6` |
-| Ground truth accidentally leaks into the demo | `test_guards.py` blocks it in CI/local, see `CLAUDE.md` |
-| Timeline: report due 15 Oct, IELTS 09 Oct | **The report is priority 1.** If something must be cut, cut backward from step 8 → 6. Steps 0–5 are the minimum demo that's still defensible |
+| Demo numbers differ from the report | Prepared answer in `SZSCAN_SPEC_v5.md` §1.6 |
+| Live upload + Process takes minutes, not seconds | Live subject `chb16`, chosen by measured total time (≈5.7 min end to end in the earlier pre-freeze measurement — the fastest of the 8; re-time before the defense); pre-built copies of all 8 subjects are the insurance, backup live subject `chb03` |
+| Memory exhaustion on `chb06` when another heavy job runs | Run nothing else heavy during a demo run; Phase A cap 2 |
+| Ground truth leaks into the demo | `test_guards.py` (4 guards) |
+| Event edges, loudest raw moment and top attribution channel disagree (seen on `chb06`) | Prepared answer, not a bug: they are different quantities (`BUILD_PROGRESS.md` §16–§17) |
+| Committee sees internal labels | Committee-facing wording rule in the Instructions |
+| Timeline: report due 15 Oct, defense 5–6 Nov | The report is priority 1; the evaluated v2 build with its pre-built database is the insurance |
 
 ---
 

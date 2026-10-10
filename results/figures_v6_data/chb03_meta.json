@@ -1,0 +1,16 @@
+{
+ "threshold": 0.946566283317649,
+ "budget": 0.005175287272301979,
+ "example_file": 0,
+ "drift_files": [
+  0,
+  1,
+  2
+ ],
+ "gate_detector_localized": [
+  7,
+  23,
+  7,
+  22
+ ]
+}

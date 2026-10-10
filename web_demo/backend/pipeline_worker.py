@@ -1,6 +1,7 @@
 """pipeline_worker.py — standalone CLI entry points for the two CPU-heavy stages of
-pipeline_demo.py (Phase B, and stage-2 Process/PELT), run as a genuinely separate OS
-process launched via subprocess.Popen from upload_manager.py.
+pipeline_demo.py (Phase B, and stage-2 Process: detector + localizer), run as a genuinely separate OS
+process launched via subprocess.Popen from upload_manager.py. Both stages run the final thesis
+system (pipeline_demo.py: GAE v2 latent anomaly, per-patient alarm budget, kernel-CPD localizer).
 
 Why a subprocess instead of a background thread or a concurrent.futures.ProcessPoolExecutor
 worker: measured on this Windows dev machine, BOTH a threading.Thread and a
@@ -25,54 +26,42 @@ import pipeline_demo as pd
 
 
 def _run_phase_b(payload: dict, out_path: str) -> None:
+    """Phase B of the final system: per-file ensemble score (key = filename) and per-channel
+    latent distance (key = "dist__" + filename) in one .npz; the channel-panel arrays are also
+    written next to each file's `.filtered.npy` in the (still-draft) subject directory, which
+    `_finalize_draft_dir` (upload_manager.py) later moves as one unit."""
     filtered_paths = payload["filtered_paths"]
-    flag_paths = payload.get("flag_paths")  # App v3 item 1: Amendment A2 signal-loss flags
-    pernode = {}
-    pernode_baseline: dict = {}
-    scores = pd.process_subject_phase_b_from_paths(
-        filtered_paths, pernode_out=pernode, pernode_baseline_out=pernode_baseline,
-        flag_paths=flag_paths,
+    res = pd.process_subject_phase_b_from_paths(
+        filtered_paths, payload["flag_paths"], payload["moments_paths"]
     )
-    np.savez(out_path, **scores)
-    # Step 7 (CC_STEP7_PROMPT.md Part 1 item 1): persist the per-node array next to the
-    # already-written `{stem}.filtered.npy`/`.raw.npy` in the same (still-draft) directory —
-    # `_finalize_draft_dir` in upload_manager.py moves the whole directory as one unit once
-    # Process locks in the subject id, so this rides along automatically. Never touches
-    # `.score.npy` or any other existing output.
-    for fn, arr in pernode.items():
+    arrays = dict(res.scores)
+    arrays.update({f"dist__{fn}": d for fn, d in res.dists.items()})
+    np.savez(out_path, **arrays)
+    for fn, d in res.dists.items():
         filtered_path = Path(filtered_paths[fn])
         stem = filtered_path.name.removesuffix(".filtered.npy")
-        pernode_path = filtered_path.with_name(f"{stem}.pernode.npy")
-        np.save(pernode_path, arr)
-    if "baseline" in pernode_baseline:
-        # Step 7 fix round 2 (CC_STEP7_FIX2_PROMPT.md Part 1): same rides-along mechanism as
-        # the per-file `.pernode.npy` arrays above — written into this still-draft directory
-        # under a subject-agnostic name (the subject id/Project ID isn't locked in yet at this
-        # point, see pipeline_demo.PERNODE_BASELINE_FILENAME's own comment), so it ends up at
-        # `uploads/{subject_id}/pernode_baseline.npy` once `_finalize_draft_dir` moves the
-        # whole directory.
-        any_filtered_path = Path(next(iter(filtered_paths.values())))
-        baseline_path = any_filtered_path.with_name(pd.PERNODE_BASELINE_FILENAME)
-        np.save(baseline_path, pernode_baseline["baseline"])
+        np.save(filtered_path.with_name(f"{stem}.pernode.npy"), d.astype(np.float32))
+    any_filtered_path = Path(next(iter(filtered_paths.values())))
+    np.save(any_filtered_path.with_name(pd.PERNODE_BASELINE_FILENAME), res.baseline)
 
 
-_FLAG_KEY_PREFIX = "flag__"  # App v3 item 1: see upload_manager.py's _run_process
+_FLAG_KEY_PREFIX = "flag__"
+_DIST_KEY_PREFIX = "dist__"
 
 
 def _run_process_events(payload: dict, out_path: str) -> None:
     with np.load(payload["score_npz_path"]) as data:
-        scores = {}
-        flags = {}
+        scores, flags, dists = {}, {}, {}
         for key in data.files:
             if key.startswith(_FLAG_KEY_PREFIX):
                 flags[key[len(_FLAG_KEY_PREFIX):]] = data[key]
+            elif key.startswith(_DIST_KEY_PREFIX):
+                dists[key[len(_DIST_KEY_PREFIX):]] = data[key]
             else:
                 scores[key] = data[key]
-    file_events, op = pd.process_subject_events(scores, flag_by_filename=flags or None)
+    file_events, budget = pd.process_subject_events(scores, flags, dists)
     result = {
-        "pen_mult": op.pen_mult,
-        "event_rate_per_day": op.event_rate_per_day,
-        "grid": op.grid,
+        "alarm_budget": budget.top,
         "events": {
             fn: [[e.onset_sec, e.offset_sec] for e in evs] for fn, evs in file_events.items()
         },

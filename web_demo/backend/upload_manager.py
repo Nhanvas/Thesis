@@ -82,6 +82,7 @@ class FileEntry:
     cancel_flag: threading.Event = field(default_factory=threading.Event)
     phase_a: Optional[pd.PhaseAResult] = None
     score: Optional[object] = None
+    dist: Optional[object] = None  # [n_windows, 18] per-channel latent distance (Phase B)
 
 
 class UploadSession:
@@ -102,8 +103,7 @@ class UploadSession:
         self.processing = False
         self.done = False
         self.error: Optional[str] = None
-        self.op_pen_mult: Optional[float] = None
-        self.op_rate_per_day: Optional[float] = None
+        self.alarm_budget: Optional[float] = None  # p_i of the frozen system (never shown in the UI)
 
     def snapshot(self) -> dict:
         with self.lock:
@@ -128,11 +128,6 @@ class UploadSession:
                 "processing": self.processing,
                 "done": self.done,
                 "error": self.error,
-                "operating_point": (
-                    {"pen_mult": self.op_pen_mult, "event_rate_per_day": self.op_rate_per_day}
-                    if self.done
-                    else None
-                ),
             }
 
 
@@ -215,6 +210,10 @@ def _run_phase_a(session: UploadSession, entry: FileEntry) -> None:
             entry.error = f"Unexpected error while reading this file: {exc}"
         return
 
+    # Phase B and stage 2 read every array back from disk inside the worker process; keeping
+    # the whole-file arrays in this server's memory for every uploaded file is not needed.
+    result.filtered = None
+    result.moments = None
     with session.lock:
         if session.files.get(entry.filename) is not entry:
             return  # removed/cancelled while phase A was running
@@ -280,13 +279,18 @@ def _maybe_run_phase_b(session: UploadSession) -> None:
             for fn, f in session.files.items()
             if f.status == "uploaded"
         }
+        moments_paths = {
+            fn: str(f.phase_a.moments_path)
+            for fn, f in session.files.items()
+            if f.status == "uploaded"
+        }
     if not filtered_paths:
         with session.lock:
             session.phase_b_running = False
         return
 
     threading.Thread(
-        target=_run_phase_b, args=(session, gen, filtered_paths, flag_paths), daemon=True
+        target=_run_phase_b, args=(session, gen, filtered_paths, flag_paths, moments_paths), daemon=True
     ).start()
 
 
@@ -314,13 +318,17 @@ def _run_worker(mode: str, payload: dict, out_suffix: str) -> Path:
         Path(in_name).unlink(missing_ok=True)
 
 
-def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_paths: dict) -> None:
+def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_paths: dict,
+                 moments_paths: dict) -> None:
     try:
         out_path = _run_worker(
-            "phase_b", {"filtered_paths": filtered_paths, "flag_paths": flag_paths}, ".npz"
+            "phase_b",
+            {"filtered_paths": filtered_paths, "flag_paths": flag_paths, "moments_paths": moments_paths},
+            ".npz",
         )
         with np.load(out_path) as data:
-            scores = {fn: data[fn] for fn in data.files}
+            scores = {fn: data[fn] for fn in data.files if not fn.startswith("dist__")}
+            dists = {fn[len("dist__"):]: data[fn] for fn in data.files if fn.startswith("dist__")}
         out_path.unlink(missing_ok=True)
     except Exception as exc:  # pragma: no cover - unexpected pipeline failure
         with session.lock:
@@ -337,6 +345,7 @@ def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_pa
         for fn, score in scores.items():
             if fn in session.files:
                 session.files[fn].score = score
+                session.files[fn].dist = dists[fn]
         session.phase_b_done = True
 
 
@@ -394,15 +403,16 @@ def _wait_phase_b_then_process(session: UploadSession) -> None:
                 return
             if session.phase_b_done:
                 scores = {fn: f.score for fn, f in session.files.items()}
+                dists = {fn: f.dist for fn, f in session.files.items()}
                 phase_a_by_filename = {fn: f.phase_a for fn, f in session.files.items()}
                 break
         time.sleep(0.3)
 
     _finalize_draft_dir(session)
-    _run_process(session, scores, phase_a_by_filename)
+    _run_process(session, scores, dists, phase_a_by_filename)
 
 
-def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict) -> None:
+def _run_process(session: UploadSession, scores: dict, dists: dict, phase_a_by_filename: dict) -> None:
     try:
         score_npz = UPLOAD_DIR / "_work"
         score_npz.mkdir(parents=True, exist_ok=True)
@@ -415,6 +425,7 @@ def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict
         savez_payload = dict(scores)
         for fn, phase_a in phase_a_by_filename.items():
             savez_payload[f"flag__{fn}"] = phase_a.flag
+            savez_payload[f"dist__{fn}"] = dists[fn]
         np.savez(score_npz_name, **savez_payload)
 
         out_path = _run_worker("process_events", {"score_npz_path": score_npz_name}, ".json")
@@ -422,8 +433,7 @@ def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict
         result = json.loads(out_path.read_text())
         out_path.unlink(missing_ok=True)
 
-        op_pen_mult = result["pen_mult"]
-        op_rate_per_day = result["event_rate_per_day"]
+        alarm_budget = result["alarm_budget"]
         file_events = result["events"]  # {filename: [[onset_sec, offset_sec], ...]}
 
         files_payload = []
@@ -461,8 +471,7 @@ def _run_process(session: UploadSession, scores: dict, phase_a_by_filename: dict
     with session.lock:
         session.processing = False
         session.done = True
-        session.op_pen_mult = op_pen_mult
-        session.op_rate_per_day = op_rate_per_day
+        session.alarm_budget = alarm_budget
 
 
 def save_upload_to_tmp(data: bytes) -> Path:

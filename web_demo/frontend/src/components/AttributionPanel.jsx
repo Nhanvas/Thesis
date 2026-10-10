@@ -4,7 +4,7 @@ import { ELECTRODES, CHANNEL_PAIRS, HEAD_CENTER, HEAD_RADIUS, scoreColors } from
 import tokens from '../design-tokens.js'
 
 // Channel Attribution Panel (Step 7, CC_STEP7_PROMPT.md Part 3 / SZSCAN_SPEC_v5.md §6.7).
-// XAI for the GAE reconstruction branch — NOT localization, NOT SOZ (THESIS_CONTEXT_FOR_
+// XAI readout of the GAE node-latent anomaly — NOT localization, NOT SOZ (THESIS_CONTEXT_FOR_
 // DEMO.md §5). Syncs to whichever event Panel Event currently has selected (AI or Human);
 // AnalysisScreen passes that event object (or null) in as `event` — this component holds no
 // sync state of its own, same division of responsibility as PanelEvent.
@@ -107,7 +107,7 @@ export default function AttributionPanel({ event }) {
     )
   }
 
-  const title = `Channel-level reconstruction anomaly — ${event.name}`
+  const title = `Channel-level latent anomaly — ${event.name}`
   const colors = data?.available ? scoreColors(data.rows) : {}
 
   return (

@@ -1,31 +1,21 @@
-"""attribution.py — Channel Attribution Panel backend (Step 7, CC_STEP7_PROMPT.md Part 2;
-formula closed in Step 7 fix round 2, CC_STEP7_FIX2_PROMPT.md Part 1).
+"""attribution.py — Channel panel backend: `Channel-level latent anomaly — Event N`.
 
-Computes an event's 18-channel attribution ON READ from the per-file `{stem}.pernode.npy`
-cache (Part 1) plus the subject's persisted `pernode_baseline.npy` (fix round 2) — never
-cached in the DB itself, so an edited Human event (its range changes) always gets fresh
-scores. Only per-channel Accept/Reject review status is persisted (db.py's
-`attribution_status` table).
+Computes an event's 18-channel scores ON READ from the per-file `{stem}.pernode.npy` cache plus the
+subject's `pernode_baseline.npy` (both written by Phase B, pipeline_demo.py) — never cached in the
+DB, so an edited Human event always gets fresh scores. Only per-channel Accept/Reject review status
+is persisted (db.py's `attribution_status` table).
 
-Definition (CC_STEP7_FIX2_REPORT.md has the full provenance):
-  1. Windows of an event: the windows whose 4 s span [4i, 4i+4) overlaps [onset_sec,
-     offset_sec] — the same overlap criterion `src/attribution_pipeline.py`'s
-     `_blocks_for_subject` uses (there, via a label-derived per-second array; here, directly
-     from the event's own onset/offset, which the demo already has for both AI and Human
-     events — no labels needed). Always at least the window containing the onset. Clamped to
-     the file's usable window count.
-  2-3. Aggregation and score shown per channel — CLOSED (no longer PROVISIONAL), 2026-09-25:
-     score = 95th percentile of |robust-z| across the event's windows, per channel:
-       z = |(window - med) / mad|          # per window, per channel
-       score = percentile(z, 95, axis=0)   # [18], event-level
-     `med`/`mad` are the subject's persisted whole-subject baseline (see
-     `pipeline_demo.compute_pernode_baseline`) — median/MAD over every window of every file
-     belonging to the subject, no 1.4826 factor. Exact same formula as
-     `src/attribution_pipeline.py`'s `cmd_score` (lines ~514-520); the only difference is
-     baseline scope (whole-subject recording here vs. interictal-only there), which is the
-     divergence already recorded in `SZSCAN_SPEC_v5.md` §1.6 item 1, not a new one — the
-     interictal-only baseline is off-limits per CLAUDE.md guard 3.
-     Rank = position by the unrounded score, highest first, unaffected by status.
+Quantity (final thesis system, the quantity of its channel study, src/attribution_v8.py):
+  `{stem}.pernode.npy` = D, the per-channel LedoitWolf Mahalanobis distance of the GAE v2 node
+  latent [n_windows, 18], NaN at signal-loss windows; baseline = per-channel median and MAD (+1e-9)
+  of D over every non-signal-loss window of the subject.
+    z = |(D - median) / MAD|                 # per window, per channel (robust-z, no 1.4826)
+    score = p95 of z over the event's windows # per channel
+  Event windows: window i spans [4i, 4i+4) and is used if it overlaps [onset, offset); at least the
+  window containing the onset; signal-loss windows are skipped (they have no latent). If every
+  window of the event is signal loss, the panel says attribution is not available.
+  Rank = position by the unrounded score, highest first. Neutral XAI readout: not localization,
+  not seizure-onset-zone; no metric shown.
 """
 from pathlib import Path
 
@@ -77,15 +67,23 @@ def get_event_attribution(event: dict, file_row: dict, upload_dir: Path) -> dict
             "message": "Attribution is not available for this file.",
         }
 
-    pernode = np.load(pernode_path, mmap_mode="r")  # [n_windows, 18] float32
+    pernode = np.load(pernode_path, mmap_mode="r")  # [n_windows, 18] float32, NaN = signal loss
     n_windows = pernode.shape[0]
     lo, hi = _event_windows(event["onset_sec"], event["offset_sec"], n_windows)
     window_scores = np.asarray(pernode[lo : hi + 1]).astype(np.float64)  # [k, 18]
+    window_scores = window_scores[np.isfinite(window_scores).all(axis=1)]  # skip signal loss
+    if len(window_scores) == 0:
+        return {
+            "available": False,
+            "event_id": event["id"],
+            "event_name": event["name"],
+            "message": "Attribution is not available for this event (no signal in its windows).",
+        }
 
     baseline = np.load(baseline_path).astype(np.float64)  # [2, 18]: row 0 = median, row 1 = MAD
     med, mad = baseline[0], baseline[1]
     z = np.abs((window_scores - med) / mad)  # [k, 18], per window per channel
-    per_channel = np.percentile(z, 95, axis=0)  # items 2-3: p95 |robust-z|, event-level score
+    per_channel = np.percentile(z, 95, axis=0)  # p95 |robust-z|, event-level score
     order = np.argsort(-per_channel)  # item 3: rank = position by score, highest first
     rank_of = np.empty(len(CHANNELS), dtype=int)
     rank_of[order] = np.arange(1, len(CHANNELS) + 1)
@@ -110,6 +108,6 @@ def get_event_attribution(event: dict, file_row: dict, upload_dir: Path) -> dict
         "window_hi": hi,
         "window_lo_sec": lo * WIN_S,
         "window_hi_sec": (hi + 1) * WIN_S,
-        "n_windows_used": hi - lo + 1,
+        "n_windows_used": int(len(window_scores)),
         "rows": rows,
     }

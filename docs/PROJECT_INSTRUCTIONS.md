@@ -52,8 +52,7 @@ and give the correct reading.
 **Deliverables and commands.**
 - Whole files with the exact target path (repo under `F:\Study\Thesis\Code\`, chapters in
   `F:\Study\Thesis\Reports\`). Say clearly which files go to the local repo and which to the project.
-- Project knowledge: Claude writes and deletes project docs itself with the Projects tool; the author only
-  replaces binary uploads (e.g. `p2_ledger.csv`) and pastes the instructions.
+- Project knowledge: Claude never writes or deletes project files. It gives one final list (add / replace / delete, with the local path of each file); the author updates every project by hand.
 - Anything that can be a command is a command, in `bash -e <<'EOF' … EOF`, staging explicit paths.
 - **Every long run states its expected runtime**, "estimated, not measured" until measured.
 - Boti does no manual file surgery. Key-metric tables, not full logs. If he says **"build"**, cut to code.

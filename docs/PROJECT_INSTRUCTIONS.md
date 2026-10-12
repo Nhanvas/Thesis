@@ -1,10 +1,11 @@
 # PROJECT INSTRUCTIONS — Claude agent spec
 ### Thesis: Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and Change Point Detection
 
-> **Rev. 2026-10-12b (report phase, v8, after chat 1).** Replaces rev. 2026-10-12 in full. Performance work
+> **Rev. 2026-10-12c (report phase, v8, after chats 1–2).** Replaces rev. 2026-10-12b in full. Performance work
 > is CLOSED (tag `perf-p3-closed`); the thesis system is the P3 frozen system (tag `p3-frozen`). The
 > supervisor commented on the 11/10 draft on 12/10; the report is rewritten as v8 from v5, in one-task chats.
-> The demo is finished (`szscan-frozen-v4.1`) and the outline v8 is written (approval of O1–O6 pending).
+> The demo is finished (`szscan-frozen-v4.1`); the outline v8 is approved (O1–O6) and the v8 exhibits are
+> produced by `src/figures_v8/make_v8_exhibits.py` from committed results (gated).
 > **Start every chat from `docs/STATUS_BOARD.md`** (state, approvals pending, layout, plan of chats).
 
 **Authority order on any conflict:**
@@ -230,6 +231,7 @@ metric in the UI.
   Python 3.11.9, torch 2.12 CPU. Repo github.com/Nhanvas/Thesis, branch `main`. Gitignored inputs:
   `data/processed/` (V1), `data/trainset_v2/`, `data/testset_v2/`, large caches (`results/p2_test/`,
   `results/app_eval_v3/cache/`, …).
+- The repository is public: a cloud chat can clone `github.com/Nhanvas/Thesis` (read only) to read committed results.
 - Outside the repo (layout in STATUS_BOARD §5): `Reports/v8/` (the report being written),
   `Reports/submitted/`, `Agent/inbox/` (hand-over tray only), `Archive/<date>/` (superseded material),
   `Dataset/`, `Papers/`.
@@ -247,8 +249,7 @@ metric in the UI.
 · `docs/HANDOFF_T1_DEMO_REBUILD.md` · `docs/BRIEFING_2026-10-08_vi.md` · `results/p2_ledger.csv` (every
 P2/P3 arm; the `verdict` column is the step gate, not the final choice) · `docs/PROVENANCE.md`,
 `docs/PROVENANCE_V2.md` · `docs/ATTRIBUTION_SPEC.md` · `docs/Thesis_Reference_Sheet.md` (groups K–N).
-**Writing:** `docs/writing/REPORT_OUTLINE_v8.md` (the plan of record once O1–O6 are approved; supersedes
-REPORT_BLUEPRINT_v5) · `docs/writing/` (AUTHOR_REQUIREMENTS — items 3 and 21 are amended by §5 above;
+**Writing:** `docs/writing/REPORT_OUTLINE_v8.md` (approved plan of record; supersedes REPORT_BLUEPRINT_v5) · `docs/writing/` (AUTHOR_REQUIREMENTS — items 3 and 21 are amended by §5 above;
 REVIEWER_RULES; RUBRIC_MAP; SAMPLE_PATTERNS) · `PROSE_STYLE_SPEC.md` · `THESIS_REPORT_WRITING_GUIDE.md` ·
 `Report format.md`. Base text: Chapters v5 (project) + the 11/10 draft (`Reports/submitted/`).
 **Never cite:** `docs/archive/` · `tables/` · `results/history_superseded/` · `Archive/`.

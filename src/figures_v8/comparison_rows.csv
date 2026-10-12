@@ -1,0 +1,16 @@
+dataset,label,study,ref,group,method_and_labels,protocol,sens,fp_day,fp_note,aggregate,source,show,dx,dy
+CHB-MIT,held-out,"This work, held-out evaluation",,this,Unsupervised; per-patient fitting without labels,"8 test patients, continuous, SzCORE",0.342,22.2,,pooled (per-patient mean 0.508),results/e23_test_look7/SUMMARY.md,1,6,-10
+CHB-MIT,final,"This work, final system (test-informed)",,this,As above; last design choice test-informed,As above,0.487,27.5,,pooled (per-patient mean 0.577),results/e23_test_look7/SUMMARY.md,1,4,3
+CHB-MIT,application,"This work, review application",,this,As above; label-free normalisation statistics,"As above, every event before review",0.434,27.9,,pooled (per-patient mean 0.528),results/application_eval_v4/pooled.json,1,8,-3
+CHB-MIT,Ali 2024,Ali et al.,F2,supervised,"Random forest, leave-one-subject-out",All subjects; seizure counted at >= 70 % coverage; events <= 10 s ignored,0.753,115.0,4.79/h x 24 (computed),overall,Thesis_Reference_Sheet U-F2,1,4,3
+CHB-MIT,SzCORE RF,SzCORE baseline RF,K6,supervised,"Random forest, within-dataset cross-validation",Event-based (2024),0.370,1.66,,subject-mean,Thesis_Reference_Sheet K6,1,4,3
+CHB-MIT,SzCORE XGB,SzCORE baseline XGBoost,K6,supervised,"XGBoost, within-dataset cross-validation",Event-based (2024),0.671,2.09,,subject-mean,Thesis_Reference_Sheet K6,1,4,3
+CHB-MIT,Chung 2026,Chung et al.,M2,supervised,"CNN, leave-one-patient-out","Excludes chb06, chb14, chb16; own scoring",0.801,27.1,1.13/h x 24 (computed),pooled,Thesis_Reference_Sheet M2,1,4,3
+CHB-MIT,Yin 2026,Yin and Yin,M3,supervised,"Fusion network, split by recording within each case","Excludes chb06, chb12, chb16",1.000,19.7,0.82/h x 24 (computed),overall,Thesis_Reference_Sheet M3,1,4,3
+CHB-MIT,Mirzaei 2025,Mirzaei and Singh,M1,supervised,One-class model per patient; threshold set with that patient's seizures,18 of 24 patients; seizures >= 40 s,0.916,2.4,0.1/h x 24 (computed),overall,Thesis_Reference_Sheet M1,1,4,3
+CHB-MIT,Shoeb 2010,Shoeb and Guttag,M8,supervised,Patient-specific SVM,"173 test seizures, leave-one-record-out",0.96,2.0,median false detections per 24 h,overall,Thesis_Reference_Sheet M8,1,4,3
+Siena,this work,"This work, external validation",,this,Unsupervised; per-patient fitting without labels,"14 patients, SzCORE definitions, own scorer",0.633,41.0,,subject-mean (four seeds),results/x1_external/SUMMARY.md; record 9.9,1,6,-12
+Siena,DynaSD,DynaSD,K3/K4,unsupervised,Label-free detector; threshold tuned on labelled intracranial EEG,SzCORE benchmark,0.664,77.74,,subject-mean,docs/BENCHMARK_CHECK_szcore_c57da2f.md,1,4,5
+Siena,Zhu 2023,Zhu Transformer 2023,K3,supervised,"Supervised, trained on TUH",SzCORE benchmark,0.674,15.30,,subject-mean,docs/BENCHMARK_CHECK_szcore_c57da2f.md,1,4,3
+Siena,EventNet,EventNet 2024,K3,supervised,"Supervised, trained on TUH",SzCORE benchmark,0.587,8.21,,subject-mean,docs/BENCHMARK_CHECK_szcore_c57da2f.md,1,4,3
+Siena,Tang 2021,Self-GNN (Tang 2021),K3,supervised,"Supervised, trained on TUH",SzCORE benchmark,0.824,112.50,,subject-mean,docs/BENCHMARK_CHECK_szcore_c57da2f.md,1,4,3

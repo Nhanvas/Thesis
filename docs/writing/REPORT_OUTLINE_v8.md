@@ -1,8 +1,8 @@
-# REPORT_OUTLINE_v8 — outline of the thesis report (rev 1, 2026-10-12)
+# REPORT_OUTLINE_v8 — outline of the thesis report (rev 2, 2026-10-12)
 
-**Status: PROPOSED — author approval pending (items O1–O6, Section 9).** No chapter text is written
-before approval (instructions, chat protocol 4). Once approved, this file is the plan of record for
-chats 2–5 and supersedes `REPORT_BLUEPRINT_v5.md`.
+**Status: APPROVED (author, 12/10, O1–O6 as proposed).** Plan of record for the writing chats; supersedes
+`REPORT_BLUEPRINT_v5.md`. Rev 2 (chat 2, figures): open checks of §8.2 resolved against the committed
+repository (§8.1), exhibits produced (§5 status column), two data-accounting facts added (§8.1).
 
 Inputs read for this outline: Chapters v5 + front matter v5; the 11/10 draft; PERF_PHASE_RECORD rev R;
 HANDOFF_REPORT rev 2; STATUS_BOARD rev 1; `x1_SUMMARY.md`, `e23_SUMMARY.md`, `p3c_SUMMARY.md`,
@@ -155,10 +155,11 @@ unsupervised (v5).
 - 1.2.2 Unsupervised, self-supervised and graph-based anomaly detection — two paragraphs.
   (a) reconstruction/generative: VAE AUC 0.68 window-level, folds over windows [C2]; DDPM segment-level
   per patient [C7]; cascaded AE with adaptive window threshold [E12]; SincVAE [E14]; sub-sequence
-  anomalies [N1, title only]; extreme events [M4]. (b) graph and self-supervised: graph-deviation network on
+  anomalies, up to 99.38 % sensitivity, protocol not stated in the abstract [N1, abstract only]; extreme events [M4]. (b) graph and self-supervised: graph-deviation network on
   motor-imagery EEG, labels from a supervised classifier, Youden threshold [N4]; IRENE learned graphs
   sparse (0.16 vs 0.72) with a label-relevance term [G9]; self-supervised detectors with labelled heads
-  [E9, N2, N3 title only]; foundation-model adaptation with unlabelled target data 46.9 → 83.1 % AUROC but
+  [E9; N2 SLAM, CHB-MIT patient-dependent and cross-patient; N3 MCAN, cross-domain, AUROC 0.914 and F1 0.709 —
+  abstract only, no event-level protocol stated]; foundation-model adaptation with unlabelled target data 46.9 → 83.1 % AUROC but
   labelled probe and 2 test patients [N5]; DynaSD fits the first minutes of each recording [K4].
   **Ends with G1** (reference) and **G5** (explanations checked against chance or per-channel corpora
   [E11, E13]; CHB-MIT has none).
@@ -199,8 +200,10 @@ sentence maps stages to Chapters 2–4.
 - 2.1.1 CHB-MIT database and patient split — v5 text; cases vs individuals (chb01 = chb21, both
   training); 18 derivations; chb12 three files skipped (13 seizures); licence and de-identification
   (draft). N: test 76 seizures, 6–205 s, median 45 s, 23 < 20 s by annotation (`results/p3_seizure_burden/burden.txt`).
-  X: **Figure 4** Bipolar montage (INH). **Table 4** Patient split (v5 Table 4: 566.43 / 115.82 / 279.39 h;
-  93 / 13 / 76 seizures; chb24 21.3 h, 16; Siena 141.0 h, 47) — source of the development hours to confirm (8.2).
+  X: **Figure 4** Bipolar montage (INH). **Table 4** Patient split (566.43 / 115.82 / 279.39 h listed in the CHB-MIT summary files;
+  93 / 13 / 76 seizures; chb24 21.3 h, 16; Siena 141.0 h, 47; table note: hours scored 562.40 / 111.82 / 279.38 —
+  chb12 three files without the 18 derivations, chb11 four files and chb21 one file absent from the local copy,
+  none with a seizure; O7). Per-case table → Appendix A1 (`tables/appA1_chbmit_accounting`).
 - 2.1.2 External data — chb24 (every present file, 21.3 h, 16 seizures); Siena: 14 adults (9 men 36–71,
   5 women 20–58) [K1, K2], referential 512 Hz → 18 bipolar derivations, 256 Hz, 50 Hz notch; annotations by
   the benchmark's converter [K5]; licence. **Hours sentence = A4 wording + PN14 clause (O3).** Per-patient
@@ -240,8 +243,8 @@ without labels (covariances, robust scaling, percentiles, budget); seizures 0.4 
 - 2.5.3 Spatial members and baseline drift correction — members 6/9/12 + mean; drift motivation: about
   85 % (84.5 %) of the top-2 % non-seizure windows lie in the quarter of each patient's files with the
   highest median, and 8 % (8.3 %) of those files hold a seizure (record §6.1 E16); Eq 8; level only.
-  X: **Figure 8** Baseline drift correction (S2/CC export: one development patient, seed 42; cache
-  `results/e16_recording_baseline/` — confirm).
+  X: **Figure 8** Baseline drift correction (DONE: `fig08_drift.png`, chb03, three consecutive files, seed 42,
+  from committed `results/figures_v6_data/`; label-free signal, seizures shaded for orientation).
 - 2.5.4 Ensemble score — percentile ranks, Eq 9.
 
 **2.6 Detection and localization** (~650 words)
@@ -287,7 +290,7 @@ Each section opens with its question (one sentence) and ends with the **answer**
 **3.1 Connectivity graphs (Objective 1)** (~200 words) — v5 3.1 numbers: fixed threshold density
 0.921–0.973 (background), 0.949–0.974 (seizure); proportional 0.196 (chb17 background 0.224); separation
 up on 8/8 test patients, relative Frobenius +48 % (chb15) to +196 % (chb17), cosine +545 % to +903 %.
-**Source to locate (8.2).** X: **Figure 11** Separation by sparsification rule (INH; check data source).
+Source `results/diagnostics/density_frobenius_v2/` (8.1). X: **Figure 11** Separation by sparsification rule (DONE).
 Answer: "Keeping the strongest fifth of the edges gave every patient the same graph density and a larger
 seizure–background difference than a fixed threshold."
 
@@ -295,10 +298,10 @@ seizure–background difference than a fixed threshold."
 - 3.2.1 Contribution of each component — X: **Table 9** (v5 Table 9, 7 rows, 4-seed means unless marked):
   0.330 @ 23.7 (seed 42) → 0.489 @ 20.1 → 0.612 @ 24.6 (0.742) → 0.681 @ 24.3 (0.821) → 0.668 @ 20.0 (0.828)
   → 0.678 @ 23.8 (0.842) → 0.670 @ 23.3 (0.832). Sources: record §2 E8, bootstrap (0.489 @ 20.06), E16
-  reference, ledger E21-1, E17b, `p3c_SUMMARY.md`. Note under the table: rows 3 and 4 are read on
-  different threshold grids unless 8.2 confirms otherwise. Short seizures of this set: 2.0 of 3 (ensemble)
+  reference, ledger E21-1, E17b, `p3c_SUMMARY.md`. Rows 3 and 4 are on the same grid (S9 base
+  re-scored on the fine grid: 0.612, 8.1). Short seizures of this set: 2.0 of 3 (ensemble)
   vs 1.5 (single member).
-- 3.2.2 **Designs evaluated and not adopted (NEW, F3)** — X: **Table 10** columns: stage | design |
+- 3.2.2 **Designs evaluated and not adopted (NEW, F3)** — X: **Table 10** (DONE as `tables/table10_designs.md`, 15 rows) columns: stage | design |
   development result (pooled sensitivity @ FP/day, 4 seeds unless marked) | reference under the same rule |
   why not adopted (one line). Rows (sources: record §2, §6.1, §9.7, ledger):
   1. Reference from other patients (feature model) — 0.340 | patient-own feature density 0.596 | does not separate the patient's high-amplitude states (E1, E5)
@@ -335,16 +338,17 @@ seizure–background difference than a fixed threshold."
   every other budget-0.005 patient identical.
 - 3.3.3 Detection by seizure duration (NEW) — 4 of the 18 seizures shorter than five whole windows
   detected in both evaluations; detection rate by duration bin. X: **Figure 12** Detection by seizure
-  duration (S2 from the per-seizure file, 8.2).
+  duration (script ready; data = Claude Code `CC_FIGURES_V8.md` step 1, gated 37/76 and 26/76).
 - 3.3.4 Onset and offset — X: **Table 13** (v5 Table 12: development 16/24 → 4/16 computed, n = 247;
   held-out 28/16 → 8/20, n = 103; final 32/20 → 12/24, n = 146; chb24 12/8 → 4/4, n = 53; Siena 36/28 →
   20/28, n = 116); offset bias +16 s; contiguous-run offset 16 s (final). **Figure 13** Onset and offset
-  error (S2: distribution detector vs localizer, final system, matched pairs; file 8.2). Review share of
+  error (DONE). Table 13 adds the localizer bias (median signed error): development +4/+4, held-out +4/+16, final +8/+16,
+  chb24 +4/0, Siena +20/+20 s. Review share of
   detected events 2.2 % of recorded time (0.0215; `e23_SUMMARY.md`).
-- 3.3.5 Detection examples (NEW, F5) — X: **Figure 14** Detected and missed seizures (CC; 18-channel EEG +
+- 3.3.5 Detection examples (NEW, F5) — X: **Figure 14** Detected and missed seizures (plot script ready and smoke-tested; data = Claude Code step 2; 18-channel EEG +
   ensemble score + threshold + detector event + localized event + annotation; panels: (a) chb03 detected,
   (b) chb15 seizure detected only under the per-patient budget, (c) chb16 short seizure missed, (d) a
-  high-amplitude false alarm, (e) one Siena seizure). Panel (e) needs the Siena EDF (Kaggle or local; 8.2).
+  high-amplitude false alarm, (e) one Siena seizure). Panel (e) only if the Siena EDF files are on the laptop (O8).
 - Answer: "The held-out evaluation detected 26 of 76 seizures (per-patient mean 0.508) at 22.2 false
   alarms per day; the final, test-informed system 37 of 76 (0.577) at 27.5, the difference being one
   patient; the localizer placed onsets within a median of 12 s but did not improve offsets."
@@ -373,7 +377,7 @@ seizure–background difference than a fixed threshold."
 **3.5 Channel-level explanation (Goal 3)** (~200 words) — X: **Table 16** (v5 Table 14): final readout
 0.547 [0.499, 0.597], p = 0.018; Δ prior −0.191 [−0.262, −0.118] (prior 0.739); specificity p = 0.53;
 without chb15 0.486; earlier readout 0.569 [0.510, 0.632], p = 0.001; −0.169 [−0.255, −0.080];
-p = 0.34 (Holm 0.68 — confirm which p the table prints, 8.2); without chb15 0.501; seeds 1/2/3 0.543 /
+p = 0.34 (Holm 0.68); the table prints both, final readout p = 0.53 (Holm 1.00); without chb15 0.501; seeds 1/2/3 0.543 /
 0.588 / 0.545 (HANDOFF §3; `results/attribution_v8/`, `results/attribution_v7/`). Answer: "The ranking
 agreed with the blind annotation slightly above chance and clearly below a rule that ignores the EEG."
 
@@ -392,8 +396,7 @@ agreed with the blind annotation slightly above chance and clearly below a rule 
 - Processing time (O1): median 21.68 s per hour of EEG on chb16 (19.0 h, 3 runs, range 21.60–24.41;
   feature stage 266.1 s of 410–464 s, `TIMING.md`); the full 8-patient run took 5,862 s for 279.39 h
   (21.0 s per hour overall, computed as total/total; per-patient rates 11.8–25.4 s/h under varying
-  background load) → one day of EEG in about 9 minutes (computed 21.68 × 24 = 520 s). Processor model to
-  confirm (8.2).
+  background load) → one day of EEG in about 9 minutes (computed 21.68 × 24 = 520 s). Processor model from the author's check (O8).
 - Answer: "Running the whole system from the raw recordings, with no label at any step, the application
   flagged 33 of the 76 test seizures at 27.9 false alarms per day and processed an hour of EEG in about
   22 seconds on a laptop processor."
@@ -402,8 +405,9 @@ agreed with the blind annotation slightly above chance and clearly below a rule 
 
 **4.1 Detection performance in context** (~650 words) — X: **Table 18** Comparison with published studies
 (v5 Table 16 rows + this work's fully label-free application row + Siena supervised entries trained on
-other data, if 8.2 confirms: Zhu 2023 0.674 @ 15.3, EventNet 0.587 @ 8.2 [K3]); **Figure 16** Sensitivity
-versus false alarms per day (S2 from Table 18 rows). Content: only DynaSD on Siena is directly comparable
+TUH only — out-of-sample, confirmed in `docs/BENCHMARK_CHECK_szcore_c57da2f.md`: Zhu 2023 0.674 @ 15.30, EventNet 0.587 @ 8.21,
+Tang 2021 0.824 @ 112.50 [K3]; rows in `src/figures_v8/comparison_rows.csv`); **Figure 16** Sensitivity
+versus false alarms per day (DONE, two panels CHB-MIT / Siena). Content: only DynaSD on Siena is directly comparable
 (similar sensitivity, about half the false alarms; own scorer implementation); supervised detectors
 trained elsewhere reach Siena at 8–15 FP/day — the price of having no labels; CHB-MIT rows differ by
 labels, exclusions or rule (Ali [F2], Chung [M2], Yin [M3], Mirzaei [M1], Shoeb [M8], SzCORE baselines
@@ -435,15 +439,16 @@ recording (computed).
   seizure peaks outranked by 20–50 % of same-length non-seizure spans vs 4 % on validation,
   `results/oracle_gate_bound/`); the offline protocol overestimated (one sentence, refer to 2.8.2).
 
-**4.3 Where the system fails** (~450 words) — v5 4.2 text, numbers re-checked (8.2: v5 says chb06/chb13/
-chb16 need 2.7–3.5 % of patient time, draft says 3.0–4.2 %; channels at peak 6–15 vs 6.5–14.5).
-X: **Figure 17** Alarm budget needed per test seizure (S2 from `results/p3_anatomy/seizures.csv`;
+**4.3 Where the system fails** (~450 words) — v5 4.2 text with ONE reading (8.1): seed 42, the reading of Figure 17 — median alarm budget needed chb06 4.2 %,
+chb13 3.0 %, chb16 3.4 % (well-detected patients ≤ 0.25 %); channels with robust z > 3 at the seizure peak (4-seed mean):
+chb06 1.4 vs 6.3–15.4 in the well-detected patients.
+X: **Figure 17** Alarm budget needed per test seizure (DONE, `results/p3_anatomy/seizures.csv`, seed 42;
 caption title only; text says it is a post-hoc analysis that uses the test annotations). Short
 seizures: 23 by annotation / 18 by whole windows, 4 detected. False alarms: the highest non-seizure
-scores are mostly high-amplitude windows and rarely near seizures (record §9.7 D2; source file 8.2).
+scores are mostly high-amplitude windows and rarely near seizures (`results/p3b_diag/tail.csv`, 8.1).
 
-**4.4 Channel-level explanation** (~250 words) — v5 4.4 (frontopolar 41 % of annotated channels, five
-channels never annotated — source to confirm in `results/attribution_v8/`; chb15 0.675).
+**4.4 Channel-level explanation** (~250 words) — v5 4.4 (frontopolar channels 116 of 282 annotated channel labels = 41 %, computed; five channels never
+annotated: C3-P3, C4-P4, P4-O2, FZ-CZ, CZ-PZ — `results/attribution_v7/label_composition.csv`; chb15 0.675).
 
 **4.5 Limitations and future work** (~400 words) — eight test patients (wide intervals); test set used
 during development; **label-dependent normalisation now measured: with label-free statistics the same
@@ -480,6 +485,12 @@ one-sentence significance.
 ---
 
 ## 5 · Exhibit register (consecutive, short titles; owner; source)
+
+**Produced in chat 2** (`src/figures_v8/make_v8_exhibits.py`, gated; output `Reports/v8/figures|tables/`): Figures 8, 9,
+11, 13, 16, 17; Tables 4 (totals), 10, 11, 12, 13, 14, 15, 16, 17; Appendix A1, D1–D3. **Waiting for Claude Code**
+(`docs/prompts/CC_FIGURES_V8.md`): Figure 12 (per-seizure file), Figure 14 (gallery data). **Inherited, to check by the
+author:** Figures 1, 2, 4, 5, 7. **To draw (diagram):** Figures 3, 6, 10 — reuse the draft's drawings if they show the
+final system, else redraw (chat 3). Tables 1, 2, 3, 5–9, 18 are written in the chapter files.
 
 | No. | Sec | Title | Owner | Source / status |
 |---|---|---|---|---|
@@ -572,38 +583,42 @@ separate sentence.
 
 ## 8 · Open checks
 
-### 8.1 Resolved in this chat
-- **PN14 (A4).** EDF durations from the author's Kaggle printout: 2.1856 + 2.5458 + 11.6653 + 4.0672 =
-  20.464 h (computed) = the 20.4622 h scored. PhysioNet's table (23.47 h) and PN14's seizure list (23.46 h)
-  are both about 3.0 h longer than the files, all in PN14-3 (11.67 h in the file vs 14.67 h implied by its
-  registration times). PN14's 4 seizures are all among the 47 scored references (`x1_SUMMARY.md`).
+### 8.1 Resolved (chat 1 and chat 2; read from the committed repository, commit 9f64036)
+- **PN14 (A4).** EDF 2.1856 + 2.5458 + 11.6653 + 4.0672 = 20.464 h (computed) = the 20.4622 h scored; PhysioNet's table
+  (23.47 h) and PN14's seizure list (23.46 h) are ~3.0 h longer, all in PN14-3; PN14's 4 seizures are among the 47 scored.
+- **(1) Development hours.** 566.43 / 115.82 / 279.39 h = start/end times of the CHB-MIT summary files (computed by
+  `make_v8_exhibits.py`). Hours scored (`results/p3_anatomy/labelfree.csv`): 562.40 / 111.82 / 279.38. Differences:
+  chb12 3.0 h (three files without the 18 derivations, known); **chb11 4.0 h (chb11_12–15) and chb21 1.0 h (one file)
+  listed in the summaries but absent from the local dataset copy** (`continuous_eval.list_files` docstring for chb11);
+  none of these five files holds a seizure. → O7.
+- **(2) Sparsification.** `results/diagnostics/density_frobenius_v2/` (density and separation per test patient):
+  relative Frobenius +47.9 % (chb15) to +195.9 % (chb17), cosine +545 % to +903 % — the v5 numbers.
+- **(3) Table 9 rows 3–4** are on the same fine grid: S9 base 0.612 @ 24.64 (`results/e21_fine_grid/SUMMARY.md`).
+- **(4) Per-seizure files.** `results/p3_anatomy/seizures.csv` (duration, pn_final, `caught` = held-out detector stage,
+  4 seeds) feeds Figure 17; it has no final-system detection flag → Figure 12 needs the Claude Code export
+  (`docs/prompts/CC_FIGURES_V8.md`, step 1). Matched-pair errors: `results/e23_test_look7/errors.csv`,
+  `results/e22_test_oneshot/errors.csv`, `results/p3c_freeze/errors.csv` (budget L2f), `results/x1_external/errors_*.csv`.
+- **(5) v5 vs draft (4.3).** Both were right under different readings: v5 2.7–3.5 % = 4-seed mean of the per-seed
+  medians; draft 3.0–4.2 % = seed 42. v8 uses seed 42 (the reading of Figure 17): chb06 4.2 %, chb13 3.0 %, chb16 3.4 %.
+- **(6) False-alarm anatomy:** `results/p3b_diag/tail.csv` (flagged, peri-ictal and in-tolerance shares of the top
+  non-seizure windows, per patient and tier).
+- **(7) Per-seed per-patient:** `results/e22_test_oneshot/per_subject_seed.csv`, `results/e23_test_look7/per_subject_seed.csv`,
+  `results/x1_external/rows_*.csv` → Appendix D tables done.
+- **(9) Siena benchmark entries:** Zhu 2023, EventNet 2024 and Tang 2021 declare TUH only → out-of-sample on Siena
+  (`docs/BENCHMARK_CHECK_szcore_c57da2f.md`).
+- **(11) Table 16:** both p printed: final readout specificity p = 0.53 (Holm 1.00); earlier readout p = 0.34 (Holm 0.68).
+- **(12) 4.4 numbers:** frontopolar 116 of 282 annotated channel labels (41 %, computed); five channels never annotated.
+- **(13) Figure 1:** `src/figures/fig1_1_seizure_phases.py`, chb11 (validation patient); author confirms it is the draft's Fig 1.
+- **Figure 9** (scoring rules): `src/figures/fig2_14_event_scoring.py` reads the parameters from `src/szcore_eval.py`
+  (synthetic waveform, own drawing) → `fig09_event_scoring.png`; first candidate in the cut order (full page).
+- **N1–N3:** abstracts supplied by the author (12/10); cited at abstract level (§3, 1.2.2).
 
-### 8.2 To confirm (chat 2 or the writing chats; one command each)
-1. Development hours 566.43 / 115.82 h (Table 4): name the file that holds them.
-2. Sparsification numbers of 3.1 and Figure 11's data: committed result file (not `tables/`).
-3. Table 9 rows 3–4: S9 base re-scored on the fine grid (E21 stage 1 output) or note the grid change.
-4. Per-seizure file for Figures 12 and 17: columns of `results/p3_anatomy/seizures.csv` (duration,
-   detected flag per seed, p_need); and the matched-pair error file of look #7 for Figure 13.
-5. v5 vs draft conflict in 4.3: share of patient time for chb06/chb13/chb16 (2.7–3.5 % vs 3.0–4.2 %)
-   and channels above z 3 at the peak (6–15 vs 6.5–14.5): read from the anatomy summary.
-6. Source of the false-alarm anatomy (record 9.7 D2: flagged and peri-ictal shares): committed file?
-7. Per-seed per-patient files for Appendix D (test and Siena).
-8. Siena EDF location for Figure 14 (e) (local or Kaggle); score cache for that patient.
-9. Training data of the Siena benchmark entries Zhu 2023 and EventNet 2024 (benchmark check file of
-   08/10) before they enter Table 18 as "trained on other data".
-10. Processor model of the timing laptop (`wmic cpu get name`); the draft says Intel Core i5-8250U.
-11. Table 16 p-value of the earlier readout's specificity test: p = 0.34 (v5) vs Holm 0.68 (HANDOFF).
-12. 4.4 numbers (frontopolar 41 %, five channels never annotated) from `results/attribution_v8/`.
-13. Figure 1's record and file (inherited figure).
+### 8.2 Still open (author, one command — O8)
+- (8) Where the Siena EDF files are on the laptop (for Figure 14 e), if anywhere.
+- (10) Processor model of the timing laptop.
+- chb21: name of the file absent from the local copy (for Appendix A1).
 
-### 8.3 Literature
-- N1 (Toliopoulos 2025), N2 (BSPC 2023/2024), N3 (MCAN 2025): only titles are known (paywall and
-  rate limit, 09/10 and 12/10). They are cited for what the title states. If the author pastes the three
-  abstracts, 1.2.2 and Table 1 can say what they do.
-
----
-
-## 9 · Approvals asked of the author (board A8–A13)
+## 9 · Approvals (O1–O6 approved by the author 12/10; O7–O8 pending)
 
 | # | Question | Proposal |
 |---|---|---|
@@ -613,3 +628,5 @@ separate sentence.
 | O4 (A11) | New Table 6, decision matrix for the normal reference | Yes (it carries G1/H1/C1 into Methods with development evidence) |
 | O5 (A12) | Appendix numbering | Tables and figures in the appendix continue the integer numbering (AR 1); appendices titled "Appendix A: Data accounting" etc., referred to as [Appendix A] |
 | O6 (A13) | Table 3 row labels | Keep the draft's labels and weeks (default), or rename three labels to the report's terms with weeks unchanged |
+| O7 | Table 4 hours | Print the hours listed in the CHB-MIT summary files (566.43 / 115.82 / 279.39) with a note giving the hours scored (562.40 / 111.82 / 279.38) and why (chb12 channels; five seizure-free files of chb11 and chb21 absent from the local copy); per case in Appendix A1 |
+| O8 | Figure 14 panel (e) and timing laptop | Author's check command answers the Siena location and the processor model |

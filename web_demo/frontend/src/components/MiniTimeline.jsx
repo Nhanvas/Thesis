@@ -14,18 +14,17 @@ import { blockStyle, dimOpacity } from '../eventStyle.js'
 // are always 10 min each, even on a trailing partial page); only the data drawn on top
 // (score line, detection blocks) is clipped to [pageStart, pageEnd). For a <= 1 h file
 // pageStart is always 0 and this is pixel-identical to the old single-page behaviour.
+//
+// Final system (2026-10-10), docs/HANDOFF_T1_DEMO_REBUILD.md §3.4: the score is now a
+// patient-percentile mean in [0, 1], not a robust z-score — fixed y-range [0, 1], no reference
+// line, no threshold line (the alarm budget is an internal operating-point parameter and must
+// not appear in the product). Replaces the earlier P1-P99 auto-scale + zero-line design.
 const PAGE_WIDTH_SEC = 3600 // SPEC §6.3's stated default page size.
 const N_COLUMNS = 6
 const LABEL_W = 168
 const SCORE_ROW_H = 64
 const DET_ROW_H = 26
 const TICK_ROW_H = 16
-
-function percentile(sortedAsc, p) {
-  if (sortedAsc.length === 0) return 0
-  const idx = Math.min(sortedAsc.length - 1, Math.max(0, Math.round(p * (sortedAsc.length - 1))))
-  return sortedAsc[idx]
-}
 
 function Playhead({ frac, height }) {
   if (frac == null || frac < 0 || frac > 1) return null
@@ -44,21 +43,12 @@ export default function MiniTimeline({ fileMeta, score, scoreWindowSec, events, 
   const fileDurationSec = fileMeta?.usable_duration_seconds ?? (pageStart + PAGE_WIDTH_SEC)
   const pageEnd = Math.min(pageStart + PAGE_WIDTH_SEC, fileDurationSec)
 
-  const { p1, p99 } = useMemo(() => {
-    if (!score || score.length === 0) return { p1: -1, p99: 1 }
-    const sorted = [...score].sort((a, b) => a - b)
-    const lo = percentile(sorted, 0.01)
-    const hi = percentile(sorted, 0.99)
-    return { p1: lo, p99: hi > lo ? hi : lo + 1e-6 }
-  }, [score])
-
-  const center = (p1 + p99) / 2
-  const halfRange = Math.max((p99 - p1) / 2, 1e-6)
-
   function clampVal(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v))
   }
 
+  // Fixed y-range [0, 1] (patient-percentile mean score) — no reference line, no threshold
+  // line. A small top/bottom margin keeps 0 and 1 off the row's own borders.
   const scorePath = useMemo(() => {
     if (!score || !scoreWindowSec) return ''
     const pts = []
@@ -67,15 +57,12 @@ export default function MiniTimeline({ fileMeta, score, scoreWindowSec, events, 
       if (t < pageStart) continue
       if (t > pageEnd) break
       const xFrac = (t - pageStart) / PAGE_WIDTH_SEC
-      const v = clampVal(score[i], p1, p99)
-      const yFrac = 0.5 - ((v - center) / halfRange) * 0.45
+      const v = clampVal(score[i], 0, 1)
+      const yFrac = 0.95 - v * 0.9
       pts.push(`${(xFrac * 1000).toFixed(2)},${(yFrac * 100).toFixed(2)}`)
     }
     return pts.join(' ')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score, scoreWindowSec, p1, p99, center, halfRange, pageStart, pageEnd])
-
-  const zeroFrac = 0.5 - ((0 - center) / halfRange) * 0.45
+  }, [score, scoreWindowSec, pageStart, pageEnd])
 
   const playheadFrac = playheadSec != null ? (playheadSec - pageStart) / PAGE_WIDTH_SEC : null
 
@@ -93,9 +80,9 @@ export default function MiniTimeline({ fileMeta, score, scoreWindowSec, events, 
 
   return (
     <div className="border border-border bg-surface mb-4">
-      {/* Row 1 — Seizure Detection Score. SPEC §6.3: y-axis shows no numbers, just a zero
-          line + relative height, auto-scaled to THIS file's own P1-P99 (never a fixed scale,
-          never shared across files) — never call this "Probability", it's a robust z-score. */}
+      {/* Row 1 — Seizure Detection Score. Final system (HANDOFF_T1_DEMO_REBUILD.md §3.4):
+          y-axis shows no numbers, fixed range [0, 1], no reference line, no threshold line —
+          never call this "Probability" even though the range happens to be [0, 1]. */}
       <div className="flex" style={{ height: SCORE_ROW_H }}>
         <div className="shrink-0 flex items-center text-xs text-text-secondary pl-2" style={{ width: LABEL_W }}>
           Seizure Detection Score
@@ -104,10 +91,6 @@ export default function MiniTimeline({ fileMeta, score, scoreWindowSec, events, 
           {columnLines.map((left) => (
             <div key={left} className="absolute top-0 bottom-0 border-l border-grid" style={{ left: `${left}%` }} />
           ))}
-          <div
-            className="absolute left-0 right-0 border-t border-grid-strong"
-            style={{ top: `${zeroFrac * 100}%` }}
-          />
           {scorePath && (
             <svg
               viewBox="0 0 1000 100"

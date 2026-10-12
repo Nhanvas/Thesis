@@ -1,4 +1,4 @@
-# STATUS_BOARD — thesis report phase (rev 3, 2026-10-12, end of chat 1+2)
+# STATUS_BOARD — thesis report phase (rev 4, 2026-10-12, end of chat 3)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to
 approve, where every file lives, and what the next chat does. At the end of every chat the board is
@@ -20,52 +20,54 @@ Deadlines: send v8 to the supervisor **14/10 (afternoon)** · submission **15/10
 5. Long runs go to Claude Code on the laptop (prompt files in `Code/docs/prompts/`); every prompt states
    its estimated runtime.
 
-## 2 · Where things stand (12/10, 23:00)
+## 2 · Where things stand (12/10, 23:30)
 
 | track | state | next |
 |---|---|---|
 | Performance | **closed** (tag `perf-p3-closed`); numbers in `PERF_PHASE_RECORD.md` rev R | none |
-| External validation | done (`results/x1_external/`); **Siena hours resolved** (A4 + PN14, section 4) | wording O3 |
+| External validation | done; Siena hours resolved (A4 + PN14); per-patient table in Appendix A (Table 20) | none |
 | Channel attribution | closed (A4, A5) | none |
-| Demo | **finished** (Claude Code, 12/10): build commit `8aabf4d`, tag `szscan-frozen-v4.1`; tests 15/15; identity gate PASS (chb03); timing 21.68 s/h (chb16, 3 runs); **application run on the 8 test patients: 33/76 (0.434) @ 27.86 FP/day pooled, per-patient mean 0.528 @ 26.92** (`results/application_eval_v4/`); new screenshots in `Reports/v8/figures/app_screens/`; handback `web_demo/report_handback/DEMO_FINAL_HANDBACK.md` | report use: O1 |
-| Report | **outline v8 APPROVED** (rev 2; O1–O6 approved 12/10). **Exhibits:** `src/figures_v8/make_v8_exhibits.py` (gated) produced Figures 8, 9, 11, 13, 16, 17, Tables 4, 10–17, Appendix A1, D1–D3 in `Reports/v8/`; Figure 12 and Figure 14 wait for Claude Code (`docs/prompts/CC_FIGURES_V8.md`, plot scripts ready) | Claude Code run; author answers O7–O8; then chat 3 |
-| Git | `main` pushed by Claude Code (12/10) | commit of chat 1 files (command in the chat) |
+| Demo | **finished** (`szscan-frozen-v4.1`, commit `8aabf4d`); application run 33/76 @ 27.86 (pooled), per-patient mean 0.528 @ 26.92 | none |
+| Report | outline v8 approved (O1–O6); **O7 approved, O8 answered (chat 3)**. **Chapter 2, Chapter 3 and the Appendix v8 written** (`Reports/v8/chapters/`, `Reports/v8/appendix/`). Two FILL-CC markers in Ch3 (3.3.3, 3.3.5) wait for the Claude Code handback | Claude Code `CC_FIGURES_V8.md`; chat 4 |
+| Figures | done: 8, 9, 11, 13, 16, 17, 15 (screens); inherited checked by the author: 1, 2, 4, 5, 7; **6 and 10 = the 11/10 draft drawings, checked in chat 3: both show the final system → reuse as is**; **3 (research framework) does not show design → held-out → final → external: redraw in chat 4** (Ch1); 12 and 14 wait for Claude Code | CC run tonight |
+| Git | `main` pushed (chat 2 files); board rev 4 to commit (command in the chat-3 reply) | — |
 
-## 3 · Supervisor feedback on the 11/10 draft (12/10) → where the outline answers it
+## 3 · Supervisor feedback on the 11/10 draft (12/10) → where v8 answers it
 
-| # | feedback (paraphrased) | v8 answer (outline section) |
-|---|---|---|
-| F1 | cut too much to fit 50 pages | Ch2 ~15.5 pp, Ch3 ~15 pp; detail to Appendix A–F (outline §2, §4) |
-| F2 | results not detailed | Ch3 Tables 9–17, Figures 11–15; answer sentence per section (§3 Ch3) |
-| F3 | show methods that did not work | Table 10 (14 designs with numbers, development patients), Appendix C, Discussion 4.2 (mechanisms) |
-| F4 | external validation too thin | Section 3.4: Tables 14–15, false-alarm drivers, onset/offset, children → adults, Figure 14 (e) |
-| F5 | figures of detected seizures | Figure 14 gallery (5 panels), Figures 12–13 |
+| # | feedback (paraphrased) | v8 answer | state |
+|---|---|---|---|
+| F1 | cut too much to fit 50 pages | Ch2 and Ch3 written in full; detail moved to Appendix A–F | Ch2–3 written |
+| F2 | results not detailed | Ch3: Tables 9–17, Figures 11–15, answer sentence per section | written |
+| F3 | show methods that did not work | Table 10 (15 designs) + Appendix C Table 22 (all 40 gated decisions) + Discussion 4.2 (chat 4) | Ch3 + App done |
+| F4 | external validation too thin | Section 3.4: Tables 14–15, false-alarm drivers, onset/offset, children → adults; Fig 14 (e) if PN10 runs | written |
+| F5 | figures of detected seizures | Figure 14 gallery (CC), Figures 12–13 | waits for CC |
 
 ## 4 · Approvals
 
-**Approved 12/10 (author):** A1 (base text v5 + parts of the 11/10 draft; critique done first, outline §0),
-A2 (appendix A–F, outside the 50), A3 (tried designs as results), A4 (Siena-hours wording, PN14 checked),
-A5 (application run as its own row), A6 (page budget), A7 (`Code/bme11/` stays, gitignored).
-Also (author, 12/10): Table 3 "Thesis timeline" keeps the weeks of the 11/10 draft.
+**Approved 12/10 (author):** A1–A7; Table 3 keeps the draft's weeks; O1–O6.
 
-**Approved 12/10 (author): O1–O6** (outline §9). Chat 2 was done in the same chat as chat 1 (author's choice).
+**Approved / answered in chat 3 (12/10):**
+- **O7 approved.** Table 4 prints the hours listed in the CHB-MIT summary files (566.43 / 115.82 / 279.39)
+  with a note on the hours scored (562.40 / 111.82 / 279.38). The five files absent from the local copy are
+  **chb11_12–15 and chb21_11** (author's check), all seizure-free, all in development patients (5.0 of
+  682.25 listed development hours, 0.7 %, computed). **Not re-downloaded, not re-run** (chat-3 reasoning,
+  author's condition "if not feasible, approve O7"): test, external and application numbers are
+  unaffected; adding chb21_11 changes the autoencoder's training set → retraining → every number changes,
+  and re-scoring the test patients would be a further look at a used-up test set (forbidden); effect on
+  development numbers not measured, stated once in Appendix A.
+- **O8 answered.** Timing processor: Intel Core i5-8250U @ 1.60 GHz (author). Siena EDF files: not on the
+  laptop (Kaggle only). Chat 3 proposed downloading **only PN10** (6 EDF + seizure list, ≈ 2.96 GB from the
+  PhysioNet listing; download time not measured) into `F:/Study/Thesis/Dataset/siena/PN10/` for panel (e);
+  if the download fails or takes > 1 h, panel (e) is skipped (Ch3 text works both ways).
 
-**Pending:**
+**Pending (author, small):**
 
-| # | question | proposal (outline §9) |
+| # | question | proposal |
 |---|---|---|
-| O7 | Table 4 hours | print the hours listed in the CHB-MIT summary files (566.43 / 115.82 / 279.39) with a note on the hours scored (562.40 / 111.82 / 279.38): chb12 three files without the 18 derivations; chb11_12–15 and one chb21 file absent from the local dataset copy, none with a seizure |
-| O8 | Siena EDF location (Figure 14 e) and timing processor | answered by the check command of chat 2 |
-
-**PN14 finding (12/10, measured by the author on Kaggle).** EDF hours PN14-1 2.1856, PN14-2 2.5458,
-PN14-3 11.6653, PN14-4 4.0672 → 20.464 h (computed) = the 20.4622 h scored. PhysioNet's table (23.47 h)
-and PN14's seizure list (23.46 h) are both ~3.0 h longer than the files, all in PN14-3 (11.67 h in the
-file vs 14.67 h from its registration times). PN14's 4 seizures are among the 47 scored references.
-
-**Application-run finding (12/10).** Same system, label-free normalisation statistics: 33/76 vs 37/76
-(seed 42) — one seizure fewer in chb03, chb06, chb15, chb16; false alarms 323 vs 318. "21.0 s/h" in the
-handback is total time / total hours (5,862 s / 279.39 h), not a median (median of per-patient rates
-20.69, computed).
+| A-1 | Siena sexes and ages: v5 wrote "9 men aged 36–71 and 5 women aged 20–58" (originating paper [K2]); PhysioNet's `subject_info.csv` (read 12/10) lists 8 men (25–71) and 6 women (20–58) for the same 14 patients (PN10 male, 25) | v8 Ch2 writes only "14 adult patients aged 20 to 71 years" (true under both); approve or give the wording |
+| A-2 | Laptop memory "16 GB" in Ch3 3.6 comes from the project instructions §8 (Dell Latitude 3590) | confirm it is the machine of `TIMING.md` |
+| A-3 | Appendix E protocol wording ("fixed bipolar display"; "approved before any comparison") taken from the draft and instructions | confirm or edit |
+| A-4 | Appendix F Table 28 column "Loading and filtering" = `phase_a_s` of `TIMING.md` | confirm the stage name |
 
 ## 5 · Layout (unchanged since the 12/10 tidy-up)
 
@@ -73,79 +75,94 @@ handback is total time / total hours (5,862 s / 279.39 h), not a median (median 
 F:/Study/Thesis/
   Code/                         git repo (github.com/Nhanvas/Thesis, main)
     docs/                       documents of record + STATUS_BOARD.md + PROJECT_INSTRUCTIONS.md
-      writing/                  report rules + REPORT_OUTLINE_v8.md (REPORT_BLUEPRINT_v5 superseded once O1–O6 approved)
-      prompts/                  Claude Code prompts (CC_DEMO_FINISH.md done; CC_FIGURES_V8.md from chat 2)
-      prereg/  archive/         pre-registrations; superseded docs (never cite)
-    src/  results/  data/       code, committed results (now + application_eval_v4/), inputs
-    web_demo/                   SzScan; report_handback/ (DEMO_FINAL_HANDBACK.md, tier2_v4/)
+      writing/                  report rules + REPORT_OUTLINE_v8.md (rev 2, approved)
+      prompts/                  CC_FIGURES_V8.md (to run); CC_DEMO_FINISH.md done
+    src/  results/  data/       code, committed results, inputs
+    web_demo/                   SzScan; report_handback/
   Reports/
-    v8/  chapters/ figures/ tables/ appendix/    ← the only place where v8 is written
-    v8/figures/app_screens/     a_import.png, b_analysis.png, c_panel_review.png (1600×1000)
-    v8/figures_inherited/       figures of the 11/10 draft (check each before reuse)
+    v8/chapters/                Chapter_2_Methodology_v8.md, Chapter_3_Results_v8.md   ← chat 3
+    v8/appendix/                Appendix_v8.md                                         ← chat 3
+    v8/figures/ tables/         exhibits (chat 2) + app_screens/
+    v8/figures_inherited/       figures of the 11/10 draft (1, 2, 4, 5, 6, 7, 10 reused; 3 redrawn in chat 4)
     submitted/                  what was sent to the supervisor (dated)
-    Sample report/              VBPH, Tri, Tuong, Hien (style samples)
   Agent/inbox/                  hand-over tray only (empty at the end of every chat)
-  Archive/2026-10-12/           superseded material; MOVES.csv + UNDO.sh
-  Dataset/  Papers/             unchanged
+  Archive/2026-10-12/           superseded material
+  Dataset/                      + siena/PN10/ if downloaded for Figure 14 (e)
 ```
 
 ## 6 · Plan of chats (one task each)
 
 | # | when | chat / tool | task | output |
 |---|---|---|---|---|
-| 0 | 12/10 | thesis chat | inventory, tidy-up, board, instructions, demo prompt | done |
-| D | 12/10 | Claude Code | `CC_DEMO_FINISH.md` | done (handback, application_eval_v4, screenshots) |
-| 1 | 12/10 | thesis chat "Outline v8" | critique + outline | **done**: outline approved (O1–O6) |
-| 2 | 12/10 | same chat as 1 | §8.2 checks; gated exhibit script; CC prompt | **done** except Figures 12, 14 (Claude Code) |
-| 2b | 12–13/10 night | **Claude Code** (laptop) | `docs/prompts/CC_FIGURES_V8.md` (est. 25–50 min) | `results/figures_v8_data/`, `Reports/v8/figures/fig12_duration.png`, `fig14_gallery.png`, handback |
-| 3 | 13/10 | thesis chat **"Write Ch2–Ch3 + Appendix"** | from the approved outline and the chat-2 exhibits | chapter files in `Reports/v8/chapters/`, appendix in `Reports/v8/appendix/` |
-| 4 | 13–14/10 | thesis chat **"Write Ch4, Ch1, Ch5, front matter"** | from the outline + Ch2–3 | chapter files |
-| 5 | 14/10 morning | thesis chat **"Check and assemble"** + accounts `xanh` (numbers vs files, outline §6), `en` (English), `hồng` (references) | page count measured (cut order outline §2), number check, polish | v8 for the supervisor |
+| 0–2 | 12/10 | thesis chats | inventory, outline, exhibits | done |
+| D | 12/10 | Claude Code | demo finish | done |
+| 2b | 12–13/10 night | **Claude Code** (laptop) | `docs/prompts/CC_FIGURES_V8.md` with `<SIENA_DIR>` = `F:/Study/Thesis/Dataset/siena` if PN10 was downloaded (est. 25–50 min, not measured) | `results/figures_v8_data/`, `fig12_duration.png`, `fig14_gallery.png`, `CC_FIGURES_V8_HANDBACK.md` |
+| 3 | 12/10 | thesis chat "Write Ch2–Ch3 + Appendix" | **done** | `Reports/v8/chapters/Chapter_2_Methodology_v8.md`, `Chapter_3_Results_v8.md`, `Reports/v8/appendix/Appendix_v8.md` |
+| 4 | 13/10 | thesis chat **"Write Ch4, Ch1, Ch5, front matter"** | from the outline (§3 Ch1, Ch4, Ch5, front matter) + Ch2–3 v8 + App v8; Figure 3 redraw; Table 1 (gap table with G-codes and numbers), Table 2, Table 18; Discussion 4.2 must agree with Table 10 / Table 22 | chapter files + front matter in `Reports/v8/chapters/` |
+| 5 | 14/10 morning | thesis chat **"Check and assemble"** + accounts `xanh`, `en`, `hồng` | fill FILL-CC markers from the CC handback; build the document and measure pages (cut order outline §2; see note below); number check vs outline §6 and the chapter notes; polish | v8 for the supervisor |
 | 6 | 14–15/10 | thesis chat **"Final revision"** | supervisor comments → submission | submitted report |
 
-**Start prompt of chat 3 (copy):**
-> Chat 3 — Write Ch2–Ch3 + Appendix. Đọc `STATUS_BOARD.md` (rev 3) và `REPORT_OUTLINE_v8.md` (rev 2), làm task #3.
-> Trả lời O7–O8: [điền]. Claude Code figures: [đính kèm `CC_FIGURES_V8_HANDBACK.md`, hoặc "chưa xong"].
-> Đính kèm: thư mục `Reports/v8/tables/` (zip) và các hình inherited đã kiểm (1, 2, 4, 5, 7) nếu có thay đổi.
+**Length note (chat 3, measured by script on the markdown; tables, equations, headings excluded):** Ch2
+about 4,300 prose words (v5 3,898 by its own count; outline target 2,900 was below v5 for the same content),
+Ch3 about 2,600 (target 2,300), Appendix about 1,050 + 11 tables. Ch2 may exceed its 15.5-page budget by
+2–3 pages. If the built body exceeds 50 pages, apply the outline §2 cut order first, then in Ch2: shorten
+2.1.3 first paragraph (filter details are in Appendix B), the training paragraph of 2.4 (also in
+Appendix B), and the Goal-1 qualifier of 2.2 to one sentence.
 
-Files chat 3 needs (project): this board, `REPORT_OUTLINE_v8.md`, `Chapter_2_Methodology_v5.md`,
-`Chapter_3_Results_v5.md`, `2026-10-11_draft_to_supervisor.md`, `PERF_PHASE_RECORD.md`, `HANDOFF_REPORT.md`,
-`AUTHOR_REQUIREMENTS.md`, `PROSE_STYLE_SPEC.md`, `Thesis_Reference_Sheet.md`, `DEMO_FINAL_HANDBACK.md`.
-The chat can also clone the public repository `github.com/Nhanvas/Thesis` to read any committed result.
+**Start prompt of chat 4 (copy):**
+> Chat 4 — Write Ch4, Ch1, Ch5, front matter. Đọc `STATUS_BOARD.md` (rev 4) và `REPORT_OUTLINE_v8.md`
+> (rev 2), làm task #4. Trả lời A-1 đến A-4: [điền]. Claude Code figures: [đính kèm
+> `CC_FIGURES_V8_HANDBACK.md`, hoặc "chưa xong"]. Đính kèm: `Reports/v8/chapters/` + `Reports/v8/appendix/`
+> (zip) nếu có chỉnh sửa so với bản chat 3.
+
+Files chat 4 needs (project): this board, `REPORT_OUTLINE_v8.md`, `Chapter_1_Introduction_v5.md`,
+`Chapter_4_Discussion_v5.md`, `Chapter_5_Conclusion_v5.md`, `Front_matter_v5.md`,
+`Chapter_2_Methodology_v8.md`, `Chapter_3_Results_v8.md`, `Appendix_v8.md`,
+`2026-10-11_draft_to_supervisor.md`, `PERF_PHASE_RECORD.md`, `HANDOFF_REPORT.md`, `AUTHOR_REQUIREMENTS.md`,
+`PROSE_STYLE_SPEC.md`, `Thesis_Reference_Sheet.md`, `Thesis Registration Form.md`. The chat can clone
+`github.com/Nhanvas/Thesis` (read only) for committed results.
 
 ## 7 · Open checks (small, any time)
 
-- O7–O8 (section 4) — one command in the chat 2 reply.
-- Inherited Figures 1, 2, 4, 5, 7 (`Reports/v8/figures_inherited/`): author checks they are the draft's final versions;
-  diagrams 3, 6, 10: reuse the draft's drawings if they show the final system, else chat 3 redraws them.
-- `figures/fig2_7_event_scoring.png` in the repo is regenerated by the scoring-figure script; the v8 copy is
-  `Reports/v8/figures/fig09_event_scoring.png`.
+- A-1 to A-4 (section 4).
+- Ch3 FILL-CC markers: 3.3.3 (detection share by duration bin) and 3.3.5 (one sentence per panel; delete
+  panel (e) if skipped). Fill only from `CC_FIGURES_V8_HANDBACK.md`.
+- Figure 3 redraw (chat 4): add "design on the development patients → held-out evaluation → final system
+  (test-informed) → external validation → application run" to the framework.
 
-## 8 · Where the numbers are (for the outline and the writing chats)
+## 8 · Where the numbers are (for the writing chats)
 
 | content | file |
 |---|---|
-| every number of the final system, held-out/final evaluations, external, decisions | `docs/PERF_PHASE_RECORD.md` (rev R) — authority |
-| what the report says, disclosures, translations of internal names | `docs/HANDOFF_REPORT.md` (rev 2; its section 0 is superseded by this board) |
-| **numbers chosen for each section, with their source and reading** | `docs/writing/REPORT_OUTLINE_v8.md` §3 and §6 |
-| **tables and figures of v8 (gated)** | `Reports/v8/tables/`, `Reports/v8/figures/`; script `src/figures_v8/make_v8_exhibits.py` |
-| development designs, one row per gated arm | `results/p2_ledger.csv` (`verdict` = step gate, not the final choice) + record §2, §6.1, §9.7 |
+| every number of the final system, decisions | `docs/PERF_PHASE_RECORD.md` (rev R) — authority |
+| what the report says, disclosures, translations of internal names | `docs/HANDOFF_REPORT.md` (rev 2) |
+| numbers chosen for each section, with source | `docs/writing/REPORT_OUTLINE_v8.md` §3 and §6 |
+| **numbers as written in Ch2–Ch3 and the Appendix, with sources and computed values** | "Notes — not part of the report" at the end of each v8 chapter file |
+| tables and figures of v8 (gated) | `Reports/v8/tables/`, `Reports/v8/figures/`; `src/figures_v8/make_v8_exhibits.py` |
+| every gated design decision (report form) | Appendix C, Table 22 (40 rows; from record §2, §6.1, §9.7, §9.7b and `p2_ledger.csv`) |
+| Siena hours per patient (EDF vs PhysioNet table) | Appendix A, Table 20 (PhysioNet `subject_info.csv` read 12/10, sum 128.4 h) |
 | held-out / final per patient, seeds, onset/offset | `results/e22_test_oneshot/`, `results/e23_test_look7/SUMMARY.md` |
 | external per patient, per seed, onset/offset | `results/x1_external/SUMMARY.md` |
-| seizure-level failure anatomy (p_need) | `results/p3_anatomy/` (record 9.6) |
-| channel attribution | `results/attribution_v8/`, `results/attribution_v7/`, `docs/ATTRIBUTION_SPEC.md` |
-| demo identity gate, timing | `results/t1_demo/GATE.md`, `gate.json`, `TIMING.md` |
-| **application run on 8 patients** | `results/application_eval_v4/` (SUMMARY, per_subject, pooled, ingest_timing), `web_demo/report_handback/DEMO_FINAL_HANDBACK.md` |
+| channel attribution per patient / seizure | `results/attribution_v8/attribution_summary.csv`, `attribution_perseizure.csv` |
+| application run | `results/application_eval_v4/`, `DEMO_FINAL_HANDBACK.md` |
 | references and DOIs | `docs/Thesis_Reference_Sheet.md` (groups K–N) |
 
-## 9 · Decisions log
+## 9 · Numbering of exhibits (v8, fixed)
 
-- 2026-10-08: record 10.1 (offline protocol one paragraph; label-free per-patient fitting is part of the
+Figures 1–3 Ch1 · 4–10 Ch2 · 11–15 Ch3 · 16–17 Ch4. Tables 1–3 Ch1 · 4–8 Ch2 · 9–17 Ch3 · 18 Ch4 ·
+**19–29 Appendix** (19 CHB-MIT per case, 20 Siena per patient, 21 settings, 22 development designs, 23–25
+per-seed results, 26 channel ranking per patient, 27 identity check, 28 timing chb16, 29 application run
+per patient). Equations 1–12 in Ch2.
+
+## 10 · Decisions log
+
+- 2026-10-08: record 10.1 (offline protocol one paragraph; label-free per-patient fitting part of the
   system; CPD = localizer; held-out and final side by side; pooled + per-patient mean; seed 42 headline).
 - 2026-10-10: one shared reference list; supervisor's papers in Ch1 and Ch4; held-out evaluation kept.
-- 2026-10-12 (author, chat 0): one-task chats with this board as the hand-over; outline before writing;
-  demo finished overnight; v8 restarts from v5.
-- 2026-10-12 (author, chat 1): A1–A7 approved; Table 3 keeps the draft's weeks; PN14 durations measured.
-- 2026-10-12 (chat 1): outline v8 rev 1 delivered; O1–O6 put to the author.
+- 2026-10-12 (author, chat 0): one-task chats with this board as the hand-over; outline before writing.
+- 2026-10-12 (author, chat 1): A1–A7; Table 3 keeps the draft's weeks; PN14 durations measured.
 - 2026-10-12 (author): O1–O6 approved; chat 2 continued in the same chat; N1–N3 cited at abstract level.
-- 2026-10-12 (chat 2): outline rev 2; exhibits produced from committed results with gates; CC_FIGURES_V8 prompt; O7–O8 put to the author.
+- 2026-10-12 (chat 2): outline rev 2; exhibits from committed results with gates; CC_FIGURES_V8 prompt.
+- 2026-10-12 (chat 3): O7 approved without re-download or re-run (reasons in section 4); O8 answered;
+  Ch2, Ch3, Appendix v8 written; Figures 6 and 10 reused; Figure 3 to redraw; Siena ages written as a range
+  pending A-1; appendix tables numbered 19–29.

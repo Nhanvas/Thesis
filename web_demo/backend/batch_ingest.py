@@ -14,6 +14,7 @@ Writes a timing log (wall-clock seconds per subject, hours of EEG) to --log (def
 """
 import argparse
 import csv
+import re
 import sys
 import time
 from pathlib import Path
@@ -22,6 +23,17 @@ import db
 import upload_manager as um
 
 MEMO = "application-tier run"
+
+
+def subject_edfs(subject: str, edf_dir: Path) -> list[Path]:
+    """A subject's EDF files, by name only — never a summary or annotation file.
+
+    CHB-MIT splits one subject (chb17) into lettered segments (chb17a_03.edf, chb17b_57.edf,
+    chb17c_02.edf, ...); every other test subject uses a plain {subject}_NN.edf name. The pattern
+    below covers both, and is anchored so it never matches a different subject's files
+    (chb1_01.edf, chb170_01.edf and chb03_01.edf must not count toward "chb17")."""
+    pattern = re.compile(rf"^{re.escape(subject)}[a-z]?_\d+\.edf$")
+    return sorted(p for p in edf_dir.iterdir() if p.is_file() and pattern.match(p.name))
 
 
 def wait(cond, what, timeout_s, session):
@@ -40,9 +52,9 @@ def wait(cond, what, timeout_s, session):
 
 
 def ingest(subject: str, edf_dir: Path) -> dict:
-    edfs = sorted(edf_dir.glob(f"{subject}_*.edf"))
+    edfs = subject_edfs(subject, edf_dir)
     if not edfs:
-        raise SystemExit(f"STOP: no {subject}_*.edf under {edf_dir}")
+        raise SystemExit(f"STOP: no {subject}[a-z]?_NN.edf under {edf_dir}")
     t0 = time.time()
     session = um.start_session(subject, MEMO)
     for p in edfs:

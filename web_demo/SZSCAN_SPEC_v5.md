@@ -83,6 +83,16 @@ duration. Only the seizure field is forbidden.
 
 ### 1.3 Locked architecture: a real, label-free, continuous re-run
 
+> **Superseded by the final system (2026-10-10), see `web_demo/CLAUDE.md` and
+> `THESIS_CONTEXT_FOR_DEMO.md` §2.** The pipeline below (`gae_joint_seed42.pt`, reconstruction + graph-mean
+> latent + gamma-AEC, 1/3 ensemble, PELT over the whole-subject concatenated timeline) is the **retired V1
+> system**. The final system loads `data/models_v2/gae_v2_clean_seed42.pt` (verified by sha256, never by
+> filename), has **one** per-channel quantity (LedoitWolf Mahalanobis distance of the 16-d node latent,
+> fused into order statistics 6/9/12 + channel mean, drift-corrected, patient-percentile, equal mean), and
+> computes events **per file** (no concatenated subject timeline, no PELT — the detector + kernel-CPD
+> localizer of `HANDOFF_T1_DEMO_REBUILD.md` §2 run per file). The historical V1 description is kept below
+> for the record; do not implement it.
+
 The demo runs the **same locked model** (`data/models_retrain/gae_joint_seed42.pt`) on the **continuous
 recording**, with no interictal/ictal split, no windows dropped, no labels used anywhere.
 
@@ -106,6 +116,12 @@ recording**, with no interictal/ictal split, no windows dropped, no labels used 
 `t_seconds = window_index × 4`. This is exactly what the thesis's processing path lost.
 
 ### 1.5 Assigning events back to files — no lookup module needed
+
+> **Superseded by the final system (2026-10-10).** The final system's detector and kernel-CPD localizer
+> run **per file** (`HANDOFF_T1_DEMO_REBUILD.md` §2); there is no subject-wide concatenated timeline and
+> no global event to assign back to a file — "no event crosses a file" by construction. The
+> global-offset bookkeeping below belonged to the retired V1 (PELT-over-concatenated-timeline)
+> architecture and is kept for the record only.
 
 Because each file's score array has a length **exactly equal to that file's own window count**, each
 file's offset can be derived **by construction**:
@@ -136,126 +152,54 @@ unmodified, but is no longer in the actual call path, because `meas_date` solves
 
 ### 1.6 Deliberate divergence from the thesis pipeline — APPROVED BY THE AUTHOR
 
-There are **three divergence items**, matching the thesis report's own enumeration, sharing the same
-root cause: a new patient has no labels. *(Restructured from two lettered groups into these three
-numbered items in Step 7 fix round 2, 2026-09-25, C21 — the same facts and evidence, re-grouped, not
-rewritten.)*
+> **Rewritten for the final system (2026-10-10), per `docs/HANDOFF_T1_DEMO_REBUILD.md` §4.** The earlier
+> three-item divergence list below this note (normalization/robust-z fit scope, post-ictal buffer
+> inclusion, PELT background statistics) is **closed**: items 1 and 2 are not a divergence any more
+> because the final system itself fits its per-channel LedoitWolf distance, robust-z, percentiles and
+> alarm budget `q_i` on the whole recording, label-free, **by design** (author decision 2026-10-08:
+> label-free whole-recording per-patient fitting is part of the unsupervised system, not a demo
+> workaround) — no window is dropped and post-ictal segments are scored in the thesis's own continuous
+> protocol too; item 3 is gone because PELT and its background statistics no longer exist in the final
+> system (the detector is a per-file smoothed-quantile threshold, read from
+> `results/p3c_freeze/freeze.json`).
 
-#### 1. Normalization statistics, covariance, and robust-z fit on the whole recording, with no artifact rejection
+There is now **one** divergence item, matching `docs/HANDOFF_T1_DEMO_REBUILD.md` §4:
 
-A new patient has no interictal array. The demo fits all of the following on the subject's **entire set
-of windows** instead:
-
-| Step | Thesis fits on | Demo fits on |
+| item | thesis (CHB-MIT runs) | demo |
 |---|---|---|
-| z-score stats (mean/std per channel) | interictal | entire window set |
-| 5 SD artifact threshold | interictal | **dropped entirely** (no window discarded — time position must be preserved) |
-| `LedoitWolf().fit(Zi)` for `zlatent` | interictal's latent | the entire window set's latent |
-| ~~robust-z median/MAD per branch~~ | **entire window set** | **entire window set** — *not a divergence* |
-| Channel Attribution Panel's robust-z baseline (`med`/`mad`, C20/C21) | interictal (`{subj}_interictal_pernode.npy`) | whole-subject (every window of every file belonging to the subject, from `.pernode.npy`) |
+| per-subject z-score statistics | `data/processed/{subj}_stats.json`: computed **after excluding annotated seizure windows and the 4-h post-seizure buffer** (inherited preprocessing, a label-dependent step the thesis discloses) | every 10th window of the whole recording, label-free (the rule already used for the thesis's external validation) |
 
-**robust-z is not a divergence.** `retrain_io.robust_z(raw_i, raw_c)` lines 56–60 already fit median/MAD
-on `np.concatenate([raw_i, raw_c])` — i.e. the entire window set. The demo does exactly what the thesis
-does. This row is kept struck through in the table above so a future session doesn't go re-check it.
+Size of the remaining divergence is **measured, not assumed**, by the identity gate on chb03 (thesis
+statistics vs label-free statistics, same code): `results/t1_demo/GATE.md`. **Never tune the demo toward
+the thesis numbers.**
 
-**Justification:** the fraction of ictal windows is extremely low — measured on chb06: 45 / (19826 +
-45) = **0.23%**. Not enough to meaningfully skew the covariance, median, or MAD.
-
-**VERIFIED BY MEASUREMENT — 2026-09-03. No need to rerun.**
-
-Criterion set before running: PASS if Spearman ≥ 0.98 **and** |ΔAUROC| ≤ 0.02 on both subjects.
-
-| subject | AUROC (fit on interictal — thesis) | AUROC (fit on entire set — demo) | Spearman | n_int / n_ict |
-|---|---|---|---|---|
-| chb06 | 0.6066 | 0.6051 | **1.0000** | 19826 / 45 |
-| chb13 | 0.6493 | 0.6408 | **0.9999** | 12452 / 144 |
-
-→ **PASS.** Changing how LedoitWolf is fit barely changes `zlatent` (rank order is nearly identical,
-ΔAUROC 0.0015 / 0.0085). Item 1 is measurement-harmless (for the `zlatent` component measured).
-
-⚠️ This measurement **only** covers `zlatent`. The other three — z-score stats, dropping artifact
-filtering, and **item 2 below** — need continuous preprocessing straight from the EDF, so they can only
-be observed at build step 1. The Channel Attribution Panel's baseline row (added C20/C21) has not been
-separately re-measured against this AUROC/Spearman check — it is grouped into item 1 because it is the
-same statistical operation (median/MAD baseline fit on the entire window set instead of interictal-only),
-not because it was part of the 2026-09-03 measurement.
-
-#### 2. No post-ictal buffer exclusion
-
-`preprocessing.py` excludes **4 hours after every seizure** from the thesis's interictal array
-(`BUFFER_H`). The demo doesn't know where a seizure is, so it **can't exclude anything** — the entire
-post-ictal segment goes straight through PELT.
-
-Post-ictal EEG is genuinely abnormal (focal slowing, amplitude suppression, altered functional
-connectivity). The demo is quite likely to **flag those segments**, while the thesis never scored them
-at all.
-
-In magnitude, this is a much larger source of difference than item 1: 4 hours × the number of
-seizures, compared with 0.23% of windows for ictal.
-
-**This is not a bug.** Within the post-hoc review triage framing, surfacing the post-ictal segment for a
-clinician to see is clinically reasonable behavior — a clinician would still want to see it. But it must
-be:
-1. **observed at build step 1** (run 1 subject, see where events land relative to known seizures —
-   *purely a human sanity check by eye, absolutely no labels going into the code*);
-2. **stated out loud at the defense**, not left for the committee to discover on its own.
-
-#### 3. Background statistics for the PELT penalty and the CPD threshold, estimated on the whole recording
-
-`src/cpd_pipeline_v14.py` fits the PELT penalty's variance and the change-point magnitude threshold from
-a background sample — the interictal segment, when a label mask is available (see that file's own
-header: penalty variance "from the interictal/background" and a magnitude "threshold calibrated from
-background CP magnitudes"). The demo has no such mask, so both statistics are estimated from **the
-whole recording** instead — the same file's header states this explicitly for the label-free case
-("PELT variance and the magnitude threshold from the WHOLE recording"). §1.5's PELT step already notes
-the practical side of this ("the algorithm needs enough background to estimate stably, no splitting
-into separate short-file runs"); this item records the statistical side — it is the same
-"interictal-only, in the thesis, becomes whole-recording, in the demo" pattern as item 1, applied to
-Stage 2's PELT/threshold calibration instead of Phase B's per-window normalization. Kept as its own
-item, matching the thesis report's own separate enumeration, rather than folded into item 1.
-
-Not separately measured against an AUROC/Spearman-style criterion the way item 1's `zlatent` row was —
-flagged here as a gap, not silently treated as harmless.
-
-#### Related points that are NOT fit divergences (recorded so they are not rediscovered)
-
-- **Signal-loss windows (v3 code, 2026-10-01).** A rule shared with the thesis evaluation, not a divergence
-  between the two: a 4 s window is *signal-loss* when the standard deviation of its **raw, unfiltered** signal
-  is below 1e-10 V on **all 18 channels** (a constant, flat recording — e.g. an electrode dropout). Such a
-  window has no defined anomaly score (its filtered signal is ~1e-22 V, so the score depends on floating-point
-  and hardware details). The application flags it from the raw windows in Phase A (persisted as
-  `{stem}.flag.npy`), excludes it from the LedoitWolf fit, the three per-branch robust-z fits, the attribution
-  baseline and the CPD background statistics (`inter_mask` given to `detect_events`; `cpd_pipeline_v14.py` is
-  untouched), and keeps it on the timeline with fused score 0 so it cannot create a change point. The z-score
-  mean/std are not masked. The rule uses no label. In the 8 test subjects it flags 534 windows (0.59 h), all
-  in `chb17b_69.edf`; the other seven subjects are unaffected. Not shown in the UI beyond the score being 0
-  on that stretch.
-- **Filtering.** The thesis filters each 4 s window separately (with a 3 s pad per side); the application
-  filters the whole continuous recording once (zero-phase), which differs only through edge effects at the true
-  file start/end. It is what makes `t_seconds = window_index × 4` exact (§1.3).
-- **Events across a file boundary.** PELT runs once on the concatenated subject timeline (§1.5); an event is
-  assigned to the file containing its onset and is **not split**, so its offset can run past that file's end.
-  The display and the export show it as stored.
-
-**Mandatory consequences to record (for all three items):**
+**Mandatory consequences to record:**
 - **The demo's numbers WILL differ from the thesis's numbers.** They must never be forced to match,
   never adjusted to match.
-- The demo **does not** display any evaluation metric (sensitivity, FP/day, AUROC, operating-point
-  mag_pct/pen_mult). Those numbers belong to the thesis, not the product.
+- The demo **does not** display any evaluation metric (sensitivity, FP/day, AUROC, alarm budget). Those
+  numbers belong to the thesis, not the product.
 - This divergence must be **reported to the advisor** (Assoc. Prof. Hà Thị Thanh Hương) because it's a
   methodological decision.
 
 **Prepared answer for the committee** — *"why does the demo find different events than the table in the
 report?"*:
-> The report evaluates on an interictal segment that has been noise-filtered, has the 4-hour post-ictal
-> window excluded, and has labels, following the SzCORE protocol. The demo runs completely label-free on
-> the intact continuous recording — including the post-ictal segment — because that's what a new
-> patient's situation actually looks like. Same model, same weights, two different input conditions, so
-> the two result sets not matching is expected, not anomalous. Specifically, the demo may flag the
-> post-ictal segment that the report never scored at all; within a post-hoc review framing, that's
-> reasonable behavior, not a false positive.
+> The report's per-patient z-score statistics exclude annotated seizure windows and a 4-hour post-ictal
+> buffer — a label-dependent preprocessing step, disclosed in the report. The demo cannot see labels, so
+> it uses every 10th window of the whole recording instead — the same rule the thesis already uses for
+> its own external (non-CHB-MIT) validation. Every other step of the final system — the per-channel
+> LedoitWolf fit, robust-z, percentiles and alarm budget — is fitted on the whole recording, label-free,
+> in the thesis system itself, so this one item is the only source of divergence, and it is measured
+> (not assumed) by the identity gate on chb03.
 
 ### 1.7 Cost — measured, decided to run live
+
+> **Superseded by the final system.** Every timing figure below (15 s/hour, PELT 3.58 s/hour, Phase A+B
+> 14.29 s/hour, 21.9 s/hour, ≈12.3 s/hour) was measured on the retired V1 pipeline and **does not apply**
+> to the final system (`web_demo/CLAUDE.md` "Numbers and parameters"). The final system's measured figure
+> is **median 21.68 s per hour of EEG** (range 21.60–24.41, chb16, 3 runs) — see `results/t1_demo/TIMING.md`
+> for the per-stage breakdown. No timing figure is quoted until that file exists; it now does. The
+> "Decided" bullets below (real pipeline, no simulation; insurance cache; fewest-files subject for the
+> live scenario) still hold as decisions, independent of the stale numbers.
 
 Measured on the dev machine (Dell Latitude 3590, CPU): `build_adjacency` **13.2 ms/window** +
 `compute_band_powers` **3.7 ms/window** = **16.9 ms/window** → **~15 s for 1 hour of EEG** (not counting
@@ -416,6 +360,13 @@ Right-side overlay panel (`UI/A1a`):
 
 **Two processing stages:**
 
+> **Superseded by the final system.** Step 2 below describes the retired V1 architecture (one
+> concatenated subject timeline, PELT run once, global events assigned back to files). The final system's
+> Phase B fits the per-subject statistics (LedoitWolf, robust-z, percentiles, alarm budget) across the
+> whole subject, then the detector and kernel-CPD localizer run **per file** — there is no concatenated
+> timeline and no global-offset assignment (`HANDOFF_T1_DEMO_REBUILD.md` §2). The two-stage shape (Phase A
+> per file as it finishes uploading, then a second stage on Process) still holds.
+
 1. **As soon as 1 file finishes uploading** (not waiting for Process to be clicked): the backend runs
    the §1.3 pipeline for that file alone, **stopping before CPD**, producing one continuous
    time-indexed ensemble score array for the file.
@@ -485,12 +436,14 @@ illustrative example for the ≥ 24 h case; `UI/B0b` illustrates the < 24 h case
 - Default 1 hour, split into 6 cells × 10 min each.
 - Two rows: **Seizure Detection Score** (a line chart of the ensemble score) and **Detections**
   (rectangular blocks, long/short per each event's duration).
-  - Row 1's name **must not** use the word "Probability": the ensemble score is a robust z-score, which
-    can be negative or positive, not a [0,1] probability.
-  - Y-axis: **shows no numbers** at either end. Only draws a **zero line** + relative height,
-    auto-scaled to the P1–P99 percentile of **the currently viewed file itself** (avoids one outlier
-    stretching the axis). Reason for dropping numbers: this box is small, a quick-glance role; and a
-    z-score has no absolute clinical meaning worth reading as a number.
+  - **Rewritten for the final system (2026-10-10), per `docs/HANDOFF_T1_DEMO_REBUILD.md` §3.4.** The
+    ensemble score is now a **patient-percentile mean in [0, 1]**, not a robust z-score — it is no longer
+    true that it "can be negative or positive". Row 1's name stays `Seizure Detection Score` regardless
+    (never "Probability", even though the range happens to be [0, 1]).
+  - Y-axis: **fixed range [0, 1]**, no reference line, no threshold line (the alarm budget / operating
+    point is an internal parameter and must not appear in the product). The zero line may fall outside
+    the auto-scale box — left as is. **Shows no numbers** at either end (unchanged from the earlier
+    design: this box is small, a quick-glance role).
 - Has a playhead (▼) synced with Panel EEG.
 - **View-only, no interaction.** Clicks only work on Panel EEG.
 
@@ -655,9 +608,14 @@ localization and **NOT** SOZ. The label-scored evaluation is **closed** (2026-09
 human-reader labels, approved, result negative (does not support a localization/SOZ reading).
 This does not change the panel's own wording above, which stays exactly as written.
 
-- **Panel title:** `Channel-level reconstruction anomaly — Event N`
+> **Superseded by the final system (2026-10-10).** There is no reconstruction branch any more — the
+> panel is XAI for the **per-channel latent** readout (LedoitWolf Mahalanobis distance of the 16-d node
+> latent), per `THESIS_CONTEXT_FOR_DEMO.md` §5. The negative localization/SOZ finding and the panel's UI
+> rules (no causal language, no attribution metric on screen) carry over unchanged to the new readout.
+
+- **Panel title:** `Channel-level latent anomaly — Event N`
   *(revised from "Channel contribute to ..." in the mockup — the old phrasing implies a causal/
-  localizing relationship.)*
+  localizing relationship; "reconstruction" → "latent" for the final system's readout.)*
 - **Display:** a simple head diagram (circle + the 18 electrode positions of the 10-20 system) as the
   background, with **18 straight lines connecting the 2 electrodes of each bipolar channel** drawn over
   it (e.g. FP1↔F7 for channel `FP1-F7`), colored by Score.
@@ -677,6 +635,18 @@ This does not change the panel's own wording above, which stays exactly as writt
 
 > **Step 7 gap-fill note (C20, 2026-09-24):** the panel's definition, mapping and persistence, none of
 > which §6.7 spelled out:
+>
+> **Superseded by the final system (2026-10-10), see `web_demo/backend/attribution.py`'s own docstring.**
+> Items 1, 3, 5 and 6 below (window-overlap rule, rank/display, gradient mapping, per-channel
+> Accept/Reject persistence) are unchanged. Items 2 and 4 change what `D` (the quantity inside
+> `{stem}.pernode.npy`) actually is: **`D` is now the per-channel LedoitWolf Mahalanobis distance of the
+> GAE v2 node latent** (`src/attribution_v8.py`'s quantity), not the GAE v1 reconstruction-branch
+> `joint_score(..., per_node=True)` output described in item 4 below — there is no `gae_joint`/
+> `zrecon_raw` call any more. The formula is otherwise identical: `z = |(D - median)/MAD|` per window per
+> channel (whole-subject baseline, no 1.4826 factor), `score = p95(z)` over the event's windows, taken
+> **before** the final system's drift correction (the ±15-min running median) — i.e. the panel's quantity
+> is one step upstream of the timeline's ensemble score, same as it was for the v1 branch. The one-item
+> divergence of §1.6 (now the final system's single item) still applies to this baseline's scope.
 >
 > 1. **Windows of an event:** the windows whose 4 s span `[4i, 4i+4)` overlap `[onset_sec, offset_sec]`
 >    — the same overlap rule `src/attribution_pipeline.py`'s `_blocks_for_subject` uses for the thesis's
@@ -787,12 +757,12 @@ for human reading.
 
 | # | Item | How to handle |
 |---|---|---|
-| ~~O1~~ | ~~The demo's operating point~~ — **RECORDED**: `pipeline_demo.calibrate_operating_point()` targets `fp_budget_operating_point.BUDGETS["balanced"]` = **40.0 FP/day**, over the candidate grid `final_eval.DEFAULT_PENS` = **[0.3, 0.5, 1.0, 2.0, 5.0, 10.0]**, with `pipeline_demo.MIN_MAG_PCT` = **60**. Rate = events / total recording hours × 24, using the **whole recording** as the denominator (no labels — SPEC §1.6a's label-free equivalence argument). The chosen `pen_mult` is whichever grid point's rate is closest to the target. **SUPERSEDED 2026-09-29** (`REPORT_REPLY_TO_PROJECT2_OP.md` §1, Project 1's methodological decision, confirmed by the author): the app now uses **ONE fixed operating point for every patient** — `mag_pct = 50`, `pen_mult = 2.0` — as both the shipped default and for the Tier 2 run, validation-derived on the three VAL patients before any test patient was scored. `calibrate_operating_point()` no longer runs on the live path; it stays in `pipeline_demo.py` as a documented "not built" alternative (future work, thesis Ch.4 §4.5). See `pipeline_demo.FIXED_MAG_PCT`/`FIXED_PEN_MULT`. | closed |
-| O2 | **PELT parameters** (penalty, model, min_size) — take them exactly from `src/cpd_pipeline_v14.py`, don't re-choose them | read the file |
+| ~~O1~~ | ~~The demo's operating point~~ — **SUPERSEDED by the final system (2026-10-10):** there is no fixed `mag_pct`/`pen_mult` operating point any more. The alarm budget is `p_i = clip(q_i, 0.005, 0.02)`, `q_i` a label-free per-patient share computed from `results/p3c_freeze/freeze.json` (point `"balanced"`) — read at runtime, never typed in (`web_demo/CLAUDE.md` "Numbers and parameters"). All of V1's `fp_budget_operating_point`/`calibrate_operating_point`/`FIXED_MAG_PCT`/`FIXED_PEN_MULT` machinery described in this row is gone from the demo's path. | closed |
+| ~~O2~~ | ~~PELT parameters~~ — **CLOSED, superseded:** PELT (`src/cpd_pipeline_v14.py`) is not part of the final system. The localizer is `ruptures.KernelCPD` (rbf, min_size 2, 2 change points), called per file via `src/e18_cpd_localizer.py` / `src/p3_levers.py`; its parameters are read from the same frozen code, nothing re-chosen. | closed |
 | ~~O3~~ | ~~what the demo's robust-z fits on~~ — **CLOSED 2026-09-03**: `retrain_io.robust_z` already fits on the entire window set (lines 56–60). Not a divergence, nothing to handle | closed |
 | ~~O4~~ | ~~Which subject to use for the live-upload scenario~~ — **CLOSED**: `chb16`, chosen by measured end-to-end time (~5.7 min, the fastest of the 8 allowlisted subjects), not by file count | closed |
 | O4b | **The extent of post-ictal flagging** (§1.6 item 2) — observed at step 1, decide whether to call it out separately in the defense slides. No adjusting the model, no adjusting the threshold to "fix" it | observe |
-| O5 | **Gamma-AEC in the continuous path** — `dataprep/compute_gamma_aec.py` currently runs on the already-split array; a continuous version is needed | write new code in `pipeline_demo.py` |
+| ~~O5~~ | ~~Gamma-AEC in the continuous path~~ — **CLOSED, superseded:** the gamma-AEC readout does not exist in the final system (`web_demo/CLAUDE.md`: "No reconstruction/gamma/graph-mean readouts"). `dataprep/compute_gamma_aec.py` is not imported by `pipeline_demo.py`. Nothing to write. | closed |
 | O6 | **`evaluation_protocol.py` and `stat_validation.py` were just restored to `src/`** (2026-09-03, tag `repo-deps-fixed`) after being mistakenly archived while still being imported. `fp_budget_operating_point.py` depends on this chain — verify the `import` runs before pulling parameters for O1 | 1 command |
 
 None of these items block starting to build the frontend.

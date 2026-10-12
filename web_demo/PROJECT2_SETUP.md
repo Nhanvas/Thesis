@@ -40,6 +40,17 @@ Không upload `UI (figma).fig` — Claude không đọc được.
 
 ## 2 · Nhóm B — code thesis, chỉ đọc
 
+> **Superseded by the final system (2026-10-10), xem `web_demo/CLAUDE.md` mục "Reusing thesis code".**
+> Danh sách module bên dưới (`gae_joint.py`, `latent_anomaly.py`, `retrain_io.py`, `ensemble_recipe.py`,
+> `cpd_pipeline_v14.py`, `fp_budget_operating_point.py`) thuộc hệ thống V1 đã retired; `pipeline_demo.py`
+> không còn import các module đó. Danh sách đúng cho hệ thống cuối cùng (read-only, import không sửa):
+> `x1_external.py`, `c1b_build_trainset.py`, `p2_dump_seeds23.py`, `p2_scalars.py`,
+> `e16_recording_baseline.py`, `e17b_latent_family.py`, `e22_test_oneshot.py`, `p3_levers.py`,
+> `e18_cpd_localizer.py`, `e23_test_look7.py`, `attribution_v8.py`, cộng
+> `dataprep/preprocessing.py`, `dataprep/graph_construction.py`, `dataprep/feature_extraction.py`,
+> `retrain/gae_joint.py`, `edf_order.py`. Không còn operating-point cố định — alarm budget `p_i` đọc từ
+> `results/p3c_freeze/freeze.json` lúc runtime, label-free theo từng bệnh nhân.
+
 `pipeline_demo.py` tái hiện logic này ở dạng label-free liên tục. **Không được sửa** các file dưới đây.
 
 `preprocessing.py`, `graph_construction.py`, `feature_extraction.py`, `compute_gamma_aec.py`,
@@ -156,16 +167,28 @@ code thuộc quy trình freeze: guards → tag mới → chạy lại cả 8 sub
 
 **(C) Divergence mới của demo cần báo cô.** Mọi chỗ demo làm khác pipeline thesis đều là quyết định
 phương pháp. Project #2 ghi vào `SZSCAN_SPEC_v5.md` §1.6; Boti mang sang project #1 để đưa vào
-Limitations và tài liệu trình cô. Đã biết: (a) bốn bước fit trên toàn bộ window; (b) đoạn hậu-cơn không
+Limitations và tài liệu trình cô.
+
+> **Superseded by the final system (2026-10-10):** danh sách (a)-(d) dưới đây là của hệ thống V1.
+> `docs/HANDOFF_T1_DEMO_REBUILD.md` §4 đóng ba trong bốn mục (fit trên toàn bộ window, đoạn hậu-cơn,
+> PELT background statistics — không còn là divergence vì hệ thống cuối cùng tự làm label-free
+> whole-recording fitting, không phải do demo). Chỉ còn **một** mục: thống kê z-score per-subject của
+> thesis loại window có nhãn (seizure + buffer 4 giờ) còn demo dùng mọi window thứ 10 của cả bản ghi,
+> label-free. Không còn "operating point cố định" nào — alarm budget `p_i` đọc từ
+> `results/p3c_freeze/freeze.json` lúc runtime, không phải hằng số. Đo bằng identity gate trên chb03,
+> xem `results/t1_demo/GATE.md`.
+
+Đã biết (lịch sử, hệ thống V1): (a) bốn bước fit trên toàn bộ window; (b) đoạn hậu-cơn không
 bị loại; (c) quy tắc signal-loss (cửa sổ phẳng bị loại khỏi mọi phép fit, điểm 0); (d) một operating
 point cố định thay vì calibrate theo subject.
 
 **(D) Project #2 sinh vật liệu cho report.** Web demo là một sản phẩm hoàn chỉnh nên quá trình thiết kế và
 xây dựng nó là nội dung phải báo cáo. Vật liệu sẵn: F1–F4 (SPEC §1.1) — vì sao không phát lại được mảng
-score đã khóa; kiến trúc label-free liên tục và ba guard; divergence (a) đã đo, PASS; lựa chọn stack,
-phạm vi 8 subject, wording attribution; số đo thời gian và bộ nhớ của bản đã freeze (hai con số thời
-gian, §6 ở trên). Project #2 cung cấp nội dung kỹ thuật; project #1 quyết định cách viết vào report.
-Phần handback nằm ở `web_demo/report_handback/`.
+score đã khóa; kiến trúc label-free liên tục và ba guard; divergence đã đo, PASS; lựa chọn stack,
+phạm vi 8 subject, wording attribution; số đo thời gian của hệ thống cuối cùng —
+**median 21.68 s/giờ EEG** (`results/t1_demo/TIMING.md`), thay cho con số của bản freeze cũ (§6 ở trên,
+không còn áp dụng, xem `web_demo/CLAUDE.md` "Numbers and parameters"). Project #2 cung cấp nội dung kỹ
+thuật; project #1 quyết định cách viết vào report. Phần handback nằm ở `web_demo/report_handback/`.
 
 **Quy tắc trình bày (Boti, 2026-09-28):** không thứ gì hội đồng nhìn thấy — report, slide, chú thích ảnh,
 câu trả lời khi bảo vệ — được nhắc tên gọi nội bộ (step, phase, tên prompt, `CC_*`, "fix round"…). Chỉ

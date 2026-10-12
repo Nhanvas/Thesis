@@ -13,6 +13,15 @@ Không thuộc `web_demo/` repo — chỉ là ghi chú điều phối giữa hai
 
 ## 1 · Report cần gì từ các bước còn lại
 
+> **Superseded by the final system (2026-10-10), xem `web_demo/CLAUDE.md`.** Danh sách stage đo thời
+> gian dưới đây ("CPD (PELT trên toàn timeline)") và mục "Operating point" (đọc từ
+> `fp_budget_operating_point.py`) thuộc hệ thống V1 đã retired. Hệ thống cuối cùng: không có PELT (localizer
+> là kernel-CPD per file); không có operating point cố định (alarm budget `p_i` label-free, đọc từ
+> `results/p3c_freeze/freeze.json` lúc runtime). Số đo thời gian thật: `results/t1_demo/TIMING.md`
+> (median 21.68 s/giờ EEG, chia theo stage: phase_a, stats, features, gae, distances_and_score, events).
+> R1–R8 của `docs/HANDOFF_T1_DEMO_REBUILD.md` §7 là danh sách report cần hiện tại, thay cho danh sách bên
+> dưới.
+
 Chuẩn bị dần trong lúc build, không đợi xong hết mới làm:
 
 - **Ảnh chụp:**

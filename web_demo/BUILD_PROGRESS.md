@@ -1323,3 +1323,46 @@ as a new `THESIS_CONTEXT_FOR_DEMO.md`.
 6. Decide whether to tag a final defense build.
 7. Known small gaps: stage-2 all-False-mask equivalence not unit-tested; attribution of events that
    overlap flagged windows is not masked; `MIN_MAG_PCT=60` leftover in `pipeline_demo.py`.
+
+## 19 · Rebuild on the final system (2026-10-10 → 10-13)
+
+Everything in §1–§18 above describes **V1** ("rlg": GAE v1 `gae_joint_seed42.pt`, reconstruction +
+graph-mean latent + gamma-AEC readouts, equal 1/3 ensemble, PELT over a concatenated subject timeline,
+fixed operating point) — retired as the thesis system per `docs/HANDOFF_T1_DEMO_REBUILD.md` §1. Kept
+unedited above for the historical record of how the demo was actually built; do not read it as a
+description of the current system. Current authority: `web_demo/CLAUDE.md` and
+`THESIS_CONTEXT_FOR_DEMO.md`.
+
+**What changed.** The thesis now reports the final system (tag `p3-frozen`): GAE v2 clean seed 42
+(`data/models_v2/gae_v2_clean_seed42.pt`, verified by sha256), **one** per-channel quantity (LedoitWolf
+Mahalanobis distance of the 16-d node latent, fused into order statistics 6/9/12 + channel mean,
+drift-corrected, patient-percentile, equal mean), a label-free per-patient alarm budget read from
+`results/p3c_freeze/freeze.json`, a per-file smoothed-quantile detector, and a kernel-CPD localizer
+(`ruptures.KernelCPD`) — no reconstruction/gamma/graph-mean readouts, no PELT, no fixed operating point.
+Divergence from the thesis is now **one item** (per-subject z-score statistics; `SZSCAN_SPEC_v5.md` §1.6,
+`docs/HANDOFF_T1_DEMO_REBUILD.md` §4), down from the earlier three.
+
+**What was done (this rebuild):**
+1. Backend rewritten on the final system by applying the thesis project's reference implementation
+   (`F:/Study/Thesis/Agent/t1_demo/t1_demo_reference.patch`), reviewed item by item against the real
+   `src/` source before applying (`web_demo/archive/cc_history/CC_T1_RUN_REPORT.md` Stage 1.1). Panel
+   title changed to `Channel-level latent anomaly — Event N`. `test_guards.py` stayed green, unweakened;
+   11/11 backend tests pass. Committed `936b8e0`, tags `szscan-frozen-v3` and `demo-final-v1`.
+2. Identity gate on chb03 (thesis statistics vs label-free statistics, same code): **PASS**
+   (`results/t1_demo/GATE.md`).
+3. Processing time measured on chb16 (19 files, 19.0 h, 3 runs, real headless path): **median 21.68 s per
+   hour of EEG** (`results/t1_demo/TIMING.md`) — supersedes every V1 timing figure in §1–§18 and in the
+   other `web_demo/` docs.
+4. `web_demo/` tidied: ~150 step prompts/reports and screenshot folders from the V1 build rounds moved to
+   `web_demo/archive/cc_history/` (nothing deleted); `THESIS_CONTEXT_FOR_DEMO.md` replaced with the
+   thesis project's rev 2026-10-10; stale V1 sections of `SZSCAN_SPEC_v5.md`, `DEMO_BUILD_HANDOFF.md`,
+   `PROJECT2_SETUP.md`, `STEP8_9_PREDEFENSE_CHECKLIST.md` marked superseded in place, with the corrected
+   facts, rather than rewritten from scratch.
+5. Timeline row: score is now a patient-percentile mean in [0, 1] (not a robust z-score); fixed y-range
+   [0, 1], no reference line, no threshold line (thesis project decision, `docs/HANDOFF_T1_DEMO_REBUILD.md`
+   §3.4). Label `Seizure Detection Score` unchanged.
+
+Full detail, including the patch review checklist and the gate/timing raw output: see
+`web_demo/archive/cc_history/CC_T1_RUN_REPORT.md`, `results/t1_demo/GATE.md`, `results/t1_demo/TIMING.md`.
+Application-tier run on the 8 test subjects (results, screenshots, handback) is tracked separately —
+see `web_demo/report_handback/` once it exists.

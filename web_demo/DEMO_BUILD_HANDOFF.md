@@ -82,6 +82,28 @@ adds `FIXED_MERGE_S`). `calibrate_operating_point()` survives only in the dev `_
 
 ## 4 · `pipeline_demo.py` — the core of the demo
 
+> **Superseded by the final system (2026-10-10), see `web_demo/CLAUDE.md` and
+> `THESIS_CONTEXT_FOR_DEMO.md` §2.** The diagram below (GAE v1 checkpoint, `zrecon`/gamma-AEC branches,
+> 1/3 ensemble, PELT over a concatenated subject timeline with cumulative-offset file assignment) is the
+> retired V1 pipeline. The final system:
+> ```
+> # Phase A — per file, runs as soon as a file finishes uploading
+> read 18 standard channels → bandpass 0.5–60 + notch 60 → 4 s windows, NONE dropped
+> flag signal-loss windows (raw std < 1e-10 V on all 18 channels)
+> label-free z-score statistics (every 10th window of the whole recording)
+>
+> # Phase B — when "Process" is clicked
+> per window: CAR → wPLI + AEC → top 20 % edges; band powers (5) + 7 added features
+>   → GAE v2 clean seed 42 (checkpoint verified by sha256) → 16-d node latent
+> per subject, per channel: LedoitWolf Mahalanobis distance of the latent → robust-z → order
+>   statistics 6/9/12 + channel mean → each minus its ±15-min running median inside each file
+>   → patient percentile → equal mean = ONE ensemble score; alarm budget p_i from freeze.json
+> per file: detector (smoothed-quantile threshold, merge gaps ≤ 90 s) → kernel-CPD localizer
+>   — events are per file; there is no concatenated timeline and no offset bookkeeping
+> ```
+> Divergences from the thesis pipeline are recorded in `SZSCAN_SPEC_v5.md` §1.6 — read it, do not
+> re-derive them. The historical V1 diagram is kept below for the record; do not implement it.
+
 The **label-free twin** of the thesis path; it never overwrites any module in `src/`.
 
 ```

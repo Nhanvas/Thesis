@@ -1,0 +1,17 @@
+subject,file_name,event_id,onset_s,offset_s,source,review_status
+chb16,chb16_01.edf,270,1052.0,1280.0,AI,Unseen
+chb16,chb16_01.edf,271,2484.0,2800.0,AI,Unseen
+chb16,chb16_03.edf,272,1516.0,1536.0,AI,Unseen
+chb16,chb16_07.edf,273,316.0,368.0,AI,Unseen
+chb16,chb16_07.edf,274,544.0,576.0,AI,Unseen
+chb16,chb16_10.edf,275,56.0,60.0,AI,Unseen
+chb16,chb16_10.edf,276,1276.0,1304.0,AI,Unseen
+chb16,chb16_10.edf,277,2512.0,2552.0,AI,Unseen
+chb16,chb16_10.edf,278,2912.0,2932.0,AI,Unseen
+chb16,chb16_12.edf,279,716.0,764.0,AI,Unseen
+chb16,chb16_13.edf,280,3404.0,3440.0,AI,Unseen
+chb16,chb16_14.edf,281,1088.0,1132.0,AI,Unseen
+chb16,chb16_14.edf,282,1304.0,1344.0,AI,Unseen
+chb16,chb16_16.edf,283,12.0,40.0,AI,Unseen
+chb16,chb16_16.edf,284,1240.0,1244.0,AI,Unseen
+chb16,chb16_19.edf,285,976.0,996.0,AI,Unseen

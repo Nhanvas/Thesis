@@ -1,4 +1,4 @@
-# CITATION_MAP_v8 — global reference numbers of the built v8 document (13/10, chat 5)
+# CITATION_MAP_v8 — global reference numbers of the built v8 document (13/10, chat 6 — regenerated after the chat-6 edits)
 
 The chapter files keep their per-chapter working numbers ([n] → sheet code in each file's Notes). The built
 document (`Reports/v8/build/Thesis_v8_NguyenQuocTrungNhan.docx`) renumbers them once, by order of first
@@ -9,6 +9,10 @@ Entries changed from the reference sheet on 13/10: N2 authors and volume (Crossr
 (OpenAlex; author list shortened to "et al." because the OpenAlex record repeats two names), N5 venue and pages
 (Crossref: MICCAI 2026, LNCS, pp. 449–458; DOI 10.1007/978-3-032-38239-9_43 confirmed). X3, X4, X5, X10 are not in
 the sheet; their entries come from the chapter tables, completed with standard bibliographic data.
+
+**Chat 6 (13/10):** first appearances changed in Chapter 1 (EEG-CGS now discussed before N5 and K4):
+E11 is [28], N5 [29], K4 [30] (were [30], [28], [29]). Chapter 4 adds working [19] = E9 (benchmark entry
+"Self-GNN – Tang 2021"); E9 keeps global [25]. Numbers below are those of the current build.
 
 | Global | Sheet | Working numbers | Reference as printed |
 |---|---|---|---|
@@ -36,12 +40,12 @@ the sheet; their entries come from the chapter tables, completed with standard b
 | [22] | M4 | Ch1 [22] | Karpov, O.E., Grubov, V.V., Maksimenko, V.A., Kurkin, S.A., Smirnov, N.M., Utyashev, N.P., Andrikov, D.A., Shusharina, N.N., Hramov, A.E. (2022). Extreme value theory inspires explainable machine learning approach for seizure detection. *Scientific Reports*, 12, 11474. https://doi.org/10.1038/s41598-022-15675-9 |
 | [23] | N4 | Ch1 [23] | Naidji, I., Tibermacine, A., Tibermacine, I.E., Russo, S., Napoli, C. (2026). EGDN-KL: Dynamic graph-deviation network for EEG anomaly detection. *Biomedical Signal Processing and Control*, 112, 108597. https://doi.org/10.1016/j.bspc.2025.108597 |
 | [24] | G9 | Ch1 [24], Ch2 [16] | Li, L., Kotoge, R., Piao, X., Chen, Z., Dong, Y. (2026). Optimizing EEG Graph Structure for Seizure Detection: An Information Bottleneck and Self-Supervised Learning Approach (IRENE). arXiv:2604.01595 |
-| [25] | E9 | Ch1 [25], Ch2 [13] | Tang, S., Dunnmon, J., Saab, K., Zhang, X., Huang, Q., Dubost, F., Rubin, D., Lee-Messer, C. (2022). Self-supervised graph neural networks for improved electroencephalographic seizure analysis. *International Conference on Learning Representations (ICLR 2022)*. arXiv:2104.08336 |
+| [25] | E9 | Ch1 [25], Ch2 [13], Ch4 [19] | Tang, S., Dunnmon, J., Saab, K., Zhang, X., Huang, Q., Dubost, F., Rubin, D., Lee-Messer, C. (2022). Self-supervised graph neural networks for improved electroencephalographic seizure analysis. *International Conference on Learning Representations (ICLR 2022)*. arXiv:2104.08336 |
 | [26] | N2 | Ch1 [26] | Xiao, T., Wang, Z., Zhang, Y., Lv, H., Wang, S., Feng, H., Zhao, Y. (2024). Self-supervised learning with attention mechanism for EEG-based seizure detection. *Biomedical Signal Processing and Control*, 87, 105464. https://doi.org/10.1016/j.bspc.2023.105464 |
 | [27] | N3 | Ch1 [27] | Hong, T., Li, D., Chang, Y., et al. (2025). MCAN: Cross-domain self-supervised attention network based on multiscale EEG feature learning for epileptic seizure detection. *Knowledge-Based Systems*, 327, 114199. https://doi.org/10.1016/j.knosys.2025.114199 |
-| [28] | N5 | Ch1 [28], Ch4 [13] | Dani, M., Liebe, S. (2026). Parameter-efficient self-supervised adaptation for EEG-FM under fixed computational budgets. In *Medical Image Computing and Computer Assisted Intervention – MICCAI 2026*, Lecture Notes in Computer Science, 449–458. Springer, Cham. https://doi.org/10.1007/978-3-032-38239-9_43 |
-| [29] | K4 | Ch1 [29], Ch2 [9], Ch3 [2], Ch4 [2] | Ojemann, W.K.S., Xu, Z., Shi, H., Walsh, K., Pattnaik, A., Sinha, N., Lavelle, S., Aguila, C., Gallagher, R., Revell, A., LaRocque, J.J., Korzun, J., Kulick-Soper, C.V., Zhou, D.J., Galer, P.D., Sinha, S.R., Shinohara, R.T., Davis, K.A., Litt, B., Conrad, E.C. (2026). Unsupervised seizure annotation and detection with neural dynamic divergence. medRxiv, v1 (posted 17 Feb 2026). https://doi.org/10.64898/2026.02.15.26346325 |
-| [30] | E11 | Ch1 [30] | Ho, T.K.K., Armanfard, N. (2023). Self-supervised learning for anomalous channel detection in EEG graphs: application to seizure analysis. *Proceedings of the AAAI Conference on Artificial Intelligence (AAAI-23)*. arXiv:2208.07448 |
+| [28] | E11 | Ch1 [30] | Ho, T.K.K., Armanfard, N. (2023). Self-supervised learning for anomalous channel detection in EEG graphs: application to seizure analysis. *Proceedings of the AAAI Conference on Artificial Intelligence (AAAI-23)*. arXiv:2208.07448 |
+| [29] | N5 | Ch1 [28], Ch4 [13] | Dani, M., Liebe, S. (2026). Parameter-efficient self-supervised adaptation for EEG-FM under fixed computational budgets. In *Medical Image Computing and Computer Assisted Intervention – MICCAI 2026*, Lecture Notes in Computer Science, 449–458. Springer, Cham. https://doi.org/10.1007/978-3-032-38239-9_43 |
+| [30] | K4 | Ch1 [29], Ch2 [9], Ch3 [2], Ch4 [2] | Ojemann, W.K.S., Xu, Z., Shi, H., Walsh, K., Pattnaik, A., Sinha, N., Lavelle, S., Aguila, C., Gallagher, R., Revell, A., LaRocque, J.J., Korzun, J., Kulick-Soper, C.V., Zhou, D.J., Galer, P.D., Sinha, S.R., Shinohara, R.T., Davis, K.A., Litt, B., Conrad, E.C. (2026). Unsupervised seizure annotation and detection with neural dynamic divergence. medRxiv, v1 (posted 17 Feb 2026). https://doi.org/10.64898/2026.02.15.26346325 |
 | [31] | E13 | Ch1 [31] | Wong, S., Simmons, A., Rivera-Villicana, J., Barnett, S., Sivathamboo, S., Perucca, P., Ge, Z., Kwan, P., Kuhlmann, L., O'Brien, T.J. (2025). Channel-annotated deep learning for enhanced interpretability in EEG-based seizure detection. *Biomedical Signal Processing and Control*, 103, 107484. https://doi.org/10.1016/j.bspc.2024.107484 |
 | [32] | M1 | Ch1 [32], Ch4 [7] | Mirzaei, E., Singh, R. (2025). Real-time EEG-based epileptic seizure detection by one-class classification using CNN-LSTM and STFT. *IEEE International Symposium on Biomedical Imaging (ISBI 2025)*. https://doi.org/10.1109/ISBI60581.2025.10981145 |
 | [33] | L3 | Ch1 [33], Ch2 [26] | Truong, C., Oudre, L., Vayatis, N. (2020). Selective review of offline change point detection methods. *Signal Processing*, 167, 107299. https://doi.org/10.1016/j.sigpro.2019.107299 |
@@ -81,3 +85,5 @@ the sheet; their entries come from the chapter tables, completed with standard b
 | [67] | C3 | Ch2 [35] | Yuan, R., Tiw, P.J., Cai, L., Yang, Z., Liu, C., Zhang, T., Ge, C., Huang, R., Yang, Y. (2023). A neuromorphic physiological signal processing system based on VO2 memristor for next-generation human-machine interface. *Nature Communications*, 14, 3695. https://doi.org/10.1038/s41467-023-39430-4 |
 | [68] | B11 | Ch2 [36], Ch4 [18] | Mazurek, S., Moore, S., Crimi, A. (2025). Graph attention networks for detecting epilepsy from EEG signals using accessible hardware in low-resource settings. *IEEE Open Journal of Engineering in Medicine and Biology*. https://doi.org/10.1109/OJEMB.2025.3642070 |
 | [69] | K6 | Ch4 [4] | Dan, J., Pale, U., Amirshahi, A., Cappelletti, W., Ingolfsson, T.M., Wang, X., Cossettini, A., Bernini, A., Benini, L., Beniczky, S., Atienza, D., Ryvlin, P. (2024). SzCORE: A Seizure Community Open-source Research Evaluation framework for the validation of EEG-based automated seizure detection algorithms. arXiv preprint. arXiv:2402.13005 |
+
+

@@ -21,18 +21,22 @@ REPO = ROOT / 'repo'
 OUT = ROOT / 'build' / 'out'
 TMP = ROOT / 'build' / 'tmp'
 TEMPLATE = IN / 'Template.docx'
+MAXH_IN = 6.8  # text height of the template page (11 in - 1.5 in - 1.5 in = 8 in) minus room for the caption
 SHEET = REPO / 'docs' / 'Thesis_Reference_Sheet.md'
 
 FILES = [WORK / 'chapters/Front_matter_v8.md'] + [WORK / f'chapters/{n}' for n in (
     'Chapter_1_Introduction_v8.md', 'Chapter_2_Methodology_v8.md', 'Chapter_3_Results_v8.md',
     'Chapter_4_Discussion_v8.md', 'Chapter_5_Conclusion_v8.md')] + [WORK / 'appendix/Appendix_v8.md']
 
-INH = Path(os.environ.get('INH_DIR', REPO / 'figures'))  # provisional inherited copies
+INH = Path(os.environ.get('INH_DIR', IN / 'figures_inherited'))  # Reports/v8/figures_inherited/ (11/10 draft drawings)
+# chat 6 (13/10): 1, 2, 4, 5, 7 are byte-identical to the repository copies (sha256 41f2e2f0feb5, 016cd16dc409,
+# c675eca4623d, af4cdb6563e3, b82ba6d507e0); 6 and 10 checked by eye: final system (per-channel Ledoit-Wolf,
+# four members, drift correction, kernel CPD localizer; label guards of the application)
 FIG = {
-    1: INH / 'fig1_1_seizure_phases.png', 2: INH / 'fig1_2_connectivity_heatmaps.png',
-    3: IN / 'figures/fig03_framework.png', 4: INH / 'fig2_1_montage.png',
-    5: INH / 'fig2_2_raw_vs_preprocessed.png', 6: None, 7: INH / 'fig2_3_graph_construction.png',
-    8: IN / 'figures/fig08_drift.png', 9: IN / 'figures/fig09_event_scoring.png', 10: None,
+    1: INH / 'Fig01_seizure_phases.png', 2: INH / 'Fig02_connectivity.png',
+    3: IN / 'figures/fig03_framework.png', 4: INH / 'Fig04_montage.png',
+    5: INH / 'Fig05_preprocessing.png', 6: INH / 'Fig06_pipeline.png', 7: INH / 'Fig07_graph_construction.png',
+    8: IN / 'figures/fig08_drift.png', 9: IN / 'figures/fig09_event_scoring.png', 10: INH / 'Fig10_architecture.png',
     11: IN / 'figures/fig11_sparsification.png', 12: IN / 'figures/fig12_duration.png',
     13: IN / 'figures/fig13_boundaries.png', 14: IN / 'figures/fig14_gallery.png', 15: 'COMPOSE',
     16: IN / 'figures/fig16_sens_fa.png', 17: IN / 'figures/fig17_budget_needed.png',
@@ -303,7 +307,7 @@ STYLE_XML = {
                     '<w:jc w:val="center"/></w:pPr>'),
     'Reference Item': ('paragraph', 'Normal', '<w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/>'
                        '<w:ind w:left="567" w:hanging="567"/><w:jc w:val="left"/></w:pPr><w:rPr><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr>'),
-    'Equation': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="center" w:pos="4320"/><w:tab w:val="right" w:pos="8640"/></w:tabs>'
+    'Equation': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="center" w:pos="4680"/><w:tab w:val="right" w:pos="9360"/></w:tabs>'
                  '<w:spacing w:before="120" w:after="120"/></w:pPr>'),
     'Heading 1': ('paragraph', 'Normal', '<w:pPr><w:keepNext/><w:pageBreakBefore/><w:spacing w:before="0" w:after="360" w:line="240" w:lineRule="auto"/>'
                   '<w:jc w:val="center"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:bCs/><w:caps/><w:color w:val="000000"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr>'),
@@ -312,10 +316,10 @@ STYLE_XML = {
     'Heading 3': ('paragraph', 'Normal', '<w:pPr><w:keepNext/><w:spacing w:before="200" w:after="100" w:line="240" w:lineRule="auto"/>'
                   '<w:outlineLvl w:val="2"/></w:pPr><w:rPr><w:b/><w:bCs/><w:i/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>'),
     'TOC Heading': ('paragraph', 'Heading 1', '<w:pPr><w:outlineLvl w:val="9"/></w:pPr>'),
-    'toc 1': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:before="60" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/></w:rPr>'),
-    'toc 2': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="240"/></w:pPr>'),
-    'toc 3': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="480"/></w:pPr>'),
-    'table of figures': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="40" w:line="240" w:lineRule="auto"/></w:pPr>'),
+    'toc 1': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:before="60" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/></w:rPr>'),
+    'toc 2': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="240"/></w:pPr>'),
+    'toc 3': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="480"/></w:pPr>'),
+    'table of figures': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="40" w:line="240" w:lineRule="auto"/></w:pPr>'),
 }
 
 def make_reference_doc(path):
@@ -474,10 +478,13 @@ def postprocess(docx, out, eq_count, ack_text_present=True):
     body = doc.find('w:body', NS)
     final_sect = body.find('w:sectPr', NS)
 
-    # margins per the school format: left 1.5 in, top/bottom/right 1 in
+    # margins: those of the school template file (author decision P-5, 13/10): top/bottom 1.5 in,
+    # left/right 1 in, header/footer 0.5 in -- read from Template.docx, not hardcoded
+    with zipfile.ZipFile(TEMPLATE) as z:
+        tpm = etree.fromstring(z.read('word/document.xml')).find('.//w:sectPr/w:pgMar', NS)
     pgmar = final_sect.find('w:pgMar', NS)
-    for k, v in (('left', '2160'), ('right', '1440'), ('top', '1440'), ('bottom', '1440'), ('header', '567'), ('footer', '567')):
-        pgmar.set(q('w:' + k), v)
+    for k in ('left', 'right', 'top', 'bottom', 'header', 'footer'):
+        pgmar.set(q('w:' + k), tpm.get(q('w:' + k)))
 
     children = list(body)
     # 1) markers
@@ -677,7 +684,7 @@ def main():
             sys.exit(f'FAIL: figure {n} file missing: {p}')
         im = Image.open(p)
         w, h = im.size
-        width = min(6.0, 8.1 * w / h)
+        width = min(6.0, MAXH_IN * w / h)  # tall figures: height bounded so figure + caption fit one page
         fig_md[n] = f'![]({p}){{width={width:.2f}in}}'
         report.append((n, str(p), hashlib.sha256(Path(p).read_bytes()).hexdigest()[:12]))
 

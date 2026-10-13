@@ -21,7 +21,18 @@ REPO = ROOT / 'repo'
 OUT = ROOT / 'build' / 'out'
 TMP = ROOT / 'build' / 'tmp'
 TEMPLATE = IN / 'Template.docx'
-MAXH_IN = 6.8  # text height of the template page (11 in - 1.5 in - 1.5 in = 8 in) minus room for the caption
+# chat 8 (13/10, author): margins of Report format.md and of the template's own text -- left 1.5 in, top, bottom
+# and right 1 in (header/footer 0.5 in). Text block 6.0 in x 9.0 in; landscape pages 9.0 in x 6.0 in, the 1.5-in
+# binding margin at the top of the landscape page (the binding edge).
+TW = 1440  # twips per inch
+MARGIN = {'left': 2160, 'right': 1440, 'top': 1440, 'bottom': 1440, 'header': 720, 'footer': 720}
+TEXT_W_IN, LAND_W_IN = 6.0, 9.0
+MAXH_IN = 7.6  # text height (9 in) minus room for the caption
+# chat 8 (13/10, author): every table at 12 pt (no smaller table font); a table that cannot be set at 12 pt in
+# the 6.0-in portrait text width without breaking words or wrapping its numbers is set on a landscape page.
+TABLE_PT = 12
+FIG_MAXW = {4: 4.0}  # chat 8: the montage drawing (square) at 4.0 in instead of the full 6.0 in
+LANDSCAPE = set()  # filled below, by table number
 SHEET = REPO / 'docs' / 'Thesis_Reference_Sheet.md'
 
 FILES = [WORK / 'chapters/Front_matter_v8.md'] + [WORK / f'chapters/{n}' for n in (
@@ -173,6 +184,84 @@ def compose_fig15(path):
     return path
 
 # ---------------------------------------------------------------- markdown assembly
+_FONTS = {}
+def text_w_in(s, pt, bold=False):
+    """Width in inches of s in Times New Roman (Liberation Serif is metric-compatible)."""
+    k = 'B' if bold else 'R'
+    if k not in _FONTS:
+        _FONTS[k] = ImageFont.truetype(f'/usr/share/fonts/truetype/liberation/LiberationSerif-{"Bold" if bold else "Regular"}.ttf', 120)
+    return _FONTS[k].getlength(s) / 120 * pt / 72
+
+CELL_PAD_IN = 0.13  # left + right cell margins (70 twips each = 0.097 in) plus rounding
+
+def col_widths_pt(rows, avail_in, pt=TABLE_PT):
+    """Column widths for a table set at pt in avail_in inches (auto layout as in HTML tables): every column
+    gets at least its longest word, and the remaining width goes to columns in proportion to how much
+    their longest cell exceeds that minimum. Returns (widths, fits_without_breaking_words)."""
+    n = len(rows[0])
+    mins, nats = [], []
+    for j in range(n):
+        mn = nt = 0.0
+        for k, r in enumerate(rows):
+            c = r[j] if j < len(r) else ''
+            bold = k == 0 or c.startswith('**')
+            c = c.replace('**', '').replace('`', '')
+            words = c.split() or ['']
+            mn = max(mn, max(text_w_in(w, pt, bold) for w in words))
+            nt = max(nt, text_w_in(c, pt, bold))
+        mins.append(mn + CELL_PAD_IN); nats.append(nt + CELL_PAD_IN)
+    if sum(nats) <= avail_in:
+        return [w * avail_in / sum(nats) for w in nats], True
+    if sum(mins) > avail_in:
+        return [w * avail_in / sum(mins) for w in mins], False
+    # widths that minimise the table height (row height = its tallest cell): start at the minimum widths;
+    # at each step widen the column whose widening (looking up to 2 in ahead) removes the most rows of
+    # wrapped text per inch, then the most wrapped lines
+    cells = [[((r[j] if j < len(r) else '').replace('**', '').replace('`', ''),
+               k == 0 or (r[j] if j < len(r) else '').startswith('**')) for j in range(n)] for k, r in enumerate(rows)]
+    ww = [[([text_w_in(w, TABLE_PT, b_) for w in t.split()], text_w_in(' ', TABLE_PT, b_)) for t, b_ in r] for r in cells]
+    def lines(cell, w):
+        widths, sp = cell
+        avail = w - CELL_PAD_IN
+        cnt, cur = 1, 0.0
+        for x in widths:
+            if cur == 0:
+                cur = x
+            elif cur + sp + x <= avail:
+                cur += sp + x
+            else:
+                cnt += 1; cur = x
+        return cnt
+    ws = list(mins)
+    L = [[lines(ww[k][j], ws[j]) for j in range(n)] for k in range(len(rows))]
+    step = 0.05
+    while avail_in - sum(ws) >= step - 1e-9:
+        slack = avail_in - sum(ws)
+        H0 = sum(max(r) for r in L); T0 = sum(map(sum, L))
+        best = None
+        for j in range(n):
+            d = step
+            while d <= min(slack, 2.0) + 1e-9 and ws[j] + d <= nats[j] + step:
+                col = [lines(ww[k][j], ws[j] + d) for k in range(len(rows))]
+                H = sum(max(max((L[k][i] for i in range(n) if i != j), default=0), col[k]) for k in range(len(rows)))
+                T = T0 - sum(L[k][j] for k in range(len(rows))) + sum(col)
+                if (H0 - H, T0 - T) > (0, 0):
+                    score = ((H0 - H) / d, (T0 - T) / d)
+                    if best is None or score > best[0]:
+                        best = (score, j, d, col)
+                    break
+                d += step
+        if best is None:
+            break
+        _, j, d, col = best
+        ws[j] += d
+        for k in range(len(rows)):
+            L[k][j] = col[k]
+    left = avail_in - sum(ws)
+    gap = [max(nt - w, 0.0) for nt, w in zip(nats, ws)]
+    ws = [w + left * (g / sum(gap) if sum(gap) else 1 / n) for w, g in zip(ws, gap)]
+    return ws, True
+
 def col_widths(rows):
     n = len(rows[0])
     ws = []
@@ -210,6 +299,7 @@ def convert_file(path, cmap):
     out = []
     i = 0
     after_table = False
+    cur_table = None
     while i < len(lines):
         ln = lines[i]
         m = re.match(r'\[Figure (\d+): (.+)\]\s*$', ln)
@@ -219,6 +309,7 @@ def convert_file(path, cmap):
         m = re.match(r'Table (\d+): (.+)$', ln)
         if m and i + 2 < len(lines) and lines[i + 2].startswith('|'):
             out.append(f'TABCAP|{m.group(1)}|{m.group(2)}')
+            cur_table = int(m.group(1))
             i += 1; continue
         m = re.match(r'\[Equation (\d+)\]\s*$', ln)
         if m:
@@ -240,8 +331,14 @@ def convert_file(path, cmap):
                 if not re.match(r'^\|[\s:|-]+\|\s*$', lines[j]):
                     rows.append(split_row(lines[j]))
                 j += 1
-            ws = col_widths(rows)
-            scale = 160 / sum(ws)
+            ws, fits = col_widths_pt(rows, TEXT_W_IN)
+            if not fits and cur_table is not None:
+                LANDSCAPE.add(cur_table)
+                ws, fits = col_widths_pt(rows, LAND_W_IN)
+            if not fits:
+                print(f'WARN: table {cur_table} in {path.name}: words break even at {LAND_W_IN} in, {TABLE_PT} pt')
+            cur_table = None
+            scale = 400 / sum(ws)
             dashes = ['-' * max(3, int(round(w * scale))) for w in ws]
             out.append('| ' + ' | '.join(rows[0]) + ' |')
             out.append('|' + '|'.join(dashes) + '|')
@@ -309,7 +406,7 @@ STYLE_XML = {
                     '<w:jc w:val="center"/></w:pPr>'),
     'Reference Item': ('paragraph', 'Normal', '<w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/>'
                        '<w:ind w:left="567" w:hanging="567"/><w:jc w:val="left"/></w:pPr><w:rPr><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr>'),
-    'Equation': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="center" w:pos="4680"/><w:tab w:val="right" w:pos="9360"/></w:tabs>'
+    'Equation': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="center" w:pos="4320"/><w:tab w:val="right" w:pos="8640"/></w:tabs>'
                  '<w:spacing w:before="120" w:after="120"/></w:pPr>'),
     'Heading 1': ('paragraph', 'Normal', '<w:pPr><w:keepNext/><w:pageBreakBefore/><w:spacing w:before="0" w:after="360" w:line="240" w:lineRule="auto"/>'
                   '<w:jc w:val="center"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:bCs/><w:caps/><w:color w:val="000000"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr>'),
@@ -318,10 +415,10 @@ STYLE_XML = {
     'Heading 3': ('paragraph', 'Normal', '<w:pPr><w:keepNext/><w:spacing w:before="200" w:after="100" w:line="240" w:lineRule="auto"/>'
                   '<w:outlineLvl w:val="2"/></w:pPr><w:rPr><w:b/><w:bCs/><w:i/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>'),
     'TOC Heading': ('paragraph', 'Heading 1', '<w:pPr><w:outlineLvl w:val="9"/></w:pPr>'),
-    'toc 1': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:before="60" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/></w:rPr>'),
-    'toc 2': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="240"/></w:pPr>'),
-    'toc 3': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="480"/></w:pPr>'),
-    'table of figures': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="9350"/></w:tabs><w:spacing w:after="40" w:line="240" w:lineRule="auto"/></w:pPr>'),
+    'toc 1': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:before="60" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/></w:rPr>'),
+    'toc 2': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="240"/></w:pPr>'),
+    'toc 3': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="480"/></w:pPr>'),
+    'table of figures': ('paragraph', 'Normal', '<w:pPr><w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8630"/></w:tabs><w:spacing w:after="40" w:line="240" w:lineRule="auto"/></w:pPr>'),
 }
 
 def make_reference_doc(path):
@@ -350,7 +447,8 @@ def make_reference_doc(path):
         '<w:tblPr><w:jc w:val="center"/><w:tblBorders>'
         + ''.join(f'<w:{b} w:val="single" w:sz="4" w:space="0" w:color="000000"/>' for b in
                   ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'))
-        + '</w:tblBorders><w:tblCellMar><w:left w:w="70" w:type="dxa"/><w:right w:w="70" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style>'))
+        + '</w:tblBorders><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="70" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/>'
+        '<w:right w:w="70" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style>'))
     data['word/styles.xml'] = etree.tostring(st, xml_declaration=True, encoding='UTF-8', standalone=True)
     with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
         for n, b in data.items():
@@ -480,13 +578,13 @@ def postprocess(docx, out, eq_count, ack_text_present=True):
     body = doc.find('w:body', NS)
     final_sect = body.find('w:sectPr', NS)
 
-    # margins: those of the school template file (author decision P-5, 13/10): top/bottom 1.5 in,
-    # left/right 1 in, header/footer 0.5 in -- read from Template.docx, not hardcoded
-    with zipfile.ZipFile(TEMPLATE) as z:
-        tpm = etree.fromstring(z.read('word/document.xml')).find('.//w:sectPr/w:pgMar', NS)
+    # margins (chat 8, author 13/10): Report format.md -- left 1.5 in, top/bottom/right 1 in (MARGIN above);
+    # supersedes P-5 (the template file's own section, top/bottom 1.5 in)
     pgmar = final_sect.find('w:pgMar', NS)
-    for k in ('left', 'right', 'top', 'bottom', 'header', 'footer'):
-        pgmar.set(q('w:' + k), tpm.get(q('w:' + k)))
+    for k, v in MARGIN.items():
+        pgmar.set(q('w:' + k), str(v))
+    for k in ('gutter',):
+        pgmar.set(q('w:' + k), '0')
 
     children = list(body)
     # 1) markers
@@ -544,10 +642,7 @@ def postprocess(docx, out, eq_count, ack_text_present=True):
             trpr.append(etree.fromstring(f'<w:tblHeader xmlns:w="{W}"/>'))
         for tc in rows[0].findall('w:tc', NS):
             set_cell_shade(tc, 'E7E6E6')
-        if ncol >= 8:
-            size_runs(tbl, 16)
-        elif ncol >= 6:
-            size_runs(tbl, 18)
+        size_runs(tbl, 2 * TABLE_PT)  # chat 8: every table at 12 pt
         # Table 3 week shading
         texts = [ptext(tc).strip() for tc in rows[0].findall('w:tc', NS)]
         if texts[:3] == ['No', 'Task', '1']:
@@ -557,9 +652,10 @@ def postprocess(docx, out, eq_count, ack_text_present=True):
                         set_cell_shade(tc, '808080')
                         for t in tc.iter(q('w:t')):
                             t.text = t.text.replace('■', '')
-        # small tables move as one block
-        if len(rows) <= 0:
-            for tr in rows[:-1]:
+        # chat 8: the caption never stands with only the header and one row -- keep the header and the first
+        # two rows together (with the caption, which is keepNext)
+        if True:
+            for tr in rows[:min(3, len(rows) - 1)]:
                 for pp in tr.iter(q('w:p')):
                     ppr = pp.find('w:pPr', NS)
                     if ppr is None:
@@ -631,6 +727,82 @@ def postprocess(docx, out, eq_count, ack_text_present=True):
     ppr = ch1.find('w:pPr', NS)
     ppr.append(etree.fromstring(f'<w:pageBreakBefore xmlns:w="{W}" w:val="0"/>'))
 
+    # 5) landscape sections for the tables in LANDSCAPE (chat 8): caption + table + its note on their own
+    #    landscape pages; page numbers run on; the section that starts at Chapter 1 restarts at 1
+    def sect_like(orient):
+        s_ = copy.deepcopy(final_sect)
+        for pn in s_.findall('w:pgNumType', NS):
+            s_.remove(pn)
+        s_.append(etree.fromstring(f'<w:pgNumType xmlns:w="{W}" w:fmt="decimal"/>'))
+        pz = s_.find('w:pgSz', NS)
+        pm = s_.find('w:pgMar', NS)
+        if orient == 'landscape':
+            pz.set(q('w:w'), '15840'); pz.set(q('w:h'), '12240'); pz.set(q('w:orient'), 'landscape')
+            for k, v in {'top': MARGIN['left'], 'bottom': MARGIN['right'], 'left': MARGIN['top'],
+                         'right': MARGIN['bottom']}.items():
+                pm.set(q('w:' + k), str(v))
+        else:
+            pz.set(q('w:w'), '12240'); pz.set(q('w:h'), '15840'); pz.set(q('w:orient'), 'portrait')
+        for t in s_.findall('w:type', NS):
+            s_.remove(t)
+        return s_
+    def holder(sect):
+        p_ = para('Normal', [], '')
+        p_.find('w:pPr', NS).append(sect)
+        return p_
+    caps = {}
+    for p in body.findall('w:p', NS):
+        ps = p.find('w:pPr/w:pStyle', NS)
+        if ps is not None and ps.get(q('w:val')) == 'Caption':
+            mm = re.match(r'Table (\d+):', ''.join(t.text or '' for t in p.iter(q('w:t'))))
+            if mm:
+                caps[int(mm.group(1))] = p
+    # column grid = the text width of the table's page (pandoc writes 5.5 in), fixed layout so the 12-pt
+    # widths computed from the text hold in Word and LibreOffice
+    for tbl in body.findall('w:tbl', NS):
+        prev = tbl.getprevious()
+        num = next((k for k, c in caps.items() if c is prev), None)
+        tw = int((LAND_W_IN if num in LANDSCAPE else TEXT_W_IN) * TW)
+        cols = tbl.findall('w:tblGrid/w:gridCol', NS)
+        g = [int(c.get(q('w:w'))) for c in cols]
+        new = [int(round(x * tw / sum(g))) for x in g]
+        new[-1] += tw - sum(new)
+        for c, x in zip(cols, new):
+            c.set(q('w:w'), str(x))
+        tblpr = tbl.find('w:tblPr', NS)
+        for el in tblpr.findall('w:tblW', NS) + tblpr.findall('w:tblLayout', NS):
+            tblpr.remove(el)
+        tblpr.append(etree.fromstring(f'<w:tblW xmlns:w="{W}" w:w="{tw}" w:type="dxa"/>'))
+        tblpr.append(etree.fromstring(f'<w:tblLayout xmlns:w="{W}" w:type="fixed"/>'))
+        for tr in tbl.findall('w:tr', NS):
+            for j, tc in enumerate(tr.findall('w:tc', NS)):
+                tcpr = tc.find('w:tcPr', NS)
+                if tcpr is None:
+                    tcpr = etree.Element(q('w:tcPr')); tc.insert(0, tcpr)
+                for el in tcpr.findall('w:tcW', NS):
+                    tcpr.remove(el)
+                tcpr.insert(0, etree.fromstring(f'<w:tcW xmlns:w="{W}" w:w="{new[j]}" w:type="dxa"/>'))
+    for n in sorted(LANDSCAPE):
+        cap = caps[n]
+        tbl = cap.getnext()
+        assert tbl.tag == q('w:tbl'), n
+        last = tbl
+        nx = tbl.getnext()
+        if nx is not None and nx.tag == q('w:p'):
+            ps = nx.find('w:pPr/w:pStyle', NS)
+            if ps is not None and ps.get(q('w:val')) == 'TableNote':
+                last = nx
+        cap.addprevious(holder(sect_like('portrait')))
+        last.addnext(holder(sect_like('landscape')))
+    # page numbering: front = lowerRoman from i; first body section decimal from 1; the rest run on
+    sects = [s_ for s_ in body.iter(q('w:sectPr'))]
+    for k, s_ in enumerate(sects):
+        if k == 0:
+            continue
+        for pn in s_.findall('w:pgNumType', NS):
+            s_.remove(pn)
+        s_.append(etree.fromstring(f'<w:pgNumType xmlns:w="{W}" w:fmt="decimal"' + (' w:start="1"' if k == 1 else '') + '/>'))
+
     schema_order(doc)
     data['word/document.xml'] = etree.tostring(doc, xml_declaration=True, encoding='UTF-8', standalone=True)
     hd = etree.fromstring(data['word/header1.xml'])
@@ -686,7 +858,7 @@ def main():
             sys.exit(f'FAIL: figure {n} file missing: {p}')
         im = Image.open(p)
         w, h = im.size
-        width = min(6.0, MAXH_IN * w / h)  # tall figures: height bounded so figure + caption fit one page
+        width = min(FIG_MAXW.get(n, TEXT_W_IN), MAXH_IN * w / h)  # tall figures: height bounded so figure + caption fit one page
         fig_md[n] = f'![]({p}){{width={width:.2f}in}}'
         report.append((n, str(p), hashlib.sha256(Path(p).read_bytes()).hexdigest()[:12]))
 

@@ -137,3 +137,21 @@ words. Prose numbers of every chapter and the appendix searched in the committed
 record, the handoff, the benchmark check, the reference sheet and the gated tables: all found except values
 already sourced in the notes (Table 4 scored hours, the fixed-threshold density 0.921 from
 `density_per_subject.csv`, PN14 per-file hours from the author's printout, 682.25 computed).
+
+## 8 · Chat 8 (13/10): `en` check and final build
+
+| # | where | change | evidence / rule |
+|---|---|---|---|
+| 48 | all seven files | `en` polish (about 100 lines) accepted; word-level diff of every paragraph against the chat-7 files; the author's list of 15 meaning-bearing changes read one by one | numbers, [n], Section/Table/Figure/Equation/Appendix references, headings, table rows, equations and Notes identical by script; the only lost token is one "4s" ("4s and 4s" → "4s for both", Table 13: chb24 localizer 4 / 4) |
+| 49 | Ch4 4.1 | comma splice introduced by `en` ("…similar sensitivity, this is the cost…") → semicolon | reading |
+| 50 | Ch4 4.1 | Table 18 moved to the end of Section 4.1 (after its citing paragraph and the CHB-MIT paragraph) | layout only (landscape page) |
+| 51 | build | margins left 1.5 in, top/bottom/right 1 in (Report format.md and the template's own text; supersedes P-5) | author 13/10 |
+| 52 | build | every table at 12 pt; column widths computed from the text at 12 pt (no word broken, minimum table height); Tables 12, 18 and 22 on landscape pages (they cannot be set at 12 pt in 6.0 in); template cell margins top/bottom "100.0" set to 0; table grid set to the text width (pandoc wrote 5.5 in); caption kept with the header and first two rows; Figure 4 at 4.0 in | author 13/10 (question 4) |
+
+Checks after the rebuild (`src/report_build/check_v8.py`, PASS): 26 table and 16 figure captions in sequence,
+every exhibit cited, every Table/Figure/Equation/Section/Appendix reference resolves, 12 equations, 67
+references cited and first appearances in order, no forbidden number or internal label, no "@" or "§",
+abstract 299 words, all tables 12 pt, margins as above on every section. The checker fails on the chat-7
+build (table fonts 8/9 pt, template margins), so it is not empty. Against the chat-7 docx the multiset of
+numbers differs by the one "4s" above and the multiset of citations is identical; `reference_map.json` and
+the figure hashes are identical to chat 7.

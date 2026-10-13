@@ -1,4 +1,4 @@
-# CLAIM_AUDIT_v8 — verification of the report's factual claims (13/10, chats 3–6)
+# CLAIM_AUDIT_v8 — verification of the report's factual claims (13/10, chats 3–7)
 
 **Why.** The author asked (13/10) that every statement of the report be checked as a researcher would,
 not only the result numbers: the data-accounting gap (chb11, chb21 files missing locally) showed that an
@@ -47,19 +47,22 @@ density 0.921–0.973 (background) and 0.949–0.974 (seizure), chb17 0.224 (`de
 Seizure share of test time 0.42 % (whole windows, computed). WHO: around 50 million; nearly 80 % in low-
 and middle-income countries.
 
-## 4 · Open items after chat 6 (13/10)
+## 4 · Open items after chat 7 (13/10)
 
 | item | status | who | how |
 |---|---|---|---|
-| N1, N2, N3 (supervisor's papers): title-level sentences match the abstracts | **open** (`hồng` could not open them) | author | publisher abstract |
-| E9 [25]: standardisation with training statistics "as in" Tang et al. App. A | **open** (cited from the `train_gae_v2.py` docstring; clip and [0, 1] mapping no longer attributed) | author | open App. A of arXiv:2104.08336 once |
-| G2 [52]: direction of its "higher thresholds (70–85 %)" | **open, not load-bearing**: the text now cites G2 only for "thresholding changes GNN performance" | author (optional) | PDF arXiv:2211.08927 |
-| M3 [43]: exclusion sentence joined from fragments | **open, paraphrased only** ("too short for its 4 s epochs") | author (optional) | PDF Section 4.1 |
-| Benchmark "Self-GNN – Tang 2021" = E9 | **probable** (same title, arXiv 2021, ICLR 2022); cited as [25] in Table 18 | author | benchmark algorithm card, once |
-| Zotero metadata: ICHI DOI for [24]; first-posted year of [3] (arXiv 2410 = 2024); LNCS volume of [29] (16894, from the 11/10 draft); DOIs of the pre-DOI-era entries E1 [50] and E2 [62] (Crossref by title, PII S0301-0082(00)00026-5); J4 [45] journal data; M1 [32] and M3 [43] DOIs; B1 [56] journal version; B11, A2, C4 volume/pages; [69] = preprint of [39] | **open** — Zotero does it when the DOIs are entered | author (Zotero) | `CITATION_MAP_v8.md` (regenerated chat 6) |
-| WHO "nearly 80 %", "three quarters" | **closed** (live page 13/10, section 3) | — | — |
-| `en` (English polish against `PROSE_STYLE_SPEC.md`) | **not received** in chat 6 | `en` | on the chat-6 chapter files |
-| page count of the built body | **measured chat 6**: 65 pages with the template margins (P-5) and Figures 6 and 10; 61 with the earlier margins | author | board P-7 |
+| E9 [Tang et al.]: standardisation with training statistics | **closed 13/10**: App. A "z-normalize the EEG clip with respect to the mean and standard deviation of the training data" (author's PDF) | — | — |
+| Benchmark "Self-GNN – Tang 2021" = E9 | **closed 13/10**: card title identical, `datasets: TUH Seizure Corpus`, Siena 0.8238 / 112.50 (`siena.json`); labelled "benchmark implementation" | — | — |
+| M3 exclusion sentence | **closed 13/10**: PDF 4.1 quoted by the author; text consistent | — | — |
+| G2 direction | **closed, no change**: G2 cited only for sensitivity to the thresholding choice | — | — |
+| N1 | **closed 13/10 by removal** (author: full text unavailable) | — | — |
+| N2, N3 | **closed**: abstracts (author) support "pretrain on unlabelled EEG … attention"; no numbers used | — | — |
+| Processor and memory of the timing laptop | **closed 13/10**: `wmic` i5-8250U @ 1.60 GHz; `systeminfo` 16,279 MB | — | — |
+| Appendix E "fixed bipolar display", annotation before scoring | **closed 13/10**: author confirms the display; git `d3c4001` (13:55) is an ancestor of `9f32494` (14:06) | — | — |
+| Table 10/22 row 2 (0.096, 0.351) | **closed, kept**: `results/e4_artifact_rejection/SUMMARY.md` l. 24, 26 | — | — |
+| Zotero metadata (ICHI DOI of G9; first-posted year of F6; LNCS volume of N5; E1/E2 DOIs; J4; M1/M3 DOIs; B1 journal version; B11, A2, C4 pages) | **open** — Zotero fills them from the DOIs | author | `CITATION_MAP_v8.md` (regenerated chat 7) |
+| `en` (English) | **open**: run on the chat-7 chapter files | `en` | section 6 of the board |
+| page count | **measured chat 7**: 62 pages (LibreOffice, template margins); plan in `CUT_PLAN_50p.md` | author / supervisor | — |
 
 ## 5 · Checks made in chat 5 (13/10)
 
@@ -111,3 +114,26 @@ four-seed mean); no "expert" in the report text except the title of a cited pape
 abstract 299 words, one page. Figures 1, 2, 4, 5, 7 byte-identical to the repository copies; 6 and 10 from
 `figures_inherited/`, checked by eye (final system). `xanh` rows 8–11 (Ch4 4.3) verified against
 `results/p3_anatomy/seizures.csv` and `results/p3b_diag/tail.csv` (all values confirmed except row 11).
+
+## 7 · Chat 7 (13/10): rewrite from the author's feedback on v8
+
+| # | where | change | evidence / rule |
+|---|---|---|---|
+| 38 | Ch1 1.2, Table 1 | literature review rewritten: one study per row (Author, Method, Data and protocol, Reported result, Limitation), grouped prose with each study's numbers and its limitation, synthesis and novelty sentence; no G-codes | sample theses (Tri Table 1, VBPH Table 12); every number = a verified statement of the reference sheet (list in the Ch1 notes) |
+| 39 | Ch1 1.3, Ch4 4.2, Ch5 | hypotheses H1–H3 and contributions C1–C5 removed; 1.3 describes the proposed solution | author feedback 1, 6 |
+| 40 | Ch1 | N1 removed; N2/N3 without numbers | author decision |
+| 41 | Ch3 Table 14, Table 16, 3.5 | simplified (Table 16: final system, anatomical prior, random ranking; detail in Appendix E) | author feedback 4 |
+| 42 | Ch4 4.1, Table 18 | one comparison level: Siena, SzCORE event-based, per-patient mean, the 11 entries not trained on Siena + this work (four-seed mean); CHB-MIT studies in prose; old Figure 16 removed | `esl-epfl/szcore` c57da2f re-read (siena.json, algorithms/*.yaml); author feedback 8 |
+| 43 | Ch4 4.6, Ch5 | "between a third and a half of the seizures" (P-9) | 26/76, 37/76, 33/76 |
+| 44 | all | units written without a space (10%, 4s, 60Hz); "@" removed | author feedback 3, 10 |
+| 45 | Appendix | old Tables 25, 27, 29 replaced by sentences with the same numbers; renumbered (26 tables); Appendix E: commit order, without-chb15, seeds, reconstruction readout | author feedback 10 |
+| 46 | Figure 15 | 2 + 1 layout (a, b side by side; c below) | author |
+| 47 | abstract, 3.4, Ch5 | "the only label-free learned benchmark entry" (Table 18 now contains a rule-based entry, Gotman 1982) | benchmark cards |
+
+Checks after the rebuild (script): 26 table and 16 figure captions in sequence; every Table/Figure/Section
+reference resolves and every exhibit is cited; 12 equations; 67 references, none unmapped; no G/H/C labels,
+no "@", no "expert", no "at any step", no unit spaced from its number; forbidden numbers none; abstract 298
+words. Prose numbers of every chapter and the appendix searched in the committed result summaries, the
+record, the handoff, the benchmark check, the reference sheet and the gated tables: all found except values
+already sourced in the notes (Table 4 scored hours, the fixed-threshold density 0.921 from
+`density_per_subject.csv`, PN14 per-file hours from the author's printout, 682.25 computed).

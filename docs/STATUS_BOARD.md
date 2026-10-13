@@ -1,4 +1,4 @@
-# STATUS_BOARD — thesis report phase (rev 7, 2026-10-13, end of chat 6)
+# STATUS_BOARD — thesis report phase (rev 8, 2026-10-13, end of chat 7)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to
 approve, where every file lives, and what the next chat does. At the end of every chat the board is
@@ -10,70 +10,59 @@ Deadlines: send v8 to the supervisor **14/10 (afternoon)** · submission **15/10
 
 ## 1 · Chat protocol (binding)
 
-1. One task per chat from section 6, unless the author decides otherwise.
+1. One task per chat from section 6, unless the author decides otherwise (13/10: chat 7 continued in the
+   chat-6 session to keep context, by the author's choice).
 2. Start: read this board → the files named for the task → nothing else unless the task needs it.
 3. End: (a) this board rewritten (rev + 1); (b) **one** list for the author (project files add / replace /
    delete, with local paths); (c) the start prompt of the next chat. Nothing is left only in the chat.
 4. Files go to their place in the layout of section 5. `Agent/inbox/` is a hand-over tray only.
 5. Long runs go to Claude Code on the laptop; every prompt states its estimated runtime.
-6. **Verification standard (author, 13/10):** every claim is checked against its primary source — result
-   files for numbers, the running code for methods, the raw data/PhysioNet/WHO pages for dataset facts, the
-   reference sheet's verified quotes for literature. Record in `docs/writing/CLAIM_AUDIT_v8.md`.
+6. **Verification standard (author, 13/10):** every claim is checked against its primary source. Record in
+   `docs/writing/CLAIM_AUDIT_v8.md`. Checks the author has already run (commands, PDFs) are trusted and not
+   asked again (author, 13/10).
 7. **The report is built, not pasted.** The chapter markdown files are the report of record; the Word
-   document is produced from them by `src/report_build/build_v8.py`. A change to the text is made in the
-   chapter file and the document is rebuilt; edits made only in Word are lost at the next build.
-8. **Citations (author, 13/10):** the author inserts the citations with Zotero in the built document; the
-   build keeps the numeric [n] and the reference list as the checkable reference (`CITATION_MAP_v8.md`). No
-   PDF is produced by the chats; a LibreOffice render is used only to measure pages.
+   document is produced from them by `src/report_build/build_v8.py`. Edits made only in Word are lost at the
+   next build. **Zotero citations are inserted after the last build** (a rebuild removes them).
+8. No PDF is produced by the chats; a LibreOffice render is used only to measure pages.
 
-## 2 · Where things stand (13/10, end of chat 6)
+## 2 · Where things stand (13/10, end of chat 7)
 
 | track | state | next |
 |---|---|---|
 | Performance, external, attribution, demo | closed / finished (unchanged) | none |
-| Report text | all chapters v8 + appendix, revised in chat 6 from the P-3 reading, `xanh`, `hồng` and a cross-review (23 corrections, `CLAIM_AUDIT_v8.md` section 6); Table 9 rows 1–2 corrected to the three-readout ensemble, new row 0.553 | supervisor comments (chat 7) |
-| Built document | `Reports/v8/build/Thesis_v8_NguyenQuocTrungNhan.docx` rebuilt 13/10 (chat 6): all 17 figures (no placeholder), margins of the template file (P-5), tall figures bounded to fit the page with their caption | author: open in Word, update fields (F9), insert citations with Zotero, send to the supervisor |
-| Figures | 1, 2, 4, 5, 7 from `figures_inherited/`, byte-identical to the repository copies; 6 and 10 from `figures_inherited/`, checked: final system; others unchanged | — |
-| Pages (LibreOffice, measured) | **body 65 pages** (Ch1 11, Ch2 24, Ch3 18, Ch4 10, Ch5 2); front matter x; references 6; appendix 14. With the earlier margins the same text is 61 pages: the template margins cost 4 pages, Figures 6 and 10 and the chat-6 text about 3. Word may differ by about ±2 | P-7 |
-| Checks (chat 6, script over the build) | captions 29 + 17 beside their exhibits; every Section/Table/Figure reference resolves, every exhibit cited; 12 equations; 69 references, none unmapped; forbidden numbers none; no "expert", no "at any step"; abstract 299 words, one page | `en` not yet run |
-| References | global numbers changed for three entries (E11 [28], N5 [29], K4 [30]); `CITATION_MAP_v8.md` regenerated from the build | Zotero metadata list in `CLAIM_AUDIT_v8.md` section 4 |
-| Git | board rev 7, `CLAIM_AUDIT_v8.md`, `CITATION_MAP_v8.md`, `src/report_build/build_v8.py` to commit (command in the chat reply) | — |
+| Report text | rewritten in chat 7 from the author's feedback on v8 (10 points): literature review with one study per row (Table 1), Section 1.3 = proposed solution only (no hypotheses, no contributions, no G/H/C codes), Table 18 at one level (Siena benchmark, 11 entries not trained on Siena), old Figure 16 removed, Tables 14 and 16 simplified, Chapter 5 shorter, appendix trimmed (26 tables), units without a space, no "@", N1 removed, P-9 applied | `en` → chat 8 |
+| Built document | `Reports/v8/build/Thesis_v8_NguyenQuocTrungNhan.docx` (chat 7): 26 tables, 16 figures (Figure 15 in 2 + 1 layout), 12 equations, 67 references, template margins | rebuilt in chat 8 after `en` |
+| Pages (LibreOffice, measured) | **body 62 pages** (Ch1 12, Ch2 24, Ch3 15, Ch4 9, Ch5 2); references 6; appendix 13. Word measured about 2 pages less on the chat-6 build | supervisor question 1–2 (section 6); plan `docs/writing/CUT_PLAN_50p.md` (not applied) |
+| Checks (chat 7, script over the build) | captions in sequence, every cross-reference resolves and every exhibit cited, no forbidden number, no G/H/C label, no "@", abstract 298 words; prose numbers of all chapters searched in the committed sources (`CLAIM_AUDIT_v8.md` section 7) | repeat after `en` |
+| References | renumbered by first appearance (Table 1 now first in Chapter 1); `CITATION_MAP_v8.md` regenerated (67) | Zotero after the chat-8 build |
 
 ## 3 · Supervisor feedback on the 11/10 draft (12/10) → v8
 
 | # | feedback | v8 answer | state |
 |---|---|---|---|
 | F1 | cut too much | full Ch2–Ch3, detail in Appendix A–F | done |
-| F2 | results not detailed | Ch3 Tables 9–17, Figures 11–15, answer sentences | done |
-| F3 | show methods that did not work | Table 10 (15 designs), Appendix C Table 22 (40 decisions), Discussion 4.2 | done |
-| F4 | external validation too thin | Section 3.4 (Tables 14–15, false-alarm drivers, boundaries, children → adults) | done |
-| F5 | figures of detected seizures | Figure 14 (4 panels), Figures 12–13 | done |
+| F2 | results not detailed | Ch3 Tables 9–17, Figures 11–15 | done |
+| F3 | show methods that did not work | Table 10, Appendix C Table 22 (40 decisions), Discussion 4.2 | done |
+| F4 | external validation too thin | Section 3.4, Table 18 | done |
+| F5 | figures of detected seizures | Figure 14, Figures 12–13 | done |
 
 Supervisor comments on v8: **not yet received** (v8 goes out 14/10 afternoon).
 
 ## 4 · Approvals
 
-**Approved earlier:** A1–A7; Table 3 keeps the draft's weeks; O1–O7; O8 answered; A-1 to A-4; page excess
-accepted when the content is needed; P-1, P-2.
+**Approved earlier:** A1–A7; O1–O8; A-1 to A-4; P-1 to P-6; C4/novelty wording (chat 6).
 
-**13/10, chat 6 (closed):**
-- P-3: H1–H3 and C1–C5 corrected as in the reviewer's reading (lead sentence "before the held-out
-  evaluation"; C1 same readout with different reference fits; C2 drift separated from the test-informed
-  budget; C3 offsets not improved; C5 with its result).
-- C4 / novelty: "no seizure label of the patient under review" (author's choice), in the abstract, 1.2,
-  C4, Table 2, 3.6, 4.1 and Chapter 5.
-- P-4: 58 pages accepted, no cut (decided before P-5 added 4 pages: see P-7).
-- P-5: margins of the template file (top and bottom 1.5 in, left and right 1 in, header and footer 0.5 in),
-  read from `Template.docx` by the build.
-- P-6: closed — `figures_inherited/` attached and used.
+**13/10, chat 7 (closed):** P-8 closed (E9 App. A confirmed; Tang card = E9, benchmark implementation on
+TUH; M3 confirmed; G2 unchanged; N1 removed; N2/N3 abstract level). P-9 applied ("between a third and a
+half"). Author feedback 1–10 applied (CLAIM_AUDIT section 7). Figure 15 in 2 + 1. Template margins kept.
+Table 10/22 row 2 kept (0.096 and 0.351 are sourced: `results/e4_artifact_rejection/SUMMARY.md`).
 
-**Pending (author):**
+**Pending:**
 
-| # | item | where |
+| # | item | who |
 |---|---|---|
-| P-7 | Body now 65 pages (template margins + Figures 6 and 10). Keep, or switch back to the written rule of `Report format.md` (left 1.5 in, others 1 in) for 61 pages — one line in `build_v8.py`. Recommendation: keep the template, since the author chose it; no content cut | built document |
-| P-8 | Optional checks before submission: E9 App. A (standardisation with training statistics); benchmark card "Self-GNN – Tang 2021" = E9; N1–N3 abstracts | `CLAIM_AUDIT_v8.md` section 4 |
-| P-9 | Optional wording: Ch5 last sentence and 4.6 say "about half of the seizures"; held-out pooled 0.342, final 0.487, application 0.434, per-patient means 0.508–0.577. Keep, or "between a third and a half" | Ch5, 4.6 |
+| P-7 | Page limit: 62 pages (LibreOffice). Ask the supervisor (section 6); apply `CUT_PLAN_50p.md` only if the limit is hard | supervisor → author |
+| P-10 | Appendix choices of chat 7 (old Tables 25, 27, 29 → sentences; Table 22 kept whole) — revert any on request | author |
 
 ## 5 · Layout
 
@@ -81,71 +70,69 @@ accepted when the content is needed; P-1, P-2.
 F:/Study/Thesis/
   Code/
     docs/STATUS_BOARD.md  docs/writing/CLAIM_AUDIT_v8.md  docs/writing/CITATION_MAP_v8.md
-    docs/writing/REPORT_OUTLINE_v8.md  docs/prompts/CC_FIGURES_V8*.md
-    src/report_build/ build_v8.py (chat 6: inherited figures, template margins, figure height bound),
-                      render_pdf.py, pagemap.py (run in a cloud chat: pandoc 3, LibreOffice, python-lxml, Pillow)
-    src/figures_v8/  results/figures_v8_data/
+    docs/writing/CUT_PLAN_50p.md (new)  docs/prompts/EN_POLISH_v8.md (new)
+    docs/writing/REPORT_OUTLINE_v8.md
+    src/report_build/ build_v8.py (chat 7: Figure 15 2 + 1, Figure 16 = budget figure, note styles),
+                      render_pdf.py, pagemap.py
   Reports/v8/
-    chapters/   Front_matter_v8.md, Chapter_1_Introduction_v8.md … Chapter_5_Conclusion_v8.md
-    appendix/   Appendix_v8.md
-    figures/    fig03, fig08, fig09, fig11–fig14, fig16, fig17, app_screens/
-    figures_inherited/   Fig01, Fig02, Fig04–Fig07, Fig10 used by the build (others unused)
-    tables/     chat-2 tables (source of Ch3 and Appendix tables)
+    chapters/   Front_matter_v8.md, Chapter_1 … Chapter_5 (chat 7)
+    appendix/   Appendix_v8.md (chat 7)
+    figures/  figures_inherited/  tables/  Template.docx
     build/      Thesis_v8_NguyenQuocTrungNhan.docx, figure_sources.txt, reference_map.json
-    Template.docx
-  Archive/2026-10-13/   v8 chapters and build of chat 5 (superseded)
+  Archive/2026-10-13/chat6_v8/   chapters, appendix and build of chat 6 (superseded)
 ```
 
-Build layout in a cloud chat (as `build_v8.py` expects): `/home/claude/in/` = unzipped `Reports/v8/`,
-`/home/claude/work/{chapters,appendix}` = copies of the chapter files being edited, `/home/claude/repo/` =
-clone of the repository (reference sheet).
+Cloud build layout: `/home/claude/in/` = unzipped `Reports/v8/`, `/home/claude/work/{chapters,appendix}` =
+the chapter files, `/home/claude/repo/` = repository clone.
 
 ## 6 · Plan of chats
 
-| # | when | chat | task | output |
+| # | when | who | task | output |
 |---|---|---|---|---|
-| 0–5 | 12–13/10 | thesis chats + Claude Code | inventory → outline → exhibits → chapters v8 → build | done |
-| 6 | 13/10 | "Revision before the supervisor" | P-3, `xanh`, `hồng`, cross-review applied; figures complete; template margins; rebuild | done |
-| — | 14/10 morning | author | open the build in Word, F9, Zotero citations, read once, send v8 to the supervisor (afternoon); run `en` on the chat-6 chapter files if time allows | v8 sent |
-| 7 | 14–15/10 | thesis chat **"Final revision"** | supervisor comments (+ `en` if any) → edit chapter files → rebuild → submission | submitted report |
+| 0–7 | 12–13/10 | thesis chats | inventory → outline → exhibits → chapters → build → revisions | done |
+| — | 13/10 evening | author | place the chat-7 files; run `en` with `docs/prompts/EN_POLISH_v8.md` | `en` files |
+| 8 | 13/10 night or 14/10 morning | thesis chat **"en check and final build"** | number check of the `en` files against the chat-7 files, rebuild, checks, page count | final docx for Word |
+| — | 14/10 | author | Word: F9, Zotero (67 references, `CITATION_MAP_v8.md`), read once, send to the supervisor with the 5 questions below | v8 sent |
+| 9 | 14–15/10 | thesis chat "Final revision" | supervisor comments → chapter files → rebuild → submission | submitted report |
 
-**Start prompt of chat 7 (copy):**
-> Chat 7 — Final revision. Đọc `STATUS_BOARD.md` (rev 7) và `CLAIM_AUDIT_v8.md`. Nhận xét của cô: [dán /
-> đính kèm]. Kết quả `en`: [dán hoặc "chưa có"]. P-7: [giữ lề template / đổi về lề quy định]. P-8: [đã kiểm /
-> bỏ qua]. P-9: [giữ / sửa]. Đính kèm: `Reports/v8/` (zip: chapters, appendix, figures, figures_inherited,
-> tables, Template.docx). Sửa vào file chương rồi build lại bằng `src/report_build/`. Không tạo PDF.
+**Five questions for the supervisor (with the 14/10 email):**
+1. Does the 50-page limit count Chapters 1–5 only (now about 60 pages in Word) or everything except the
+   lists, appendices and references?
+2. How strict is the limit — is about 60 pages acceptable for this content?
+3. Margins: those of `Template.docx` (top and bottom 1.5 in) or those written in `Report format.md` (left
+   1.5 in, others 1 in)?
+4. May wide tables use a 10 pt font?
+5. Is the 15/10 submission the draft (spiral-bound, with the committee chair's form) or the final copy?
 
-Files chat 7 needs (project): this board, `CLAIM_AUDIT_v8.md`, `CITATION_MAP_v8.md`, all v8 chapter files +
-`Appendix_v8.md`, `REPORT_OUTLINE_v8.md`, `Report format.md`, `PROSE_STYLE_SPEC.md`, `Thesis_Reference_Sheet.md`.
+**Start prompt of chat 8 (copy):**
+> Chat 8 — en check and final build. Đọc `STATUS_BOARD.md` (rev 8). Đính kèm: 7 file `en` trả về (chương +
+> phụ lục) và danh sách câu `en` đã đổi nghĩa (nếu có). [Nếu là chat mới: thêm zip `Reports/v8/`.]
+> So số liệu, [n], tham chiếu với bản chat 7, sửa chỗ lệch, build lại bằng `src/report_build/`, đo trang.
+> Không tạo PDF.
 
 ## 7 · Where the numbers are
 
 | content | file |
 |---|---|
 | every number of the final system, decisions | `docs/PERF_PHASE_RECORD.md` (rev R) — authority |
-| numbers as written, with sources and computed values | "Notes — not part of the report" at the end of each v8 chapter file |
-| what was verified and how; open checks | `docs/writing/CLAIM_AUDIT_v8.md` |
-| tables and figures (gated) | `Reports/v8/tables/`, `Reports/v8/figures/`; `src/figures_v8/` |
-| per-seizure detection (final, held-out, 4 seeds) | `results/figures_v8_data/perseizure_final.csv` |
-| failure analysis of Ch4 4.3 | `results/p3_anatomy/seizures.csv`, `results/p3b_diag/tail.csv` |
-| development designs (report form) | Appendix C, Table 22 |
-| references: working numbers per chapter → global numbers → DOI | `docs/writing/CITATION_MAP_v8.md`; sheet `docs/Thesis_Reference_Sheet.md` |
+| numbers as written, with sources | "Notes — not part of the report" of each chapter file |
+| what was verified and how | `docs/writing/CLAIM_AUDIT_v8.md` |
+| benchmark entries on Siena | `docs/BENCHMARK_CHECK_szcore_c57da2f.md`; `esl-epfl/szcore` c57da2f |
+| tables and figures (gated) | `Reports/v8/tables/`, `Reports/v8/figures/` |
+| references: working → global → DOI | `docs/writing/CITATION_MAP_v8.md` |
 
-## 8 · Numbering of exhibits (v8, fixed)
+## 8 · Numbering of exhibits (chat 7)
 
-Figures 1–3 Ch1 · 4–10 Ch2 · 11–15 Ch3 · 16–17 Ch4. Tables 1–3 Ch1 · 4–8 Ch2 · 9–17 Ch3 · 18 Ch4 ·
-19–29 Appendix. Equations 1–12 in Ch2. References [1]–[69] in the built document (global, first appearance).
+Figures 1–3 Ch1 · 4–10 Ch2 · 11–15 Ch3 · 16 Ch4. Tables 1–3 Ch1 · 4–8 Ch2 · 9–17 Ch3 · 18 Ch4 · 19–26
+Appendix. Equations 1–12 in Ch2. References [1]–[67] (global, first appearance).
 
 ## 9 · Decisions log
 
 - 2026-10-08: record 10.1. 2026-10-10: one reference list; supervisor's papers in Ch1/Ch4.
-- 2026-10-12: one-task chats; outline v8 (O1–O6); exhibits; O7 approved without re-run; Ch2, Ch3, App v8.
-- 2026-10-13 (author): continue in one chat for continuity; verification standard (section 1.6); A-1 by
-  the per-patient table; A-2 confirmed; A-3 provisional; A-4 from code; page excess accepted when needed.
-- 2026-10-13 (chat 3–4): code and source audit of Ch2 (14 corrections); Ch1, Ch4, Ch5, front matter v8.
-- 2026-10-13 (chat 5): P-1 and P-2 closed; the report is built from the chapter files; one global
-  reference list; body 58 pages; Figures 6 and 10 of the repository kept out (earlier system).
-- 2026-10-13 (chat 6): P-3 closed with corrections; C4/novelty "no seizure label of the patient under
-  review"; P-4 58 pages accepted; P-5 template margins; P-6 closed; Table 9 rows 1–2 = three-readout
-  ensemble; literature claims narrowed to the sheet's verified statements; citations by Zotero (author);
-  body 65 pages after P-5 (P-7).
+- 2026-10-12: one-task chats; outline v8; exhibits; Ch2, Ch3, App v8.
+- 2026-10-13 (chats 3–5): code and source audit; all chapters v8; build from the chapter files; 58 pages.
+- 2026-10-13 (chat 6): P-3 corrections; "no seizure label of the patient under review"; template margins.
+- 2026-10-13 (chat 7): author feedback 1–10 applied (literature review per study, no G/H/C codes, Section 1.3
+  as proposed solution, one-level Siena comparison, Figure 16 removed, simpler Tables 14 and 16, units
+  without a space, no "@", shorter Chapter 5, appendix trimmed); N1 removed; P-8 closed; P-9 applied;
+  cut plan prepared, not applied; body 62 pages (LibreOffice).

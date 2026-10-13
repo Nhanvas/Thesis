@@ -39,12 +39,13 @@ FIG = {
     8: IN / 'figures/fig08_drift.png', 9: IN / 'figures/fig09_event_scoring.png', 10: INH / 'Fig10_architecture.png',
     11: IN / 'figures/fig11_sparsification.png', 12: IN / 'figures/fig12_duration.png',
     13: IN / 'figures/fig13_boundaries.png', 14: IN / 'figures/fig14_gallery.png', 15: 'COMPOSE',
-    16: IN / 'figures/fig16_sens_fa.png', 17: IN / 'figures/fig17_budget_needed.png',
+    # chat 7 (13/10): the sensitivity-vs-false-alarm figure is dropped (Table 18 suffices); fig17 becomes Figure 16
+    16: IN / 'figures/fig17_budget_needed.png',
 }
 if os.environ.get('FIG6'): FIG[6] = Path(os.environ['FIG6'])
 if os.environ.get('FIG10'): FIG[10] = Path(os.environ['FIG10'])
 
-NOTE_STARTS = ("Mean over four seeds", "Pooled sensitivity at the best", "Seed 42", "Median absolute error",
+NOTE_STARTS = ("Siena, 14 patients", "Seed 42; interval", "Mean over four seeds", "Pooled sensitivity at the best", "Seed 42", "Median absolute error",
                "Per-patient mean = ", "62 focal", "Application: label-free", "Values marked",
                "Hours listed:", "PhysioNet hours:", "Seizures in file order", "Laptop processor",
                "Total = total")
@@ -153,20 +154,21 @@ def notes_table(text):
 def compose_fig15(path):
     shots = [IN / 'figures/app_screens' / n for n in ('a_import.png', 'b_analysis.png', 'c_panel_review.png')]
     ims = [Image.open(p).convert('RGB') for p in shots]
-    W = ims[0].size[0]
-    lab = 70
-    H = sum(im.size[1] + lab for im in ims)
+    # chat 7 (13/10): 2 + 1 layout -- (a) and (b) side by side, (c) centred below, same size
+    w, h = ims[0].size
+    gap, lab = 40, 70
+    W = 2 * w + gap
+    H = 2 * (h + lab) + gap
     canvas = Image.new('RGB', (W, H), 'white')
     try:
-        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf', 44)
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf', 48)
     except OSError:
         font = ImageFont.load_default()
     d = ImageDraw.Draw(canvas)
-    y = 0
-    for im, l in zip(ims, 'abc'):
-        d.text((4, y + 12), f'({l})', fill='black', font=font)
-        canvas.paste(im, (0, y + lab))
-        y += im.size[1] + lab
+    pos = [(0, 0), (w + gap, 0), ((W - w) // 2, h + lab + gap)]
+    for im, l, (x, y) in zip(ims, 'abc', pos):
+        d.text((x + 4, y + 10), f'({l})', fill='black', font=font)
+        canvas.paste(im.resize((w, h)), (x, y + lab))
     canvas.save(path)
     return path
 

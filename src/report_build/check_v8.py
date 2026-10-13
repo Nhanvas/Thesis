@@ -128,6 +128,7 @@ def main(path):
     land = sum(1 for s in sects if s.find('w:pgSz', NS).get(q('orient')) == 'landscape')
     print('6 table font sizes other than 12 pt:', sorted(small) or 'none', '| sections', len(sects), 'landscape', land)
     if small: fails.append(f'table runs not at 12 pt: {small}')
+    if land: fails.append(f'{land} landscape section(s); the author asked for portrait pages only (13/10)')
     for s in sects:
         pm = s.find('w:pgMar', NS); pz = s.find('w:pgSz', NS)
         m = {k: pm.get(q(k)) for k in ('top', 'bottom', 'left', 'right')}

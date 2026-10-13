@@ -28,11 +28,11 @@ TW = 1440  # twips per inch
 MARGIN = {'left': 2160, 'right': 1440, 'top': 1440, 'bottom': 1440, 'header': 720, 'footer': 720}
 TEXT_W_IN, LAND_W_IN = 6.0, 9.0
 MAXH_IN = 7.6  # text height (9 in) minus room for the caption
-# chat 8 (13/10, author): every table at 12 pt (no smaller table font); a table that cannot be set at 12 pt in
-# the 6.0-in portrait text width without breaking words or wrapping its numbers is set on a landscape page.
+# chat 8 (13/10, author): every table at 12 pt (no smaller table font), on portrait pages only (a table may run
+# longer); no landscape pages. LANDSCAPE stays empty; the section code below is kept for reference only.
 TABLE_PT = 12
 FIG_MAXW = {4: 4.0}  # chat 8: the montage drawing (square) at 4.0 in instead of the full 6.0 in
-LANDSCAPE = set()  # filled below, by table number
+LANDSCAPE = set()  # author 13/10: no landscape pages
 SHEET = REPO / 'docs' / 'Thesis_Reference_Sheet.md'
 
 FILES = [WORK / 'chapters/Front_matter_v8.md'] + [WORK / f'chapters/{n}' for n in (
@@ -192,6 +192,10 @@ def text_w_in(s, pt, bold=False):
         _FONTS[k] = ImageFont.truetype(f'/usr/share/fonts/truetype/liberation/LiberationSerif-{"Bold" if bold else "Regular"}.ttf', 120)
     return _FONTS[k].getlength(s) / 120 * pt / 72
 
+def pieces(word):
+    """Line-break points of a word: after each hyphen (Word and LibreOffice break there)."""
+    return [x for x in re.split(r'(?<=-)', word) if x]
+
 CELL_PAD_IN = 0.13  # left + right cell margins (70 twips each = 0.097 in) plus rounding
 
 def col_widths_pt(rows, avail_in, pt=TABLE_PT):
@@ -206,7 +210,7 @@ def col_widths_pt(rows, avail_in, pt=TABLE_PT):
             c = r[j] if j < len(r) else ''
             bold = k == 0 or c.startswith('**')
             c = c.replace('**', '').replace('`', '')
-            words = c.split() or ['']
+            words = [pc for w in c.split() for pc in pieces(w)] or ['']
             mn = max(mn, max(text_w_in(w, pt, bold) for w in words))
             nt = max(nt, text_w_in(c, pt, bold))
         mins.append(mn + CELL_PAD_IN); nats.append(nt + CELL_PAD_IN)
@@ -219,16 +223,19 @@ def col_widths_pt(rows, avail_in, pt=TABLE_PT):
     # wrapped text per inch, then the most wrapped lines
     cells = [[((r[j] if j < len(r) else '').replace('**', '').replace('`', ''),
                k == 0 or (r[j] if j < len(r) else '').startswith('**')) for j in range(n)] for k, r in enumerate(rows)]
-    ww = [[([text_w_in(w, TABLE_PT, b_) for w in t.split()], text_w_in(' ', TABLE_PT, b_)) for t, b_ in r] for r in cells]
+    # each word as its hyphen pieces: (width, joined to the previous piece without a space)
+    ww = [[([(text_w_in(pc, TABLE_PT, b_), k > 0) for w in t.split() for k, pc in enumerate(pieces(w))],
+            text_w_in(' ', TABLE_PT, b_)) for t, b_ in r] for r in cells]
     def lines(cell, w):
         widths, sp = cell
         avail = w - CELL_PAD_IN
         cnt, cur = 1, 0.0
-        for x in widths:
+        for x, joined in widths:
+            gap = 0.0 if joined else sp
             if cur == 0:
                 cur = x
-            elif cur + sp + x <= avail:
-                cur += sp + x
+            elif cur + gap + x <= avail:
+                cur += gap + x
             else:
                 cnt += 1; cur = x
         return cnt
@@ -332,11 +339,8 @@ def convert_file(path, cmap):
                     rows.append(split_row(lines[j]))
                 j += 1
             ws, fits = col_widths_pt(rows, TEXT_W_IN)
-            if not fits and cur_table is not None:
-                LANDSCAPE.add(cur_table)
-                ws, fits = col_widths_pt(rows, LAND_W_IN)
             if not fits:
-                print(f'WARN: table {cur_table} in {path.name}: words break even at {LAND_W_IN} in, {TABLE_PT} pt')
+                sys.exit(f'FAIL: table {cur_table} in {path.name}: a word does not fit {TEXT_W_IN} in at {TABLE_PT} pt')
             cur_table = None
             scale = 400 / sum(ws)
             dashes = ['-' * max(3, int(round(w * scale))) for w in ws]

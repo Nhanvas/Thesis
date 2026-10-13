@@ -30,10 +30,10 @@ Deadlines: send v8 to the supervisor **14/10 (afternoon)** · submission (draft)
 | track | state | next |
 |---|---|---|
 | Performance, external, attribution, demo | closed / finished (unchanged) | none |
-| Report text | chat-7 text + `en` polish (accepted after a word-level diff; numbers, [n], references, tables, equations, Notes unchanged) + 1 fix (comma splice in 4.1) + Table 18 moved to the end of 4.1 (layout) | supervisor comments (chat 9) |
-| Built document | `Reports/v8/build/Thesis_v8_NguyenQuocTrungNhan.docx` (chat 8, sha256 `3b5848f424a5928d…`): 26 tables, 16 figures, 12 equations, 67 references; margins left 1.5 in, others 1 in; every table 12 pt; Tables 12, 18, 22 on landscape pages | author: Word F9, Zotero, send |
-| Pages (LibreOffice, measured) | **Chapters 1–5: 60 pages** (Ch1 11, Ch2 21, Ch3 17, Ch4 9, Ch5 2); front matter 9 (i–ix); references 6; appendix 13; total 88. **Count of Report format.md** (total minus list of tables, list of figures, appendices, references): **67 pages**. Word measured about 2 pages less than LibreOffice on earlier builds | over the limit by the author's choice (section 4) |
-| Checks (chat 8, `check_v8.py`, PASS) | captions in sequence, every exhibit cited, every reference resolves, 67 references in first-appearance order, no forbidden number or internal label, abstract 299 words, all tables 12 pt, margins on every section; numbers and citations identical to the chat-7 docx except one "4s" (wording "4s for both") | repeat after every rebuild |
+| Report text | chat-7 text + `en` polish (accepted after a word-level diff; numbers, [n], references, tables, equations, Notes unchanged) + comma splice in 4.1 fixed + chapter-roadmap sentence of Section 1.6 removed (P-11) | supervisor comments (chat 9) |
+| Built document | `Reports/v8/build/Thesis_v8_NguyenQuocTrungNhan.docx` (chat 8, sha256 `de5521e80eff9d19…`): 26 tables, 16 figures, 12 equations, 67 references; margins left 1.5 in, others 1 in; every table 12 pt, all pages portrait (Table 18 runs over two pages with its header repeated) | author: Word F9, Zotero, send |
+| Pages (LibreOffice, measured) | **Chapters 1–5: 60 pages** (Ch1 12, Ch2 21, Ch3 16, Ch4 9, Ch5 2); front matter 9 (i–ix); references 6; appendix 12; total 87. **Count of Report format.md** (total minus list of tables, list of figures, appendices, references): **67 pages**. Word measured about 2 pages less than LibreOffice on earlier builds | over the limit by the author's choice (section 4) |
+| Checks (chat 8, `check_v8.py`, PASS) | captions in sequence, every exhibit cited, every reference resolves, 67 references in first-appearance order, no forbidden number or internal label, abstract 299 words, all tables 12 pt, no landscape section, margins; numbers and citations identical to the chat-7 docx except one "4s" (wording "4s for both") and the removed roadmap sentence | repeat after every rebuild |
 | References | numbering unchanged from chat 7 (`reference_map.json` identical); `CITATION_MAP_v8.md` (67) still valid | Zotero after the last build |
 
 ## 3 · Supervisor feedback on the 11/10 draft (12/10) → v8
@@ -60,17 +60,19 @@ Supervisor comments on v8: **not yet received** (v8 goes out 14/10 afternoon).
    quality does not suffer).
 3. Margins: left 1.5 in, top/bottom/right 1 in (Report format.md and the template's own text). **Supersedes
    P-5** (the template file's section had top/bottom 1.5 in). Applied.
-4. Tables: no 10-pt font; every table at 12 pt, fitted by column widths and, where it cannot fit, a
-   landscape page. Applied (Tables 12, 18, 22 landscape).
+4. Tables: no 10-pt font; every table at 12 pt, fitted by column widths, **portrait pages only** (a table
+   may run longer; landscape pages tried and rejected by the author). Applied.
 5. 15/10 is the draft; the committee's comments after the defense go into the final copy. The template may
    be outdated; follow it only for margins and tables.
+
+**P-11 closed (author 13/10):** Acknowledgements keep "I" / "my"; US/UK spelling not unified; the
+chapter-roadmap sentence at the end of Section 1.6 removed.
 
 **Pending:**
 
 | # | item | who |
 |---|---|---|
 | P-10 | Appendix choices of chat 7 (old Tables 25, 27, 29 → sentences; Table 22 kept whole) — revert any on request | author |
-| P-11 | Left open by `en`: (a) Acknowledgements keep "I" / "my" (style spec allows it there)? (b) "pediatric", "localize" (US) beside "colour", "labelled" (UK) — keep, or unify? (c) the chapter-roadmap sentence at the end of Section 1.6 — keep or drop? Chat 8 left all three as written | author |
 | P-12 | Page-limit strictness (question 2) | author → supervisor |
 
 ## 5 · Layout
@@ -81,10 +83,10 @@ F:/Study/Thesis/
     docs/STATUS_BOARD.md  docs/writing/CLAIM_AUDIT_v8.md (section 8 new)  docs/writing/CITATION_MAP_v8.md
     docs/writing/CUT_PLAN_50p.md (not applied)  docs/prompts/EN_POLISH_v8.md
     docs/writing/REPORT_OUTLINE_v8.md
-    src/report_build/ build_v8.py (chat 8: margins, 12-pt tables, column widths, landscape sections),
+    src/report_build/ build_v8.py (chat 8: margins, 12-pt tables on portrait pages, column widths),
                       check_v8.py (new), render_pdf.py, pagemap.py
   Reports/v8/
-    chapters/   Front_matter_v8.md, Chapter_1 … Chapter_5 (chat 8 = `en` + Ch4 fixes)
+    chapters/   Front_matter_v8.md, Chapter_1 … Chapter_5 (chat 8 = `en` + Ch1 roadmap removed + Ch4 fix)
     appendix/   Appendix_v8.md (chat 8 = `en`)
     figures/  figures_inherited/  tables/  Template.docx
     build/      Thesis_v8_NguyenQuocTrungNhan.docx, figure_sources.txt, reference_map.json (chat 8)
@@ -102,13 +104,12 @@ check: `python3 repo/src/report_build/check_v8.py build/out/Thesis_v8_NguyenQuoc
 | # | when | who | task | output |
 |---|---|---|---|---|
 | 0–8 | 12–13/10 | thesis chats | inventory → outline → exhibits → chapters → build → revisions → `en` check and final build | done |
-| — | 14/10 | author | Word: open the docx, F9 (fields: contents, lists, captions); Zotero (67 references, `CITATION_MAP_v8.md`); check the three landscape pages print the right way round; read once; answer P-11; send to the supervisor | v8 sent |
-| 9 | 14–15/10 | thesis chat "Final revision" | supervisor comments and P-11 → chapter files → rebuild → check → submission | submitted draft |
+| — | 14/10 | author | Word: open the docx, F9 (fields: contents, lists, captions); Zotero (67 references, `CITATION_MAP_v8.md`); read once; send to the supervisor | v8 sent |
+| 9 | after the supervisor's feedback | thesis chat "Final revision" | supervisor comments → chapter files → rebuild → check → submission | submitted draft |
 
 **Start prompt of chat 9 (copy):**
-> Chat 9 — Final revision. Đọc `STATUS_BOARD.md` (rev 9). Đính kèm: nhận xét của cô về v8 (nếu có), trả lời
-> P-11 (Acknowledgements "I/my"; chính tả US/UK; câu roadmap cuối Section 1.6). [Nếu là chat mới: thêm zip
-> `Reports/v8/`.] Sửa file chương theo nhận xét, build lại bằng `src/report_build/`, chạy `check_v8.py`, đo
+> Chat 9 — Final revision. Đọc `STATUS_BOARD.md` (rev 9). Đính kèm: nhận xét của cô về v8. [Nếu là chat mới:
+> thêm zip `Reports/v8/`.] Sửa file chương theo nhận xét, build lại bằng `src/report_build/`, chạy `check_v8.py`, đo
 > trang. Không tạo PDF.
 
 ## 7 · Where the numbers are
@@ -135,7 +136,7 @@ Appendix. Equations 1–12 in Ch2. References [1]–[67] (global, first appearan
 - 2026-10-13 (chat 6): P-3 corrections; "no seizure label of the patient under review"; template margins.
 - 2026-10-13 (chat 7): author feedback 1–10 applied; N1 removed; P-8 closed; P-9 applied; cut plan
   prepared, not applied; body 62 pages (LibreOffice).
-- 2026-10-13 (chat 8): `en` accepted after diff; comma splice fixed; Table 18 to the end of 4.1; margins
-  left 1.5 / others 1 in (supersedes P-5); every table 12 pt with landscape pages for Tables 12, 18, 22;
-  template cell margins and table grid fixed; `check_v8.py` added; page limit exceeded by choice (cut plan not
-  applied); Chapters 1–5 60 pages, Report-format count 67 (LibreOffice).
+- 2026-10-13 (chat 8): `en` accepted after diff; comma splice fixed; P-11 closed (roadmap sentence of 1.6
+  removed); margins left 1.5 / others 1 in (supersedes P-5); every table 12 pt on portrait pages (landscape
+  tried, rejected by the author); template cell margins and table grid fixed; `check_v8.py` added; page limit
+  exceeded by choice (cut plan not applied); Chapters 1–5 60 pages, Report-format count 67 (LibreOffice).

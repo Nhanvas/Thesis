@@ -1,4 +1,4 @@
-# CLAIM_AUDIT_v8 — verification of the report's factual claims (13/10, chat 3–4)
+# CLAIM_AUDIT_v8 — verification of the report's factual claims (13/10, chats 3–5)
 
 **Why.** The author asked (13/10) that every statement of the report be checked as a researcher would,
 not only the result numbers: the data-accounting gap (chb11, chb21 files missing locally) showed that an
@@ -47,14 +47,28 @@ density 0.921–0.973 (background) and 0.949–0.974 (seizure), chb17 0.224 (`de
 Seizure share of test time 0.42 % (whole windows, computed). WHO: around 50 million; nearly 80 % in low-
 and middle-income countries.
 
-## 4 · Still open (chat 5)
+## 4 · Open items after chat 5 (13/10)
 
-| item | who | how |
+| item | status | who | how |
+|---|---|---|---|
+| N1, N2, N3 (supervisor's papers): title-level sentences match the abstracts | **open** | `hồng` | publisher abstract (blocked for the container) |
+| N2, N3 authors and years; N5 venue and DOI | **closed 13/10**: N2 = Xiao et al. 2024, *BSPC* 87, 105464 (Crossref); N3 = Hong et al. 2025, *Knowledge-Based Systems* 327, 114199 (OpenAlex; printed "et al." because the record repeats two names); N5 = Dani & Liebe 2026, MICCAI 2026, LNCS, pp. 449–458, DOI 10.1007/978-3-032-38239-9_43 (Crossref) | chat 5 | `CITATION_MAP_v8.md` |
+| Figure 14 panel (d): what the EEG shows | **closed 13/10** from the author's reading (P-1) | author | Ch3 3.3.5 |
+| Table 3 pasted unchanged from the 11/10 draft | **closed 13/10** (P-2) | author | Ch1 1.5 |
+| abstract ≤ 300 words, one page | **closed**: 299 by `split()`; one page in the build (p. ix) | chat 5 | recount in Word optional |
+| page count of the built body | **measured**: 58 pages (LibreOffice render); decision P-4 on the board | chat 5 / author | Word page count after updating fields |
+| every number of Ch1–5 prose against the chapter notes and result files | **open** for prose; tables done (section 5) | `xanh` | outline §6 + chapter notes |
+| Figures 1, 2, 4, 5, 7 in the build are the repository copies; identity with `Reports/v8/figures_inherited/` | **open** | chat 5b | sha256 against the inherited files |
+| Figures 6 and 10: the repository copies show the earlier system | **open**: placeholders in the build | author → rebuild | attach `figures_inherited/` |
+
+## 5 · Checks made in chat 5 (13/10)
+
+| check | method | result |
 |---|---|---|
-| N1, N2, N3 (supervisor's papers): title-level sentences match the abstracts; authors and years in Zotero | `hồng` | publisher abstract (blocked for the container) |
-| N5 DOI 10.1007/978-3-032-38239-9_43 (from the 11/10 draft) | `hồng` | Zotero / doi.org |
-| Figure 14 panel (d): what the EEG shows (Ch3 3.3.5 CHECK marker) | author | look at `fig14_gallery.png` |
-| every number of Ch1–5 against the chapter notes and result files | `xanh` | outline §6 + chapter notes |
-| Table 3 pasted unchanged from the 11/10 draft | author | docx |
-| abstract 299 words by `split()`; recount in Word | chat 5 | Word count |
-| page count of the built body (author accepts > 50 if content is needed, 13/10) | chat 5 | build the document |
+| Ch3 and Appendix tables vs the gated table files (`Reports/v8/tables/`) | script: row-by-row and numeric-token comparison | Tables 11, 13, 16, 17, 23, 24, 25 identical; 12, 14, 15, 19 same values (column order, rounding 77.74 → 77.7, 6.1 → 6.10); Table 4 carries listed hours by approval O7, and its scored hours (562.40, 111.82, 279.38) match the file; Table 10 = the file without its source column |
+| Table 9 values vs `PERF_PHASE_RECORD.md` | grep of every value | all present (E8, E16, E21, E17b, P3 rows) |
+| cross-references | script over the built text | every "Section", "Table", "Figure", "Equation" and "Appendix" reference resolves; all 29 tables and 17 figures are cited in the text |
+| forbidden numbers (instructions §4) | script | none; 0.498 appears only as the four-seed mean; 21.0 s/h only as "overall" beside the 21.68 s/h median; 0.500 only as the chb24 F1 |
+| abbreviations | script: listed vs used | all listed ones used; AUC, CI, CNN, F1 used but unlisted → added |
+| citations | script: every [n] of every chapter mapped to a sheet code through the chapter's Notes table, renumbered by first appearance | 69 references, no unmapped citation; working → global map in `CITATION_MAP_v8.md` |
+| keywords | count | 10 words (limit 10) |

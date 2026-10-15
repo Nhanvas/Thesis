@@ -1,0 +1,17 @@
+[13:53:48.201 UTC] login ok: {'username': 'AdminSzScan'}
+[13:53:48.208 UTC] PRE-FLIGHT: no live session at startup
+[13:53:48.210 UTC] === chb06: 18 real files on disk ===
+[13:53:48.224 UTC] chb06: started upload session -- {'project_id': 'chb06', 'memo': 'Tier 2 -- frozen build szscan-frozen-v1', 'files': [], 'phase_b_done': False, 'ready_to_process': False, 'processing': False, 'done': False, 'error': None, 'operating_point': None}
+[13:53:52.116 UTC] chb06: uploaded chb06_01.edf
+[13:53:56.480 UTC] chb06: uploaded chb06_02.edf
+[13:54:04.719 UTC] chb06: uploaded chb06_03.edf
+[13:54:24.994 UTC] chb06: uploaded chb06_04.edf
+[13:55:09.268 UTC] chb06: uploaded chb06_05.edf
+[13:55:47.923 UTC] chb06: uploaded chb06_06.edf
+[13:55:58.525 UTC] chb06: uploaded chb06_07.edf
+[13:56:32.445 UTC] chb06: uploaded chb06_08.edf
+[13:56:59.535 UTC] chb06: uploaded chb06_09.edf
+[13:57:23.595 UTC] chb06: uploaded chb06_10.edf
+[13:57:39.370 UTC] chb06: uploaded chb06_12.edf
+[13:57:56.538 UTC] chb06: uploaded chb06_13.edf
+[13:58:16.450 UTC] chb06: STOPPED -- lost connection to backend (possible OOM kill, like the earlier chb06 run): ConnectionError(ProtocolError('Connection aborted.', OSError(10055, 'An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full', None, 10055, None)))

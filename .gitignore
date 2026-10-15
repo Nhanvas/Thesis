@@ -76,3 +76,6 @@ results/*/smoke/
 results/veto_screen*/*.npy
 # separate BME11 paper (not thesis work)
 bme11/
+
+# old demo data (archived locally)
+web_demo/_old_data_*/

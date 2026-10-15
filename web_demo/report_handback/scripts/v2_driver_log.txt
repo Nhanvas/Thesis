@@ -1,0 +1,102 @@
+[2026-09-29T19:40:01 UTC] Logged in
+[2026-09-29T19:40:01 UTC] === Starting subject 1/8: chb06 ===
+[2026-09-29T19:40:01 UTC] chb06: 18 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb06
+[2026-09-29T19:40:01 UTC] chb06: session started, uploading 18 files sequentially
+[2026-09-29T19:40:51 UTC] Logged in
+[2026-09-29T19:40:51 UTC] === Starting subject 1/8: chb06 ===
+[2026-09-29T19:40:51 UTC] chb06: 18 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb06
+[2026-09-29T19:40:51 UTC] Discarded a leftover non-processing session (200).
+[2026-09-29T19:40:51 UTC] chb06: session started, uploading 18 files sequentially
+=== restart marker 2026-09-29T19:44:38Z: killed a duplicate racy driver instance, discarded corrupted shared session, removed 2 orphaned drafts it created, restarting clean ===
+[2026-09-29T19:44:43 UTC] Logged in
+[2026-09-29T19:44:43 UTC] === Starting subject 1/8: chb06 ===
+[2026-09-29T19:44:43 UTC] chb06: 18 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb06
+[2026-09-29T19:44:43 UTC] chb06: session started, uploading 18 files sequentially
+[2026-09-29T19:48:36 UTC] chb06: upload phase done in 232.6s, 0 file(s) failed
+[2026-09-29T19:48:36 UTC] chb06: not ready_to_process after all uploads -- snapshot: {"project_id": "chb06", "memo": "frozen build szscan-frozen-v2", "files": [{"filename": "chb06_01.edf", "status": "uploaded", "error": null}, {"filename": "chb06_02.edf", "status": "uploaded", "error": null}, {"filename": "chb06_03.edf", "status": "uploaded", "error": null}, {"filename": "chb06_04.edf", "status": "uploaded", "error": null}, {"filename": "chb06_05.edf", "status": "uploaded", "error": null}, {"filename": "chb06_06.edf", "status": "uploaded", "error": null}, {"filename": "chb06_07.
+[2026-09-29T19:48:36 UTC] === Starting subject 2/8: chb03 ===
+[2026-09-29T19:48:36 UTC] chb03: 38 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb03
+[2026-09-29T19:48:36 UTC] Discarded a leftover non-processing session (200).
+[2026-09-29T19:48:36 UTC] chb03: session started, uploading 38 files sequentially
+=== restart marker 2 2026-09-29T19:51:07Z: fixed premature-readiness-check bug (now waits for Phase A to settle before judging ready_to_process, and drops per-file errors from the session instead of failing the whole subject), restarting clean from chb06 ===
+[2026-09-29T19:51:08 UTC] Logged in
+[2026-09-29T19:51:08 UTC] === Starting subject 1/8: chb06 ===
+[2026-09-29T19:51:08 UTC] chb06: 18 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb06
+[2026-09-29T19:51:08 UTC] chb06: session started, uploading 18 files sequentially
+[2026-09-29T19:53:53 UTC] chb06: all 18 upload POSTs sent in 165.5s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T19:54:49 UTC] chb06: poll exception while waiting for Phase A (1): ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))
+[2026-09-29T19:56:15 UTC] chb06: upload+Phase A settled in 307.1s, 0 file(s) failed total
+[2026-09-29T19:56:15 UTC] chb06: Process started, polling...
+[2026-09-29T20:04:26 UTC] chb06: poll exception (1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-09-29T20:05:11 UTC] chb06: DONE. upload=307.1s process=536.2s total=843.4s op_point={'pen_mult': 2.0, 'event_rate_per_day': 37.40259740259741}
+[2026-09-29T20:05:12 UTC] chb06: acknowledged, lock freed for next subject
+[2026-09-29T20:05:12 UTC] ESTIMATE after chb06: measured rate 12.64s/hour-of-EEG; remaining 213h of EEG across 7 subjects -> est. 44.9 min more -> estimated finish 2026-09-29T20:50:03Z
+[2026-09-29T20:05:12 UTC] === Starting subject 2/8: chb03 ===
+[2026-09-29T20:05:12 UTC] chb03: 38 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb03
+[2026-09-29T20:05:12 UTC] chb03: session started, uploading 38 files sequentially
+[2026-09-29T20:06:42 UTC] chb03: all 38 upload POSTs sent in 90.0s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:06:47 UTC] chb03: poll exception while waiting for Phase A (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:07:57 UTC] chb03: upload+Phase A settled in 165.2s, 0 file(s) failed total
+[2026-09-29T20:07:57 UTC] chb03: Process started, polling...
+[2026-09-29T20:08:22 UTC] chb03: poll exception (1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-09-29T20:12:52 UTC] chb03: DONE. upload=165.2s process=295.4s total=460.6s op_point={'pen_mult': 2.0, 'event_rate_per_day': 44.20923364813895}
+[2026-09-29T20:12:53 UTC] chb03: acknowledged, lock freed for next subject
+[2026-09-29T20:12:53 UTC] === Starting subject 3/8: chb13 ===
+[2026-09-29T20:12:53 UTC] chb13: 33 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb13
+[2026-09-29T20:12:53 UTC] chb13: session started, uploading 33 files sequentially
+[2026-09-29T20:14:13 UTC] chb13: all 33 upload POSTs sent in 80.6s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:14:33 UTC] chb13: poll exception while waiting for Phase A (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:15:03 UTC] chb13: upload+Phase A settled in 130.8s, 0 file(s) failed total
+[2026-09-29T20:15:03 UTC] chb13: Process started, polling...
+[2026-09-29T20:17:39 UTC] chb13: poll exception (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:19:19 UTC] chb13: DONE. upload=130.8s process=255.3s total=386.2s op_point={'pen_mult': 2.0, 'event_rate_per_day': 48.0}
+[2026-09-29T20:19:19 UTC] chb13: acknowledged, lock freed for next subject
+[2026-09-29T20:19:19 UTC] === Starting subject 4/8: chb14 ===
+[2026-09-29T20:19:19 UTC] chb14: 26 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb14
+[2026-09-29T20:19:19 UTC] chb14: session started, uploading 26 files sequentially
+[2026-09-29T20:20:42 UTC] chb14: all 26 upload POSTs sent in 83.0s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:21:02 UTC] chb14: poll exception while waiting for Phase A (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:21:12 UTC] chb14: upload+Phase A settled in 113.1s, 0 file(s) failed total
+[2026-09-29T20:21:12 UTC] chb14: Process started, polling...
+[2026-09-29T20:24:32 UTC] chb14: DONE. upload=113.1s process=200.3s total=313.4s op_point={'pen_mult': 2.0, 'event_rate_per_day': 94.15384615384615}
+[2026-09-29T20:24:33 UTC] chb14: acknowledged, lock freed for next subject
+[2026-09-29T20:24:33 UTC] === Starting subject 5/8: chb15 ===
+[2026-09-29T20:24:33 UTC] chb15: 40 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb15
+[2026-09-29T20:24:33 UTC] chb15: session started, uploading 40 files sequentially
+[2026-09-29T20:27:25 UTC] chb15: all 40 upload POSTs sent in 172.6s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:27:45 UTC] chb15: upload+Phase A settled in 192.6s, 0 file(s) failed total
+[2026-09-29T20:27:45 UTC] chb15: Process started, polling...
+[2026-09-29T20:33:06 UTC] chb15: DONE. upload=192.6s process=320.7s total=513.3s op_point={'pen_mult': 2.0, 'event_rate_per_day': 88.78027105087759}
+[2026-09-29T20:33:06 UTC] chb15: acknowledged, lock freed for next subject
+[2026-09-29T20:33:06 UTC] === Starting subject 6/8: chb16 ===
+[2026-09-29T20:33:06 UTC] chb16: 19 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb16
+[2026-09-29T20:33:06 UTC] chb16: session started, uploading 19 files sequentially
+[2026-09-29T20:34:00 UTC] chb16: all 19 upload POSTs sent in 53.5s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:34:25 UTC] chb16: upload+Phase A settled in 78.6s, 0 file(s) failed total
+[2026-09-29T20:34:25 UTC] chb16: Process started, polling...
+[2026-09-29T20:34:40 UTC] chb16: poll exception (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:35:05 UTC] chb16: poll exception (1): ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))
+[2026-09-29T20:36:00 UTC] chb16: poll exception (1): ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))
+[2026-09-29T20:36:10 UTC] chb16: poll exception (1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-09-29T20:36:55 UTC] chb16: poll exception (1): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-09-29T20:37:10 UTC] chb16: DONE. upload=78.6s process=165.3s total=243.9s op_point={'pen_mult': 2.0, 'event_rate_per_day': 31.578947368421055}
+[2026-09-29T20:37:10 UTC] chb16: acknowledged, lock freed for next subject
+[2026-09-29T20:37:10 UTC] === Starting subject 7/8: chb17 ===
+[2026-09-29T20:37:10 UTC] chb17: 21 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb17
+[2026-09-29T20:37:10 UTC] chb17: session started, uploading 21 files sequentially
+[2026-09-29T20:38:15 UTC] chb17: all 21 upload POSTs sent in 65.0s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:38:40 UTC] chb17: upload+Phase A settled in 90.1s, 0 file(s) failed total
+[2026-09-29T20:38:40 UTC] chb17: Process started, polling...
+[2026-09-29T20:41:20 UTC] chb17: DONE. upload=90.1s process=160.2s total=250.3s op_point={'pen_mult': 2.0, 'event_rate_per_day': 53.697238971755}
+[2026-09-29T20:41:21 UTC] chb17: acknowledged, lock freed for next subject
+[2026-09-29T20:41:21 UTC] === Starting subject 8/8: chb18 ===
+[2026-09-29T20:41:21 UTC] chb18: 36 real files found on disk under F:\Study\Thesis\Dataset\CHB-MIT\chb18
+[2026-09-29T20:41:21 UTC] chb18: session started, uploading 36 files sequentially
+[2026-09-29T20:43:14 UTC] chb18: all 36 upload POSTs sent in 113.7s, 0 file(s) rejected outright; now waiting for Phase A (background per-file processing, concurrency 2) to settle every file to uploaded/error
+[2026-09-29T20:43:59 UTC] chb18: upload+Phase A settled in 158.9s, 0 file(s) failed total
+[2026-09-29T20:43:59 UTC] chb18: Process started, polling...
+[2026-09-29T20:44:19 UTC] chb18: poll exception (1): ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))
+[2026-09-29T20:44:30 UTC] chb18: poll exception (1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-09-29T20:48:35 UTC] chb18: DONE. upload=158.9s process=275.3s total=434.2s op_point={'pen_mult': 2.0, 'event_rate_per_day': 40.411599625818525}
+[2026-09-29T20:48:35 UTC] chb18: acknowledged, lock freed for next subject
+[2026-09-29T20:48:35 UTC] === All subjects processed (or recorded as failed/skipped). Driver finished. ===

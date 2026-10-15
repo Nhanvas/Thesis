@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 13, 2026-10-16, end of chat D3)
+# STATUS_BOARD — DEFENSE phase (rev 14, 2026-10-16, end of chat D4)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to
 give or approve, where every file lives, and what the next chat does. At the end of every chat the board
@@ -20,90 +20,97 @@ The report phase is closed. Its last board was rev 9 (chat 8, 2026-10-13); its h
    delete, with local paths); (c) the start prompt of the next chat.
 4. Defense material lives in `F:/Study/Thesis/Defense/` (private, outside the repository). The repository
    (public) holds only this board and the instructions; cloud chats clone it to read code, results and
-   `web_demo/`.
+   `web_demo/`. Cloud chats cannot open the author's local folders: a local file a chat needs is attached.
 5. Every number on a slide, in the script or in an answer matches the final report **and**
    `Defense/notes/NUMBERS_LOCK.md`. A number not in that file goes to the author.
 6. **No script before the slide freeze** (anh Trí: script rewritten after every slide change falls apart).
+7. **Questions come from the slides and the talk, not the report** (author, 16/10): every number on a main
+   slide has an answer in `qa/QA_BANK.md` or an appendix slide.
 
-## 2 · Where things stand (16/10, end of D3)
+## 2 · Where things stand (16/10, end of D4)
 
 | track | state | next |
 |---|---|---|
-| Report | submitted; report of record = `Reports/final/…Report.docx` (sha256 `fe9c56ea47f2cc45…`), text `Thesis_Final_Report.md` | none before the committee; format risks P4 checked by the author in the .docx |
-| Numbers (D1a) | `notes/NUMBERS_LOCK.md`; no content mismatch; §3b and §12 added in D2 | author approves N1–N9 (= P8) |
-| Figures (D1b) | `notes/FIGURE_PROVENANCE.md` (internal); 3, 6, 10 hand-drawn in Figma, edited with Claude | author writes the exact AI-help sentence (P2) |
+| Report | submitted; report of record = `Reports/final/…Report.docx` (sha256 `fe9c56ea47f2cc45…`), text `Thesis_Final_Report.md` | none before the committee; P4 closed (fixes go into the final copy) |
+| Numbers (D1a) | `notes/NUMBERS_LOCK.md` | author approves N1–N9 (= P8) |
+| Figures (D1b) | `notes/FIGURE_PROVENANCE.md` (internal) | author confirms the AI-help sentence (P2) |
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
-| **Q&A bank (D3)** | `qa/QA_BANK.md`: 79 questions under the 8 rubric criteria (C1 7, C2 6, C3 14, C4 6, C5 14, C6 12, C7 9, C8 11); reviewer-first list of 14; 14 traps indexed; every answer ≤ 4 Vietnamese sentences + one English line + numbers tagged NL§1–11 / NL§12 + supporting slide; 21 appendix slides A1–A21 (14 priority 1); rubric coverage check; points P1–P8. Every number token checked against NUMBERS_LOCK (only P5's computed equal-weight totals are outside it, pending approval) | author rehearses the [PB] list; answers P1–P8; D4 uses §0, §10, §11 |
-| App (D1c) | `notes/APP_FACTS.md` | D4 one slide + Figma architecture |
+| Q&A bank (D3) | `qa/QA_BANK.md`: 79 questions, 21 appendix slides, coverage check | author rehearses the [PB] list |
+| **Slide outline (D4)** | `outline/SLIDE_OUTLINE.md`: 20 main slides, 13:20 planned incl. 1:45 demo slot; title, minutes, English slide text, numbers (NL§1–11, three labels), figure source, word estimate, rubric criterion and Q&A link per slide; References p.21–22; appendix index p.23, A# on page 23 + #; text-density check; rubric coverage (Table 8 on slide 16 → criterion 4; objective-by-objective table on slide 19 → criterion 5); 10 figures for Claude Code with a copy-ready prompt | **author builds slides v1** + runs the Claude Code figure prompt |
+| App (D1c) | `notes/APP_FACTS.md`; on slides: 16 (architecture + Table 8), 17 (demo slot + application run) | demo checklist in D8 |
 | Repository | public; `web_demo/` code identical to tag `szscan-frozen-v4.1` | read only |
-| Defense rubric | not given by the faculty yet; working rubric = `RUBRIC_MAP.md` | re-run QA_BANK §11 when known |
+| Defense rubric | not given by the faculty yet; working rubric = `RUBRIC_MAP.md` | re-run SLIDE_OUTLINE §6 when known |
 | Time, committee | 12–15 min including demo; Q&A length unknown | author adds committee info (P1) |
-| Slide template | none required | — |
+| Slide template | none required; outline §0 proposes 16:9, title `Section \| message`, body ≥ 18 pt | author decides |
 
 ## 3 · Feedback and rules in force
 
 | # | source | rule | where it lands |
 |---|---|---|---|
 | R1 | anh Trí | slides matter more than the report; finish early | plan, section 5 |
-| R2 | anh Trí | app on slides briefly: technology per layer, which does what; a demo that runs is enough | APP_FACTS §1–2 → D4 one slide |
-| R3 | anh Trí / cô | slide figures only from repository scripts on committed results, or hand-drawn in Figma | FIGURE_PROVENANCE (internal) |
+| R2 | anh Trí | app on slides briefly: technology per layer, which does what; a demo that runs is enough | **outline slides 16–17** |
+| R3 | anh Trí / cô | slide figures only from repository scripts on committed results, or hand-drawn in Figma | **outline §7** (F1–F10, Figma list) |
 | R4 | cô 15/10 | understand every plot; check results are correct | D1, D2 done |
-| R5 | lab notes | answer from the rubric, not only the thesis | **D3 done** (QA_BANK by criterion) |
-| R6 | lab notes | novelty and contribution versus previous research | QA C1-4, C7-7; D4 `M:Contrib` |
-| R7 | lab notes | appendix slides after References, page numbers | **QA_BANK §10 (A1–A21)** → D4 |
-| R8 | lab notes | not too little, not too much text | D4, D5 |
-| R9 | lab notes | slide title = section + main message | D4 (appendix titles drafted in QA §10) |
-| R10 | lab notes | ≤ 20 main slides (12–15 min) | D4 (draft frame in QA §0) |
-| R11 | lab notes | every rubric item has scorable content | **QA_BANK §11** → D4 |
-| R12 | lab notes | look at seniors' slides | D4 (if received) |
-| R13 | lab notes | demo prepared carefully: patient ingested beforehand, video fallback | APP_FACTS §5 → D8 |
+| R5 | lab notes | answer from the rubric, not only the thesis | D3 done |
+| R6 | lab notes | novelty and contribution versus previous research | **outline slides 3, 20** |
+| R7 | lab notes | appendix slides after References, page numbers | **outline §4** (p.23–44) |
+| R8 | lab notes | not too little, not too much text | **outline §5** (3 dense slides with cut options) |
+| R9 | lab notes | slide title = section + main message | **outline §2** |
+| R10 | lab notes | ≤ 20 main slides (12–15 min) | **outline: 20 slides, 13:20** |
+| R11 | lab notes | every rubric item has scorable content | **outline §6** (all 8 ✔) |
+| R12 | lab notes | look at seniors' slides | D5 (author attaches the PDFs in that chat) |
+| R13 | lab notes | demo prepared carefully: patient ingested beforehand, video fallback | outline slide 17 → D8 |
 
 ## 4 · Decisions
 
-- D0-1 … D0-5 (15/10): plan D0–D8; figure provenance internal only; `web_demo/` read from the public clone;
-  project knowledge = final report text; `RUBRIC_MAP.md` = working rubric.
-- D1, D2 (16/10): see rev 12 (NUMBERS_LOCK §3b, §12; figure notes for Fig 12, 13).
-- **D3 (16/10):** Q&A bank written. Proposed slide frame of 20 main slides (`M:Title … M:Contrib`) is a
-  cross-reference for D4, not a decision. Two rubric risks for D4: criterion 4 needs Table 8 (compact) on a
-  main slide; criterion 5 needs an objective-by-objective verdict on the conclusion slide.
-- **Waiting for the author (QA_BANK §12):**
-  - P1 committee research fields / known question habits → `Defense/inputs/committee.md`.
-  - P2 exact, truthful sentence on AI help for Figures 3, 6, 10 (answer C8-1).
-  - P3 truthful wording on AI use in code and report (answer C8-2), checked against university policy.
-  - P4 format risks seen in the text export, to check in the .docx: Mazurek 2026 listed twice; Dani & Liebe
-    2026 in text vs 2027 in the list; Σ missing in Eq 9–11 (maybe export only); List of Tables page numbers;
-    body Ch1 p. 1 → Ch5 p. 58 vs the 50-page limit. Report stays locked; answers only.
-  - P5 add the equal-weight deployment totals (computed from Table 8: 4.0 / 3.4 / 2.6) to NUMBERS_LOCK §12?
-  - P6 midterm slides into `Defense/inputs/` (if they showed earlier-protocol numbers, A19 becomes priority 1).
-  - P7 framing of "is the GAE needed?" (0.596 feature density vs 0.612 channel latent, not a controlled ablation).
-  - P8 = NUMBERS_LOCK N1–N9 (N2 network wording, N3/N4 "4 seeds" label, N5 Figure 1 version).
+- D0–D3: see rev 13 (plan; provenance internal; Q&A bank; draft frame).
+- **D4 (16/10):**
+  - D4-1 Outline of 20 main slides replaces the QA_BANK §0 frame: Eval merged into Data (slide 5), Limits merged
+    into Impact (slide 18), App split (16 design + Table 8, 17 demo + application run), Contributions split
+    (19 objective by objective, 20 contributions). Mapping table in outline §1.
+  - D4-2 Demo slot 1:30 inside slide 17 on **chb03 ingested the evening before**; fallback screen recording of the
+    same path; switch to the video if the app does not respond within 10 s.
+  - D4-3 Defaults while points are open: N3/N4 label "4 seeds" on slides 12, 19, 20; nothing about network blocking
+    on slides (N2); Figure 1 only if Claude Code confirms it matches the .docx (N5), else Figure 14a; the benchmark
+    scatter not in the report (`fig16_sens_fa`) is not used.
+  - D4-4 A19 (earlier protocol) raised to priority 1: the midterm slides used the earlier pipeline (P6 resolved by
+    that fact; the PDF can still be attached in D5).
+- **Author, 16/10:** questions come from the slides and the talk (rule 1.7). P4 closed: the 50-page overrun was
+  accepted earlier by the author; Dani & Liebe is 2026 (Zotero defaulted to 2027, fixed by hand); the duplicated
+  Mazurek entry (two identical list items 2026a/2026b, cited in 2.9.1 and twice in 4.6) is fixed in the final copy.
+  Figures 3, 6, 10: drawn by the author in Figma, first for the earlier pipeline, redrawn with Claude's guidance
+  (exact sentence = P2, drafted in chat D4, waiting for confirmation).
+- **Waiting for the author:**
+  - P1 committee research fields / question habits → `Defense/inputs/committee.md`.
+  - P2 confirm the drafted sentence on AI help for Figures 3, 6, 10.
+  - P3 truthful wording on AI use in code and report (lower priority after rule 1.7, still prepare one line).
+  - P5 add the equal-weight deployment totals (computed from Table 8: 4.0 / 3.4 / 2.6) to NUMBERS_LOCK §12.
+  - P7 framing of "is the GAE needed?" (slide 8 shows 0.596 beside 0.612).
+  - P8 = NUMBERS_LOCK N1–N9 (N5 is checked by the Claude Code figure prompt).
 
 ## 5 · Plan of chats
 
 | # | target date | task | output (in `F:/Study/Thesis/Defense/`) |
 |---|---|---|---|
 | D0 | 15/10 ✔ | plan, project switch to the defense phase | board rev 10, instructions rev 2026-10-15d |
-| D1 | 16/10 ✔ | numbers, figure provenance, app facts | `notes/NUMBERS_LOCK.md`, `notes/FIGURE_PROVENANCE.md`, `notes/APP_FACTS.md` |
+| D1 | 16/10 ✔ | numbers, figure provenance, app facts | `notes/NUMBERS_LOCK.md`, `FIGURE_PROVENANCE.md`, `APP_FACTS.md` |
 | D2a/b | 16/10 ✔ | study guide, two parts | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` |
-| D3 | 16/10 ✔ | Q&A bank by rubric criterion, reviewer first; appendix slide list; rubric coverage check | `qa/QA_BANK.md` |
-| **D4** | 20/10 | slide outline: ≤ 20 main slides, minutes per part, title (section + message), figure source per slide, words per slide, demo slot, appendix slides with page numbers, rubric coverage check, list of figures for Claude Code to redraw at slide size | `outline/SLIDE_OUTLINE.md` |
-| — | 20–22/10 | **author builds slides v1** (Figma for hand-drawn parts) | `slides/` |
-| D5 | 22/10 | slide review: numbers vs NUMBERS_LOCK, titles, figure sources, rubric coverage, text density → cô (22/10) and anh Trí | review list |
+| D3 | 16/10 ✔ | Q&A bank, appendix list, rubric coverage | `qa/QA_BANK.md` |
+| D4 | 16/10 ✔ | slide outline | `outline/SLIDE_OUTLINE.md` |
+| — | **17–21/10** | **author builds slides v1** (outline §8); Claude Code redraws figures (outline §7, est. 15–30 min, not measured) | `slides/Defense_slides_v1.*`, `slides/figs/` |
+| D5 | 21/10 | slide review: numbers vs NUMBERS_LOCK (`xanh`), titles, figure sources, rubric coverage, text density, English (`en`), seniors' slides for comparison → cô 22/10 08:00 and anh Trí | review list |
 | D6 | ≈ 26–27/10 | apply feedback → **slide freeze** | `slides/…_FROZEN` |
 | D7 | 28–30/10 | English script per slide, timed | `script/` |
 | D8 | 30/10–04/11 | rehearsal: mock committee in English (QA_BANK [PB] list first), timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
 
-**Start prompt of chat D4 (copy):**
-> Chat D4 — Slide outline. Đọc `STATUS_BOARD.md` (rev 13) và instruction rev 2026-10-15d, rồi `QA_BANK.md`
-> (§0 khung 20 slide đề xuất, §10 appendix A1–A21, §11 kiểm tra phủ rubric, §12 các điểm P đã được duyệt),
-> `NUMBERS_LOCK.md`, `APP_FACTS.md`, `RUBRIC_MAP.md`, `STUDY_GUIDE_part2_vi.md` §13 (đóng góp). Viết
-> `Defense/outline/SLIDE_OUTLINE.md`: ≤ 20 slide chính cho 12–15 phút kể cả demo; mỗi slide: tiêu đề tiếng Anh
-> (section + main message), số phút, nội dung (số chỉ từ NUMBERS_LOCK mục 1–11, đủ 3 nhãn), hình và nguồn
-> (script repo / Figma / ảnh chụp app), số chữ ước tính, tiêu chí rubric chấm được; khe demo (bệnh nhân nạp
-> trước, video dự phòng); slide References; appendix A1–A21 có số trang; kiểm tra phủ rubric (Table 8 thu nhỏ
-> trên slide chính cho tiêu chí 4; bảng đối chiếu từng mục tiêu cho tiêu chí 5) và mật độ chữ; danh sách hình cần
-> Claude Code vẽ lại ở kích thước slide. Kết thúc: board rev 14, danh sách file project, prompt cho bước tác giả
-> làm slide / chat D5.
+**Start prompt of chat D5 (copy):**
+> Chat D5 — Slide review. Đọc `STATUS_BOARD.md` (rev 14) và instruction rev 2026-10-15d, rồi `SLIDE_OUTLINE.md`,
+> `NUMBERS_LOCK.md`, `QA_BANK.md` (§10, §11), `RUBRIC_MAP.md`. Tôi đính kèm: slide v1 (PDF xuất từ bản dựng),
+> `slides/figs/HANDBACK.md` của Claude Code, và (nếu có) slide của các anh chị khoá trên. Việc: (1) đối chiếu từng con
+> số trên slide với NUMBERS_LOCK và 3 nhãn; (2) tiêu đề = section + thông điệp; (3) nguồn mỗi hình đúng outline §7;
+> (4) phủ rubric và mật độ chữ (outline §5, §6); (5) tiếng Anh trên slide; (6) so sánh nhanh với slide khoá trên.
+> Kết quả: một danh sách sửa theo thứ tự ưu tiên để mang tới cô 22/10. Kết thúc: board rev 15, danh sách file project,
+> prompt chat D6.
 
 ## 6 · Layout
 
@@ -113,14 +120,14 @@ F:/Study/Thesis/
                               results/, src/, web_demo/
   Reports/final/              Thesis_NguyenQuocTrungNhan_BEBEIU2284_Report.docx (submitted),
                               Thesis_Final_Report.md (text export)
-  Reports/v8/                 report-phase build (kept, not cited)
+  Reports/v8/                 report-phase build (kept, not cited); figures/app_screens/ = final-build screenshots
   Defense/                    private, not committed
-    inputs/   rubric, committee info (P1), lab_slides/, midterm slides (P6)
+    inputs/   rubric, committee info (P1), lab_slides/, midterm slides
     notes/    NUMBERS_LOCK.md, FIGURE_PROVENANCE.md, APP_FACTS.md
     content/  D2 study guide (Vietnamese)
     qa/       D3 QA_BANK.md
     outline/  D4 SLIDE_OUTLINE.md
-    slides/   author's slide versions; slides/figs/ regenerated or Figma figures
+    slides/   author's slide versions; slides/figs/ regenerated figures + make_slide_figs.py + HANDBACK.md
     script/   D7
     demo/     checklist, fallback video
 ```
@@ -132,6 +139,7 @@ F:/Study/Thesis/
 | every number of the final system, decisions | `docs/PERF_PHASE_RECORD.md` (rev R) — authority |
 | what the committee read | `Thesis_Final_Report.md` |
 | **numbers allowed on slides** | `Defense/notes/NUMBERS_LOCK.md` |
+| **slide by slide: text, numbers, figures** | `Defense/outline/SLIDE_OUTLINE.md` |
 | figure sources (internal) | `Defense/notes/FIGURE_PROVENANCE.md` |
 | application facts | `Defense/notes/APP_FACTS.md` |
 | answers to committee questions | `Defense/qa/QA_BANK.md` |
@@ -143,5 +151,7 @@ F:/Study/Thesis/
 - Report phase (2026-10-08 → 13): see board rev 9 in git.
 - 2026-10-15: report submitted after the author's own revision; anh Trí's slide feedback; defense phase opened (D0).
 - 2026-10-16: D1 done — numbers locked (no content mismatch), figure provenance, app facts from the frozen build.
-- 2026-10-16: D2a + D2b done in the same chat — two-part study guide; NUMBERS_LOCK §3b and §12 added.
+- 2026-10-16: D2a + D2b done — two-part study guide; NUMBERS_LOCK §3b and §12 added.
 - 2026-10-16: D3 done — Q&A bank by rubric criterion, 21 appendix slides, coverage check; P1–P8 to the author.
+- 2026-10-16: D4 done — slide outline (20 main slides, 13:20 incl. demo), figure redraw prompt; P4 and P6 closed;
+  questions come from the slides (author).

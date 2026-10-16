@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 14, 2026-10-16, end of chat D4)
+# STATUS_BOARD — DEFENSE phase (rev 16, 2026-10-16, end of chat D4)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to
 give or approve, where every file lives, and what the next chat does. At the end of every chat the board
@@ -8,7 +8,8 @@ Defense **05–06/11/2026** (English; 12–15 min of speaking **including the de
 not yet known). Reviewer: **TS. Ngô Thị Lụa**; chair on the report's approval page: Assoc. Prof. Nguyễn Thị
 Hiệp. Supervisor meetings Thursdays 08:00 (22/10, 29/10).
 
-The report phase is closed. Its last board was rev 9 (chat 8, 2026-10-13); its history is in git.
+Report-phase history: board rev 9 (chat 8, 2026-10-13) in git. **The report is locked when it is submitted to the
+faculty on 17/10/2026** (the version of sha256 `fe9c56ea…` was the feedback copy for cô and staff, not the lock).
 
 ---
 
@@ -31,12 +32,12 @@ The report phase is closed. Its last board was rev 9 (chat 8, 2026-10-13); its h
 
 | track | state | next |
 |---|---|---|
-| Report | submitted; report of record = `Reports/final/…Report.docx` (sha256 `fe9c56ea47f2cc45…`), text `Thesis_Final_Report.md` | none before the committee; P4 closed (fixes go into the final copy) |
-| Numbers (D1a) | `notes/NUMBERS_LOCK.md` | author approves N1–N9 (= P8) |
-| Figures (D1b) | `notes/FIGURE_PROVENANCE.md` (internal) | author confirms the AI-help sentence (P2) |
+| Report | **faculty-submission draft checked 16/10** (`Thesis_NguyenQuocTrungNhan_BEBEIU22184_Report.docx`, sha256 `9df985819bea39d2…` at check time): every headline number identical, no forbidden number, Σ present in Eq 3, 9–11 (the 15/10 text export lost them), Figure 12 axis already "whole 4 s windows", one Mazurek 2026 entry, Dani & Liebe 2026. Author fixes: R1 (abstract "over four seeds"); R2, R3, R6 declined; R4, R5, R7 no action needed | **author submits to the faculty 17/10**, then re-exports `Thesis_Final_Report.md` (command in chat D4) and replaces the project file |
+| Numbers (D1a) | `notes/NUMBERS_LOCK.md`; **N1–N9 approved 16/10** (N5: Figure 1 = `fig1_background_ictal.py` on EDF chb11_82); P5 equal-weight totals in §12 | closed |
+| Figures (D1b) | `notes/FIGURE_PROVENANCE.md` (internal) | closed (P2 dropped: answer C8-1 only) |
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
-| Q&A bank (D3) | `qa/QA_BANK.md`: 79 questions, 21 appendix slides, coverage check | author rehearses the [PB] list |
-| **Slide outline (D4)** | `outline/SLIDE_OUTLINE.md`: 20 main slides, 13:20 planned incl. 1:45 demo slot; title, minutes, English slide text, numbers (NL§1–11, three labels), figure source, word estimate, rubric criterion and Q&A link per slide; References p.21–22; appendix index p.23, A# on page 23 + #; text-density check; rubric coverage (Table 8 on slide 16 → criterion 4; objective-by-objective table on slide 19 → criterion 5); 10 figures for Claude Code with a copy-ready prompt | **author builds slides v1** + runs the Claude Code figure prompt |
+| Q&A bank (D3) | `qa/QA_BANK.md`: 79 questions, 21 appendix slides; **updated 16/10** (C3-4, C4-1, C8-1, C8-2, C8-3, C8-4, C8-7, C8-10, §12) | author rehearses the [PB] list, C8-2 included |
+| **Slide outline (D4)** | `outline/SLIDE_OUTLINE.md`: 20 main slides, 13:20 planned incl. 1:45 demo slot; title, minutes, English slide text, numbers (NL§1–11, three labels), figure source, word estimate, rubric criterion and Q&A link per slide; References p.21–22; appendix index p.23, A# on page 23 + #; text-density check; rubric coverage (Table 8 on slide 16 → criterion 4; objective-by-objective table on slide 19 → criterion 5); 10 figures for Claude Code — **done 16/10**: `slides/figs/*.png`, all gates OK (`slides/figs/HANDBACK.md`) | **author builds slides v1** |
 | App (D1c) | `notes/APP_FACTS.md`; on slides: 16 (architecture + Table 8), 17 (demo slot + application run) | demo checklist in D8 |
 | Repository | public; `web_demo/` code identical to tag `szscan-frozen-v4.1` | read only |
 | Defense rubric | not given by the faculty yet; working rubric = `RUBRIC_MAP.md` | re-run SLIDE_OUTLINE §6 when known |
@@ -80,13 +81,13 @@ The report phase is closed. Its last board was rev 9 (chat 8, 2026-10-13); its h
   Mazurek entry (two identical list items 2026a/2026b, cited in 2.9.1 and twice in 4.6) is fixed in the final copy.
   Figures 3, 6, 10: drawn by the author in Figma, first for the earlier pipeline, redrawn with Claude's guidance
   (exact sentence = P2, drafted in chat D4, waiting for confirmation).
-- **Waiting for the author:**
-  - P1 committee research fields / question habits → `Defense/inputs/committee.md`.
-  - P2 confirm the drafted sentence on AI help for Figures 3, 6, 10.
-  - P3 truthful wording on AI use in code and report (lower priority after rule 1.7, still prepare one line).
-  - P5 add the equal-weight deployment totals (computed from Table 8: 4.0 / 3.4 / 2.6) to NUMBERS_LOCK §12.
-  - P7 framing of "is the GAE needed?" (slide 8 shows 0.596 beside 0.612).
-  - P8 = NUMBERS_LOCK N1–N9 (N5 is checked by the Claude Code figure prompt).
+- **Approved 16/10 (author):** N1–N9 (N5 resolved, chb11_82); P5 (equal weights 4.0 / 3.4 / 2.6, Q&A only);
+  P7 (answer C3-4); P2 dropped (figures: answer C8-1 only, nothing on slides or in the report); P3 answer C8-2 —
+  the author used an AI assistant as a working tool across the thesis; every decision, experiment run and approval is
+  his; the answer says so plainly and leads to what he decided and how every number can be checked.
+- **Report (16/10):** the 15/10 copy was for feedback; the faculty copy (17/10) is the lock. Author applied R1; declined
+  R2 (Ch5 seed label), R3 (2.9.2 network wording — answer C4-4 covers it), R6 (Bruns name format).
+- **Open:** P1 committee research fields / question habits → `Defense/inputs/committee.md` (when known).
 
 ## 5 · Plan of chats
 
@@ -104,15 +105,29 @@ The report phase is closed. Its last board was rev 9 (chat 8, 2026-10-13); its h
 | D8 | 30/10–04/11 | rehearsal: mock committee in English (QA_BANK [PB] list first), timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
 
 **Start prompt of chat D5 (copy):**
-> Chat D5 — Slide review. Đọc `STATUS_BOARD.md` (rev 14) và instruction rev 2026-10-15d, rồi `SLIDE_OUTLINE.md`,
-> `NUMBERS_LOCK.md`, `QA_BANK.md` (§10, §11), `RUBRIC_MAP.md`. Tôi đính kèm: slide v1 (PDF xuất từ bản dựng),
-> `slides/figs/HANDBACK.md` của Claude Code, và (nếu có) slide của các anh chị khoá trên. Việc: (1) đối chiếu từng con
+> Chat D5 — Slide review. Đọc `STATUS_BOARD.md` (rev 16) và instruction rev 2026-10-15d, rồi `SLIDE_OUTLINE.md`,
+> `NUMBERS_LOCK.md`, `QA_BANK.md` (§10, §11), `RUBRIC_MAP.md`. Tôi đính kèm: slide v1 (PDF xuất từ bản dựng)
+> và (nếu có) slide của các anh chị khoá trên. Hình đã có nguồn trong `slides/figs/HANDBACK.md` (gate OK 16/10). Việc: (1) đối chiếu từng con
 > số trên slide với NUMBERS_LOCK và 3 nhãn; (2) tiêu đề = section + thông điệp; (3) nguồn mỗi hình đúng outline §7;
 > (4) phủ rubric và mật độ chữ (outline §5, §6); (5) tiếng Anh trên slide; (6) so sánh nhanh với slide khoá trên.
-> Kết quả: một danh sách sửa theo thứ tự ưu tiên để mang tới cô 22/10. Kết thúc: board rev 15, danh sách file project,
+> Kết quả: một danh sách sửa theo thứ tự ưu tiên để mang tới cô 22/10. Kết thúc: board rev 17, danh sách file project,
 > prompt chat D6.
 
-## 6 · Layout
+## 6 · Which file for what (defense material, `F:/Study/Thesis/Defense/`)
+
+| File | Use it to | When |
+|---|---|---|
+| `outline/SLIDE_OUTLINE.md` | build every slide: title, English text, numbers, figure, appendix pages | **now** (slides v1) |
+| `notes/NUMBERS_LOCK.md` | check any number before it goes on a slide or into an answer | every slide, every answer |
+| `content/STUDY_GUIDE_part1_vi.md` | understand data, preprocessing, graphs, GAE, score, detector, CPD, evaluation (Ch1–2) | study, before rehearsal |
+| `content/STUDY_GUIDE_part2_vi.md` | understand every result, figure, failure, comparison, contribution (Ch3–5) | study, before rehearsal |
+| `qa/QA_BANK.md` | rehearse answers: §1 the 14 reviewer questions first, §13 the traps | daily from now to 05/11 |
+| `notes/APP_FACTS.md` | what each layer of the app is and does; demo facts | slides 16–17, demo prep (D8) |
+| `notes/FIGURE_PROVENANCE.md` | internal proof of where every figure came from | only if asked; never on slides |
+| `slides/figs/*.png` + `HANDBACK.md` | slide-size figures (F1–F10) and their sources | now (slides v1) |
+| `docs/STATUS_BOARD.md` (repo) | state, plan, next prompt | start of every chat |
+
+## 7 · Layout
 
 ```
 F:/Study/Thesis/
@@ -132,7 +147,7 @@ F:/Study/Thesis/
     demo/     checklist, fallback video
 ```
 
-## 7 · Where the numbers are
+## 8 · Where the numbers are
 
 | content | file |
 |---|---|
@@ -146,7 +161,7 @@ F:/Study/Thesis/
 | how each report claim was verified | `docs/writing/CLAIM_AUDIT_v8.md` |
 | benchmark entries on Siena | `docs/BENCHMARK_CHECK_szcore_c57da2f.md` |
 
-## 8 · Decisions log
+## 9 · Decisions log
 
 - Report phase (2026-10-08 → 13): see board rev 9 in git.
 - 2026-10-15: report submitted after the author's own revision; anh Trí's slide feedback; defense phase opened (D0).
@@ -155,3 +170,5 @@ F:/Study/Thesis/
 - 2026-10-16: D3 done — Q&A bank by rubric criterion, 21 appendix slides, coverage check; P1–P8 to the author.
 - 2026-10-16: D4 done — slide outline (20 main slides, 13:20 incl. demo), figure redraw prompt; P4 and P6 closed;
   questions come from the slides (author).
+- 2026-10-16: approvals recorded (rev 15–16) — N1–N9, P5, P7; P2 dropped; P3 answer written; reference list fixed;
+  slide figures done; faculty-submission draft checked (numbers identical); report locks at the faculty submission 17/10.

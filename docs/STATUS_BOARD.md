@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 21, 2026-10-17, end of chat D4c–D4e)
+# STATUS_BOARD — DEFENSE phase (rev 22, 2026-10-17, end of chat D4c–D4e + HD4 review)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to give or approve,
 where every file lives and what the next chat does. At the end of every chat the board is rewritten as a whole file
@@ -35,7 +35,7 @@ where every file lives and what the next chat does. At the end of every chat the
 7. **Questions come from the slides and the talk** (author, 16/10): every number on a main slide has an answer in `QA_BANK.md` or a backup slide.
 8. **Requests are not repeated** (author, 17/10): every author request about slides is logged in `DECK_BRIEF.md` §1. A chat reads it before proposing anything and never re-asks what is there.
 
-## 2 · Where things stand (17/10, end of D4c–D4e)
+## 2 · Where things stand (17/10 late, end of D4c–D4e + HD4 review)
 
 | track | state | next |
 |---|---|---|
@@ -46,8 +46,9 @@ where every file lives and what the next chat does. At the end of every chat the
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
 | Q&A bank (D3) | `qa/QA_BANK.md`: 79 questions, A1–A21; **C8-1 rewritten (P-D4 = yes)** via `apply_d4c_patches.py` | A# → B# mapping in SLIDE_OUTLINE §4 |
 | Slide design (D4 rework) | `outline/DECK_BRIEF.md` **rev 2** (A18–A20 added) + `outline/SLIDE_OUTLINE.md` **rev 2.1** (§6 decided, §7 figures + v4 slide map) | — |
-| **Deck (artifact)** | "Thesis Defense Slides v4": https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (Slides type; `project/deck.json` + `project/slides/<id>.html`). **D4d done 17/10:** main slides s01–s19, References ref1–ref2, Thank you s23 (page 22) rebuilt to v4 — 5 numbered sections, keyword titles + coloured takeaway, logo footer, R-figures from the asset store; v3 s20–s22, ref3 removed (content merged). **D4e done 17/10:** backups b01–b26 = B1–B26 (pages 23–48), one answer line + one figure/diagram/table each, question in the notes; v3 demo slide removed (now B26). **Deck v4 complete (48 pages)** | author: .pptx → Canva; then **D5** review |
-| App (D1c) | `notes/APP_FACTS.md` | slides 17–18 of v4; demo checklist in D8 |
+| **Deck (artifact)** | "Thesis Defense Slides v4": https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (Slides type; `project/deck.json` + `project/slides/<id>.html`). **D4d done 17/10:** main slides s01–s19, References ref1–ref2, Thank you s23 (page 22) rebuilt to v4 — 5 numbered sections, keyword titles + coloured takeaway, logo footer, R-figures from the asset store; v3 s20–s22, ref3 removed (content merged). **D4e done 17/10:** backups b01–b26 = B1–B26 (pages 23–48), one answer line + one figure/diagram/table each, question in the notes; v3 demo slide removed (now B26). **After the HD4 review (A21): B27 Future Work, B28 Dataset Choice (pages 49–50) and a Vietnam line on slide 3 (Phạm & Vũ 2023). Deck v4: 22 main pages + 28 backups** | author: .pptx → Canva; then **D5** review |
+| App (D1c) | `notes/APP_FACTS.md` | slides 17–18 of v4 |
+| **Demo prep (parallel, A22)** | prompt `Defense/demo/CC_DEMO_PREP.md` for **Claude Code on the laptop**: freeze check, 15 tests, fresh DB with the 8 test patients, identity check outside the app vs `results/application_eval_v4/`, event to show on chb03, Playwright-recorded fallback video, DB snapshot, `DEMO_CHECKLIST.md` | author starts Claude Code with it; brings `DEMO_PREP_HANDBACK.md` to D8 |
 | Repository | public; `web_demo/` identical to tag `szscan-frozen-v4.1` | read only |
 | Defense rubric | not given yet; working rubric = `RUBRIC_MAP.md` | re-run SLIDE_OUTLINE §5 when known |
 | Committee | — | author adds info (P1) |
@@ -102,6 +103,7 @@ where every file lives and what the next chat does. At the end of every chat the
   - P-D7: **reversed the same day by the author (A19)** — no figure comparing with other studies; R5 retired; slide 15 = R11 + 4-row table.
   - P-D8: titles = numbered section label + keyword title (≤ 6 words) + one coloured takeaway line (≤ 14 words).
 - **D4d (17/10):** deck v4 main slides built in the same artifact (slide map: SLIDE_OUTLINE §7); Siena comparison as a 4-row table; Moura 2014 on slide 4.
+- **HD4 review (17/10 late):** B27, B28 and the Vietnam line approved (A21); no lab logo; demo preparation and the fallback video delegated to Claude Code (A22); chb03 stays the demo patient (6 / 7, lowest false-alarm rate, 12.67 per day, in `application_eval_v4/per_subject.csv`).
 - **Approved earlier:** N1–N9; P5 (equal weights only in Q&A); P7; P3 answer C8-2; report fixes R1.
 - **Open (author):**
   - P1 committee research fields → `Defense/inputs/committee.md`.
@@ -123,16 +125,16 @@ where every file lives and what the next chat does. At the end of every chat the
 | D8 | 30/10–04/11 | rehearsal: mock committee in English, timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
 
 **Start prompt of chat D5 (copy):**
-> Chat D5 — Review of deck v4. Read `STATUS_BOARD.md` (rev 21) and the instructions (rev 2026-10-17e), then
+> Chat D5 — Review of deck v4. Read `STATUS_BOARD.md` (rev 22) and the instructions (rev 2026-10-17e), then
 > `DECK_BRIEF.md` (rev 2, A1–A20), `SLIDE_OUTLINE.md` (rev 2.1: §5 rubric, §7 slide maps), `NUMBERS_LOCK.md`, `RUBRIC_MAP.md`.
 > Input: the deck artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (and, if made, my Canva PDF `slides/Defense_slides_v4.pdf`).
-> 1. Check every number on slides 1–22 and B1–B26 against NUMBERS_LOCK (set · seed · aggregate labels).
+> 1. Check every number on slides 1–22 and B1–B28 against NUMBERS_LOCK (set · seed · aggregate labels).
 > 2. Check titles, takeaways, text density, repeated ideas, English wording, DECK_BRIEF compliance (A1–A20), the rubric
 >    coverage of SLIDE_OUTLINE §5, and the figure sources (HANDBACK_R, FIGURE_PROVENANCE).
 > 3. Give one review list (slide · problem · fix) and apply the agreed fixes to the same artifact; prepare the
 >    questions for cô (22/10) and anh Trí.
 >
-> End: board rev 22, project file list, prompt of chat D6.
+> End: board rev 23, project file list, prompt of chat D6.
 
 ## 6 · Which file for what
 
@@ -168,8 +170,9 @@ F:/Study/Thesis/
                         R1–R12 .png/.svg, layers/, make_defense_figs.py, figs_manifest.json, HANDBACK_R.md (D4c)
                  gen/   diagrams.py, icons.py, build_v4.py (D4d), build_backups.py (D4e)
                  Defense_slides_v4.pdf (author, from Canva)
-    script/  demo/
-  Agent/inbox/                hand-over tray (D4cde_bundle.zip)
+    script/
+    demo/        CC_DEMO_PREP.md (Claude Code prompt), then DEMO_CHECKLIST.md, demo_fallback_chb03.mp4, DEMO_PREP_HANDBACK.md, rehearsal_<date>/
+  Agent/inbox/                hand-over tray (D4f_bundle.zip)
   Archive/2026-10-17/         SLIDE_DECK_v1.md, SLIDE_OUTLINE_rev_c.md; d4c_before/ (pre-patch copies)
 ```
 
@@ -205,3 +208,8 @@ F:/Study/Thesis/
   - Backups B1–B26 built; R13 (processing time per stage, Table 25) coded and uploaded.
   - The v3 HTML-bar backups (held-out vs final, development steps) were replaced by R3, R1 and R2.
   - Deck v4 complete: 22 main pages + 26 backups.
+- 2026-10-17 (late): **HD4 review.** The author shared the full senior defense deck (74 pages).
+  - Kept as is: objective closure, same-data table, metric formulas, conclusion with numbers.
+  - Added: B27 Future Work (diagram), B28 Dataset Choice and a Vietnam context line on slide 3 (Phạm & Vũ 2023, 5.5 per 1,000 in urban HCMC; verified from the journal page).
+  - Not copied: section dividers, consecutive table slides, a paragraph conclusion, a separate Q&A page, a third logo.
+  - Demo preparation delegated to Claude Code (`demo/CC_DEMO_PREP.md`).

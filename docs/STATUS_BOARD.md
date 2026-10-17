@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 19, 2026-10-17, end of chat D4c)
+# STATUS_BOARD — DEFENSE phase (rev 20, 2026-10-17, end of chat D4c–D4d)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to give or approve,
 where every file lives and what the next chat does. At the end of every chat the board is rewritten as a whole file
@@ -14,7 +14,7 @@ where every file lives and what the next chat does. At the end of every chat the
 - The report is locked when it is submitted to the faculty on 17/10/2026.
 
 **For any slide work, read `DECK_BRIEF.md` (rev 2: how slides look and flow; every author request so far) and
-`SLIDE_OUTLINE.md` rev 2.1 (what each slide carries; §7 = D4c figures and decisions) before anything else.**
+`SLIDE_OUTLINE.md` rev 2.1 (what each slide carries; §7 = figures, decisions, v4 slide map) before anything else.**
 
 ---
 
@@ -35,18 +35,18 @@ where every file lives and what the next chat does. At the end of every chat the
 7. **Questions come from the slides and the talk** (author, 16/10): every number on a main slide has an answer in `QA_BANK.md` or a backup slide.
 8. **Requests are not repeated** (author, 17/10): every author request about slides is logged in `DECK_BRIEF.md` §1. A chat reads it before proposing anything and never re-asks what is there.
 
-## 2 · Where things stand (17/10, end of D4c)
+## 2 · Where things stand (17/10, end of D4c–D4d)
 
 | track | state | next |
 |---|---|---|
 | Report | submission copy checked 16/10; to the faculty 17/10 | author confirms the submission; re-exports `Thesis_Final_Report.md` if the text changed |
-| Numbers (D1a) | `notes/NUMBERS_LOCK.md` (N1–N9 approved); **§13 added D4c: Moura 2014 row, pending P-D6b** | P-D6b |
+| Numbers (D1a) | `notes/NUMBERS_LOCK.md` (N1–N9 approved); **§13 added: Moura 2014 (approved), WHO wording, slide-15 table** | closed |
 | Figures (D1b) | `slides/figs/F1–F10` + `HANDBACK.md`, all gates OK | closed |
-| **Result figures (D4c)** | **done 17/10:** R1, R2, R3, R5, R7, R7b, R8, R9, R10, R11, R12 by `slides/figs/make_defense_figs.py` (reads committed results at repo `45bfe64`, imports `make_v8_exhibits.py`; **ALL GATES PASSED**); R4 = F8, R6 = F5; layers for R1 (6) and R3 (3); every figure viewed and fixed; `HANDBACK_R.md` lists sources, gates, numbers shown | used by D4d / D4e |
+| **Result figures (D4c)** | **done 17/10:** R1, R2, R3, R7, R7b, R8, R9, R10, R11, R12 (**R5 retired, A19**) by `slides/figs/make_defense_figs.py` (reads committed results at repo `45bfe64`, imports `make_v8_exhibits.py`; **ALL GATES PASSED**); R4 = F8, R6 = F5; layers for R1 (6) and R3 (3); every figure viewed and fixed; `HANDBACK_R.md` lists sources, gates, numbers shown | used by D4d / D4e |
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
 | Q&A bank (D3) | `qa/QA_BANK.md`: 79 questions, A1–A21; **C8-1 rewritten (P-D4 = yes)** via `apply_d4c_patches.py` | A# → B# mapping in SLIDE_OUTLINE §4 |
-| Slide design (D4 rework) | `outline/DECK_BRIEF.md` **rev 2** (A18 added) + `outline/SLIDE_OUTLINE.md` **rev 2.1** (§6 decided, §7 D4c) | — |
-| Deck (artifact) | "Thesis Defense Slides v3": https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (Slides type; content in `project/deck.json` + `project/slides/<id>.html`). **20 R-figure PNGs uploaded to its asset store** (urls: HANDBACK_R §3). Still the v3 draft: storytelling, wording and assets reused; layout, sections and result slides rebuilt to v4 in D4d | **D4d** updates the **same** artifact |
+| Slide design (D4 rework) | `outline/DECK_BRIEF.md` **rev 2** (A18–A20 added) + `outline/SLIDE_OUTLINE.md` **rev 2.1** (§6 decided, §7 figures + v4 slide map) | — |
+| **Deck (artifact)** | "Thesis Defense Slides v4": https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (Slides type; `project/deck.json` + `project/slides/<id>.html`). **D4d done 17/10:** main slides s01–s19, References ref1–ref2, Thank you s23 (page 22) rebuilt to v4 — 5 numbered sections, keyword titles + coloured takeaway, logo footer, R-figures from the asset store; v3 s20–s22, ref3 removed (content merged). **Backups b01–b14 + demo are still v3** | **D4e**: backups B1–B26 |
 | App (D1c) | `notes/APP_FACTS.md` | slides 17–18 of v4; demo checklist in D8 |
 | Repository | public; `web_demo/` identical to tag `szscan-frozen-v4.1` | read only |
 | Defense rubric | not given yet; working rubric = `RUBRIC_MAP.md` | re-run SLIDE_OUTLINE §5 when known |
@@ -76,7 +76,8 @@ where every file lives and what the next chat does. At the end of every chat the
 | R17 | author 17/10 | researcher-style full sentences, no repeated ideas, keyword titles, highlighted keywords, little text | DECK_BRIEF §3.2–§3.4 |
 | R18 | author 17/10 | paper-style diagrams (GAE etc.), app tool diagram with logos | DECK_BRIEF §5 |
 | R19 | author 17/10 + senior | results as **coded figures**, not text or tables; **many visual backups**; no appendix index | SLIDE_OUTLINE §3–§4, §7 |
-| **R20** | **author 17/10 (D4c)** | Background numbers may come from verified papers outside the report (web search allowed); each still goes to the author and into NUMBERS_LOCK before a slide | DECK_BRIEF A18; NL §13 |
+| R20 | author 17/10 (D4c) | Background numbers may come from verified papers outside the report (web search allowed); each still goes to the author and into NUMBERS_LOCK before a slide | DECK_BRIEF A18; NL §13 |
+| **R21** | **author 17/10 (D4d)** | **comparisons with other studies are TABLES, never figures** (said many times during the report); Background facts stated generally, not tied to the thesis | DECK_BRIEF A19, A20 |
 
 ## 4 · Decisions
 
@@ -97,13 +98,12 @@ where every file lives and what the next chat does. At the end of every chat the
   - P-D5: seizure definition cites WHO 2024 only.
   - P-D6: a review-burden number may come from a paper outside the report (web search) → **Moura et al. 2014**
     (Neurology 83(1):56–64): conventional review ≈ 38 min per 24 h of continuous EEG, adult ICU, 118 recordings.
-    **Use on slide 4 = P-D6b, open.**
-  - P-D7: Siena benchmark scatter used (R5): this work and DynaSD highlighted, other out-of-sample entries grey.
+    **P-D6b approved 17/10: on slide 4, said generally (A20).**
+  - P-D7: **reversed the same day by the author (A19)** — no figure comparing with other studies; R5 retired; slide 15 = R11 + 4-row table.
   - P-D8: titles = numbered section label + keyword title (≤ 6 words) + one coloured takeaway line (≤ 14 words).
+- **D4d (17/10):** deck v4 main slides built in the same artifact (slide map: SLIDE_OUTLINE §7); Siena comparison as a 4-row table; Moura 2014 on slide 4.
 - **Approved earlier:** N1–N9; P5 (equal weights only in Q&A); P7; P3 answer C8-2; report fixes R1.
 - **Open (author):**
-  - **P-D6b:** put the Moura 2014 line on slide 4? (proposed: *"Reading one day of continuous EEG by eye takes an
-    expert about 38 minutes (Moura et al., 2014)."*); if yes, NL §13 row → approved and the reference enters References.
   - P1 committee research fields → `Defense/inputs/committee.md`.
 
 ## 5 · Plan of chats
@@ -114,31 +114,28 @@ where every file lives and what the next chat does. At the end of every chat the
 | D4 / D4b | 16/10 ✔ | outline rev c; Canva build sheet v1 | superseded 17/10 |
 | D4 rework | 16–17/10 ✔ | deck v2 → v3 (Slides artifact); seniors' decks studied | `outline/DECK_BRIEF.md`, `outline/SLIDE_OUTLINE.md` rev 2; artifact v3 |
 | **D4c** | **17/10 ✔** | P-D1…P-D8 decided; result figures R1–R12 coded from committed results, gated, viewed; uploaded to the deck's asset store; C8-1 rewritten; P-D6 source found | `slides/figs/make_defense_figs.py`, `R*.png/.svg`, `layers/`, `HANDBACK_R.md`; patches to DECK_BRIEF rev 2, SLIDE_OUTLINE rev 2.1, NL §13, QA C8-1 |
-| **D4d** | 18–19/10 | rebuild **main slides 1–20 + References** of the same artifact to v4 (DECK_BRIEF rev 2 + SLIDE_OUTLINE rev 2.1, R-figure asset urls) | artifact v4 |
-| **D4e** | 20/10 | backup slides B1–B26 in the artifact | artifact v4 complete |
+| **D4d** | **17/10 ✔** | main slides 1–20 + References rebuilt to v4 in the same artifact; R5 retired (A19); Moura on slide 4 | artifact v4 (main); `slides/gen/build_v4.py` |
+| **D4e** | 18/10 | backup slides B1–B26 in the artifact (replace v3 b01–b14 + demo), each = one question + one figure/diagram + ≤ 2 sentences | artifact v4 complete |
 | — | 20–21/10 | author: download .pptx → Canva, adjust (R1/R3 layers: stack + "appear") | `slides/Defense_slides_v4.pdf` |
 | D5 | 21/10 | review: numbers vs NUMBERS_LOCK (`xanh`), titles, figure sources, rubric, text density, English (`en`), compliance with DECK_BRIEF → cô 22/10 08:00, anh Trí | review list |
 | D6 | ≈ 26–27/10 | apply feedback → **slide freeze** | `slides/…_FROZEN` |
 | D7 | 28–30/10 | English script per slide, timed | `script/` |
 | D8 | 30/10–04/11 | rehearsal: mock committee in English, timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
 
-**Start prompt of chat D4d (copy):**
-> Chat D4d — Main slides of deck v4. Read `STATUS_BOARD.md` (rev 19) and the instructions (rev 2026-10-17e), then
-> `DECK_BRIEF.md` (rev 2), `SLIDE_OUTLINE.md` (rev 2.1: §1–§2, §7), `NUMBERS_LOCK.md` (incl. §13), and the
-> "Asset store" table of `HANDBACK_R.md` (attached).
-> 0. P-D6b (Moura 2014 on slide 4): my answer is ___ .
-> 1. Read the deck artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (`project/deck.json`, then the slide files you
->    will change) and rebuild **main slides 1–20 + References** in the **same** artifact to v4:
->    - 5 numbered sections;
->    - keyword titles + one coloured takeaway;
->    - BME11 visual grammar;
->    - R-figures from the asset urls (R1/R3 full images; layers stay for Canva);
->    - v3 diagrams and icons reused;
->    - speaker notes = one line per slide (no script yet).
-> 2. Every number on a slide must be in NUMBERS_LOCK with set · seed · aggregate; no internal labels.
-> 3. Keep ≤ 20 main slides; References list only works cited on slides (+ icon/logo credits).
+**Start prompt of chat D4e (copy):**
+> Chat D4e — Backup slides of deck v4. Read `STATUS_BOARD.md` (rev 20) and the instructions (rev 2026-10-17e), then
+> `DECK_BRIEF.md` (rev 2, A1–A20), `SLIDE_OUTLINE.md` (rev 2.1: §4 backup list, §7), `NUMBERS_LOCK.md`, `QA_BANK.md`,
+> `HANDBACK_R.md` (asset urls).
+> 1. Read the deck artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (`project/deck.json`, one main slide for
+>    the v4 style, the v3 backups b01–b14 and demo).
+> 2. Rebuild the backups B1–B26 of SLIDE_OUTLINE §4 in the **same** artifact, after Thank you:
+>    - each answers one question with one figure or diagram + ≤ 2 sentences, keyword title, page number;
+>    - no appendix index;
+>    - comparisons with other studies only as tables (A19);
+>    - reuse R2, R7b, R8, R9, R10, R11, F-figures and v3 diagrams; new small schematics only if needed.
+> 3. Every number must be in NUMBERS_LOCK with set · seed · aggregate; no internal labels.
 >
-> End: board rev 20, project file list, prompt of chat D4e.
+> End: board rev 21, project file list, prompt of chat D5 (review).
 
 ## 6 · Which file for what
 
@@ -148,7 +145,8 @@ where every file lives and what the next chat does. At the end of every chat the
 | **`outline/SLIDE_OUTLINE.md` (rev 2.1)** | content of each main slide, backup list, rubric coverage, decisions (§6), D4c figures (§7) | D4d–D6 |
 | `SAMPLE_BME11_oral.pdf` | the style to follow (20-slide oral of a lab senior) | D4d–D6 |
 | deck artifact (link in §2) | the deck itself; download .pptx for Canva | D4d onward |
-| **`slides/figs/HANDBACK_R.md`** | R-figure sources, gates, numbers shown, **asset urls** | D4d, D4e, D5 |
+| **`slides/figs/HANDBACK_R.md`** | R-figure sources, gates, numbers shown, **asset urls** | D4e, D5 |
+| `slides/gen/build_v4.py` | record of how the v4 main slides were generated (reads the v3 files saved from the artifact) | only if rebuilding |
 | `slides/figs/make_defense_figs.py` | redraw R-figures (`--repo F:/Study/Thesis/Code`; `--smoke` = gates only) | if a figure changes |
 | `slides/gen/diagrams.py`, `icons.py` | redraw schematics / recolour icons (matplotlib + Inter) | if a schematic changes |
 | `notes/NUMBERS_LOCK.md` | check any number | every slide, every answer |
@@ -171,10 +169,10 @@ F:/Study/Thesis/
     outline/     DECK_BRIEF.md (rev 2), SLIDE_OUTLINE.md (rev 2.1)
     slides/      figs/  F1–F10, make_slide_figs.py, HANDBACK.md (D1b);
                         R1–R12 .png/.svg, layers/, make_defense_figs.py, figs_manifest.json, HANDBACK_R.md (D4c)
-                 gen/   diagrams.py, icons.py
+                 gen/   diagrams.py, icons.py, build_v4.py (D4d)
                  Defense_slides_v4.pdf (author, from Canva)
     script/  demo/
-  Agent/inbox/                hand-over tray (D4c_bundle.zip)
+  Agent/inbox/                hand-over tray (D4cd_bundle.zip)
   Archive/2026-10-17/         SLIDE_DECK_v1.md, SLIDE_OUTLINE_rev_c.md; d4c_before/ (pre-patch copies)
 ```
 
@@ -201,4 +199,8 @@ F:/Study/Thesis/
   - P-D1…P-D8 approved; P-D6 opened to outside papers, which gave Moura 2014 (pending P-D6b).
   - 11 R-figures coded from committed results with gates, viewed and corrected (label overlaps, legends, layout), layered R1 and R3.
   - 20 PNGs uploaded to the deck's asset store.
-  - C8-1 rewritten; DECK_BRIEF rev 2 (A18), SLIDE_OUTLINE rev 2.1, NL §13 by patch script.
+  - C8-1 rewritten; DECK_BRIEF rev 2, SLIDE_OUTLINE rev 2.1, NL §13 by patch script.
+- 2026-10-17 (late): **D4d** in the same chat (author: "chat chưa dài, tiếp tục D4d tại đây").
+  - P-D6b approved, stated generally (A20).
+  - The author reminded that comparisons with other studies are never figures (A19): R5 retired, P-D7 reversed.
+  - Deck v4 main slides 1–22 built and published to the same artifact; v3 s20–s22, ref3 removed.

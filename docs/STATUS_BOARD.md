@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 23, 2026-10-19, end of chat D4f: deck rev 3)
+# STATUS_BOARD — DEFENSE phase (rev 24, 2026-10-20, end of chat D4f: author's Canva deck + D4g brief)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to give or approve,
 where every file lives and what the next chat does. At the end of every chat the board is rewritten as a whole file
@@ -12,8 +12,8 @@ where every file lives and what the next chat does. At the end of every chat the
 
 **Report.** Locked at the faculty submission (17/10/2026). Report-phase history: board rev 9 in git.
 
-**For any slide work, read `DECK_BRIEF.md` rev 3 (requests A1–A30 and the lessons L1–L10 of D4f) and
-`SLIDE_OUTLINE.md` rev 3 (slide map, backups, figure scripts, rubric) before anything else.**
+**For any slide work, read `DECK_BRIEF.md` rev 3.1 (requests A1–A31, lessons L1–L13), `D4g_BRIEF.md` (the author's
+Canva deck = content baseline, the 5 fixes, the appendix plan) and `SLIDE_OUTLINE.md` rev 3.1 before anything else.**
 
 ---
 
@@ -37,11 +37,11 @@ where every file lives and what the next chat does. At the end of every chat the
 | track | state | next |
 |---|---|---|
 | Report | submitted 17/10 | — |
-| Numbers | `notes/NUMBERS_LOCK.md` §1–§13; **§14 added (D4f)**: Table 13 rows, worked example, gallery facts; **P-D9, P-D10 pending** | author approves P-D9, P-D10 |
+| Numbers | `notes/NUMBERS_LOCK.md` §1–§14 | §15 in D4g for new background sources (slide 4) and appendix numbers |
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
 | Q&A bank (D3) | `qa/QA_BANK.md` + **§14 C9 (performance and model choice, 14 questions for TS. Lụa)**, slide pages updated to rev 3 | D5 maps every B# to its question |
 | Slide design | `outline/DECK_BRIEF.md` **rev 3**, `outline/SLIDE_OUTLINE.md` **rev 3** | — |
-| **Deck (artifact)** | https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 **version 45 (19/10)**. **Rev 3:** 28 pages main (title, outline, 23 content, 2 references, thank you) + **23 backups (pages 29–51)**. Method rebuilt in pipeline order with self-drawn detailed diagrams **D10** (graph and node features, +7 absolute features), **D11** (GAE with true matrix sizes and parameters), **D12** (anomaly score with real chb03 member and E(t)); background images replaced (GBD 2016 map, BioRender focal and generalized); conclusion as 4 goal cards; preprocessing steps with reasons; backups rebuilt, each = question + answer line + figure/diagram (all result figures gated: ALL GATES PASSED) | author: approve P-D9 to P-D11; .pptx → Canva; then **D5** |
+| **Deck** | **Content baseline = the author's Canva deck `Defense/slides/Thesis_final_slide.pdf` (46 pages, 20/10)**: 25 main pages + 2 references + thank you + 18 appendix pages (page map: D4g_BRIEF §0). The artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (v45) stays the build tool for new or changed slides (author copies them into Canva) | **D4g**: 5 fixes (ToC, slide 3 chart, slide 4 clinical workflow, conclusion framing + limits, page 44 → report Fig 10) and a documented appendix (D4g_BRIEF §2.1) |
 | App (D1c) | `notes/APP_FACTS.md` | slide 21, B20, B21 |
 | **Demo prep (A22)** | `Defense/demo/CC_DEMO_PREP.md` for Claude Code on the laptop | author runs it; video goes into B23 in Canva |
 | Repository | public; `web_demo/` = tag `szscan-frozen-v4.1`; figures read at `45a17e2` | read only |
@@ -71,9 +71,10 @@ R1–R21 of rev 22 stand (anh Trí, cô, lab notes, author 17/10). Added in D4f 
     and not window AUROC is B5.
   - Slides 3, 4, 10, 11, 12 approved provisionally (A30) after the diagrams D10–D12 and the new background images.
 - **Open (author):**
-  - **P-D9** Timpte 2023: "1 in 3 first seizures appeared only after 24 h of video-EEG" (6 of 19, 31.6 %) on slide 4 — approve or remove.
-  - **P-D10** Koren 2018 quote "CEEG review is very demanding and time consuming." on slide 4 — approve or remove.
-  - **P-D11** Keep "Deployment and Impact" (slide 23, rubric criterion 4 = 10 points) as a main slide (23 content slides) or move it to backup (22). Recommendation: keep.
+  - P-D9 (Timpte 2023 line): kept by the author on page 4 for now; re-decided with the slide-4 rework in D4g (citation must be on the slide).
+  - P-D10 (Koren quote): removed by the author in Canva — closed.
+  - P-D11: Deployment and Impact kept as a main slide (page 23) — closed.
+  - **D4g opening decisions:** ToC lines, slide-3 chart (found image vs coded stat chart vs none), slide-4 one or two slides, conclusion labels (D4g_BRIEF §1).
   - P1 committee research fields → `Defense/inputs/committee.md`.
   - Optional: a high-resolution Timpte Fig. 2B if the author wants the curve on slide 4.
 
@@ -83,29 +84,32 @@ R1–R21 of rev 22 stand (anh Trí, cô, lab notes, author 17/10). Added in D4f 
 |---|---|---|---|
 | D0–D4e | 15–17/10 ✔ | plan, numbers, study guide, Q&A, design, figures, deck v4 | rev 22 |
 | **D4f** | **18–19/10 ✔** | deck rev 3: structure by pipeline, background images, self-drawn method diagrams D10–D12, conclusion cards, 23 new backups (B1–B23), QA §14 for the reviewer | artifact v45; DECK_BRIEF rev 3; SLIDE_OUTLINE rev 3; NL §14; QA §14; `slides/gen/` + `figs/rev3/` |
-| — | 20–21/10 | author: P-D9…P-D11; .pptx → Canva; insert demo video in B23 | `slides/Defense_slides_rev3.pdf` |
-| **D5** | 21/10 | review: numbers vs NUMBERS_LOCK (`xanh`), English (`en`), rubric, text density, image legibility, DECK_BRIEF A1–A30 and L1–L10; map B1–B23 to QA → cô 22/10 08:00, anh Trí | review list; fixes in the same artifact |
+| ✔ | 20/10 | author: Canva deck, kept ~80 % (A31) | `slides/Thesis_final_slide.pdf` |
+| **D4g** | 20–22/10 | 5 fixes + documented appendix (A31; D4g_BRIEF) in the same artifact → author copies into Canva | new / changed slides; NL §15 |
+| **D5** | 22–23/10 | review of the Canva deck after D4g: numbers vs NUMBERS_LOCK (`xanh`), English (`en`), rubric, image legibility, DECK_BRIEF A1–A31 and L1–L13 → cô, anh Trí | review list |
 | D6 | ≈ 26–27/10 | apply feedback → **slide freeze** | `slides/…_FROZEN` |
 | D7 | 28–30/10 | English script per slide, timed | `script/` |
 | D8 | 30/10–04/11 | rehearsal: mock committee, timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
 
-**Start prompt of chat D5 (copy):**
-> Chat D5 — Review of deck rev 3. Read `STATUS_BOARD.md` (rev 23) and the instructions, then `DECK_BRIEF.md` (rev 3:
-> A1–A30, lessons L1–L10), `SLIDE_OUTLINE.md` (rev 3), `NUMBERS_LOCK.md` (§1–§14), `QA_BANK.md` (§14), `RUBRIC_MAP.md`.
-> Input: the deck artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 (version ≥ 45) and, if made, my Canva
-> PDF. My decisions on P-D9, P-D10, P-D11: [write them here].
-> 1. Apply P-D9…P-D11. 2. Check every number on pages 1–51 against NUMBERS_LOCK (set · seed · aggregate). 3. Check
-> titles, takeaways, text density, repeated ideas, English, image legibility and image ↔ text agreement (L1–L10),
-> rubric coverage (SLIDE_OUTLINE §4). 4. Map B1–B23 to QA_BANK questions. 5. One review list (slide · problem · fix),
-> apply the agreed fixes to the same artifact, prepare questions for cô (22/10) and anh Trí.
-> End: board rev 24, project file list, prompt of chat D6.
+**Start prompt of chat D4g (copy):**
+> Chat D4g — Fix 5 points of my Canva deck and build a documented appendix. Read `STATUS_BOARD.md` (rev 24), the
+> instructions, `DECK_BRIEF.md` (rev 3.1: A1–A31, L1–L13), **`D4g_BRIEF.md`** (Canva page map, your proposals for the
+> 5 fixes, appendix plan §2.1, start commands §3), `SLIDE_OUTLINE.md` (rev 3.1), `NUMBERS_LOCK.md`, `QA_BANK.md` §14.
+> Attached: my Canva deck `Thesis_final_slide.pdf`, the report figures (Fig 1–16), the HD4 sample PDF [and images for
+> slide 4 if I have them].
+> 1. Run the start commands of D4g_BRIEF §3 and read the report sections and record files it names, so you know the
+>    whole thesis again. 2. Put your 5-fix proposals (D4g_BRIEF §1) to me in one short list and wait for my answer.
+> 3. Build the fixed slides and the appendix (D4g_BRIEF §2.1, finalised with me) in the same artifact; every number
+>    from NUMBERS_LOCK or a committed file (add §15); render and look at every slide before sending.
+> End: board rev 25, DECK_BRIEF / SLIDE_OUTLINE updates, project file list, prompt of chat D5 (review).
 
 ## 6 · Which file for what
 
 | File | Use it to | When |
 |---|---|---|
-| **`outline/DECK_BRIEF.md` (rev 3)** | every author request (A1–A30), lessons L1–L10, presentation rules, design system | before any slide work |
-| **`outline/SLIDE_OUTLINE.md` (rev 3)** | slide map with pages, backups B1–B23, figure scripts, rubric coverage | D5–D7 |
+| **`outline/DECK_BRIEF.md` (rev 3.1)** | every author request (A1–A31), lessons L1–L13, presentation rules, design system | before any slide work |
+| **`outline/D4g_BRIEF.md`** | Canva page map, the 5 fixes with proposals, appendix plan, start commands | D4g |
+| **`outline/SLIDE_OUTLINE.md` (rev 3.1)** | rev 3 slide map, figure scripts, rubric coverage | D4g–D7 |
 | deck artifact (link in §2) | the deck; download .pptx for Canva | D5 onward |
 | `slides/gen/build_rev3.py` + `diag_*.py`, `pipeline.py` | record of how rev 3 slides and diagrams were generated (cloud paths) | only if rebuilding |
 | `slides/figs/rev3/figs_*.py` + PNGs | result figures of rev 3 (gated on committed results) | if a figure changes |
@@ -154,3 +158,7 @@ F:/Study/Thesis/
 - 2026-10-19 (morning): A30 — slides approved provisionally; deck rev 3 completed: main slides reviewed (preprocessing
   steps, larger montage, conclusion cards, app diagram blob fixed, page numbers consistent with the Deployment slide),
   23 backups built from new and existing gated figures, references extended (34 works), artifact version 45.
+- 2026-10-20: the author reviewed rev 3 in Canva (`Thesis_final_slide.pdf`, 46 pages): ~80 % kept, some slides merged
+  or dropped; feedback A31 (ToC, slide 3 chart, slide 4 clinical workflow, conclusion framing + limits, page 44 →
+  report Fig 10) and a new reading of the appendix: complete documentation of the thesis, not Q&A. No slide edited in
+  this chat; `D4g_BRIEF.md` prepared for chat D4g.

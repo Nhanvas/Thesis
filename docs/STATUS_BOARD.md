@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 26, 2026-10-21, end of chat D4g: deck v5 rebuilt in full)
+# STATUS_BOARD — DEFENSE phase (rev 27, 2026-10-21, end of chat D4g: deck v5.1 + rules for speaking)
 
 **Read this first in every chat.** It says what is done, what is open, what the author still has to give or approve,
 where every file lives and what the next chat does. At the end of every chat the board is rewritten as a whole file
@@ -12,7 +12,7 @@ where every file lives and what the next chat does. At the end of every chat the
 
 **Report.** Locked at the faculty submission (17/10/2026). Report-phase history: board rev 9 in git.
 
-**For any slide work, read `DECK_BRIEF.md` rev 3.4 (requests A1–A34, lessons L1–L18) and `SLIDE_OUTLINE.md` rev 5
+**For any slide work, read `DECK_BRIEF.md` rev 3.5 (requests A1–A35, lessons L1–L18, §8 speaking and Q&A) and `SLIDE_OUTLINE.md` rev 5.1
 (page map 1–61 of deck v5, what changed on every page) before anything else.**
 
 ---
@@ -40,7 +40,7 @@ where every file lives and what the next chat does. At the end of every chat the
 | Study guide (D2) | `content/STUDY_GUIDE_part1_vi.md`, `part2_vi.md` | author studies |
 | Q&A bank (D3) | `qa/QA_BANK.md` + §14 C9 | D5: point each question to its appendix page (A–H) |
 | Slide design | `outline/DECK_BRIEF.md` **rev 3.3**, `outline/SLIDE_OUTLINE.md` **rev 4** | — |
-| **Deck** | **Deck v5 = artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 version 107 (61 pages):** the author's Canva deck v2 (21/10, 67 pages) rebuilt in full with the approved feedback (A34): main 1–25, References 26, Thank you 27, appendix A1–H2 28–61; the author's own figures, editable text | **author** downloads .pptx → Canva, sets Calibri, inserts the demo video on G3 (p59); exports `Thesis_final_slide_v3.pdf` → D5 |
+| **Deck** | **Deck v5 = artifact https://claude.ai/artifact/RQNQLEV2gmfjrcrZUuzid9 version 108 (61 pages; v5.1 adds takeaways on 7, 9, 13, 14, 15, 21, 24 and Limit · Next on 25):** the author's Canva deck v2 (21/10, 67 pages) rebuilt in full with the approved feedback (A34): main 1–25, References 26, Thank you 27, appendix A1–H2 28–61; the author's own figures, editable text | **author** downloads .pptx → Canva, sets Calibri, inserts the demo video on G3 (p59); exports `Thesis_final_slide_v3.pdf` → D5 |
 | Slide 3 image | done by the author (cartoon + brain images in Canva v2) | — |
 | App (D1c) | `notes/APP_FACTS.md` | — |
 | Demo prep (A22) | `Defense/demo/CC_DEMO_PREP.md` | author runs it; video into Appendix G4 (p67) |
@@ -84,28 +84,28 @@ R1–R27 of rev 24 stand (anh Trí, cô, lab notes, author 17–19/10). Added in
 | ✔ | 20/10 | author: Canva deck, kept ~80 % (A31) | `slides/Thesis_final_slide.pdf` |
 | **D4g** | **20/10 ✔** | 5 fixes + documented appendix A–H (A31–A33) | artifact v64 (31 pages); NL §15; DECK_BRIEF rev 3.3; SLIDE_OUTLINE rev 4; `slides/gen/d4g/`, `slides/figs/d4g/` |
 | ✔ | 21/10 | author: Canva deck v2 (67 pages) → feedback → **deck v5 rebuilt (artifact v107, 61 pages)**; author takes it into Canva, sets Calibri, adds the demo video; export `Thesis_final_slide_v3.pdf` | Canva deck v3 |
-| **D5** | 21–22/10 | review of Canva deck v3: numbers vs NUMBERS_LOCK (`xanh`), English (`en`), rubric (`boti`), image legibility, DECK_BRIEF A1–A34, L1–L18; QA_BANK → appendix pages; list for cô (22/10) and anh Trí | review list; QA page map |
+| **D5** | 21–22/10 | review of Canva deck v3: numbers vs NUMBERS_LOCK (`xanh`), English (`en`), rubric (`boti`), image legibility, DECK_BRIEF A1–A35, L1–L18, §8; QA_BANK → appendix pages; list for cô (22/10) and anh Trí | review list; QA page map |
 | D6 | ≈ 26–27/10 | apply feedback → **slide freeze** | `slides/…_FROZEN` |
-| D7 | 28–30/10 | English script per slide, timed | `script/` |
-| D8 | 30/10–04/11 | rehearsal: mock committee, timing, demo checklist, fallback video | `demo/DEMO_CHECKLIST.md` |
+| D7 | 28–30/10 | English script per slide, timed, per DECK_BRIEF §8 (message · where to look · transition; not memorized); Q&A phrases into QA_BANK; page lookup sheet for the appendix | `script/` |
+| D8 | 30/10–04/11 | rehearsal: recorded, timed; mock committee ([PB] questions) + one non-specialist; demo checklist, fallback video; DECK_BRIEF §8.8–8.9 technical checklist | `demo/DEMO_CHECKLIST.md` |
 
 **Start prompt of chat D5 (copy):**
-> Chat D5 — Review my Canva deck v3 before cô (22/10). Read `STATUS_BOARD.md` (rev 26), the instructions,
-> `DECK_BRIEF.md` (rev 3.4: A1–A34, L1–L18), `SLIDE_OUTLINE.md` (rev 5: page map 1–61), `NUMBERS_LOCK.md` (§1–§15),
+> Chat D5 — Review my Canva deck v3 before cô (22/10). Read `STATUS_BOARD.md` (rev 27), the instructions,
+> `DECK_BRIEF.md` (rev 3.5: A1–A35, L1–L18, §8), `SLIDE_OUTLINE.md` (rev 5.1: page map 1–61), `NUMBERS_LOCK.md` (§1–§15),
 > `QA_BANK.md` (incl. §14 C9) and `RUBRIC_MAP.md`. Attached: `Thesis_final_slide_v3.pdf` (Canva, from deck v5).
-> 1. Check every page against SLIDE_OUTLINE rev 5 (changes kept, page numbers 1–61, codes A1–H2, Calibri, nothing lost
+> 1. Check every page against SLIDE_OUTLINE rev 5.1 (changes kept, one takeaway per slide, page numbers 1–61, codes A1–H2, Calibri, nothing lost
 >    in the pptx → Canva copy). 2. Check every number on every page against NUMBERS_LOCK with its label (set · seed ·
 >    aggregate) — give the `xanh` prompt and do the check yourself. 3. English and wording (`en` prompt), rubric coverage
 >    (`boti` prompt). 4. Image legibility and image ↔ text agreement (L1–L10, L14). 5. Map every QA_BANK question to the
 >    main or appendix page that answers it; list gaps. Output: one review list (page · problem · exact fix), the three
->    account prompts, and a short summary for cô. End: board rev 27, file list, prompt of chat D6 (freeze).
+>    account prompts, and a short summary for cô. Also apply DECK_BRIEF §8.3 ("not said → not on the slide") and the §8.9 checklist items that concern slides. End: board rev 28, file list, prompt of chat D6 (freeze).
 
 ## 6 · Which file for what
 
 | File | Use it to | When |
 |---|---|---|
-| **`outline/DECK_BRIEF.md` (rev 3.4)** | every author request (A1–A34), lessons L1–L18, presentation rules, design system | before any slide work |
-| **`outline/SLIDE_OUTLINE.md` (rev 5)** | page map 1–61 of deck v5, what changed on every page, rubric coverage | D5–D7 |
+| **`outline/DECK_BRIEF.md` (rev 3.5)** | every author request (A1–A35), lessons L1–L18, §8 speaking and Q&A rules, presentation rules, design system | before any slide work |
+| **`outline/SLIDE_OUTLINE.md` (rev 5.1)** | page map 1–61 of deck v5, what changed on every page, rubric coverage | D5–D7 |
 | deck artifact (link in §2) | the D4g pack; download .pptx for Canva | until the freeze |
 | `slides/gen/v5/` | scripts of deck v5 (crop of the author's figures, slides, preview/overflow check) | only if a page changes |
 | `slides/gen/d4g/` | scripts of the D4g pages (Canva style, gated figures, equations, preview/overflow check) | only if a D4g page changes |
@@ -126,7 +126,7 @@ F:/Study/Thesis/
     notes/       NUMBERS_LOCK.md (§15 D4g), FIGURE_PROVENANCE.md, APP_FACTS.md
     content/     study guide (Vietnamese)
     qa/          QA_BANK.md (§14 C9)
-    outline/     DECK_BRIEF.md (rev 3.4), SLIDE_OUTLINE.md (rev 5)
+    outline/     DECK_BRIEF.md (rev 3.5), SLIDE_OUTLINE.md (rev 5.1)
     slides/      Thesis_final_slide.pdf (Canva, 20/10); figs/ (D1b, D4c, rev3/, d4g/); gen/ (v4, rev 3, d4g/)
     script/
     demo/        CC_DEMO_PREP.md, then DEMO_CHECKLIST.md, demo_fallback_chb03.mp4, DEMO_PREP_HANDBACK.md
@@ -161,3 +161,5 @@ F:/Study/Thesis/
   Deck v5 rebuilt in full (artifact v107, 61 pages). Found and corrected in the Canva copy: Siena FA/day column shifted
   from PN13 and PN09 budget (Table 15), chb18 = 6 seizures, workstation × data protection = 5, duplicate Held-out row,
   'offsets late by 16 s' (not locked) (L18).
+- 2026-10-21 (D4g, end): author shared the Dr Kangabu article on thesis defenses; review done; author approved both slide
+  changes (takeaway on every content slide; Limit · Next on the conclusion) → artifact v108; speaking and Q&A rules → DECK_BRIEF §8 (A35).

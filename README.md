@@ -123,7 +123,8 @@ features, identity by sha256 in `docs/PROVENANCE_V2.md`) and score caches such a
 | 3 | the CHB-MIT test results are rebuilt from EDF | EDF of the 8 test cases, PyTorch | see 5.3 (estimated, not measured) |
 | 4 | the autoencoder is retrained from scratch | EDF of the 15 development cases, a GPU | ~3.0–3.8 h per seed on Kaggle GPU (measured) |
 
-The results of each check are recorded in `docs/REPRODUCE.md`.
+The results of each check are recorded in `docs/REPRODUCE.md`; `src/r1_compare_external.py` compares an
+external rerun with the committed rows (criterion fixed in its header).
 
 ### 5.1 Level 1 — redraw the report exhibits (no EEG)
 
@@ -154,8 +155,8 @@ python src/x1_external.py report                                          # rewr
 - `gates` (run once before the original external run) needs caches that are not committed
   (`data/testset_v2/chb03.npz`, `results/p2_test/chb03.npz`); the committed `GATES_OK` records that it passed.
 - On Windows, the Siena seizure-list parser copied from `epilepsy2bids` raises `OverflowError`
-  in `time.mktime` (a year-1900 date); run it on Linux or through a wrapper that replaces
-  `time.mktime` by time-of-day arithmetic (see `docs/REPRODUCE.md`).
+  in `time.mktime` (a year-1900 date); on Windows run `python src/r1_x1_win.py` with the same
+  arguments, which replaces `time.mktime` by seconds-of-day arithmetic for that process only.
 - Memory: about 1.5 GB per worker on the largest Siena files; use `--procs 2` on a 16 GB laptop.
 
 ### 5.3 Level 3 — rebuild the CHB-MIT test results

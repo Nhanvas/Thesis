@@ -32,6 +32,7 @@ Usage
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import tempfile
@@ -60,8 +61,9 @@ EXPECTED_SEIZURES = {
 EXPECTED_TOTAL_SEIZURES = sum(EXPECTED_SEIZURES.values())  # 76
 EXPECTED_TOTAL_HOURS = 279.39  # report Table 2.1
 
-DATASET_DIR = Path("F:/Study/Thesis/Dataset/CHB-MIT")
-SUMMARY_DIR = DATASET_DIR / "CHB info" / "summary"
+# R1: CHBMIT_DIR / CHBMIT_SUMMARY_DIR override the author's local layout (defaults unchanged)
+DATASET_DIR = Path(os.environ.get("CHBMIT_DIR", "F:/Study/Thesis/Dataset/CHB-MIT"))
+SUMMARY_DIR = Path(os.environ.get("CHBMIT_SUMMARY_DIR", str(DATASET_DIR / "CHB info" / "summary")))
 
 DEFAULT_TIER2_DIR = ROOT / "web_demo" / "report_handback" / "tier2"
 OUT_DIR = ROOT / "results" / "application_eval"

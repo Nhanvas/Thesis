@@ -39,6 +39,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning,
                         message=".*Channel names are not unique.*")
 
 import json
+import os
 import re
 import numpy as np
 import mne
@@ -489,8 +490,9 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    RAW_DIR       = Path("F:/Study/Thesis/Dataset/CHB-MIT")
-    PROCESSED_DIR = Path("F:/Study/Thesis/Code/data/processed")
+    # R1: CHBMIT_DIR overrides the author's local EDF root; output stays in <repo>/data/processed
+    RAW_DIR       = Path(os.environ.get("CHBMIT_DIR", "F:/Study/Thesis/Dataset/CHB-MIT"))
+    PROCESSED_DIR = Path(__file__).resolve().parents[2] / "data" / "processed"
 
     all_stats = []
     for subj in args.subjects:

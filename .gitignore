@@ -79,3 +79,6 @@ bme11/
 
 # old demo data (archived locally)
 web_demo/_old_data_*/
+
+# R1 (2026-10-22): per-patient z-score statistics of CHB-MIT are committed (small; needed to rebuild the features)
+!data/processed/*_stats.json

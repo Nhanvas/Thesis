@@ -57,6 +57,7 @@ import argparse
 import gc
 import hashlib
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -92,7 +93,8 @@ torch.set_num_threads(1)
 # ── constants ────────────────────────────────────────────────────────────────
 WIN_SEC = P.WIN_S                       # 4
 N_CH = len(P.COMMON_CHANNELS)           # 18
-DATASET_DIR = Path("F:/Study/Thesis/Dataset/CHB-MIT")
+# CHB-MIT EDF root (folders chb01 ... chb23); set CHBMIT_DIR to override the author's local default (R1).
+DATASET_DIR = Path(os.environ.get("CHBMIT_DIR", "F:/Study/Thesis/Dataset/CHB-MIT"))
 SUMMARY_DIR = ROOT / "data" / "summaries"
 PROCESSED_DIR = ROOT / "data" / "processed"
 CKPT_PATH = ROOT / "data" / "models_retrain" / "gae_joint_seed42.pt"

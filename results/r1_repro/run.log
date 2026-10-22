@@ -1,0 +1,166 @@
+chb24: statistics (labelfree) 39s
+chb24: 21 files (0 skipped: []), 20.3 h, 356s (18 s per hour of EEG)
+chb24: scored (chb24)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+PN10: statistics (labelfree) 108s
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\venv\Lib\site-packages\numpy\lib\_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+F:\Study\Thesis\repro_R1\venv\Lib\site-packages\numpy\lib\_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+F:\Study\Thesis\repro_R1\Thesis\src\c1b_build_trainset.py:62: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+  k = kurtosis(W, axis=-1, fisher=True)
+PN10: 6 files (0 skipped: []), 18.7 h, 421s (23 s per hour of EEG)
+PN10: scored (siena)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+PN00: statistics (labelfree) 20s
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+PN00: 5 files (0 skipped: []), 3.2 h, 154s (47 s per hour of EEG)
+PN00: scored (siena)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+PN11: statistics (labelfree) 15s
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different highpass filters. Highest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Channels contain different lowpass filters. Lowest filter setting will be stored.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+F:\Study\Thesis\repro_R1\Thesis\src\x1_external.py:210: RuntimeWarning: Highpass cutoff frequency 15.91549 is greater than lowpass cutoff frequency 15.0, setting values to 0 and Nyquist.
+  raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+PN11: 1 files (0 skipped: []), 2.4 h, 85s (35 s per hour of EEG)
+PN11: scored (siena)
+
+real	19m26.971s
+user	0m0.046s
+sys	0m0.046s

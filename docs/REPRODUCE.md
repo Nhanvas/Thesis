@@ -121,8 +121,13 @@ result to make a check pass; a failed check is recorded as it is.
      1,578 vs 1,534 bytes; PN11: 909 vs 897 bytes), consistent with text line-ending conversion rather
      than corrupted content — not independently verified further.
   3. `chb24_08.edf` missing from the local dataset — see above.
-  4. No other deviations: ground rules 1 (no edits under `src/`, `data/`, `results/x1_external/`), 4 (no
-     EDF or `features/*.npz` staged) and 5 (Chrome/Edge/Cursor closed before the run) were followed.
+  4. Ground rule 5 (close Chrome, Edge and Cursor before the run) was **not** followed: a post-hoc check
+     after the run found Edge and Cursor still running throughout. The run still completed within the
+     estimated 20–45 min window (19 m 27 s) using `--procs 2` on ~16 GB RAM, so it is not flagged as a
+     likely cause of the chb24 FAIL above, but memory headroom during the run was not as the ground
+     rules intended, and this was not caught until after Step 8.
+  5. No other deviations: ground rules 1 (no edits under `src/`, `data/`, `results/x1_external/`) and 4
+     (no EDF or `features/*.npz` staged) were followed.
 
 ## Check 3 — retrain one seed (optional, not started)
 

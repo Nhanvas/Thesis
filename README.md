@@ -119,9 +119,14 @@ features, identity by sha256 in `docs/PROVENANCE_V2.md`) and score caches such a
 | Level | What it shows | Needs | Runtime |
 |---|---|---|---|
 | 1 | every table and result figure of the report is redrawn from the committed result files and gated against the numbers of record | repository only | ~5 s (measured on a cloud CPU) |
-| 2 | the final system, run from raw EDF with the committed checkpoints, reproduces the committed external results | EDF of chb24 / Siena, PyTorch | about 6 min for PN10 (18.7 h) on a laptop (measured); whole external set 29 min on Kaggle CPU (measured) |
+| 2 | the final system, run from raw EDF with the committed checkpoints, reproduces the committed external results | EDF of chb24 / Siena, PyTorch | 16–23 s per hour of EEG on a laptop CPU (measured: chb24 21.3 h in 7.3 min); whole external set 29 min on Kaggle CPU (measured) |
 | 3 | the CHB-MIT test results are rebuilt from EDF | EDF of the 8 test cases, PyTorch | see 5.3 (estimated, not measured) |
 | 4 | the autoencoder is retrained from scratch | EDF of the 15 development cases, a GPU | ~3.0–3.8 h per seed on Kaggle GPU (measured) |
+
+**Checks done (October 2026):** level 1 PASS on a clean clone; level 2 on a clean clone and a new
+environment on another computer, four external patients: chb24 and Siena PN00 and PN11 reproduced on
+every row of the criterion, PN10 on seeds 42 and 1, with one borderline seizure different in seeds 2
+and 3 (details and the first, failed attempt with a missing chb24 file in `docs/REPRODUCE.md`).
 
 The results of each check are recorded in `docs/REPRODUCE.md`; `src/r1_compare_external.py` compares an
 external rerun with the committed rows (criterion fixed in its header).
@@ -227,7 +232,7 @@ Shared code: `src/p2_scalars.py` (score and detector), `src/szcore_eval.py` (SzC
 | Figure 12 | `results/figures_v8_data/perseizure_final.csv` | level 1 (`fig12_duration`) |
 | Figure 14 | `results/figures_v8_data/gallery/{a,b,c,d}.npz` (written from EDF by `src/figures_v8/export_v8_data.py`) | `src/figures_v8/fig14_gallery.py` |
 | Figure 16 | `results/p3_anatomy/seizures.csv` | level 1 (`fig17_budget_needed.png`) |
-| Figure 8 (drift correction) | drawn from development score caches | script to be added (`docs/REPRODUCE.md`) |
+| Figure 8 (drift correction) | `data/testset_v2/chb03.npz`, `results/p2_test/chb03.npz` (not committed, level 3) | `src/figures_v6/fig_example_chb03.py` (runs only where these caches exist) |
 | Figures 1, 2, 5, 7 | illustrations drawn from raw EEG of validation cases | earlier illustration scripts in `src/figures/`, `src/dataprep/plot_raw_vs_preprocessed.py` |
 | Figures 3, 4, 6, 9, 10, 15 | diagrams and application screenshots | not code-generated |
 | Tables 1–3, 5, 7, 8 | literature, requirements, timeline, decision matrices | text |

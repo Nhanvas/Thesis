@@ -9,7 +9,7 @@ result to make a check pass; a failed check is recorded as it is.
 | 1 | 1 · redraw the report exhibits from committed results | cloud container, fresh clone, new environment | `1638359` | **PASS** (22/10) |
 | 2 | 2 · external rerun from raw EDF with the committed checkpoints | author's laptop, fresh clone, new environment | `5cf5fb2` | **FAIL** (23/10) |
 | 2b | 2 · chb24 only, rerun with its complete input (22 files) | author's laptop, same clone, `git pull --ff-only` | `fe1fcc6` | **PASS** (23/10) |
-| 3 | 4 · retrain one seed from scratch | Kaggle GPU | — | optional, not started |
+| 3 | 4 · retrain one seed from scratch | Kaggle GPU | — | not done (author's decision 23/10: time before the defense) |
 | — | 3 · rebuild the CHB-MIT test results from EDF | — | — | not done (gates need uncommitted caches, README 5.3) |
 
 ---
@@ -204,7 +204,7 @@ result to make a check pass; a failed check is recorded as it is.
   3. No other deviations: the criterion, the code under `src/`, `data/`, and `results/x1_external/` were
      not edited; the committed chb24 rows were set aside and restored exactly as the prompt specifies.
 
-## Check 3 — retrain one seed (optional, not started)
+## Check 3 — retrain one seed (not done)
 
 GPU training is not bit-reproducible; the criterion will be set before the run (expected: the same
 detected seizures within a few events, not identical weights).

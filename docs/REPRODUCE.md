@@ -56,9 +56,10 @@ result to make a check pass; a failed check is recorded as it is.
   laptop, 12/10: tp 7 = 7, fp 17 vs 18 (seed 42, balanced, localized); the likely cause, not proven, is
   a floating-point difference between library versions (the original run was on Kaggle).
 - **Result: FAIL.** 44 / 64 rows pass (`results/r1_repro/COMPARE.md`, reproduced in full below).
-  PN00 and PN11 pass every one of their 16 rows; PN10 passes 12/16 (tp equal on all 16; max |fp diff| 1,
-  within tolerance — the 4 failing rows fail only on the hours/skipped check, by the same
-  order of magnitude as the 12/10 precedent); **chb24 passes 0/16** — every chb24 row fails because
+  PN00 and PN11 pass every one of their 16 rows; PN10 passes 12/16 (hours, seizures and budget equal on all
+  16 rows; the 4 failing rows fail on tp: seed 2 detects 6 instead of 5 and seed 3 detects 5 instead of 6,
+  at both operating points and both stages, so the four-seed total is unchanged, 24 = 24 after the
+  localizer at the balanced point; max |fp diff| 1; seeds 42 and 1 pass every row); **chb24 passes 0/16** — every chb24 row fails because
   `hours` differs from `hours_ref` by ≈1.0000 h (21.2956 h committed vs 20.2956 h rerun; the
   `top_diff`/`fp_diff` terms are small, within or near tolerance on several rows, e.g. the seed-42
   balanced-localized row below has tp 14 = 14).
@@ -98,6 +99,12 @@ result to make a check pass; a failed check is recorded as it is.
   | PN00  | 15 / 15 | 32.00 s / 32.00 s | 4.00 s / 4.00 s |
   | PN11  | 4 / 4   | 4.00 s / 4.00 s | 20.00 s / 20.00 s |
 
+- **Reading (added 23/10 after the result, the verdict is unchanged):** on the three Siena patients,
+  whose input files were complete, seed 42 is identical (13 of 16 seizures, 22 false
+  alarms, committed and rerun) and the four-seed sums are 43 = 43 seizures with 102 vs 103 false alarms
+  (balanced point, after the localizer); the only differences are one borderline seizure in each of two
+  seeds of PN10. chb24 cannot be judged from this run, because one of its 22 files was missing from the
+  input (below). The criterion asked for identical tp on every row, which this run does not meet.
 - **Likely cause of the chb24 FAIL (not proven; not fixed, per the ground rules of
   `docs/prompts/CC_R1_REPRO.md`):** `chb24_08.edf` is confirmed present on PhysioNet (`HEAD` request:
   HTTP 200, 42,399,744 bytes — the same size as the other full-hour chb24 files) but is absent from the

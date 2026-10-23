@@ -1,0 +1,17 @@
+subject,point,seed,stage,n_ref,n_ref_new,hours,hours_new,skipped,skipped_new,tp,tp_new,fp,fp_new,fp_diff,top_diff,q_raw_diff,pass
+chb24,balanced,clean_seed42,detector,16,16,21.2956,21.2956,0,0,14,14,26,27,1,0.0,0.0,True
+chb24,balanced,clean_seed42,localized,16,16,21.2956,21.2956,0,0,14,14,26,25,-1,0.0,0.0,True
+chb24,balanced,clean_seed1,detector,16,16,21.2956,21.2956,0,0,13,13,25,24,-1,0.0,0.0,True
+chb24,balanced,clean_seed1,localized,16,16,21.2956,21.2956,0,0,13,13,23,22,-1,0.0,0.0,True
+chb24,balanced,clean_seed2,detector,16,16,21.2956,21.2956,0,0,12,12,28,27,-1,5.2175727851398734e-05,5.2175727851398734e-05,True
+chb24,balanced,clean_seed2,localized,16,16,21.2956,21.2956,0,0,12,12,26,25,-1,5.2175727851398734e-05,5.2175727851398734e-05,True
+chb24,balanced,clean_seed3,detector,16,16,21.2956,21.2956,0,0,14,14,28,28,0,0.0,0.0,True
+chb24,balanced,clean_seed3,localized,16,16,21.2956,21.2956,0,0,14,14,25,25,0,0.0,0.0,True
+chb24,sensitivity,clean_seed42,detector,16,16,21.2956,21.2956,0,0,14,14,26,27,1,0.0,0.0,True
+chb24,sensitivity,clean_seed42,localized,16,16,21.2956,21.2956,0,0,14,14,26,25,-1,0.0,0.0,True
+chb24,sensitivity,clean_seed1,detector,16,16,21.2956,21.2956,0,0,13,13,25,24,-1,0.0,0.0,True
+chb24,sensitivity,clean_seed1,localized,16,16,21.2956,21.2956,0,0,13,13,23,22,-1,0.0,0.0,True
+chb24,sensitivity,clean_seed2,detector,16,16,21.2956,21.2956,0,0,12,12,28,27,-1,5.2175727851398734e-05,5.2175727851398734e-05,True
+chb24,sensitivity,clean_seed2,localized,16,16,21.2956,21.2956,0,0,12,12,26,25,-1,5.2175727851398734e-05,5.2175727851398734e-05,True
+chb24,sensitivity,clean_seed3,detector,16,16,21.2956,21.2956,0,0,14,14,28,28,0,0.0,0.0,True
+chb24,sensitivity,clean_seed3,localized,16,16,21.2956,21.2956,0,0,14,14,25,25,0,0.0,0.0,True

@@ -8,6 +8,7 @@ result to make a check pass; a failed check is recorded as it is.
 |---|---|---|---|---|
 | 1 | 1 · redraw the report exhibits from committed results | cloud container, fresh clone, new environment | `1638359` | **PASS** (22/10) |
 | 2 | 2 · external rerun from raw EDF with the committed checkpoints | author's laptop, fresh clone, new environment | `5cf5fb2` | **FAIL** (23/10) |
+| 2b | 2 · chb24 only, rerun with its complete input (22 files) | author's laptop, same clone, `git pull --ff-only` | `fe1fcc6` | **PASS** (23/10) |
 | 3 | 4 · retrain one seed from scratch | Kaggle GPU | — | optional, not started |
 | — | 3 · rebuild the CHB-MIT test results from EDF | — | — | not done (gates need uncommitted caches, README 5.3) |
 
@@ -135,6 +136,73 @@ result to make a check pass; a failed check is recorded as it is.
      rules intended, and this was not caught until after Step 8.
   5. No other deviations: ground rules 1 (no edits under `src/`, `data/`, `results/x1_external/`) and 4
      (no EDF or `features/*.npz` staged) were followed.
+
+## Check 2b — chb24 with its complete input (PASS)
+
+- **Question:** check 2 could not judge chb24 because `chb24_08.edf` was missing from the input
+  (20.2956 h instead of 21.2956 h). This check reruns the same subject with the same code and the same
+  criterion, once the input is complete. Check 2 stays recorded as FAIL above; nothing else from check 2
+  is rerun.
+- **Setup:** same clone as check 2 (`F:/Study/Thesis/repro_R1/Thesis`), `git pull --ff-only`
+  `67e807d` → `fe1fcc6` (fast-forward). Same `--data` folder as check 2
+  (`F:/Study/Thesis/Dataset`).
+- **Download and file-count check:** `chb24_08.edf` was already present in the local dataset folder
+  when checked (42,399,744 bytes, timestamped 2026-10-23 — downloaded before this check's own steps ran;
+  see deviations). Verified: size exactly 42,399,744 bytes; sha256 `bb6c2e11ff0206b08a57424840defeb1cfb895be340ddf825f6882667de9150e`,
+  matching PhysioNet's `SHA256SUMS.txt` entry for `chb24/chb24_08.edf` exactly. Went beyond the prompt and
+  hashed all 22 `chb24_*.edf` files against `SHA256SUMS.txt`: all 22 match byte-for-byte. Folder listing:
+  22 `chb24_*.edf` files plus `chb24-summary.txt` — as required.
+- **Criterion (unchanged from check 2, in `src/r1_compare_external.py`):** all 16 rows (2 operating
+  points × 4 seeds × 2 stages): tp equal; |fp difference| ≤ 2; number of seizures and skipped files
+  equal; hours within 0.01 h. PASS only if every row passes.
+- **Run:** committed `rows_chb24.csv`/`errors_chb24.csv` set aside to `results/r1_repro_2b/committed/`;
+  the stale 21-file feature cache `results/x1_external/features/chb24.npz` from check 2 removed so it
+  could not be reused; `python src/r1_x1_win.py run --data F:/Study/Thesis/Dataset --subjects chb24
+  --procs 2`. Log: `chb24: 22 files (0 skipped: []), 21.3 h, 344s (16 s per hour of EEG)`. Measured
+  runtime (`time`, includes feature extraction + scoring): **7 m 19.7 s** (close to the 6–8 min estimate).
+  Rerun output copied to `results/r1_repro_2b/rerun/`, then `results/x1_external/` restored to its
+  committed state with `git checkout --`.
+- **Result: PASS.** 16/16 rows pass (`results/r1_repro_2b/COMPARE.md`, reproduced in full below).
+
+  ```
+  # R1 check 2 -- external rerun from a clean clone vs committed results/x1_external/
+
+  Criterion: tp equal, |fp diff| <= 2, n_ref and skipped equal, hours within 0.01 h, on every row (2 points x 4 seeds x 2 stages per subject).
+
+  Rows compared: 16; rows passing: 16; VERDICT: PASS
+
+  Seed 42, balanced point, after the localizer:
+
+  subject  n_ref  tp  tp_new  fp  fp_new   hours  hours_new  top_diff
+    chb24     16  14      14  26      25 21.2956    21.2956       0.0
+
+  Per subject (all 16 rows): rows with tp equal, max |fp diff|, max |budget diff|:
+
+           rows  passing  tp_equal  max_abs_fp_diff  max_abs_budget_diff
+  subject
+  chb24      16       16        16                1             0.000052
+  ```
+
+  `hours` now matches `hours_ref` exactly (21.2956 h both sides) with all 22 files present, confirming
+  check 2's reading that the missing file alone explained the chb24 FAIL. tp is equal on all 16 rows
+  (14 = 14 at the seed-42 balanced/localized point shown above); fp differs by at most 1 across all 16
+  rows (25 vs 26 at that same row) — within the ≤ 2 tolerance, and of the same small, library-version
+  character as the borderline PN10 rows in check 2, not a new discrepancy.
+- **Deviations from `docs/prompts/CC_R1_CHECK2B.md`:**
+  1. Step 2's download was not literally performed by this check's own steps: `chb24_08.edf` was already
+     present in the dataset folder, timestamped 2026-10-23, when this check's Step 2 first inspected the
+     folder — downloaded earlier the same day, outside this record. The file was verified in full per the
+     prompt (size and sha256 against PhysioNet) regardless of who fetched it.
+  2. Ground rule / step 3 preamble (close Edge, Chrome and Cursor before the run): Cursor hosts this
+     session (process ancestry: `powershell.exe ← claude.exe ← bash.exe ← Cursor.exe`) and could not be
+     closed without ending the check. Chrome and Edge were asked to be closed; free memory rose from
+     5.25 GB to 7.73 GB but residual processes remained (Chrome 11 processes / ~860 MB, Edge 6 processes /
+     ~520 MB) rather than reaching zero. The run proceeded on the author's decision at 7.73 GB free — more
+     headroom than check 2 had (`--procs 2` completed check 2's 4-subject run with similar or less free
+     memory) — and did complete without error. Same deviation category as check 2's ground-rule-5 note;
+     not flagged as a likely cause of anything here since the result is PASS.
+  3. No other deviations: the criterion, the code under `src/`, `data/`, and `results/x1_external/` were
+     not edited; the committed chb24 rows were set aside and restored exactly as the prompt specifies.
 
 ## Check 3 — retrain one seed (optional, not started)
 

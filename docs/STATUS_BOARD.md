@@ -1,4 +1,4 @@
-# STATUS_BOARD — DEFENSE phase (rev 31, 2026-10-23, end of chat D6: slides from mentor feedback, script v1, demo script)
+# STATUS_BOARD — DEFENSE phase (rev 32, 2026-10-24, end of chat D7: Canva v5 checked, page map v5, script v2)
 
 **Read this first in every chat, then `Defense/notes/D5_HANDOFF.md`.** This board says what is done, what is open and
 what the next chats do. At the end of every chat it is rewritten as a whole file (new rev number).
@@ -12,123 +12,106 @@ what the next chats do. At the end of every chat it is rewritten as a whole file
 
 **Report.** Locked at the faculty submission (17/10/2026) until the committee's comments.
 
-**For any slide or script work, read `DECK_BRIEF.md` rev 3.8 (A1–A40, L1–L22, §8), `SLIDE_OUTLINE.md` rev 7 (§0b),
-`D5_HANDOFF.md`, `QA_PAGE_MAP.md`, and `script/SCRIPT_v1.md`.**
+**For any slide or script work, read `DECK_BRIEF.md` rev 3.9 (A1–A41, L1–L24, §8), `SLIDE_OUTLINE.md` rev 8 (§0c),
+`QA_PAGE_MAP.md` (v5) and `script/SCRIPT_v2.md`.**
 
 ---
 
 ## 1 · Chat protocol (binding)
 
 1. One task per chat from section 5, unless the author decides otherwise.
-2. **Start:** read this board → `D5_HANDOFF.md` → the files named for the task.
+2. **Start:** read this board → the files named for the task.
 3. **End:** (a) this board rewritten (rev + 1); (b) **one** list for the author (project files add / replace / delete,
    with local paths); (c) the start prompt of the next chat.
 4. Defense material lives in `F:/Study/Thesis/Defense/` (private). The repository (public) holds this board.
 5. Every number on a slide, in the script or in an answer matches the final report **and** `NUMBERS_LOCK.md`
    (a post-submission number needs NUMBERS_LOCK §16 and its label).
-6. **No freeze** (A37): slides stay editable; every change → re-check the numbers on the changed pages.
-7. **Claude writes the script** (A37), IELTS 5.5 English; the author reads, adapts and rephrases.
-8. **Guidance goes directly in the chat**, short and detailed; files are records, not reading assignments (A37).
-9. Every author request about slides is logged in `DECK_BRIEF.md` §1.
-10. Before sending anything for approval, render and look at every changed slide (A24); a review item quotes the
-    text as it is now on the page (L19). (The cloud chat cannot render the deck: say so and ask the author to check.)
-11. **Repository changes go out as one zip + one `.sh`** that checks the base commit first and stops without changing
-    anything if a file differs.
-12. **Main-slide text = short key phrases like the sample** (A39); details go to the appendix. **Diagrams for Canva are
-    built from editable elements, never a flat PNG** (L21). **Scripts are written to a word budget and counted** (L22).
+6. **Order of work (A41, L23):** slides fixed → script written to a word budget that fits 100–120 words/min → author
+   approves the script → **one** timed read. Never ask for timing on slides or a script that are still changing.
+7. **Main slides carry the full reported information** (A41, L24): a cut happens in what is *said*, never by moving
+   reported information to the appendix. The appendix adds detail; it never hides.
+8. **Claude writes the script** (A37), IELTS 5.5 English; the author reads, adapts and rephrases.
+9. **Guidance goes directly in the chat**, short and detailed; files are records, not reading assignments (A37).
+10. Every author request about slides is logged in `DECK_BRIEF.md` §1.
+11. A review item quotes the text as it is now on the page (L19).
+12. **Changes go out as one zip + one `.sh`** that checks its base first and stops without changing anything if a file
+    differs (L16).
 
-## 2 · Where things stand (23/10)
+## 2 · Where things stand (24/10)
 
 | track | state | next |
 |---|---|---|
-| Numbers | NUMBERS_LOCK §1–§16 (§16 = R1, post-submission). Every number in the D6 slides and script is in it | D7: `xanh` check of the changed Canva pages |
-| Deck | **Slides artifact (version 115) = target for Canva v5**: p4–p26 rebuilt (M1–M6, text cuts), H3 new. The author edits Canva v4 → v5 page by page | **Author: Canva v5** (list in section 2c) |
-| Mentor feedback | M1–M6 done (M2 redrawn; M6 = p26, to confirm); rest to come | new feedback → D7 |
-| Script | **`script/SCRIPT_v1.md`**: 26 slides, 1,212 spoken words = 10:06 at 120 wpm + demo 2:00 = **12:06** (14:07 at 100 wpm, measured word count, speed assumed) | author adapts; D7 timed read with a recording |
-| Demo | **`script/DEMO_SCRIPT.md`**: 2:00 path, checklist, fallback (video on p61), Q&A lines. Event number from `demo/DEMO_EVENT.md` still to fill in | D8: rehearsal + `DEMO_CHECKLIST.md` |
-| Q&A | `qa/QA_BANK.md` (C6-7 rewritten with R1), `qa/QA_PAGE_MAP.md` (**pages of v4: appendix pages now +1**, H3 = 64) | D7: page map to v5 |
-| Reproducibility | R1 done; one line → **Appendix H3 (p64)** + QA C6-7 + NL §16 | — |
-| Optimization | allowed, limited (D5_HANDOFF §5); cheapest candidate: hybrid localizer | O1 (optional), only if D7 is on track |
-| Repository | public; README = final system; `web_demo/` = tag `szscan-frozen-v4.1` | — |
+| Deck | **Canva v5 PDF (24/10, 62 pages) = deck of record.** Main 1–25 · References 26–27 · Thank you 28 · Appendix 29–62 (= D5 page map). p26 Contributions merged into p25 (M6). No H3 (author). The Slides artifact is a layout source only (its s25b, s26, aH3 are not in the deck) | author: five optional text fixes (section 2c) |
+| Numbers | every number on main pages 1–25 of v5 checked against NUMBERS_LOCK §1–§15 in D7: **all match** | — |
+| Mentor feedback | M1–M6 done. **M7** (findings after Results and after Discussion): **kept as now** (findings on half of p25), author 24/10 | revisit only if the mentor insists |
+| Script | **`script/SCRIPT_v2.md`**: 25 slides, **1,168 spoken words** (measured) = 10:37 at 110 wpm; with demo 12:37 (11:44 at 120 wpm, 13:41 at 100 wpm; speeds assumed) | **author: approve / reword v2** → one timed read |
+| Demo | `script/DEMO_SCRIPT.md`: fallback video now **page 60** (G3). Event number from `demo/DEMO_EVENT.md` still to fill in | D8 |
+| Q&A | `qa/QA_BANK.md`, **`qa/QA_PAGE_MAP.md` (v5)**: C6-7 reproducibility = spoken answer (no slide); p24 figures = Fig 11, Fig 12 | D8 mock committee |
+| Reproducibility | R1 done (`docs/REPRODUCE.md`); used only in the spoken answer C6-7 (NL §16) | — |
+| Optimization | allowed, limited (D5_HANDOFF §5) | O1 optional, only if D8 is on track |
 | Committee | — | author adds info (P1) |
 
-## 2b · R1 — what was checked (record: `docs/REPRODUCE.md`)
+## 2c · Canva v5 — five optional text fixes found in D7 (none moves a page or changes the script)
 
-| # | check | result |
+| page | on the page now | proposed |
 |---|---|---|
-| 1 | every report table and result figure redrawn from committed results (cloud, fresh clone) | **PASS** |
-| 2 | external rerun from raw EDF, 4 patients, committed checkpoints (laptop, fresh clone) | **FAIL** 44/64 (chb24 input file missing; PN10 one seizure in seeds 2 and 3) |
-| 2b | chb24 again with all 22 files, same code and criterion | **PASS** 16/16 |
-| 3 | retrain one seed | not done (author 23/10) |
+| p25 | "Objective 1: localization without labels → Achieved" (same words as the Goal line) | "Objective 1: anomaly score → Achieved" |
+| p25 | "New hospital: Siena 0.633 at 41.0 FA/day (4 seeds)" | add "per-patient mean" |
+| p22 | cite line "… Shyu et al., 2023 · Ali et al., 2024 · …" (neither is on p22) | drop both from the line; Ali 2024 then out of References p26 |
+| p22 | "SzCORE challenge leader: 37% at ~1 FA/day (Dan, 2026)" | add "(private corpus)" |
+| p23 | "Sites without labels, GPU or cloud (nearly 80% of people with epilepsy)" | "Low- and middle-income settings without GPU or cloud (where nearly 80% of people with epilepsy live)" |
 
-Used on Appendix H3 (p64) and QA C6-7, labelled post-submission (NL §16).
-
-## 2c · Canva v5 — what the author changes (deck artifact version 115 = the target layout)
-
-- **p4** Protocol cells: "Reads the whole recording before the report" · "Marks onset, offset and channels of each seizure".
-- **p6** four "→" lines shortened; requirements without "Settings fixed before testing" and "Every number traceable…".
-- **p9** four steps, one line each. **p13** Detection 3 bullets, Localization 2 bullets. **p14** two bullets shortened.
-- **p15–p24** (done by the author 22/10: M1, M3, M5, text cuts); **p21** paste the editable diagram from the artifact;
-  arrow heads at the end of the line.
-- **p25** Conclusion = answer box + Summary of findings (left) + Goal and objectives (right).
-- **p26 new** Contributions and Next Steps. **References** without Ali 2024. **Appendix +1**; **H3 Reproducibility
-  (p64) new**.
-- From reading the script (D6): **p3** remove "Up to 70% could be seizure-free…" (not said) or say it; **p9** red
-  line → "(measured: Appendix G2, p60)"; **p25** never "did not work" — use "did not match the seizure channels".
-- If the timed read in D7 runs over 13:30: first candidate is to move p16 to the appendix (its gains are not on p25),
-  second to merge p15 into p11.
+Decided by the author 24/10 (not changes): p3 keeps "Up to 70% …"; p17 keeps precision and F1; no H3.
 
 ## 3 · Feedback and rules in force
 
-R1–R41 stand (rev 24–30; DECK_BRIEF A1–A38). Added 22–23/10 (DECK_BRIEF A39–A40):
+R1–R44 stand (DECK_BRIEF A1–A40). Added 24/10 (A41):
 
 | # | source | rule |
 |---|---|---|
-| R42 | mentor + author 22/10 | Results/Discussion findings summarized on **half of the Conclusion slide** (not a separate slide) |
-| R43 | author 22/10 | Main-slide text = short key phrases like the sample; keep only what is reported; details in the appendix |
-| R44 | author 22/10 | Diagrams for Canva are editable elements; no flat PNG |
+| R45 | author 24/10 | Slides decide what is reported; the script follows the slides; timing comes after both are approved |
+| R46 | author 24/10 | Main slides show the full reported information (p17 precision and F1 stay); appendix = more detail, not hiding |
+| R47 | author 24/10 | Post-hoc material (e.g. reproducibility) is shown as a capability, never as a sequence of internal checks ("2", "2b") |
 
 ## 4 · Decisions
 
-- Earlier: rev 22–30 (in git).
-- **22–23/10 (D6):** M1 (loss → C1), M2 (diagram redrawn, scikit-learn logo whole, no NumPy logo on Cache), M3 (one
-  "→" line per result/discussion slide; p24 under the table), M4 (Summary of findings in the left half of p25), M5
-  (p20 line), text cuts p4–p24 (A40); R1 line → Appendix H3; script v1 and demo script written.
-- **Open (author):** **M6 — keep p26 Contributions and Next Steps, or fold it back into p25?** (Claude: keep; the
-  table answers "novelty" for the reviewer); event number for the demo (`demo/DEMO_EVENT.md`); P1 committee fields.
+- Earlier: rev 22–31 (in git or the project).
+- **24/10 (D7):** M6 = p26 removed, merged into p25 (separate slide too empty). M7 = keep the current slides. H3 not
+  added. p3 and p17 unchanged. SCRIPT_v2 on Canva v5. QA_PAGE_MAP v5. DEMO_SCRIPT fallback page 60.
+- **Open (author):** approve SCRIPT_v2; the five optional fixes (2c); event number for the demo (`demo/DEMO_EVENT.md`);
+  P1 committee fields.
 
-## 5 · Plan of chats (from 24/10)
+## 5 · Plan of chats (from 25/10)
 
 | # | date | task | output |
 |---|---|---|---|
-| D6 | 22–23/10 ✔ | slides from mentor feedback, script v1, demo script, R1 line | SCRIPT_v1, DEMO_SCRIPT, deck v115, board rev 31 |
-| **D7** | 24–28/10 | Canva v5 check (numbers on changed pages, `xanh`), QA_PAGE_MAP to v5, new mentor feedback, **first timed read** (author records; Claude marks over-long slides and hard words) → `SCRIPT_v2.md` | page map v5, script v2 |
-| O1 | optional | hybrid localizer on development, one disclosed test look | NL §16 if adopted |
+| D7 | 24/10 ✔ | Canva v5 check, page map v5, script v2 | SCRIPT_v2, QA_PAGE_MAP v5, rev 32 |
+| — | 25–27/10 | **author:** read SCRIPT_v2, reword it in his own English, one timed read (lap per slide) | lap times |
+| D8 | 28/10–04/11 | rehearsal: timed-read review (only slides above budget), mock committee ([PB] with QA_PAGE_MAP), demo fallback test, Kangabu checklist | `script/SCRIPT_v3.md` if needed, `demo/DEMO_CHECKLIST.md` |
 | — | 29/10 | cô: run-through | — |
-| D8 | 30/10–04/11 | rehearsal: mock committee in chat ([PB] questions with QA_PAGE_MAP), Kangabu checklist, demo fallback test | `demo/DEMO_CHECKLIST.md` |
+| O1 | optional | hybrid localizer on development, one disclosed test look | NL §16 if adopted |
 
-**Start prompt of chat D7 (copy):**
-> Chat D7 — Canva v5 check + page map + first timed read. Read `STATUS_BOARD.md` (rev 31: sections 2c and 4),
-> `DECK_BRIEF.md` (rev 3.8), `SLIDE_OUTLINE.md` (rev 7, §0b), `NUMBERS_LOCK.md` (§1–§16), `QA_PAGE_MAP.md`,
-> `script/SCRIPT_v1.md` and `DEMO_SCRIPT.md`. Attached: my Canva v5 PDF, my recording or measured time of one read of
-> SCRIPT_v1 (per slide if possible), and any new mentor feedback. Guide me directly in the chat, short and detailed.
-> 1. Check every changed page of v5 against the deck artifact and NUMBERS_LOCK (quote the text as it is on the page).
-> 2. Update QA_PAGE_MAP to the v5 pages (appendix +1, H3 = 64, p26 new). 3. From my timing, cut or merge to stay under
-> 13:30 with the demo; write `SCRIPT_v2.md`. 4. One proposal per new mentor comment, wait for my approval. My answer on
-> M6 (keep p26 or not): [write it here]. End: board rev 32, file list, start prompt of the next chat.
+**Start prompt of chat D8 (copy):**
+> Chat D8 — rehearsal. Read `STATUS_BOARD.md` (rev 32), `DECK_BRIEF.md` (rev 3.9, §8), `script/SCRIPT_v2.md`,
+> `DEMO_SCRIPT.md`, `QA_PAGE_MAP.md` (v5) and `QA_BANK.md`. Attached: my lap time per slide of one read of SCRIPT_v2
+> (and my reworded script if I changed it), the Canva PDF if I changed a page, any new feedback from cô or the mentor.
+> 1. From my lap times, shorten only the slides above their budget (target ≤ 13:30 with the demo); do not touch the
+> slides. 2. Mock committee: ask me the [PB] questions one by one, as TS. Ngô Thị Lụa would, and grade each answer
+> (direct answer first, page to open, no invented number). 3. Demo: walk me through the fallback test (page 60).
+> End: board rev 33, file list, start prompt of the next chat.
 
 ## 6 · Which file for what
 
 | File | Use it to | When |
 |---|---|---|
-| **`script/SCRIPT_v1.md`** | what to say on each slide, where to point, time per slide | practice, D7 |
-| **`script/DEMO_SCRIPT.md`** | demo path (2:00), before-session checks, fallback, demo questions | D8, defense day |
-| `notes/D5_HANDOFF.md` | decisions of 21/10 night, mentor feedback M1–M6, optimization plan | D7, O1 |
+| **`script/SCRIPT_v2.md`** | what to say on each slide, where to point, word count per slide | practice, D8 |
+| `script/DEMO_SCRIPT.md` | demo path (2:00), before-session checks, fallback (page 60), demo questions | D8, defense day |
+| `qa/QA_PAGE_MAP.md` (v5), `qa/QA_BANK.md` | question → page; answers | D8 |
+| `outline/DECK_BRIEF.md` (rev 3.9) | author requests A1–A41, lessons L1–L24, §8 speaking and Q&A | slide or script work |
+| `outline/SLIDE_OUTLINE.md` (rev 8) | page map; §0c = Canva v5 of record | slide changes |
+| `notes/NUMBERS_LOCK.md` | every allowed number (§16 post-submission, spoken only) | always |
+| `notes/D5_HANDOFF.md` | mentor feedback M1–M6, optimization plan | O1 |
 | `docs/REPRODUCE.md` (repo) | what was reproduced, how, criterion and result | Q&A C6-7 |
-| `outline/DECK_BRIEF.md` (rev 3.8) | author requests A1–A40, lessons L1–L22, §8 speaking and Q&A | slide or script work |
-| `outline/SLIDE_OUTLINE.md` (rev 7) | page map; §0b = v5 changes | slide changes |
-| `qa/QA_PAGE_MAP.md`, `qa/QA_BANK.md` | question → page; answers | D7, D8 |
-| `notes/NUMBERS_LOCK.md` | every allowed number (§16 post-submission) | always |
 | `notes/APP_FACTS.md`, `demo/CC_DEMO_PREP.md` | app and demo facts | D8 |
 
 ## 7 · Layout
@@ -136,20 +119,20 @@ R1–R41 stand (rev 24–30; DECK_BRIEF A1–A38). Added 22–23/10 (DECK_BRIEF 
 ```
 F:/Study/Thesis/
   Code/                       repository (public): README.md, docs/STATUS_BOARD.md, docs/REPRODUCE.md, results/, src/, web_demo/
-  repro_R1/                   clean clone + venv of check 2 (can be deleted after the defense)
   Reports/final/              submitted report (.docx) + Thesis_Final_Report.md
   Defense/
-    inputs/      rubric, committee (P1), Kangabu_defense_tips.md, mentor_2110_app_diagram.png, lab_slides/
+    inputs/      rubric, committee (P1), Kangabu_defense_tips.md, lab_slides/
     notes/       NUMBERS_LOCK.md (§1–§16), D5_HANDOFF.md, FIGURE_PROVENANCE.md, APP_FACTS.md
     content/     study guide (Vietnamese)
-    qa/          QA_BANK.md, QA_PAGE_MAP.md
+    qa/          QA_BANK.md, QA_PAGE_MAP.md (v5)
     review/      D5_REVIEW.md
-    outline/     DECK_BRIEF.md (rev 3.8), SLIDE_OUTLINE.md (rev 7)
-    slides/      Canva PDFs; figs/; gen/
-    script/      SCRIPT_v1.md, DEMO_SCRIPT.md
+    outline/     DECK_BRIEF.md (rev 3.9), SLIDE_OUTLINE.md (rev 8)
+    slides/      Canva PDFs (v5 = deck of record); figs/; gen/
+    script/      SCRIPT_v2.md, DEMO_SCRIPT.md
     demo/        CC_DEMO_PREP.md, DEMO_EVENT.md, then DEMO_CHECKLIST.md, fallback video
-  Agent/inbox/                hand-over tray (D6_bundle.zip)
-  Archive/2026-10-23/         DECK_BRIEF rev 3.7, SLIDE_OUTLINE rev 6, QA_BANK and NUMBERS_LOCK before D6 (backups by the D6 script)
+  Agent/inbox/                hand-over tray (D7_bundle.zip)
+  Archive/2026-10-24/         SCRIPT_v1, QA_PAGE_MAP (v3), DECK_BRIEF rev 3.8, SLIDE_OUTLINE rev 7, DEMO_SCRIPT,
+                              NUMBERS_LOCK, QA_BANK before D7 (backups by the D7 script)
 ```
 
 ## 8 · Where the numbers are
@@ -158,13 +141,13 @@ F:/Study/Thesis/
 |---|---|
 | every number of the final system | `docs/PERF_PHASE_RECORD.md` (rev R) |
 | what the committee read | `Thesis_Final_Report.md` |
-| numbers allowed on slides | `Defense/notes/NUMBERS_LOCK.md` (§1–§15; §16 post-submission) |
+| numbers allowed on slides | `Defense/notes/NUMBERS_LOCK.md` (§1–§15; §16 post-submission, spoken only) |
 | reproducibility checks | `docs/REPRODUCE.md`, `results/r1_repro/`, `results/r1_repro_2b/` |
 
 ## 9 · Decisions log
 
 - 2026-10-15 → 21: defense phase; D1–D5 (rev 22–29 in git).
-- 2026-10-22/23 (R1): README for the final system; checks 1 PASS, 2 FAIL (missing input file), 2b PASS; rev 30.
-- 2026-10-22/23 (D6): M1–M5 done, M6 proposed (p26); main-slide text cut to key phrases (A39–A40); app diagram
-  redrawn as editable elements; Appendix H3 Reproducibility; NL §16; QA C6-7; SCRIPT_v1 (12:06 with demo, measured
-  words) and DEMO_SCRIPT; rev 31.
+- 2026-10-22/23 (R1): reproducibility checks; rev 30.
+- 2026-10-22/23 (D6): M1–M5, app diagram, script v1, demo script; rev 31.
+- 2026-10-24 (D7): Canva v5 = deck of record (numbers all match); M6 merged; M7 kept as now; no H3; p3 and p17 kept;
+  SCRIPT_v2 (1,168 measured words); QA_PAGE_MAP v5; demo fallback page 60; A41, L23–L24; rev 32.

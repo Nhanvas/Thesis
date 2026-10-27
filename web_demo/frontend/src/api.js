@@ -2,12 +2,21 @@
 // `credentials: 'include'` is required so the browser sends/stores the HttpOnly session
 // cookie even though Vite's dev proxy makes requests look same-origin.
 
+// Session's in-memory on the backend (main.py's `_sessions` dict) — a backend restart mid-demo
+// drops it, and every subsequent call 401s. App.jsx registers this so any such 401 bounces the
+// screen back to Login immediately instead of leaving a stale screen with silently-failing calls.
+let onUnauthorized = null
+export const setUnauthorizedHandler = (fn) => {
+  onUnauthorized = fn
+}
+
 async function request(path, options = {}) {
   const res = await fetch(path, {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
+  if (res.status === 401) onUnauthorized?.()
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(body.detail || `Request failed (${res.status})`)
@@ -35,6 +44,7 @@ async function uploadRequest(path, options = {}) {
   // response we want the CALLER to see verbatim (SPEC's exact rejection wording) rather than
   // a generic "Request failed (409)" fallback.
   const res = await fetch(path, { credentials: 'include', ...options })
+  if (res.status === 401) onUnauthorized?.()
   const body = res.status === 204 ? null : await res.json().catch(() => ({}))
   if (!res.ok) {
     const err = new Error(body?.detail || `Request failed (${res.status})`)

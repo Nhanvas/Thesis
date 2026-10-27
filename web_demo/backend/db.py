@@ -13,10 +13,10 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent / "szscan.db"
 
-# SZSCAN_SPEC_v5.md §2 / CLAUDE.md — the fixed 8-subject held-out test allowlist. Not a
-# numeric threshold pulled from a model file (CLAUDE.md's "never hardcode a threshold" is
-# about pipeline parameters); this list IS the source of truth, spelled out verbatim there.
-ALLOWED_SUBJECTS = {"chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"}
+# SZSCAN_SPEC_v5.md §2 / CLAUDE.md — the fixed 8-subject held-out test allowlist, plus chb24
+# (added 2026-10-27 per author approval in V9-T1: format-compatible — 256 Hz, same 23-channel
+# bipolar naming as the other chb* subjects — and not part of the training/validation split).
+ALLOWED_SUBJECTS = {"chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18", "chb24"}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS subjects (

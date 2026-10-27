@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import LoginScreen from './screens/LoginScreen.jsx'
 import DatabaseScreen from './screens/DatabaseScreen.jsx'
 import AnalysisScreen from './screens/AnalysisScreen.jsx'
-import { getSession, logout } from './api.js'
+import { getSession, logout, setUnauthorizedHandler } from './api.js'
 
 function App() {
   const [username, setUsername] = useState(null)
@@ -18,6 +18,17 @@ function App() {
       .then(({ username }) => setUsername(username))
       .catch(() => setUsername(null))
       .finally(() => setCheckingSession(false))
+  }, [])
+
+  useEffect(() => {
+    // A 401 from any call (not just getSession's initial check) means the backend's in-memory
+    // session is gone — most likely a backend restart mid-demo. Bounce back to Login right away
+    // instead of leaving a stale screen whose calls keep silently failing.
+    setUnauthorizedHandler(() => {
+      setUsername(null)
+      setAnalysisTarget(null)
+    })
+    return () => setUnauthorizedHandler(null)
   }, [])
 
   async function handleLoggedOut() {

@@ -34,6 +34,11 @@ logger = logging.getLogger(__name__)
 
 ADMIN_USER = os.environ.get("ADMIN_USER", "")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "")
+if not ADMIN_USER or not ADMIN_PASS:
+    raise RuntimeError(
+        "ADMIN_USER/ADMIN_PASS missing or empty — check backend/.env. Refusing to start: "
+        "with both empty, secrets.compare_digest('', '') would let an empty login succeed."
+    )
 SESSION_COOKIE = "szscan_session"
 
 # token -> username. In-memory by design (dev-only demo, single process, see module docstring).

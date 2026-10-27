@@ -72,6 +72,7 @@ results/p2_seeds/
 results/p2_test/
 results/e6_gae_dump/
 results/e15_patient_adaptation/pernode_s23/
+results/v9_e1/cache/
 results/*/smoke/
 results/veto_screen*/*.npy
 # separate BME11 paper (not thesis work)

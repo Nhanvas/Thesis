@@ -1,0 +1,15 @@
+{
+ "per_patient_mean_all": 0.6333333333333334,
+ "per_patient_mean_ex_le2": 0.5302083333333334,
+ "pooled_sens_all": 0.6170212765957447,
+ "pooled_sens_ex_le2": 0.5675675675675675,
+ "n_patients_le2": 6,
+ "patients_le2": [
+  "PN01",
+  "PN03",
+  "PN07",
+  "PN11",
+  "PN16",
+  "PN17"
+ ]
+}

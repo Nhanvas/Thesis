@@ -1,0 +1,17 @@
+set,bin,n,caught
+development,<=20s,3,2
+development,21-40s,30,13
+development,41-80s,29,19
+development,>80s,31,29
+chb-test,<=20s,24,7
+chb-test,21-40s,12,4
+chb-test,41-80s,27,16
+chb-test,>80s,13,11
+chb24,<=20s,4,2
+chb24,21-40s,9,9
+chb24,41-80s,3,3
+chb24,>80s,0,0
+siena-3of14,<=20s,4,2
+siena-3of14,21-40s,2,1
+siena-3of14,41-80s,10,10
+siena-3of14,>80s,0,0

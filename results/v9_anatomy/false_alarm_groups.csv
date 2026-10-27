@@ -1,0 +1,16 @@
+set,position,high_amp,n
+chb-test,first_15min,False,9
+chb-test,first_15min,True,64
+chb-test,last_15min,False,13
+chb-test,last_15min,True,53
+chb-test,middle,False,47
+chb-test,middle,True,125
+chb24,first_15min,True,9
+chb24,last_15min,False,1
+chb24,last_15min,True,6
+chb24,middle,True,10
+siena-3of14,first_15min,False,1
+siena-3of14,first_15min,True,1
+siena-3of14,last_15min,True,1
+siena-3of14,middle,False,1
+siena-3of14,middle,True,19

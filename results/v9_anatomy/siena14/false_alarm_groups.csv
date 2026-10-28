@@ -1,0 +1,7 @@
+position,high_amp,n
+first_15min,False,3
+first_15min,True,13
+last_15min,False,1
+last_15min,True,14
+middle,False,25
+middle,True,197

@@ -70,6 +70,7 @@ import p2_scalars as PS                # noqa: E402
 import e8_gae_v2_eval as E8            # noqa: E402
 import e22_test_oneshot as E22         # noqa: E402
 import p3_levers as P3L                # noqa: E402
+import e23_test_look7 as E23           # noqa: E402
 import x1_external as X1               # noqa: E402
 import raw_eeg_view as RV              # noqa: E402
 import preprocessing as P              # noqa: E402
@@ -93,6 +94,7 @@ X1._parseTimeStamp = _parseTimeStamp_win
 
 OUT = ROOT / "results" / "v9_anatomy"
 XCACHE = OUT / "xcache"
+OUT14 = OUT / "siena14"   # V9-T4: all 14 Siena patients; OUT (3/14) stays as committed in V9-T3
 FREEZE = json.loads((ROOT / "results" / "p3c_freeze" / "freeze.json").read_text())
 SMOOTH = FREEZE["smooth"]
 LOCALIZER = FREEZE["localizer"]
@@ -112,7 +114,21 @@ TOP_GRID = sorted({0.001, 0.0015, 0.002, 0.0025, 0.003, 0.004, 0.005, 0.0075, 0.
 CH_NAMES = list(P.COMMON_CHANNELS)
 SIENA_ALL_14 = ["PN00", "PN01", "PN03", "PN05", "PN06", "PN07", "PN09", "PN10", "PN11", "PN12",
                 "PN13", "PN14", "PN16", "PN17"]
-SIENA_LOCAL = [s for s in SIENA_ALL_14 if (SIENA_DATA / s).is_dir()]
+
+
+def _siena_ready(s):
+    """True only once the patient's annotation file and every .edf under its folder look complete
+    (non-empty) -- not just dir-exists, so a folder created for an in-progress download (V9-T4) is
+    never mistaken for an available patient."""
+    d = SIENA_DATA / s
+    ann = d / f"Seizures-list-{s}.txt"
+    if not ann.exists() or ann.stat().st_size == 0:
+        return False
+    edfs = list(d.glob("*.edf"))
+    return len(edfs) > 0 and all(p.stat().st_size > 0 for p in edfs)
+
+
+SIENA_LOCAL = [s for s in SIENA_ALL_14 if _siena_ready(s)]
 SIENA_MISSING = [s for s in SIENA_ALL_14 if s not in SIENA_LOCAL]
 
 
@@ -275,6 +291,7 @@ def check_repro_ext(subj, ctx, csv_stub):
     note = f" (fp within tolerance, not exact, on: {bad})" if bad else " (exact)"
     print(f"repro OK: {subj} reproduces results/x1_external/rows_{csv_stub}.csv (balanced, 4 seeds, "
           f"det+localized, tp exact, fp within +-{FP_TOL}){note}", flush=True)
+    return bad
 
 
 # ============================================================================ raw-EEG amplitude helpers
@@ -470,12 +487,320 @@ def interp_at_fa(curve, fa_targets):
     return out
 
 
+# ============================================================================ V9-T4: Siena, all 14
+def run_siena_full(procs=4):
+    """Step 3+4+5 of V9-T4, all 14 Siena patients. Writes results/v9_anatomy/siena14/ only; the
+    committed 3-patient results/v9_anatomy/ outputs from V9-T3 are untouched."""
+    t0 = time.time()
+    OUT14.mkdir(parents=True, exist_ok=True)
+    print(f"Siena patients ready: {len(SIENA_LOCAL)}/14 (missing: {SIENA_MISSING})", flush=True)
+    if SIENA_MISSING:
+        raise SystemExit(f"STOP: Siena download incomplete, missing {SIENA_MISSING} -- re-run once "
+                         "every patient's Seizures-list file and .edf files are fully present")
+
+    # ---- measure the first not-yet-cached patient, project the rest (per the task's own instruction) ----
+    todo = [s for s in SIENA_ALL_14 if not _x1_cache_paths(s)[0].exists()]
+    if todo:
+        rows_hint = pd.concat([pd.read_csv(p) for p in (ROOT / "results" / "x1_external").glob("rows_PN*.csv")],
+                              ignore_index=True)
+        hrs = rows_hint.drop_duplicates("subject").set_index("subject")["hours"]
+        t1 = time.time()
+        build_or_load_ext(todo[0], SIENA_DATA, procs=procs)
+        el0 = time.time() - t1
+        rate = el0 / max(float(hrs.get(todo[0], 1.0)), 1e-9)
+        rest_h = sum(float(hrs.get(s, 0.0)) for s in todo[1:])
+        proj = rest_h * rate
+        print(f"siena14: {todo[0]} recomputed in {el0:.0f}s -> {rate:.1f} s/h of EEG; projected for "
+              f"the remaining {len(todo) - 1} not-yet-cached patient(s) ({rest_h:.1f} h): {proj:.0f}s "
+              f"(~{proj / 60:.1f} min)", flush=True)
+
+    # ---- step 3: gate every patient first; STOP and report on the first failure beyond tolerance ----
+    ctxs, metas, gate = {}, {}, []
+    for s in SIENA_ALL_14:
+        ctx, meta = build_or_load_ext(s, SIENA_DATA, procs=procs)
+        bad = check_repro_ext(s, ctx, s)
+        ctxs[s], metas[s] = ctx, meta
+        gate.append(dict(subject=s, passed=True, exact=not bad, detail=str(bad) if bad else "exact"))
+        print(f"  {s}: gate OK ({time.time() - t0:.0f}s)", flush=True)
+    pd.DataFrame(gate).to_csv(OUT14 / "gate.csv", index=False)
+    print(f"Siena gate: all 14/14 patients reproduce results/x1_external/rows_PN*.csv (tp within "
+          f"+-{TP_TOL}, fp within +-{FP_TOL}) -- {sum(g['exact'] for g in gate)}/14 exact", flush=True)
+
+    # ---- step 4: per-seizure table, duration bins, false-alarm anatomy ----
+    seiz_rows, fa_rows = [], []
+    for s in SIENA_ALL_14:
+        ctx, meta = ctxs[s], metas[s]
+        res = final_events(ctx, HEAD)
+        thr = 5.0 * meta["sd"]
+        exf = (lambda subj, fname, w, t, _s=s: ext_exceed_window(subj, "siena", 50.0, SIENA_DATA / _s / fname, w, t))
+        seiz_rows += per_seizure_rows(ctx, s, "siena-14", res, exf, thr)
+        fa_rows += false_alarm_rows(ctx, s, "siena-14", res, exf, thr)
+    Seiz14, FA14 = pd.DataFrame(seiz_rows), pd.DataFrame(fa_rows)
+    Seiz14.to_csv(OUT14 / "per_seizure.csv", index=False)
+    FA14.to_csv(OUT14 / "false_alarms.csv", index=False)
+    dbin14 = duration_bin_counts(seiz_rows, "siena-14")
+    dbin14.to_csv(OUT14 / "duration_bins.csv", index=False)
+    if len(FA14):
+        FA14["high_amp"] = FA14.share_high_amp >= 0.5
+        fa_summary14 = FA14.groupby(["position", "high_amp"]).size().rename("n").reset_index()
+        fa_summary14.to_csv(OUT14 / "false_alarm_groups.csv", index=False)
+    else:
+        fa_summary14 = pd.DataFrame()
+    print(f"siena14: per-seizure ({len(Seiz14)} rows) / false-alarm ({len(FA14)} rows) extraction done "
+          f"({time.time() - t0:.0f}s)", flush=True)
+
+    # ---- matched operating point: siena-14 sweep + the already-committed chb-test / chb24 sweeps ----
+    sweep14 = sweep_set(ctxs)
+    sweep14.to_csv(OUT14 / "sweep_siena-14.csv", index=False)
+    sweep_tables = {"chb-test": pd.read_csv(OUT / "sweep_chb-test.csv"),
+                    "chb24": pd.read_csv(OUT / "sweep_chb24.csv"), "siena-14": sweep14}
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(figsize=(6, 4.5), dpi=150)
+        for k, v in sweep_tables.items():
+            v2 = v.dropna(subset=["pooled_fa", "pooled_sens"]).sort_values("pooled_fa")
+            ax.plot(v2.pooled_fa, v2.pooled_sens, marker="o", ms=3, label=f"{k} (pooled)")
+            v3 = v.dropna(subset=["pooled_fa", "patient_mean_sens"]).sort_values("pooled_fa")
+            ax.plot(v3.pooled_fa, v3.patient_mean_sens, marker="x", ms=3, ls="--", label=f"{k} (per-patient mean)")
+        for fa in (20, 27.5, 44):
+            ax.axvline(fa, color="#999999", lw=0.6, ls=":")
+        ax.set_xlabel("FP/day"); ax.set_ylabel("sensitivity"); ax.set_xlim(0, 60)
+        ax.legend(fontsize=7); ax.set_title("Matched operating point (detector stage, seed 42) -- Siena all 14")
+        fig.tight_layout(); fig.savefig(OUT14 / "matched_operating_point.png"); plt.close(fig)
+    except Exception as e:
+        print(f"plot skipped: {e}", flush=True)
+
+    # ---- step 5: Siena event F1 / precision, pooled and per-patient mean, seed 42 + 4-seed mean ----
+    f1rows = []
+    for s in SIENA_ALL_14:
+        for tag in TAGS:
+            out, _ = E23.evaluate(ctxs[s], tag, FREEZE, FLOOR, CAP, LOCALIZER)
+            f1rows.append(dict(subject=s, seed=tag, **out["localized"]))
+    F1df = pd.DataFrame(f1rows)
+    F1df.to_csv(OUT14 / "f1_precision_per_seed.csv", index=False)
+    per_seed = {tag: E22.metrics(F1df[F1df.seed == tag]) for tag in TAGS}
+    pd.DataFrame(per_seed).T.to_csv(OUT14 / "f1_precision_summary.csv")
+
+    write_siena14_summary(dbin14, sweep_tables, FA14, fa_summary14, gate, per_seed, time.time() - t0)
+    print(f"siena14 done in {time.time() - t0:.0f}s", flush=True)
+    return ctxs
+
+
+# ---- V9-T4 resume, one patient per OS process (laptop RAM budget) -----------------------------
+# run_siena_full() above holds all 14 ctxs in memory at once and lets build_or_load_ext spawn a
+# multiprocessing Pool (procs=4) per patient; resuming on this laptop needs one patient at a time,
+# a single worker, and memory actually returned to the OS between patients, which a long-lived
+# Python process cannot guarantee (numpy/BLAS allocator fragmentation). The three entry points
+# below do the same computation as run_siena_full's steps 3/4/5, but each --siena-build-one /
+# --siena-collect-one call is meant to be its own `python v9_anatomy.py ...` process: when it
+# exits, the OS reclaims everything, so the next patient starts from a clean slate. Only the
+# combine step (--siena-aggregate) needs more than one patient's data at a time, and it reads
+# small per-patient JSON parts, not raw ctx, so it stays cheap.
+PARTS = OUT14 / "_parts"
+
+
+def _peak_ram_mb():
+    import psutil
+    mi = psutil.Process().memory_info()
+    return getattr(mi, "peak_wset", mi.rss) / 1e6    # Windows: true peak working set; else current RSS
+
+
+def _native(o):
+    """recursively unwrap numpy scalars so json.dumps can write them as numbers, not via str()."""
+    if isinstance(o, dict):
+        return {k: _native(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_native(v) for v in o]
+    if isinstance(o, np.generic):
+        return o.item()
+    return o
+
+
+def siena_build_one(subj):
+    """Build (or confirm already-cached) xcache for exactly one Siena patient, single worker
+    (procs=1 -- no multiprocessing.Pool). Meant to be run as its own process."""
+    t0 = time.time()
+    cp, mp = _x1_cache_paths(subj)
+    if cp.exists() and mp.exists():
+        print(f"siena-build-one {subj}: already cached, skip (peak RAM {_peak_ram_mb():.0f} MB)", flush=True)
+        return
+    build_or_load_ext(subj, SIENA_DATA, procs=1)
+    print(f"siena-build-one {subj}: built in {time.time() - t0:.0f}s, peak RAM {_peak_ram_mb():.0f} MB", flush=True)
+
+
+def siena_collect_one(subj):
+    """Gate + per-seizure/false-alarm/sweep-grid/F1 rows for exactly one Siena patient, from its
+    (already-built) xcache. Writes results/v9_anatomy/siena14/_parts/{subj}.json; siena_aggregate()
+    combines every patient's part file into the same outputs run_siena_full() would have written."""
+    t0 = time.time()
+    ctx, meta = build_or_load_ext(subj, SIENA_DATA, procs=1)
+    bad = check_repro_ext(subj, ctx, subj)   # raises SystemExit and stops this process on a real gate failure
+    gate = dict(subject=subj, passed=True, exact=not bad, detail=str(bad) if bad else "exact")
+
+    res = final_events(ctx, HEAD)
+    thr = 5.0 * meta["sd"]
+    exf = (lambda _subj, fname, w, t, _s=subj: ext_exceed_window(_subj, "siena", 50.0, SIENA_DATA / _s / fname, w, t))
+    seiz_rows = per_seizure_rows(ctx, subj, "siena-14", res, exf, thr)
+    fa_rows = false_alarm_rows(ctx, subj, "siena-14", res, exf, thr)
+
+    sweep = []   # per-grid-point (tp, fp, n_ref, nonict_h) for THIS patient only; siena_aggregate()
+    for top in TOP_GRID:                                       # pools these across patients exactly
+        x = E22.final_scalar(ctx, HEAD)                        # like sweep_set() does in one pass
+        det = PS.d1_events(ctx, x, SMOOTH, top)
+        tp, fp, nr, h = PS.score(ctx, det)
+        sweep.append(dict(top=top, tp=tp, fp=fp, n_ref=nr, nonict_h=h))
+
+    f1rows = []
+    for tag in TAGS:
+        out, _ = E23.evaluate(ctx, tag, FREEZE, FLOOR, CAP, LOCALIZER)
+        f1rows.append(dict(subject=subj, seed=tag, **out["localized"]))
+
+    PARTS.mkdir(parents=True, exist_ok=True)
+    payload = _native(dict(gate=gate, seiz_rows=seiz_rows, fa_rows=fa_rows, sweep=sweep, f1=f1rows))
+    (PARTS / f"{subj}.json").write_text(json.dumps(payload), encoding="utf-8")
+    print(f"siena-collect-one {subj}: done in {time.time() - t0:.0f}s, peak RAM {_peak_ram_mb():.0f} MB", flush=True)
+
+
+def siena_aggregate():
+    """Combine every _parts/{subj}.json (written one patient at a time by siena_collect_one) into
+    the same files run_siena_full() writes in one pass: gate.csv, per_seizure.csv, false_alarms.csv,
+    duration_bins.csv, sweep_siena-14.csv, f1_precision_per_seed.csv, f1_precision_summary.csv,
+    matched_operating_point.png, SUMMARY.md. Only this step needs all 14 patients at once, and it
+    operates on small per-patient JSON rows, never on raw ctx, so it stays memory-cheap."""
+    t0 = time.time()
+    OUT14.mkdir(parents=True, exist_ok=True)
+    parts = {}
+    for s in SIENA_ALL_14:
+        fp = PARTS / f"{s}.json"
+        if not fp.exists():
+            raise SystemExit(f"STOP: missing part file for {s} ({fp}) -- run --siena-collect-one {s} first")
+        parts[s] = json.loads(fp.read_text())
+
+    gate = [parts[s]["gate"] for s in SIENA_ALL_14]
+    pd.DataFrame(gate).to_csv(OUT14 / "gate.csv", index=False)
+    print(f"Siena gate: all 14/14 patients reproduce results/x1_external/rows_PN*.csv (tp within "
+          f"+-{TP_TOL}, fp within +-{FP_TOL}) -- {sum(g['exact'] for g in gate)}/14 exact", flush=True)
+
+    seiz_rows = [r for s in SIENA_ALL_14 for r in parts[s]["seiz_rows"]]
+    fa_rows = [r for s in SIENA_ALL_14 for r in parts[s]["fa_rows"]]
+    Seiz14, FA14 = pd.DataFrame(seiz_rows), pd.DataFrame(fa_rows)
+    Seiz14.to_csv(OUT14 / "per_seizure.csv", index=False)
+    FA14.to_csv(OUT14 / "false_alarms.csv", index=False)
+    dbin14 = duration_bin_counts(seiz_rows, "siena-14")
+    dbin14.to_csv(OUT14 / "duration_bins.csv", index=False)
+    if len(FA14):
+        FA14["high_amp"] = FA14.share_high_amp >= 0.5
+        fa_summary14 = FA14.groupby(["position", "high_amp"]).size().rename("n").reset_index()
+        fa_summary14.to_csv(OUT14 / "false_alarm_groups.csv", index=False)
+    else:
+        fa_summary14 = pd.DataFrame()
+
+    sweep_rows = []
+    for i, top in enumerate(TOP_GRID):
+        a = pd.DataFrame([dict(subject=s, **parts[s]["sweep"][i]) for s in SIENA_ALL_14])
+        pooled_sens = a.tp.sum() / a.n_ref.sum() if a.n_ref.sum() else np.nan
+        pooled_fa = a.fp.sum() / a.nonict_h.sum() * 24 if a.nonict_h.sum() else np.nan
+        patient_sens = (a.tp / a.n_ref.replace(0, np.nan)).mean()
+        sweep_rows.append(dict(top=top, pooled_sens=pooled_sens, pooled_fa=pooled_fa, patient_mean_sens=patient_sens))
+    sweep14 = pd.DataFrame(sweep_rows)
+    sweep14.to_csv(OUT14 / "sweep_siena-14.csv", index=False)
+    sweep_tables = {"chb-test": pd.read_csv(OUT / "sweep_chb-test.csv"),
+                    "chb24": pd.read_csv(OUT / "sweep_chb24.csv"), "siena-14": sweep14}
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(figsize=(6, 4.5), dpi=150)
+        for k, v in sweep_tables.items():
+            v2 = v.dropna(subset=["pooled_fa", "pooled_sens"]).sort_values("pooled_fa")
+            ax.plot(v2.pooled_fa, v2.pooled_sens, marker="o", ms=3, label=f"{k} (pooled)")
+            v3 = v.dropna(subset=["pooled_fa", "patient_mean_sens"]).sort_values("pooled_fa")
+            ax.plot(v3.pooled_fa, v3.patient_mean_sens, marker="x", ms=3, ls="--", label=f"{k} (per-patient mean)")
+        for fa in (20, 27.5, 44):
+            ax.axvline(fa, color="#999999", lw=0.6, ls=":")
+        ax.set_xlabel("FP/day"); ax.set_ylabel("sensitivity"); ax.set_xlim(0, 60)
+        ax.legend(fontsize=7); ax.set_title("Matched operating point (detector stage, seed 42) -- Siena all 14")
+        fig.tight_layout(); fig.savefig(OUT14 / "matched_operating_point.png"); plt.close(fig)
+    except Exception as e:
+        print(f"plot skipped: {e}", flush=True)
+
+    f1rows = [r for s in SIENA_ALL_14 for r in parts[s]["f1"]]
+    F1df = pd.DataFrame(f1rows)
+    F1df.to_csv(OUT14 / "f1_precision_per_seed.csv", index=False)
+    per_seed = {tag: E22.metrics(F1df[F1df.seed == tag]) for tag in TAGS}
+    pd.DataFrame(per_seed).T.to_csv(OUT14 / "f1_precision_summary.csv")
+
+    write_siena14_summary(dbin14, sweep_tables, FA14, fa_summary14, gate, per_seed, time.time() - t0)
+    print(f"siena14 aggregate done in {time.time() - t0:.0f}s", flush=True)
+
+
+def write_siena14_summary(dbin14, sweep_tables, FA14, fa_summary14, gate, per_seed, elapsed):
+    L = ["# V9-T4 -- Siena, all 14 patients (balanced point, localizer cpd, computed in v9)\n",
+         "Gate (step 3): every patient's recomputed tp/fp (seed-by-seed, detector+localized) reproduces "
+         "results/x1_external/rows_PN*.csv within the tolerance documented in check_repro_ext "
+         f"(tp +-{TP_TOL}, fp +-{FP_TOL}) -- see gate.csv.\n", "```",
+         pd.DataFrame(gate)[["subject", "passed", "exact", "detail"]].to_string(index=False), "```"]
+
+    L += ["\n## Duration bins, siena-14 (duration_bins.csv)\n", "```", dbin14.to_string(index=False), "```"]
+
+    L += ["\n## Matched operating point (sweep_siena-14.csv; chb-test/chb24 reused from results/v9_anatomy/)\n"]
+    for k, v in sweep_tables.items():
+        pts = interp_at_fa(v, (20, 27.5, 44))
+        L.append(f"- {k}: sensitivity @ FP/day " + ", ".join(
+            f"{t:g}={pts[t]:.3f}" if pts[t] == pts[t] else f"{t:g}=out of range" for t in pts))
+
+    L += ["\n## Siena event F1 / precision, pooled and per-patient mean, "
+          "frozen operating point (f1_precision_per_seed.csv, f1_precision_summary.csv)\n", "```"]
+    h = per_seed[HEAD]
+    L.append(f"seed 42: sens {h['sens']:.3f}, prec {h['prec']:.3f}, F1 {h['f1']:.3f}, FP/day {h['fa_day']:.2f} | "
+             f"per-patient mean: sens {h['s_sens']:.3f}, prec {h['s_prec']:.3f}, F1 {h['s_f1']:.3f}")
+    for key, lab in (("sens", "pooled sens"), ("prec", "pooled prec"), ("f1", "pooled F1"), ("fa_day", "FP/day"),
+                     ("s_sens", "per-patient sens"), ("s_prec", "per-patient prec"), ("s_f1", "per-patient F1")):
+        vals = [per_seed[t][key] for t in TAGS]
+        L.append(f"4-seed mean {lab}: {np.mean(vals):.3f} +- {np.std(vals, ddof=1):.3f}")
+    L.append("```")
+
+    L += ["\n## False-alarm anatomy, siena-14 (false_alarms.csv, false_alarm_groups.csv)\n"]
+    if len(FA14):
+        L += ["```", fa_summary14.to_string(index=False), "```",
+              f"\n{len(FA14)} false alarms; median duration {FA14.duration_s.median():.0f} s; "
+              f"share with >=1 high-amplitude window >= 50% of the event: {float(FA14.high_amp.mean()):.0%}; "
+              f"top channel mode: {FA14.top_channel.mode().iloc[0] if len(FA14.top_channel.mode()) else 'n/a'}."]
+    else:
+        L.append("(none)")
+    L.append(f"\nElapsed {elapsed:.0f} s.")
+    (OUT14 / "SUMMARY.md").write_text("\n".join(L), encoding="utf-8")
+    print("\n".join(L))
+
+
 # ============================================================================ main
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--procs", type=int, default=4)
+    ap.add_argument("--siena-full", action="store_true",
+                    help="V9-T4: all 14 Siena patients, writes results/v9_anatomy/siena14/ only")
+    ap.add_argument("--siena-build-one", metavar="SUBJ",
+                    help="V9-T4 resume: build/cache one Siena patient only, single worker, as its own process")
+    ap.add_argument("--siena-collect-one", metavar="SUBJ",
+                    help="V9-T4 resume: gate+rows for one (already-cached) Siena patient, as its own process")
+    ap.add_argument("--siena-aggregate", action="store_true",
+                    help="V9-T4 resume: combine every _parts/*.json into the siena14/ outputs")
     a = ap.parse_args()
+    if a.siena_build_one:
+        siena_build_one(a.siena_build_one)
+        return
+    if a.siena_collect_one:
+        siena_collect_one(a.siena_collect_one)
+        return
+    if a.siena_aggregate:
+        siena_aggregate()
+        return
+    if a.siena_full:
+        run_siena_full(procs=a.procs)
+        return
     t0 = time.time()
     OUT.mkdir(parents=True, exist_ok=True)
     print(f"Siena local raw EDF: {SIENA_LOCAL} (missing: {SIENA_MISSING})", flush=True)

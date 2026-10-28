@@ -1,0 +1,5 @@
+set,bin,n,caught
+siena-14,<=20s,5,3
+siena-14,21-40s,6,2
+siena-14,41-80s,27,21
+siena-14,>80s,9,7

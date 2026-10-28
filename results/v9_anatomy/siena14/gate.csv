@@ -1,0 +1,15 @@
+subject,passed,exact,detail
+PN00,True,True,exact
+PN01,True,False,"[('clean_seed1', 'detector', 'fp', 11, 12), ('clean_seed1', 'localized', 'fp', 11, 12), ('clean_seed2', 'detector', 'fp', 12, 13), ('clean_seed2', 'localized', 'fp', 12, 13), ('clean_seed3', 'detector', 'fp', 11, 12), ('clean_seed3', 'localized', 'fp', 11, 12)]"
+PN03,True,False,"[('clean_seed42', 'detector', 'fp', 54, 55), ('clean_seed42', 'localized', 'fp', 53, 54), ('clean_seed1', 'detector', 'fp', 60, 59), ('clean_seed1', 'localized', 'fp', 58, 57), ('clean_seed2', 'detector', 'fp', 56, 55), ('clean_seed2', 'localized', 'fp', 54, 53), ('clean_seed3', 'detector', 'fp', 52, 53), ('clean_seed3', 'localized', 'fp', 51, 52)]"
+PN05,True,True,exact
+PN06,True,False,"[('clean_seed42', 'detector', 'fp', 39, 38), ('clean_seed42', 'localized', 'fp', 39, 38), ('clean_seed3', 'detector', 'fp', 36, 35), ('clean_seed3', 'localized', 'fp', 35, 34)]"
+PN07,True,False,"[('clean_seed42', 'detector', 'fp', 35, 36), ('clean_seed42', 'localized', 'fp', 32, 33), ('clean_seed2', 'detector', 'fp', 28, 29), ('clean_seed3', 'detector', 'fp', 32, 31), ('clean_seed3', 'localized', 'fp', 30, 29)]"
+PN09,True,False,"[('clean_seed3', 'detector', 'fp', 4, 5), ('clean_seed3', 'localized', 'fp', 4, 5)]"
+PN10,True,False,"[('clean_seed2', 'detector', 'tp', 6, 5), ('clean_seed2', 'localized', 'tp', 6, 5), ('clean_seed3', 'detector', 'tp', 5, 6), ('clean_seed3', 'detector', 'fp', 21, 20), ('clean_seed3', 'localized', 'tp', 5, 6), ('clean_seed3', 'localized', 'fp', 20, 19)]"
+PN11,True,True,exact
+PN12,True,False,"[('clean_seed42', 'detector', 'tp', 2, 3), ('clean_seed42', 'detector', 'fp', 9, 8), ('clean_seed42', 'localized', 'tp', 2, 3), ('clean_seed42', 'localized', 'fp', 9, 8), ('clean_seed2', 'detector', 'fp', 10, 8), ('clean_seed2', 'localized', 'fp', 10, 8), ('clean_seed3', 'detector', 'fp', 7, 8), ('clean_seed3', 'localized', 'fp', 7, 8)]"
+PN13,True,False,"[('clean_seed42', 'detector', 'fp', 13, 12), ('clean_seed42', 'localized', 'tp', 2, 1)]"
+PN14,True,False,"[('clean_seed42', 'detector', 'fp', 45, 44), ('clean_seed42', 'localized', 'fp', 45, 44), ('clean_seed2', 'detector', 'fp', 49, 48), ('clean_seed2', 'localized', 'fp', 48, 47), ('clean_seed3', 'localized', 'fp', 47, 46)]"
+PN16,True,False,"[('clean_seed42', 'detector', 'fp', 18, 19), ('clean_seed42', 'localized', 'fp', 15, 16), ('clean_seed2', 'detector', 'fp', 14, 15), ('clean_seed2', 'localized', 'fp', 13, 14)]"
+PN17,True,True,exact

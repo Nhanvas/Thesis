@@ -39,8 +39,14 @@ script's reuse of its functions, never reimplemented).
 OUTPUT: F:/Study/Thesis/Defense/slides/figs/eeg_samples/ (figures + selection.csv), results/v9_anatomy/
  (nothing else here -- Part B writes no new result CSVs beyond selection.csv, which lives with the figures
  per the task's own output path).
+
+V9-T4 (--siena-full): once all 14 Siena patients are available and v9_anatomy.py --siena-full has run,
+re-draws Siena with the ORIGINAL rule (no deviation) -- the true 4 patients with the most reference
+seizures (counted directly, not the V9-T3 fallback) plus the true shortest seizure over all 14. Writes
+only F:/.../eeg_samples/siena14/; the V9-T3 3-patient figures above are untouched.
 Run:  python src/v9_eeg_samples.py --smoke     (1 CHB-MIT test patient only)
       python src/v9_eeg_samples.py             (needs results/v9_anatomy/per_seizure.csv + false_alarms.csv)
+      python src/v9_eeg_samples.py --siena-full  (needs results/v9_anatomy/siena14/*.csv)
 """
 import argparse
 import sys
@@ -146,6 +152,24 @@ def pick_siena(seiz, fa, patients):
                           duration_s=int(r.duration_s), rule="shortest reference seizure, available patients only",
                           set="siena-3of14"))
     return picks
+
+
+def pick_siena_full(seiz, fa):
+    """V9-T4: the ORIGINAL rule (no deviation) -- the 4 patients with the most reference seizures,
+    counted directly from the siena-14 per-seizure rows, plus the shortest seizure over all 14."""
+    d14 = seiz[seiz.set == "siena-14"]
+    counts = d14.groupby("subject").size().sort_values(ascending=False)
+    top4 = list(counts.index[:4])
+    picks = pick_three(seiz, fa, top4, "siena-14")
+    for p in picks:
+        p["set"] = "siena-14"
+    if len(d14):
+        r = d14.loc[d14.duration_s.idxmin()]
+        kind = "TP (shortest)" if r.caught else "FN (shortest)"
+        picks.append(dict(subject=r.subject, kind=kind, file=r.file, onset_s=int(r.onset_s),
+                          duration_s=int(r.duration_s), rule="shortest reference seizure, all 14 patients",
+                          set="siena-14"))
+    return picks, top4, counts
 
 
 # ============================================================================ context / score access
@@ -299,10 +323,35 @@ def render(picks, setname, outdir):
 
 
 # ============================================================================ main
+def run_siena14():
+    t0 = time.time()
+    pf = ROOT / "results" / "v9_anatomy" / "siena14" / "per_seizure.csv"
+    ff = ROOT / "results" / "v9_anatomy" / "siena14" / "false_alarms.csv"
+    if not pf.exists() or not ff.exists():
+        raise SystemExit("STOP: results/v9_anatomy/siena14/per_seizure.csv and false_alarms.csv are "
+                         "missing -- run `python src/v9_anatomy.py --siena-full` first")
+    seiz, fa = pd.read_csv(pf), pd.read_csv(ff)
+    picks, top4, counts = pick_siena_full(seiz, fa)
+    outdir = FIGOUT / "siena14"
+    outdir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(picks).to_csv(outdir / "selection.csv", index=False)
+    print(f"siena-14 selection: top 4 by seizure count = {top4} (counts: {dict(counts)}); "
+          f"{len(picks)} picks -> {outdir / 'selection.csv'}", flush=True)
+    w, s = render(picks, "siena14", outdir)
+    print(f"siena14: {len(w)} panels -> {s}", flush=True)
+    print(f"done in {time.time() - t0:.0f}s", flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--siena-full", action="store_true",
+                    help="V9-T4: re-draw Siena with the original top-4-by-seizure-count rule, all 14 "
+                         "patients; writes F:/.../eeg_samples/siena14/ only, keeps the 3-patient set")
     a = ap.parse_args()
+    if a.siena_full:
+        run_siena14()
+        return
     t0 = time.time()
     pf = ROOT / "results" / "v9_anatomy" / "per_seizure.csv"
     ff = ROOT / "results" / "v9_anatomy" / "false_alarms.csv"

@@ -1,0 +1,5 @@
+,duration_s,duration_s,duration_s,amp_ratio,amp_ratio,amp_ratio,spatial_extent,spatial_extent,spatial_extent,dom_freq_hz,dom_freq_hz,dom_freq_hz,busyness,busyness,busyness
+,mean,median,count,mean,median,count,mean,median,count,mean,median,count,mean,median,count
+low_case,,,,,,,,,,,,,,,
+False,73.37254901960785,62.0,102,3.0142764705882357,2.58115,102,11.264705882352942,13.0,102,1.7892156862745099,1.75,102,0.4864823529411765,0.51,102
+True,50.89156626506024,36.0,83,1.296598795180723,1.2722,83,2.0240963855421685,1.0,83,1.677710843373494,1.25,83,0.4443192771084338,0.44,83

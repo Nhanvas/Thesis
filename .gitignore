@@ -57,6 +57,7 @@ web_demo/backend/szscan.db.bak*
 web_demo/backend/uploads/
 web_demo/frontend/node_modules/
 web_demo/frontend/dist/
+web_demo/backend/demo_backend.log
 # v2 inputs and large caches (identity in docs/PROVENANCE_V2.md)
 data/trainset_v2/
 data/testset_v2/

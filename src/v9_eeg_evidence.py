@@ -569,6 +569,35 @@ def part1_lowcase_check(D, res):
     print(grp.to_string(), flush=True)
 
 
+def draw_descriptors_fig(D, desc_cols, desc_labels, sets_order, ncols, figsize, dpi, fontscale=1.0):
+    """V9-V1-FIX: a fresh figure+grid at the GIVEN size (never a resize of an already-laid-out figure,
+    which is what produced the old slide version's overlapping titles and cut tick labels)."""
+    nrows = int(np.ceil(len(desc_cols) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, dpi=dpi)
+    axes = np.atleast_1d(axes).ravel()
+    for ax, col, lab in zip(axes, desc_cols, desc_labels):
+        xs, ys, cs = [], [], []
+        for si, s in enumerate(sets_order):
+            d = D[D.set == s]
+            jitter = (np.random.RandomState(42).rand(len(d)) - 0.5) * 0.3
+            xs += list(si + jitter)
+            ys += list(d[col])
+            cs += ["#1f77b4" if c else "#d62728" for c in d.caught]
+        ax.scatter(xs, ys, c=cs, s=10 * fontscale, alpha=0.7, linewidths=0)
+        ax.set_xticks(range(len(sets_order)))
+        ax.set_xticklabels(sets_order, fontsize=8 * fontscale, rotation=20, ha="right")
+        ax.set_title(lab, fontsize=9 * fontscale)
+        ax.tick_params(labelsize=7 * fontscale)
+    for ax in axes[len(desc_cols):]:
+        ax.axis("off")
+    axes[0].scatter([], [], c="#1f77b4", label="caught")
+    axes[0].scatter([], [], c="#d62728", label="missed")
+    axes[0].legend(fontsize=7 * fontscale, loc="upper left")
+    fig.suptitle("Measured hard-patient descriptors, caught vs missed (seed 42)", fontsize=10 * fontscale)
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    return fig
+
+
 def part1(smoke=False):
     t0 = time.time()
     res = _resout()
@@ -641,36 +670,21 @@ def part1(smoke=False):
         return
 
     # ---- figure: each descriptor by set, caught vs missed ----
+    # V9-V1-FIX: the slide version used to be the SAME fig object resized after savefig+close (no fresh
+    # tight_layout at the new aspect ratio) -- overlapping titles, cut tick labels. draw_descriptors_fig
+    # below builds each size from scratch with its own grid and its own tight_layout call.
     desc_cols = ["duration_s", "amp_ratio", "spatial_extent", "dom_freq_hz", "busyness"]
     desc_labels = ["duration (s)", "amplitude ratio (ictal/pre RMS)", "spatial extent (n ch RMS>2)",
                   "dominant frequency (Hz, 1-30)", "background busyness (share of 10 min pre-onset)"]
     sets_order = ["development", "chb-test", "chb24", "siena"]
-    fig, axes = plt.subplots(1, 5, figsize=(22, 4.2), dpi=150)
-    for ax, col, lab in zip(axes, desc_cols, desc_labels):
-        xs, ys, cs = [], [], []
-        for si, s in enumerate(sets_order):
-            d = D[D.set == s]
-            jitter = (np.random.RandomState(42).rand(len(d)) - 0.5) * 0.3
-            xs += list(si + jitter)
-            ys += list(d[col])
-            cs += ["#1f77b4" if c else "#d62728" for c in d.caught]
-        ax.scatter(xs, ys, c=cs, s=10, alpha=0.7, linewidths=0)
-        ax.set_xticks(range(len(sets_order))); ax.set_xticklabels(sets_order, fontsize=8, rotation=20)
-        ax.set_title(lab, fontsize=9)
-        ax.tick_params(labelsize=7)
-    axes[0].scatter([], [], c="#1f77b4", label="caught")
-    axes[0].scatter([], [], c="#d62728", label="missed")
-    axes[0].legend(fontsize=7, loc="upper left")
-    fig.suptitle("V9-V1 Part 1 -- measured hard-patient descriptors, caught vs missed (seed 42, frozen G)",
-                fontsize=10)
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig = draw_descriptors_fig(D, desc_cols, desc_labels, sets_order, ncols=5, figsize=(22, 4.2),
+                               dpi=150, fontscale=1.0)
     fig.savefig(outdir / "descriptors_by_set.png")
     plt.close(fig)
-    fig.set_size_inches(16, 9)
-    for ax in axes:
-        ax.title.set_fontsize(14); ax.tick_params(labelsize=12)
-    fig.savefig(outdir / "descriptors_by_set_slide.png")
-    plt.close(fig)
+    fig2 = draw_descriptors_fig(D, desc_cols, desc_labels, sets_order, ncols=3, figsize=(16, 9),
+                                dpi=150, fontscale=1.7)
+    fig2.savefig(outdir / "descriptors_by_set_slide.png")
+    plt.close(fig2)
 
     # ---- gallery: median-duration seizure of every CHB-MIT patient (dev vs test, same scale) ----
     def pick_median(df, s):
@@ -721,8 +735,7 @@ def part1(smoke=False):
             title = f"{pk['subject']}  dur {pk['duration_s']} s (patient median)"
             draw_eeg(ax, [], sgm["filt"], list(range(len(CH))), CH, sgm["t0"], sgm["t1"], title,
                     [], [], pk["onset_s"], spacing, [])
-        fig.suptitle(f"V9-V1 Part 1 -- median-duration seizure, every {group} patient (same uV scale)",
-                    fontsize=10)
+        fig.suptitle(f"Median-duration seizure, every {group} patient (same uV scale)", fontsize=10)
         fig.savefig(outdir / f"{tag}.png")
         plt.close(fig)
     print(f"Part 1 done in {time.time()-t0:.0f}s -> {outdir}", flush=True)
@@ -1014,8 +1027,20 @@ def part4(smoke=False):
         else:
             key = d[f"{typ}_pct"]
             r_extreme = d.loc[key.idxmax()]
-        med = key.median()
-        r_median = d.loc[(key - med).abs().idxmin()]
+        # V9-V1-FIX: the median pick must EXCLUDE the extreme row from its own candidate pool -- when a
+        # feature's percentile saturates at the reference distribution's cap (many FPs tied at 1.0), the
+        # population median can equal that same cap, and idxmax()/idxmin() independently resolve ties to
+        # the FIRST matching row in index order -- the SAME row both times (observed on f3/f4: the
+        # "median" panel was pixel-identical to the "extreme" one, e.g. f4 with 176 members). Dropping
+        # the extreme row before computing the median (and before the nearest-to-median search) guarantees
+        # a different event whenever more than one member exists.
+        med_pool = d.drop(index=r_extreme.name)
+        if len(med_pool):
+            key_pool = key.drop(index=r_extreme.name)
+            med = key_pool.median()
+            r_median = med_pool.loc[(key_pool - med).abs().idxmin()]
+        else:
+            r_median = r_extreme   # only one member of this type -- no distinct median exists
         for tag_kind, r in (("extreme", r_extreme), ("median", r_median)):
             tag = f"{typ}_{tag_kind}_{r.subject}_{int(r.onset_s)}"
             if event_done(outdir, tag):
@@ -1035,8 +1060,10 @@ def part4(smoke=False):
             refs, _loc = V9S.refs_and_loc(ctx, resG, fid)
             w0, w1 = int(a // WIN), int(np.ceil(b / WIN))
             svals, sw0, _ = score_strip(ctx, resG, fid, w0, w1)
-            title = (f"{r.subject}  {fname}  FP  type={typ} ({tag_kind})  "
-                    f"pct={r.get(f'{typ}_pct', r.best_pct):.2f}")
+            # V9-V1-FIX defect 3: title is exactly patient / file / false alarm / duration -- no internal
+            # labels (type=, pct=, (extreme)/(median)); that bookkeeping stays in the FILENAME (tag) and
+            # in part4_fp_types.csv, never in the rendered image.
+            title = f"{r.subject}  {fname}  false alarm  duration {dur:.0f} s"
             fpth, _sp = render_event(outdir, tag, filt, a, b, title, refs, [(r.onset_s, r.offset_s)],
                                      r.onset_s, [(svals, sw0 * WIN, "score")])
             written.append(str(fpth))
@@ -1094,10 +1121,10 @@ def part4(smoke=False):
             refs, _loc = V9S.refs_and_loc(ctx, resG, fid)
             w0, w1 = int(a // WIN), int(np.ceil(b / WIN))
             svals, sw0, _ = score_strip(ctx, resG, fid, w0, w1)
-            peak = pr.tp_peak if kind == "TP" else pr.fp_peak
+            label = "TP" if kind == "TP" else "false alarm"
             segs.append(dict(kind=kind, filt=filt, t0=a, t1=b, onset=onset, refs=refs,
                              loc=[(onset, offset)], score_vals=svals, score_t0=sw0 * WIN,
-                             title=f"{pr.subject} {fname} {kind} peak={peak:.3f}"))
+                             title=f"{pr.subject}  {fname}  {label}  duration {offset - onset:.0f} s"))
         if len(segs) != 2:
             continue
         spacing = spacing_for([s["filt"] for s in segs])
@@ -1109,8 +1136,8 @@ def part4(smoke=False):
             draw_eeg(ax_eeg, [ax_sc], sg["filt"], list(range(len(CH))), CH, sg["t0"], sg["t1"],
                     sg["title"], sg["refs"], sg["loc"], sg["onset"], spacing,
                     [(sg["score_vals"], sg["score_t0"], "score")])
-        fig.suptitle(f"V9-V1 Part 4 look-alike: {pr.subject} TP vs FP, closest peak score "
-                    f"(|diff|={pr.abs_diff:.3f})", fontsize=9)
+        fig.suptitle(f"{pr.subject}: closest-matching true alarm and false alarm, by peak score",
+                    fontsize=9)
         fig.savefig(outdir / f"lookalike_{pr.subject}.png")
         plt.close(fig)
     print(f"Part 4 done in {time.time()-t0:.0f}s -> {outdir}", flush=True)

@@ -80,6 +80,7 @@ results/v9_e2/_parts/
 results/v9_e3/_parts/
 results/v9_e4/_m/
 results/v9_e4/_parts/
+results/v9_x1/_parts/
 results/*/smoke/
 results/veto_screen*/*.npy
 # separate BME11 paper (not thesis work)

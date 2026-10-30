@@ -1,0 +1,371 @@
+{
+ "rule": "stratified group k-fold, 4 folds; unit = subject (chb01+chb21 merged); groups sorted by annotated seizure count descending (ties by case id ascending), serpentine assignment 1,2,3,4,4,3,2,1,1,2,...; seizure counts from the CHB-MIT summary files, chb12_27/28/29 excluded (missing a common channel, never in any committed array)",
+ "seizure_counts": {
+  "chb01": 7,
+  "chb02": 3,
+  "chb03": 7,
+  "chb04": 4,
+  "chb05": 5,
+  "chb06": 10,
+  "chb07": 3,
+  "chb08": 5,
+  "chb09": 4,
+  "chb10": 7,
+  "chb11": 3,
+  "chb12": 27,
+  "chb13": 12,
+  "chb14": 8,
+  "chb15": 20,
+  "chb16": 10,
+  "chb17": 3,
+  "chb18": 6,
+  "chb19": 3,
+  "chb20": 8,
+  "chb21": 4,
+  "chb22": 3,
+  "chb23": 7,
+  "chb24": 16
+ },
+ "skipped_files": [
+  "chb12_27.edf",
+  "chb12_28.edf",
+  "chb12_29.edf"
+ ],
+ "groups": [
+  {
+   "group_id": "chb12",
+   "cases": [
+    "chb12"
+   ],
+   "seizures": 27
+  },
+  {
+   "group_id": "chb15",
+   "cases": [
+    "chb15"
+   ],
+   "seizures": 20
+  },
+  {
+   "group_id": "chb24",
+   "cases": [
+    "chb24"
+   ],
+   "seizures": 16
+  },
+  {
+   "group_id": "chb13",
+   "cases": [
+    "chb13"
+   ],
+   "seizures": 12
+  },
+  {
+   "group_id": "chb01",
+   "cases": [
+    "chb01",
+    "chb21"
+   ],
+   "seizures": 11
+  },
+  {
+   "group_id": "chb06",
+   "cases": [
+    "chb06"
+   ],
+   "seizures": 10
+  },
+  {
+   "group_id": "chb16",
+   "cases": [
+    "chb16"
+   ],
+   "seizures": 10
+  },
+  {
+   "group_id": "chb14",
+   "cases": [
+    "chb14"
+   ],
+   "seizures": 8
+  },
+  {
+   "group_id": "chb20",
+   "cases": [
+    "chb20"
+   ],
+   "seizures": 8
+  },
+  {
+   "group_id": "chb03",
+   "cases": [
+    "chb03"
+   ],
+   "seizures": 7
+  },
+  {
+   "group_id": "chb10",
+   "cases": [
+    "chb10"
+   ],
+   "seizures": 7
+  },
+  {
+   "group_id": "chb23",
+   "cases": [
+    "chb23"
+   ],
+   "seizures": 7
+  },
+  {
+   "group_id": "chb18",
+   "cases": [
+    "chb18"
+   ],
+   "seizures": 6
+  },
+  {
+   "group_id": "chb05",
+   "cases": [
+    "chb05"
+   ],
+   "seizures": 5
+  },
+  {
+   "group_id": "chb08",
+   "cases": [
+    "chb08"
+   ],
+   "seizures": 5
+  },
+  {
+   "group_id": "chb04",
+   "cases": [
+    "chb04"
+   ],
+   "seizures": 4
+  },
+  {
+   "group_id": "chb09",
+   "cases": [
+    "chb09"
+   ],
+   "seizures": 4
+  },
+  {
+   "group_id": "chb02",
+   "cases": [
+    "chb02"
+   ],
+   "seizures": 3
+  },
+  {
+   "group_id": "chb07",
+   "cases": [
+    "chb07"
+   ],
+   "seizures": 3
+  },
+  {
+   "group_id": "chb11",
+   "cases": [
+    "chb11"
+   ],
+   "seizures": 3
+  },
+  {
+   "group_id": "chb17",
+   "cases": [
+    "chb17"
+   ],
+   "seizures": 3
+  },
+  {
+   "group_id": "chb19",
+   "cases": [
+    "chb19"
+   ],
+   "seizures": 3
+  },
+  {
+   "group_id": "chb22",
+   "cases": [
+    "chb22"
+   ],
+   "seizures": 3
+  }
+ ],
+ "folds": {
+  "1": [
+   {
+    "group_id": "chb12",
+    "cases": [
+     "chb12"
+    ],
+    "seizures": 27
+   },
+   {
+    "group_id": "chb14",
+    "cases": [
+     "chb14"
+    ],
+    "seizures": 8
+   },
+   {
+    "group_id": "chb20",
+    "cases": [
+     "chb20"
+    ],
+    "seizures": 8
+   },
+   {
+    "group_id": "chb04",
+    "cases": [
+     "chb04"
+    ],
+    "seizures": 4
+   },
+   {
+    "group_id": "chb09",
+    "cases": [
+     "chb09"
+    ],
+    "seizures": 4
+   }
+  ],
+  "2": [
+   {
+    "group_id": "chb15",
+    "cases": [
+     "chb15"
+    ],
+    "seizures": 20
+   },
+   {
+    "group_id": "chb16",
+    "cases": [
+     "chb16"
+    ],
+    "seizures": 10
+   },
+   {
+    "group_id": "chb03",
+    "cases": [
+     "chb03"
+    ],
+    "seizures": 7
+   },
+   {
+    "group_id": "chb08",
+    "cases": [
+     "chb08"
+    ],
+    "seizures": 5
+   },
+   {
+    "group_id": "chb02",
+    "cases": [
+     "chb02"
+    ],
+    "seizures": 3
+   },
+   {
+    "group_id": "chb22",
+    "cases": [
+     "chb22"
+    ],
+    "seizures": 3
+   }
+  ],
+  "3": [
+   {
+    "group_id": "chb24",
+    "cases": [
+     "chb24"
+    ],
+    "seizures": 16
+   },
+   {
+    "group_id": "chb06",
+    "cases": [
+     "chb06"
+    ],
+    "seizures": 10
+   },
+   {
+    "group_id": "chb10",
+    "cases": [
+     "chb10"
+    ],
+    "seizures": 7
+   },
+   {
+    "group_id": "chb05",
+    "cases": [
+     "chb05"
+    ],
+    "seizures": 5
+   },
+   {
+    "group_id": "chb07",
+    "cases": [
+     "chb07"
+    ],
+    "seizures": 3
+   },
+   {
+    "group_id": "chb19",
+    "cases": [
+     "chb19"
+    ],
+    "seizures": 3
+   }
+  ],
+  "4": [
+   {
+    "group_id": "chb13",
+    "cases": [
+     "chb13"
+    ],
+    "seizures": 12
+   },
+   {
+    "group_id": "chb01",
+    "cases": [
+     "chb01",
+     "chb21"
+    ],
+    "seizures": 11
+   },
+   {
+    "group_id": "chb23",
+    "cases": [
+     "chb23"
+    ],
+    "seizures": 7
+   },
+   {
+    "group_id": "chb18",
+    "cases": [
+     "chb18"
+    ],
+    "seizures": 6
+   },
+   {
+    "group_id": "chb11",
+    "cases": [
+     "chb11"
+    ],
+    "seizures": 3
+   },
+   {
+    "group_id": "chb17",
+    "cases": [
+     "chb17"
+    ],
+    "seizures": 3
+   }
+  ]
+ },
+ "git_commit_at_write": "7dd9869fcadf766b426d0e3f39b38029796edbfd"
+}

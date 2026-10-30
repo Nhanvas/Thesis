@@ -286,6 +286,33 @@ def draw_false_alarm(tag, row, title, margin=MARGIN_S):
                              loc_band, loc_band[0], score_x_full, 0.0, res["thr"])
 
 
+# ============================================================================ item 5: web demo comparison
+def item5_web_demo():
+    """V9-FINAL Part D item 5: the already-retaken SzScan screenshot (V9-V1-FIX, chb03_01.edf's
+    only seizure, duration 56 s -- matches this pass's own item1_chb03_first pick exactly) next to
+    the SAME event drawn in this pass's unified style. No new browser session: V9-V1-FIX already
+    retook this screenshot read-only (web_demo untouched, same as here)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    shot_path = Path("F:/Study/Thesis/Defense/slides/figs/eeg_evidence/part3/szscan_screenshots"
+                     "/chb03_TP_event1.jpg")
+    panel_path = OUT / "item1_chb03_first_slide.png"
+    if not shot_path.exists() or not panel_path.exists():
+        raise SystemExit(f"STOP: missing {shot_path} or {panel_path} -- run --draw first")
+    shot = plt.imread(shot_path)
+    panel = plt.imread(panel_path)
+    fig, axes = plt.subplots(2, 1, figsize=(14, 11), dpi=150)
+    axes[0].imshow(shot); axes[0].axis("off")
+    axes[0].set_title("Web demo (SzScan), 500 uV -- patient chb03, event 1 (duration 0:56)", fontsize=15)
+    axes[1].imshow(panel); axes[1].axis("off")
+    axes[1].set_title("Same seizure, this pack's style", fontsize=15)
+    fig.tight_layout()
+    fig.savefig(OUT / "item5_web_demo_comparison.png")
+    plt.close(fig)
+    print(f"wrote {OUT/'item5_web_demo_comparison.png'}", flush=True)
+
+
 # ============================================================================ item 7: model comparison
 def model_comparison():
     import matplotlib

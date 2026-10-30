@@ -87,6 +87,10 @@ results/v9_x1/_parts/
 results/v9_x3/chb24.npz
 results/v9_x3/chb24_SMOKE.npz
 results/v9_x3/chb24_stats.json
+# V9-X3 scoring caches: GAE per-channel latent distance D per (fold, case) and B4's kNN distance
+# per case -- regenerable by v9_x3_cv_eval.py/v9_x3_knn_b4.py given the fold checkpoints (242M + 61M).
+results/v9_x3/dumps/
+results/v9_x3/b4_cache/
 results/*/smoke/
 results/veto_screen*/*.npy
 # separate BME11 paper (not thesis work)

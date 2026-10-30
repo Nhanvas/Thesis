@@ -130,7 +130,17 @@ def run_model_ckpt(ckpt, meta, adj, Xn_all, f7):
     return rec, Z
 
 
-def dump_D(ctx, ckpt, meta):
+def dump_D(ctx, ckpt, meta, cache_key=None):
+    """cache_key, when given (e.g. "fold1_seed42/chb12"), persists D under results/v9_x3/dumps/
+    so a restarted --calibrate/--score does not redo the GAE forward pass; keyed only by fold+
+    seed+case, which is safe because dump_D's inputs (ctx's window set, the checkpoint) are
+    otherwise fixed for a given (fold, seed, case) triple."""
+    if cache_key is not None:
+        fp = OUT / "dumps" / f"{cache_key}_D.npy"
+        if fp.exists():
+            D = np.load(fp)
+            if len(D) == len(ctx["idx"]):
+                return D
     z = ctx["z"]; idx = ctx["idx"]
     adj = z["adj"][idx].astype(np.float32); adj[~np.isfinite(adj).all(axis=(1, 2))] = 0.0
     bp5 = z["bp5"][idx].astype(np.float32); bp5[~np.isfinite(bp5)] = 0.0
@@ -141,7 +151,34 @@ def dump_D(ctx, ckpt, meta):
     for c in range(Z.shape[1]):
         Zc = Z[:, c, :].astype(np.float64)
         D[:, c] = LedoitWolf().fit(Zc).mahalanobis(Zc)
+    if cache_key is not None:
+        fp = OUT / "dumps" / f"{cache_key}_D.npy"
+        fp.parent.mkdir(parents=True, exist_ok=True)
+        np.save(fp, D)
     return D
+
+
+def evaluate_full(ctx, x, m, k):
+    """evaluate_arm's own construction, PLUS matched onset/offset error rows and duration-bin
+    hits (P3L.refs_of / E18.match_errors / V9E1.duration_bins) -- the extra pieces the prompt's
+    step 5 reporting needs (onset/offset error, duration bins) that evaluate_arm's return value
+    alone does not carry (it drops P3L.localize's `pair` mapping)."""
+    q = P3L.q_of(PS.smoothed(ctx, m, SMOOTH), k)
+    top = float(np.clip(q, FLOOR, max(CAP, FLOOR)))
+    det = PS.d1_events(ctx, x, SMOOTH, top)
+    thr = np.nanquantile(PS.smoothed(ctx, x, SMOOTH), 1 - top)
+    loc, pair = P3L.localize(ctx, x, det, thr, "cpd")
+    out = {}
+    for name, ev in (("detector", det), ("localized", loc)):
+        tp, fp, nr, h = PS.score(ctx, ev)
+        kk, ns = PS.caught(PS.short_refs(ctx), ev)
+        out[name] = dict(tp=tp, fp=fp, n_ref=nr, nonict_h=h, short_tp=kk, short_n=ns, top=top, q_raw=q)
+    refs = P3L.refs_of(ctx)
+    errs = [dict(ref_dur=rb - ra, ev_dur=h1 - h0, onset_err=pair[(f_, h0, h1)][0] - ra,
+                 offset_err=pair[(f_, h0, h1)][1] - rb)
+            for f_, ra, rb, h0, h1 in E18.match_errors(refs, det)]
+    bins = V9E1.duration_bins(ctx, loc)
+    return out, errs, bins
 
 
 def load_fold_ckpt(ckpt_dir, fold, seed):
@@ -186,7 +223,7 @@ def calibrate_fold_k(fold, ckpt_dir, seed=42):
     sms = []
     for s in man["train_cases"]:
         ctx = case_ctx(s)
-        D = dump_D(ctx, ck, meta)
+        D = dump_D(ctx, ck, meta, cache_key=f"fold{fold}_seed{seed}/{s}")
         m = V9E1.member_mean_z_from_D(ctx, D)
         sms.append(PS.smoothed(ctx, m, SMOOTH))
         print(f"  {s}: dumped + smoothed ({time.time()-t0:.0f}s)", flush=True)
@@ -206,20 +243,27 @@ def score_fold(fold, ckpt_dir, seed=42):
     if not kfile.exists():
         raise SystemExit(f"run --calibrate --fold {fold} first ({kfile} missing)")
     k = json.loads(kfile.read_text())["k"]
-    rows = []
+    rows, errs, dur_rows = [], [], []
+    t0 = time.time()
     for s in man["held_out_cases"]:
         ctx = case_ctx(s)
-        D = dump_D(ctx, ck, meta)
+        D = dump_D(ctx, ck, meta, cache_key=f"fold{fold}_seed{seed}/{s}")
         x = V9E1.final_scalar_from_D(ctx, D)
         m = V9E1.member_mean_z_from_D(ctx, D)
-        out, det, loc = V9E1.evaluate_arm(ctx, x, k, FLOOR, CAP, SMOOTH, m=m)
+        out, ev, bins = evaluate_full(ctx, x, m, k)
         for stage, v in out.items():
             rows.append(dict(fold=fold, seed=seed, subject=s, stage=stage, **v))
+        errs += [dict(fold=fold, seed=seed, subject=s, **e) for e in ev]
+        for (lo, hi), (caught, n) in bins.items():
+            dur_rows.append(dict(fold=fold, seed=seed, subject=s, lo=lo, hi=hi, caught=caught, n=n))
         print(f"  {s}: scored (detector tp={out['detector']['tp']} fp={out['detector']['fp']}, "
-              f"localized tp={out['localized']['tp']} fp={out['localized']['fp']})", flush=True)
+              f"localized tp={out['localized']['tp']} fp={out['localized']['fp']}) "
+              f"({time.time()-t0:.0f}s)", flush=True)
     R = pd.DataFrame(rows)
     R.to_csv(OUT / f"fold{fold}_seed{seed}_per_subject.csv", index=False)
-    print(f"wrote {OUT / f'fold{fold}_seed{seed}_per_subject.csv'}")
+    pd.DataFrame(errs).to_csv(OUT / f"fold{fold}_seed{seed}_errors.csv", index=False)
+    pd.DataFrame(dur_rows).to_csv(OUT / f"fold{fold}_seed{seed}_duration_bins.csv", index=False)
+    print(f"wrote {OUT / f'fold{fold}_seed{seed}_per_subject.csv'} (+ errors.csv, duration_bins.csv)")
     return R
 
 

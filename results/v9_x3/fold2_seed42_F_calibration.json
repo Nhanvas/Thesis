@@ -1,0 +1,25 @@
+{
+ "fold": 2,
+ "seed": 42,
+ "k_F": 1.8129006622826642,
+ "train_cases": [
+  "chb01",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb23",
+  "chb24"
+ ]
+}

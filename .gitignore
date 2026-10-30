@@ -81,6 +81,7 @@ results/v9_e3/_parts/
 results/v9_e4/_m/
 results/v9_e4/_parts/
 results/v9_x1/_parts/
+results/v9_x6/_parts/
 # V9-X3 (docs/prompts/V9_X3_CV_PREP.md): chb24's own training-format array (built by
 # v9_x3_build_chb24.py from raw EDF, same convention as data/trainset_v2/testset_v2, 28M) and its
 # stats.json -- regenerable, same treatment as data/trainset_v2/testset_v2 above.

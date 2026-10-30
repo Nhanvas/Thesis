@@ -70,10 +70,25 @@ count is NOT significant for any of the three detectors on CHB-MIT test: thesis 
 p=0.325, GAE-CV p=0.916 -- see `results/v9_final/hard/SUMMARY.md`), the same conclusion as X1's own
 after-the-localizer p=0.792.
 
-## X6 (ASR) -- deferred
+## X6 (ASR) -- Part A, now complete
 
-Not checked: Part A (the ASR completion run) has not run yet in this pass. Will be added to this file
-after Part A finishes (pooled share removed in seizures vs high-amplitude vs background, all 70 files).
+Part A finished: cutoff=20 on all 70 files (23 remaining + 47 recomputed in the same combined pass to
+add the new contrast measure, item 2 of Part A); cutoff=5 dropped as instructed (1/70 files only,
+reported not done, not recomputed). Source: `results/v9_x6/SUMMARY.md`, `results/v9_x6/seizures.csv`,
+`results/v9_x6/highamp_windows.csv`.
+
+| Measure | Value |
+|---|---|
+| Pooled share of power removed, seizure span (cutoff=20) | n=92, mean +0.482, median +0.542 |
+| Pooled share removed, high-amplitude windows | n=16503, mean +0.411, median +0.412 |
+| Pooled share removed, background windows | n=19467, mean +0.068, median +0.000 |
+| Contrast (median-channel RMS of span / preceding 60 s), seizure span, before -> after | n=92, 2.087 -> 1.407, diff -0.685 [-1.405, -0.120] (patient bootstrap, B=2000) |
+| Contrast, high-amp windows, before -> after | n=16004, 1.061 -> 1.035, diff -0.030 [-0.062, -0.010] |
+
+Both contrast-difference 95% CIs exclude 0: ASR measurably LOWERS the seizure-vs-preictal contrast
+(the thing a detector actually uses), not just removing power in some cutoff-independent sense -- the
+same conclusion the qualitative chb03 panels (share removed 0.94-0.96) already pointed to, now with a
+pooled, patient-bootstrapped number behind it.
 
 ## Summary
 

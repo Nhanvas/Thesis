@@ -13,15 +13,12 @@ EEG re-extraction, every file already exists in data/trainset_v2/, data/testset_
 results/v9_x3/chb24.npz (built by v9_x3_build_chb24.py; the ONLY subject not already in the
 thesis's own per-subject arrays).
 
-DEVIATION from train_gae_v2.py, disclosed (flagged for the author to confirm before the Kaggle
-run): no held-out VAL subjects. The original VAL (chb10, chb11, chb22) exists only to print a
-per-epoch monitoring curve and a non-ictal/ictal sanity AUROC; the model-selection rule is fixed
-("last epoch kept") regardless of val loss, so VAL carries no decision weight there either. This
-study's own stated goal is training on MORE patients per fold, so no validation subset is carved
-out of the fold's training pool; a train-loss curve is still printed for a sanity check. If the
-author wants the original per-epoch monitoring restored, the simplest fix is 2 validation
-subjects per fold (lowest seizure count in the training pool) -- not done here without
-confirmation.
+DEVIATION from train_gae_v2.py, APPROVED by the author (2026-10-30): no held-out VAL subjects.
+The original VAL (chb10, chb11, chb22) exists only to print a per-epoch monitoring curve and a
+non-ictal/ictal sanity AUROC; the model-selection rule is fixed ("last epoch kept") regardless of
+val loss, so VAL carries no decision weight there either. This study's own stated goal is training
+on MORE patients per fold, so no validation subset is carved out of the fold's training pool; a
+train-loss curve is still printed for a sanity check.
 
 Expected directory layout under --data_root (what the author zips into the Kaggle dataset
 v9-x3-fold{k}, one subject's .npz per file, any nesting -- resolved by filename, not by a fixed

@@ -1,19 +1,18 @@
-# STATUS_BOARD — DEFENSE phase (rev 33, 2026-10-28, end of chat V9: reviewer feedback → experiments, EEG evidence, demo fix)
+# STATUS_BOARD — DEFENSE phase (rev 35, 2026-10-31, end of chat V9 part 2: verification closed, project refreshed)
 
-**Read this first in every chat, then `Defense/notes/V9_RESULTS_SUMMARY.md`.** This board says what is done, what is
-open and what the next chats do. At the end of every chat it is rewritten as a whole file (new rev number).
+**Read this first in every chat, then `Defense/notes/V9_RESULTS_SUMMARY.md` (rev 2).** This board says what is done,
+what is open and what the next chats do. At the end of every chat it is rewritten as a whole file (new rev number).
 
 **Practical facts.**
-- Defense **05–06/11/2026**, in English. **Reviewer's format (26/10): 12 min talk + 3 min demo + 10 min Q&A**; the
-  longer Q&A checks that the student did the work himself.
-- **Mock defense with cô and the mentor: 02/11.** Supervisor meetings Thursdays 08:00 (29/10).
-- Reviewer: **TS. Ngô Thị Lụa** (feedback 26/10: 12 points, answered in `V9_RESULTS_SUMMARY.md` §0).
-- After the defense there is one round of report corrections before the final submission (V9 results go in then).
+- Defense **05–06/11/2026**, in English: **12 min talk + 3 min demo (right after the Conclusion) + 10 min Q&A**; the Q&A
+  checks that the student did the work himself.
+- **Mock defense with cô and the mentor: 02/11.** Supervisor meetings Thursdays 08:00.
+- Reviewer: **TS. Ngô Thị Lụa** (12 points of 26/10 → `V9_RESULTS_SUMMARY.md` §0).
+- **Cô 30/10 on the D9 deck:** too long for 12 min; result slides too dense; no illustration of a detected seizure
+  (→ DECK_BRIEF A50–A52, L26–L27).
+- After the defense: one round of report corrections (`REPORT_REVISION_NOTES.md`).
 
 **Report.** Locked at the faculty submission (17/10/2026) until the committee's comments.
-
-**For any slide or script work, read `DECK_BRIEF.md` rev 3.9 (A1–A41, L1–L24, §8; A42–A48 to add, see summary §9),
-`SLIDE_OUTLINE.md` rev 8 (§0c), `QA_PAGE_MAP.md` (v5), `script/SCRIPT_v2.md` and `V9_RESULTS_SUMMARY.md`.**
 
 ---
 
@@ -24,126 +23,117 @@ open and what the next chats do. At the end of every chat it is rewritten as a w
 3. **End:** (a) this board rewritten (rev + 1); (b) **one** list for the author (project files add / replace / delete,
    with local paths); (c) the start prompt of the next chat.
 4. Defense material lives in `F:/Study/Thesis/Defense/` (private). The repository (public) holds this board.
-5. Every number on a slide, in the script or in an answer matches the final report **and** `NUMBERS_LOCK.md`
-   (post-submission: §16 spoken only; **§17 allowed on slides, labelled "after the review"**).
-6. **Order of work (A41, L23):** slides fixed → script written to a word budget (100–120 words/min) → author approves
-   the script → **one** timed read.
-7. **Main slides carry the full reported information** (A41, L24); the appendix adds detail, never hides.
-8. **Claude writes the script** (A37), IELTS 5.5 English; the author reads, adapts and rephrases.
-9. **Guidance goes directly in the chat**, short and detailed; files are records, not reading assignments (A37).
+5. Every number on a slide, in the script or in an answer matches the report **and** `NUMBERS_LOCK.md`
+   (§16 spoken only; **§17 rev 2 allowed on slides, labelled "after the review"**; §17b = D9 figure counts, re-check).
+6. **Order of work:** key messages approved → slides → script to a word budget (100–120 words/min) → author approves
+   → **one** timed read.
+7. **Main pages fit 12 minutes** (A50): one message per result page, details in the appendix with a pointer.
+8. **Claude writes the script** (IELTS 5.5); the author reads, adapts and rephrases.
+9. **Guidance goes directly in the chat**, short and detailed; files are records.
 10. Every author request about slides is logged in `DECK_BRIEF.md` §1.
-11. A review item quotes the text as it is now on the page (L19).
-12. **Changes go out as one zip + one `.sh`** that checks its base first and stops without changing anything if a file
-    differs (L16).
-13. **(author 27/10) Research is an iterative loop** (question → experiment → result → analysis → repeat). No
-    "look #" bookkeeping in reasoning or text; nothing is locked by default; weigh each change against the time left
-    before the defense and the rehearsal.
-14. **(reviewer 26/10, author 28/10) A claim about data, difficulty, false alarms or Siena is backed by real EEG**,
-    selected by a rule fixed before drawing, not only by words and numbers.
-15. Heavy laptop jobs run **one at a time**; never preload a whole EDF (Siena files reach 12–15 GB in memory).
+11. A review item quotes the text as it is now on the page.
+12. **Changes go out as one zip + one `.sh`** that checks its base first.
+13. **Research is an iterative loop**; nothing is locked by default; weigh each change against the time left.
+14. **Claims about data, difficulty, false alarms, Siena, hospital data are backed by real EEG**, rule-selected.
+15. **Never "low because unsupervised"**; never reuse a conclusion listed in summary §9.
+16. **A result enters a slide only after verification** (L27): committed, number-checked, and for explanations of
+    failure, checked on more than one detector.
+17. Heavy laptop jobs run **one at a time**, from Git Bash (not Cursor), browsers and MATLAB closed; never preload a
+    whole EDF.
 
-## 2 · Where things stand (28/10)
+## 2 · Where things stand (31/10)
 
 | track | state | next |
 |---|---|---|
-| Deck | Canva v5 PDF (24/10, 62 pages) = deck of record, **before** the reviewer's feedback | **D9:** integrate V9 (summary §9: A42–A48) |
-| V9 experiments | **done** (tag `v9-results`, index `docs/V9_RESULTS_INDEX.md`): Siena verified on 14 patients; model comparison (GAE + kNN +0.047 [+0.013, +0.086] at matched FA on test); kNN on all 24 cases; hard = focal, low-amplitude seizures; artifact veto and short-seizure branch negative | none planned before the defense |
-| EEG evidence | done, rule-selected: `Defense/slides/figs/eeg_samples/`, `eeg_evidence/part1–6/`, `Defense/clinical/run/` | choose figures in D9 |
-| Hospital EEG | ran on both files (qualitative): 4.8 % of 13.2 h flagged; 0 events on 27 marked activation/spike segments | one slide in D9 |
-| Numbers | NUMBERS_LOCK §17 added (post-review, slide-allowed) | D9 checks every new slide number |
-| Script | `script/SCRIPT_v2.md` matches Canva v5; **must be rewritten after D9** (12 min talk) | D10 |
-| Demo | login fixed (7c10842); `web_demo/start_demo.sh` / `stop_demo.sh` (a05eff1), backend up in 26 s; chb24 allowed | **author:** ingest chb24 (≈ 8 min), two cold-start runs, fallback video |
-| Q&A | `QA_BANK.md`, `QA_PAGE_MAP.md` (v5) — need V9 answers (model choice, unsupervised, artifacts, Siena, hard patients, hospital data) | D10 |
-| Literature | papers to read: summary §8 (author reads them himself) | author, before D10 |
-| Git | V9 commits are **local**: push needed | author: `git push && git push --tags` |
-
-## 2c · Canva v5 — five optional text fixes found in D7 (still open)
-
-| page | on the page now | proposed |
-|---|---|---|
-| p25 | "Objective 1: localization without labels → Achieved" | "Objective 1: anomaly score → Achieved" |
-| p25 | "New hospital: Siena 0.633 at 41.0 FA/day (4 seeds)" | add "per-patient mean" |
-| p22 | cite line "… Shyu et al., 2023 · Ali et al., 2024 · …" | drop both from the line |
-| p22 | "SzCORE challenge leader: 37% at ~1 FA/day (Dan, 2026)" | add "(private corpus)" |
-| p23 | "Sites without labels, GPU or cloud (nearly 80% of people with epilepsy)" | "Low- and middle-income settings without GPU or cloud (where nearly 80% of people with epilepsy live)" |
+| Experiments | **closed** (author 30/10): V9 + X1, X3 (24-case CV on Kaggle), X6 (ASR), V1-FIX, FINAL verification; 0 number mismatches; pushed (`4bcfb60`, tag `v9-final` after the install script) | none |
+| Key findings | see summary §3–§4: graph adds no detection value over channel features (kNN ≥ GAE, F1 significant); GAE + kNN improves the GAE, ties kNN; misses = low-amplitude, short seizures (3 detectors); test patients harder than CHB-MIT overall; ASR removes seizure contrast | slides |
+| Deck | Canva v5 (62 p) + D9 plan for v6 (78 p, 29 main) — **too long/dense per cô 30/10**; D9 texts and figures partly use superseded readings | **D9b:** restructure main pages to 12 min |
+| Figures | slide pack `Defense/slides/figs/final/` + `FIGURE_INDEX.md` (rule-selected); older folders as backups; `figs/d9/` to re-check | D9b |
+| Numbers | NUMBERS_LOCK §17 **rev 2** (installed by this chat's script); §17b (D9) to re-check | D9b |
+| Q&A | `QA_V9.md` (16 questions, new); `QA_BANK.md`, `QA_PAGE_MAP.md` v5 (old pages) | D10: page map v6 |
+| Script | `SCRIPT_v2.md` = Canva v5 (obsolete after D9b) | D10 |
+| Demo | login fixed; start/stop scripts; chb24 allowed | **author:** ingest chb24 (≈ 8 min), two cold-start runs, fallback video |
+| Report | `REPORT_REVISION_NOTES.md` (new) | after the defense |
 
 ## 3 · Feedback and rules in force
 
-R1–R47 stand. Added 26–28/10:
+R1–R57 stand. Added 30–31/10:
 
 | # | source | rule |
 |---|---|---|
-| R48 | reviewer 26/10 | 12 min talk + 3 min demo + 10 min Q&A |
-| R49 | reviewer 26/10 | Show other models on the same problem; unsupervised can be improved — "low because unsupervised" is removed everywhere |
-| R50 | reviewer 26/10 | Real EEG for right and wrong detections, web-demo events, Siena and hard patients |
-| R51 | reviewer 26/10 | Comparison table includes high-performing studies, the criteria of "same problem", pros and cons |
-| R52 | reviewer 26/10 | Answer "why no artifact removal" with evidence |
-| R53 | author 27/10 | Tool/app diagram at the end of Method; Results only results; channel attribution in Method and Results |
-| R54 | author 28/10 | GAE stays the thesis system and headline; GAE + kNN shown as the improvement, kNN as the strongest baseline; demo unchanged |
+| R58 | cô 30/10 (A50) | Main pages fit 12 minutes; one message per result page; a real-EEG illustration of a detected seizure in Results |
+| R59 | mentor, author 31/10 (A51) | Each finding = result + meaning on the same page; one summary-of-findings page; no long results→discussion chain |
+| R60 | author 31/10 (A52) | Key messages (≤ 5) approved before building slides; AI must select, not include everything |
+| R61 | V9 part 2 (L27) | A result enters a slide only after verification |
 
 ## 4 · Decisions
 
-- Earlier: rev 22–32 (in git or the project).
-- **27–28/10 (V9):** research loop reopened (R13); Siena checked on 14 patients; R54; artifact veto and short-seizure
-  branch not adopted (fixed rules); "hard patients" defined by measured EEG descriptors, not by duration; hospital EEG
-  shown as qualitative; demo login fixed + start scripts + chb24; local cleanup done (Archive/2026-10-28/CLEANUP_LOG.md).
-- **Open (author):** git push; chb24 ingest and demo rehearsal; the five optional fixes (2c); event number for the demo
-  (`demo/DEMO_EVENT.md`); P1 committee fields; read the papers (summary §8).
+- Earlier: rev 22–34 (in git or the project).
+- **30/10:** experiments stop after X3 (author); X7 dropped; 4-fold CV design approved (no VAL subset).
+- **31/10 (this chat):** NUMBERS_LOCK §17 rev 2; V9 summary rev 2; slides keep the report's Siena 0.633 / 0.160
+  (recompute 0.635 / 0.161 within tolerance) — **author to confirm (P-V9b)**.
+- **Open (author):**
+  - **P-V9a — framing of the model comparison.** Recommended: GAE system stays the thesis system and headline (report,
+    demo); slides state honestly that a training-free kNN on the same channel features matches its sensitivity with
+    fewer false alarms, and that GAE + kNN improves the GAE but ties kNN; "GAE + kNN = the improvement" leaves the main
+    message.
+  - P-V9b (above); chb24 ingest and demo rehearsal; demo event number; P1 committee fields; papers (summary §13).
 
-## 5 · Plan of chats (from 28/10)
+## 5 · Plan of chats (from 31/10)
 
 | # | date | task | output |
 |---|---|---|---|
-| V9 | 27–28/10 ✔ | reviewer feedback → research, experiments, EEG evidence, demo fix | V9 summary, NL §17, rev 33 |
-| D9 | 28–30/10 | **slides:** integrate A42–A48 into the deck (new/changed pages, figures from §6 of the summary, comparison table, cut to 12 min) | Slides artifact update + Canva list, DECK_BRIEF rev 4.0, SLIDE_OUTLINE rev 9 |
-| — | 29/10 | cô: run-through (Canva v5 + spoken V9 answers, or the D9 draft if ready) | feedback |
-| D10 | 30/10–01/11 | script v3 (12 min) + Q&A update (V9 questions) + page map v6 | SCRIPT_v3, QA_BANK, QA_PAGE_MAP v6 |
-| — | 02/11 | **mock defense** (cô + mentor) | feedback |
-| D11 | 02–04/11 | fixes after the mock, timed read, demo cold-start checklist | final deck, DEMO_CHECKLIST |
+| V9-2 | 30–31/10 ✔ | X1, X3, X6, V1-FIX, FINAL; project refresh | summary rev 2, NL §17 rev 2, QA_V9, REPORT_REVISION_NOTES, rev 35 |
+| D9b | 31/10 | **slides for 12 min** (A50–A52): key messages → main page map → Slides artifact + Canva list; figures from `figs/final/`; re-check D9 pages and figures against summary rev 2 | artifact update, Canva list, DECK_BRIEF 4.2, SLIDE_OUTLINE 10 |
+| — | 31/10–01/11 | **author:** Canva edits + PDF | Canva v7 |
+| D10 | 01/11 | script v3 (12 min) + QA page map v6 + demo path | SCRIPT_v3, QA_PAGE_MAP v6 |
+| — | 02/11 | **mock defense** | feedback |
+| D11 | 02–04/11 | fixes, timed read, demo cold-start checklist | final deck |
 
-**Start prompt of chat D9 (copy):**
-> Chat D9 — slides after the reviewer's feedback. Read `STATUS_BOARD.md` (rev 33), `V9_RESULTS_SUMMARY.md` (all, esp.
-> §0, §6, §9), `NUMBERS_LOCK.md` §17, `DECK_BRIEF.md` (rev 3.9), `SLIDE_OUTLINE.md` (rev 8), `QA_PAGE_MAP.md` (v5) and
-> the Slides artifact of the deck. Attached: the Canva v5 PDF (and any slide I changed). Tasks: 1. Add A42–A48 to
-> DECK_BRIEF §1. 2. Propose a new page map for 12 min of talk (+3 min demo): tool diagram to the end of Method;
-> Results = system result, model comparison (matched false alarms), why patients are hard (EEG descriptors + one EEG
-> panel), Siena explained, hospital EEG, channel attribution; comparison table with high-performing studies and the
-> "same problem" criteria; optimization path incl. the two negative levers; backups for every V9 figure. Wait for my
-> approval. 3. Then update the Slides artifact (same link) and give me the Canva change list page by page; I insert
-> the EEG figures from `F:/Study/Thesis/Defense/slides/figs/`. Every number from NUMBERS_LOCK (§17 labelled "after the
-> review"). End: board rev 34, file list, start prompt of D10.
+**Start prompt of chat D9b (copy):**
+> Chat D9b — make the deck fit 12 minutes after cô's feedback (30/10: too long, result slides too dense, no illustration
+> of a detected seizure). Read `STATUS_BOARD.md` (rev 35), `DECK_BRIEF.md` (rev 4.1: §0b, A50–A52, L26–L27),
+> `V9_RESULTS_SUMMARY.md` (rev 2, all), `NUMBERS_LOCK.md` §17 rev 2, `FIGURE_INDEX.md`, `QA_V9.md`, `SLIDE_OUTLINE.md`
+> (rev 9) and `D9_CANVA_CHANGES.md`, and the Slides artifact. Attached: my current Canva PDF. Tasks: 1. Ask me P-V9a and
+> P-V9b. 2. Propose the ≤ 5 key messages of the talk and wait for my approval. 3. Propose a main page map that fits
+> 12:00 at 110 words/min (target ≤ 16 content pages after Title and ToC; one message, one figure, ≤ 3 short lines per
+> result page; result and meaning on the same page; a detected-seizure EEG figure from `figs/final/`), with every
+> removed item mapped to an appendix page; wait for approval. 4. Re-read every old sentence and every D9 figure
+> (`figs/d9/`) against summary rev 2 §9 and list what must change. 5. Update the Slides artifact (same link) and give
+> the Canva change list page by page. End: board rev 36, file list, start prompt of D10.
 
 ## 6 · Which file for what
 
 | File | Use it to | When |
 |---|---|---|
-| **`notes/V9_RESULTS_SUMMARY.md`** | reviewer points → answers, every V9 number, figure folders, papers to read, new slide requests | D9, D10, Q&A |
-| `notes/NUMBERS_LOCK.md` (§1–§17) | every allowed number | always |
-| `script/SCRIPT_v2.md` | script of Canva v5 (to be replaced by v3) | until D10 |
-| `script/DEMO_SCRIPT.md` | demo path, fallback (page 60) | D11 |
-| `qa/QA_PAGE_MAP.md` (v5), `qa/QA_BANK.md` | question → page; answers | D10 |
-| `outline/DECK_BRIEF.md` (rev 3.9) | author requests A1–A41 (+A42–A48), lessons, §8 | D9 |
-| `outline/SLIDE_OUTLINE.md` (rev 8) | page map; §0c = Canva v5 | D9 |
-| `Defense/v9_reports/` | full V9 reports (T1–T4, C1, E1–E4, V1, cleanup) | when a detail is needed |
-| `docs/V9_RESULTS_INDEX.md` (repo) | V9 task → script → results → commit | provenance questions |
-| `web_demo/start_demo.sh`, `stop_demo.sh` (repo) | start/stop the demo | rehearsal, defense day |
+| `notes/V9_RESULTS_SUMMARY.md` (rev 2) | every post-review result, its evidence and limits; overturned conclusions §9 | always |
+| `notes/NUMBERS_LOCK.md` (§1–§17 rev 2, §17b) | every allowed number | always |
+| `slides/figs/final/FIGURE_INDEX.md` | slide figure pack and selection rules | D9b |
+| `qa/QA_V9.md` | answers to post-review questions | D10, rehearsal |
+| `notes/REPORT_REVISION_NOTES.md` | what the final report must change | after the defense |
+| `outline/DECK_BRIEF.md` (rev 4.1) | author requests A1–A52, lessons L1–L27 | slide or script work |
+| `outline/SLIDE_OUTLINE.md` (rev 9), `outline/D9_CANVA_CHANGES.md` | D9 plan (78 p) — **to be replaced in D9b** | D9b |
+| `script/SCRIPT_v2.md`, `script/DEMO_SCRIPT.md` | old script; demo path | D10 |
+| `qa/QA_BANK.md`, `qa/QA_PAGE_MAP.md` | answers about the reported system; page map v5 | D10 |
+| `Defense/v9_reports/` | full V9 reports (incl. X1, X3, X6, FINAL) | detail |
+| `docs/V9_RESULTS_INDEX.md` (repo) | task → script → results → commit | provenance |
 
 ## 7 · Layout
 
 ```
 F:/Study/Thesis/
   Code/                       repository (public): docs/STATUS_BOARD.md, docs/V9_RESULTS_INDEX.md, docs/prompts/V9_*.md,
-                              results/v9_*, src/v9_*.py, web_demo/ (start_demo.sh, stop_demo.sh)
+                              results/v9_* (incl. v9_x1, v9_x3, v9_x6, v9_final), src/v9_*.py, web_demo/
   Reports/final/              submitted report (.docx) + Thesis_Final_Report.md
-  Dataset/                    CHB-MIT, siena (14/14 verified), clinical (2 EDF; names in file names, never in the repo)
+  Dataset/                    CHB-MIT, siena (14/14), clinical (2 EDF; names in file names, never in the repo)
   Defense/
-    notes/       NUMBERS_LOCK.md (§1–§17), V9_RESULTS_SUMMARY.md, D5_HANDOFF.md, FIGURE_PROVENANCE.md, APP_FACTS.md
-    v9_reports/  11 V9 reports + cleanup report
-    clinical/    clin0X_header.md, run/ (events, timelines, panels)
-    slides/      Canva PDFs (v5 = deck of record); figs/ (eeg_samples/, eeg_samples/siena14/, eeg_evidence/part1–6/); gen/
-    qa/ · outline/ · script/ · demo/ · content/ · inputs/ · review/
-  Agent/inbox/                hand-over tray
-  Archive/2026-10-28/         CLEANUP_LOG.md; board rev 32 and NUMBERS_LOCK before §17 (backups by the V9 script)
+    notes/       NUMBERS_LOCK.md, V9_RESULTS_SUMMARY.md, REPORT_REVISION_NOTES.md, D5_HANDOFF.md, APP_FACTS.md, ...
+    qa/          QA_BANK.md, QA_PAGE_MAP.md, QA_V9.md
+    outline/     DECK_BRIEF.md (4.1), SLIDE_OUTLINE.md (9), D9_CANVA_CHANGES.md
+    slides/      Canva PDFs; figs/ (final/, d9/, eeg_samples/, eeg_evidence/part1–6, x1, x6); gen/
+    v9_reports/ · clinical/ · script/ · demo/ · content/ · inputs/ · review/
+  Agent/inbox/                hand-over tray (V9_close2/ install bundle)
+  Archive/2026-10-31/         backups made by the V9 part-2 install script
 ```
 
 ## 8 · Where the numbers are
@@ -152,16 +142,15 @@ F:/Study/Thesis/
 |---|---|
 | every number of the thesis system | `docs/PERF_PHASE_RECORD.md` (rev R) |
 | what the committee read | `Thesis_Final_Report.md` |
-| numbers allowed on slides | `Defense/notes/NUMBERS_LOCK.md` (§1–§15; §16 spoken only; §17 post-review, slide-allowed) |
-| V9 results | `V9_RESULTS_SUMMARY.md`; `results/v9_*` (tag `v9-results`) |
-| reproducibility checks | `docs/REPRODUCE.md`, `results/r1_repro/`, `results/r1_repro_2b/` |
+| numbers allowed on slides | `NUMBERS_LOCK.md` (§1–§15; §16 spoken only; §17 rev 2 post-review) |
+| post-review results | `V9_RESULTS_SUMMARY.md` rev 2; `results/v9_*`; `results/v9_final/NUMBERS_CHECK.md` |
 
 ## 9 · Decisions log
 
-- 2026-10-15 → 21: defense phase; D1–D5 (rev 22–29 in git).
-- 2026-10-22/23 (R1, D6): reproducibility checks; M1–M5, app diagram, script v1; rev 30–31.
-- 2026-10-24 (D7): Canva v5 = deck of record; SCRIPT_v2; QA_PAGE_MAP v5; rev 32.
+- 2026-10-15 → 24: defense phase D1–D7 (rev 22–32).
 - 2026-10-26: reviewer's feedback (12 points).
-- 2026-10-27/28 (V9): research loop reopened; Siena 14/14 verified; model comparison (R54); hard = focal, low amplitude;
-  two negative levers; hospital EEG; EEG evidence parts 1–6; demo login fixed, start scripts, chb24 allowed; cleanup;
-  NL §17; rev 33.
+- 2026-10-27/28 (V9): research loop; Siena 14/14; model comparison; hospital EEG; EEG evidence; demo fixed; rev 33.
+- 2026-10-30 (D9): page map v6 (78 p); rev 34.
+- 2026-10-30/31 (V9 part 2): X1 (channel member, negligible), X3 (24-case CV: kNN ≥ GAE, GAE + kNN ties kNN, test
+  patients harder), X6 (ASR removes seizure contrast), V1-FIX, FINAL verification (3-detector hard-patient analysis,
+  Siena gap, figure pack, number check); three earlier conclusions withdrawn; cô's slide feedback; rev 35.

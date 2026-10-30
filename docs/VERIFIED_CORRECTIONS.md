@@ -275,3 +275,19 @@ Settled by code reading and runs during the performance phase; full log in `PERF
   excluded three cases (chb06, chb12, chb16); the ScoreNet Neural Networks DOI is an unrelated paper; IRBM 2019
   abstract gives 6.3 s / −1.17 s, not 3.9 s / 49.26 s; the CEP 2026 paper's title differs and it is supervised.
 - **Siena hours:** PhysioNet states about 128 h; our X1 summary sums to about 140 h (open item).
+
+
+---
+
+## V9 · Corrections after the reviewer's feedback (27–31/10/2026)
+
+| correct | what it replaces | evidence |
+|---|---|---|
+| Siena checked on all 14 patients; at matched 27.5 FP/day Siena 0.534 vs CHB-MIT test 0.355; durations explain part of the gap (CI wide), amplitude does not; higher FP rate and 1–2-seizure patients add to it | "Siena is suspiciously high"; the 3-patient curve; "≈ 40 % explained" | `results/v9_anatomy/siena14/`, `results/v9_final/siena_gap/` |
+| missed seizures have a low amplitude ratio vs their own background and are shorter — in three detectors (thesis, kNN, cross-validated GAE) | "hard = short seizures"; "hard = focal seizures with few channels" | `results/v9_final/hard/` |
+| annotated channel count mattered only before the per-patient budget (p = 1.2e-4 → 0.79) | "the order-statistic members blind the system to focal seizures" | `results/v9_x1/part0/` |
+| chb06's pre-onset discharge is not an RMS surge vs the minute before (max 2.31) | "chb06's background holds frequent seizure-like discharges" | `results/v9_v1/fix/` |
+| on 24 cases a training-free kNN on the same channel features matches the GAE's sensitivity with significantly better F1 and precision; GAE + kNN improves the GAE and ties kNN | "GAE + kNN is the improvement"; "kNN only trends higher" | `results/v9_x3/` |
+| trained on 17–19 patients the GAE finds the same 37/76 on the test patients; the training-free kNN shows the same development/test gap | "low test result = over-fitting / too few training patients" | `results/v9_x3/`, `results/v9_e4/` |
+| ASR removes as much power from seizures as from high-amplitude windows and lowers seizure contrast 2.09 → 1.41 | "preprocessing artifact removal would clean false alarms safely" | `results/v9_x6/` |
+| the artifact veto deleted events after ranking without refilling the budget, so it could only trade sensitivity | "the artifact idea failed because artifacts do not matter" | `results/v9_e2/` |

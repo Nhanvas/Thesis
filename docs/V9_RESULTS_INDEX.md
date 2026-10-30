@@ -28,3 +28,15 @@ Tag `v9-results` marks the state after all of the above (plus the V9-CLEANUP com
   -- see `docs/prompts/V9_V1_RESUME.md` and `V9_V1_REPORT.md` for what happened and why.
 - `results/v9_anatomy/xcache/` and each experiment's `_parts/`/`_m/` subfolders are gitignored,
   regenerable caches (rerun the experiment's own script); not part of any commit above.
+
+## Added 31/10 (V9 part 2)
+
+| Task | Question | Script | Results dir | Commit | Report |
+|---|---|---|---|---|---|
+| V1-FIX | Fix figure defects; channel-count slide figure; chb06 background check | `src/v9_eeg_evidence.py` | `results/v9_v1/fix/` | `7dd9869` | `V9_V1_FIX_REPORT.md` |
+| X1 | Are focal seizures missed because of the order-statistic members? 3rd-largest member | `src/v9_x1_focal.py` | `results/v9_x1/` | `cc5e73c` | `V9_X1_REPORT.md` |
+| X3 | 4-fold patient-wise cross-validation of the GAE over all CHB-MIT cases (Kaggle), kNN and GAE + kNN on identical inputs, matched-FP and paired F1/precision | `src/v9_x3_*.py` | `results/v9_x3/` | `039bd16`, `1a6c904`, `d131bb4`, `f3ff19a` | `V9_X3_PREP_REPORT.md`, `V9_X3_REPORT.md` |
+| X6 | Does ASR (artifact removal) delete seizure activity? power and contrast | `src/v9_x6_asr.py` | `results/v9_x6/` | `5c3d1ef` | `V9_X6_REPORT.md`, `V9_FINAL_REPORT.md` |
+| FINAL | Hard patients on three detectors; Siena gap decomposition; slide figure pack; number check | `src/v9_final_*.py` | `results/v9_final/` | `a1c28ab`, `4bcfb60` | `V9_FINAL_REPORT.md` |
+
+Tag `v9-final` marks the state after all of the above.

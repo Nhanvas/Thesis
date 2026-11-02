@@ -1,3 +1,8 @@
+> **SUSPENDED 02/11/2026 22:30 (board rev 40, R88–R90) — nothing in this plan was run.** After the meeting with anh
+> Trí: kNN is dropped from the story (R88), combined scores are not used (R89), B0/B1/B3/B4 are suspended (R90). The
+> parallel run is now `MODEL_COMPARISON_PLAN.md` (R93). Kept for the record; B2 (offset rule) and the graph insight
+> analyses (board §4) are candidates after the rehearsal. Change log: §8.
+
 # V10_PLAN — Track B: method fix after the method review (pre-registered 02/11/2026, chat D10-plan)
 
 **Status:** design fixed by the author on 02/11 before any run. Change only with the author's explicit approval
@@ -127,3 +132,6 @@ If the defense stays on 05/11 and B1 is not verified by the slide submission, th
 ## 8 · Change log
 
 - 02/11 (D10-plan): design fixed (B0, B1 H1–H4, B2; B3/B4 conditional).
+- 02/11 22:30 (D10-plan): **plan suspended** (R88–R90), replaced for now by `MODEL_COMPARISON_PLAN.md`. Reason: meeting with
+  anh Trí — kNN carries no meaning for the thesis; compare trained single models for a stated purpose. Results seen: none
+  (nothing was run).

@@ -291,3 +291,18 @@ Settled by code reading and runs during the performance phase; full log in `PERF
 | trained on 17–19 patients the GAE finds the same 37/76 on the test patients; the training-free kNN shows the same development/test gap | "low test result = over-fitting / too few training patients" | `results/v9_x3/`, `results/v9_e4/` |
 | ASR removes as much power from seizures as from high-amplitude windows and lowers seizure contrast 2.09 → 1.41 | "preprocessing artifact removal would clean false alarms safely" | `results/v9_x6/` |
 | the artifact veto deleted events after ranking without refilling the budget, so it could only trade sensitivity | "the artifact idea failed because artifacts do not matter" | `results/v9_e2/` |
+
+---
+
+## V10 · Corrections of 02/11/2026 (chat D10-plan)
+
+| correct | what it replaces | evidence |
+|---|---|---|
+| Presentation uses the **per-patient mean only** (SzCORE aggregate); pooled values are record only | "report pooled and per-patient side by side" | author decision R72 |
+| Siena vs CHB-MIT at one matched FP/day is **withdrawn**: per-patient Siena 0.540 vs CHB-MIT test 0.519 (computed); a single FP/day level has no basis across datasets. Siena is higher because it runs at a higher false-alarm rate (41.0 vs 26.8 per-patient) and 6 of 14 patients have 1–2 seizures | the V9 row "at matched 27.5 FP/day Siena 0.534 vs 0.355; durations explain part of the gap" | `NUMBERS_LOCK_S18.md` §18.3 (`results/v9_anatomy/siena14/_parts/*.json`, `results/v9_e1/sweep.csv`; pooled values reproduced exactly as gate) |
+| The **scorer** is the weak link: same 12 channel features, Mahalanobis 0.299 vs kNN 0.588 (per-patient, CHB-MIT test, detector stage, computed); GAE latent + Mahalanobis 0.504 > features + Mahalanobis 0.299 | "the graph / the data is why results are low" | S18.2 (`results/v9_e1/sweep.csv`) |
+| **kNN implementation flaws** (code read): `d_knn` compares the in-file time offset (`idx − file start`) without the file id, so the ±60 s exclusion also drops windows of every other file at the same minute; kNN budget calibrated leave-one-case-out on 23 cases vs GAE per fold on 17–19. No label enters kNN scoring | "the kNN baseline is final" | `src/v9_e1_baselines.py` (`load_raw12_18`, `d_knn`), `src/v9_x3_knn_b4.py`, `src/v9_e4_knn24.py`; fix = `V10_PLAN.md` §2 (B0) |
+| kNN is a **scoring rule** (distance to the 10th neighbour), not a trained model; kNN scoring on the GAE latent keeps the registered title true | "kNN replaces the GAE" | `V10_PLAN.md` §0 |
+| CV false alarms per day on slides are per-case means: GAE 28.4 · kNN 17.7 · GAE + kNN 22.7 | pooled 27.9 / 18.1 / 22.9 | §17c.2 (`results/v9_x3/sys_sweep.csv`) |
+| Missed seizures are **associated** with low amplitude ratio and short duration (three detectors) | "missed seizures are caused by low amplitude, not by model design" | `V9_RESULTS_SUMMARY.md` rev 3 §4 |
+| Hospital clin02: 3 events, 6.60 %; the 27 marked segments include 7 spikes | "6.6 % not in the lock" | `V9_RESULTS_SUMMARY.md` §6.4 |

@@ -1,156 +1,208 @@
-# STATUS_BOARD — DEFENSE phase (rev 36, 2026-10-31, chat D9b: deck restructured to 12 minutes, 94 pages)
+# STATUS_BOARD — DEFENSE phase (rev 39, 2026-11-02 evening, chat D10-plan: full project reset, two parallel tracks)
 
-**Read this first in every chat, then `Defense/notes/V9_RESULTS_SUMMARY.md` (rev 2).** This board says what is done,
-what is open and what the next steps are. It is rewritten as a whole file when a task ends (new rev number).
-
-**Practical facts.**
-- Defense **05–06/11/2026**, in English: **12 min talk + 3 min demo (right after the Conclusion) + 10 min Q&A**; the Q&A
-  checks that the student did the work himself.
-- **Mock defense with cô and the mentor: 02/11.** Supervisor meetings Thursdays 08:00.
-- Reviewer: **TS. Ngô Thị Lụa** (12 points of 26/10 → `V9_RESULTS_SUMMARY.md` §0).
-- Cô 30/10 on the D9 deck (too long, dense, no detected-seizure illustration) → **answered in D9b**: 22 main pages
-  (18 content), 705 s = 11:45 at 110 words/min, p14 = real EEG of a detected seizure.
-- After the defense: one round of report corrections (`REPORT_REVISION_NOTES.md`).
-
-**Report.** Locked at the faculty submission (17/10/2026) until the committee's comments.
+**Read this first in every chat.** Rev 39 replaces rev 36–38 in full. It carries every fact and decision up to 02/11
+evening, so no earlier chat needs to be re-read. Two chats now run **in parallel** (possibly on two accounts with no
+shared memory): **Track A = defense preparation**, **Track B = method fix** (design in `V10_PLAN.md`).
 
 ---
 
-## 1 · Chat protocol (binding)
+## 0 · Practical facts (02/11)
 
-1. One task per chat from section 5 — **exception (author 31/10): chat D9b continues** through slides, answers, script
-   and Q&A until the author is satisfied, so the context is not re-sent.
-2. **Start:** read this board → the files named for the task.
-3. **End of a task:** (a) this board rewritten (rev + 1); (b) **one** list for the author (project files add / replace /
-   delete, with local paths); (c) the exact commands to install what was delivered.
-4. Defense material lives in `F:/Study/Thesis/Defense/` (private). The repository (public) holds this board.
-5. Every number on a slide, in the script or in an answer matches the report **and** `NUMBERS_LOCK.md`
-   (§16 spoken only; §17 rev 2 + §17c allowed on slides, labelled "after the review").
-6. **Order of work:** key messages ✔ → slides ✔ (D9b, page map rev 10) → **author: Canva v7** → **script to the page
-   budgets** (SLIDE_OUTLINE rev 10 §1) → author approves → **one** timed read.
-7. **Main pages fit 12 minutes** (A50): no new main page unless another goes (L26); Method keeps Data, Preprocessing,
-   Evaluation (L31).
-8. **Claude writes the script** (IELTS 5.5); the author reads, adapts and rephrases.
-9. **Guidance goes directly in the chat**, short and detailed; files are records.
-10. Every author request about slides is logged in `DECK_BRIEF.md` §1 (now A1–A72).
-11. A review item quotes the text as it is now on the page.
-12. **Changes go out as one zip + one `.sh`** that checks its base first.
-13. **Research is an iterative loop**; experiments are closed (author 30/10).
-14. **Claims about data, difficulty, false alarms, Siena, hospital data are backed by real EEG**, rule-selected.
-15. **Never "low because unsupervised"**; never reuse a conclusion listed in summary §9 (DECK_BRIEF §3.12).
-16. **A result enters a slide only after verification** (L27).
-17. Heavy laptop jobs run **one at a time**, from Git Bash (not Cursor), browsers and MATLAB closed.
-18. The word **"Appendix" is retired**: pages after Thank you are **Backup Slides** (A59).
-
-## 2 · Where things stand (31/10, D9b)
-
-| track | state | next |
-|---|---|---|
-| Experiments | **closed** (author 30/10); tag `v9-final` | none |
-| Key messages | **K1–K5 approved** (A53) | script follows them |
-| Deck | **page map rev 10 approved** (A65): Canva v7 = 94 pages, 22 main (18 content, 705 s), Backup Slides 23–94; Slides artifact = all 94 pages (link DECK_BRIEF §6); `D9B_CANVA_CHANGES.md` page by page + 31-item audit of old sentences | **author:** Canva v7 edits + PDF |
-| Figures | p14 `figs/final/item1`, p16 `item5`, p17/p18 `figs/d9b/fig17`, `fig18` (gated); `d9_hard_patients.png` withdrawn; `figs/final/model_comparison.png` and `hard_patients_amp_ratio.png` not for slides (L29) | author inserts in Canva; open "Insert in Canva" boxes: F4 (3 panels), G4 (2), I3, I5 (2), I6, I7, I11, I12, I13 |
-| Numbers | NUMBERS_LOCK §17 rev 2 + **§17c (D9b)** appended by the install script | `xanh` check of Canva v7 |
-| Author's 70 questions | answered: `notes/STUDY_GUIDE_part3_vi.md` (new) | study guide parts 1–2 → rev 2 (outdated answers) |
-| Q&A | `QA_V9.md` (16); `QA_BANK.md`; `QA_PAGE_MAP.md` v5 (old pages) | QA page map for v7 pages (this chat) |
-| Script | `SCRIPT_v2.md` = Canva v5 (obsolete) | **SCRIPT_v3** to the budgets (this chat) |
-| Demo | login fixed; start/stop scripts; chb24 allowed | **author:** ingest chb24 (≈ 8 min), two cold-start runs, fallback video |
-| Report | `REPORT_REVISION_NOTES.md` | after the defense |
-
-## 3 · Feedback and rules in force
-
-R1–R61 stand. Added 31/10 (D9b):
-
-| # | source | rule |
-|---|---|---|
-| R62 | author (A54) | P-V9a: GAE = thesis system and headline; p17 states kNN ≥ GAE honestly; never "GAE + kNN is the improvement" |
-| R63 | author (A55) | P-V9b: Siena 0.633 / 0.160 (report numbers) on slides |
-| R64 | author (A56) | Objective 3 = one line on p12 and p20; EEG panels on F4 |
-| R65 | D9b (L28, L29, L33) | Every table row's label checked against its NUMBERS_LOCK line (detector named); figures for main pages checked for internal labels and palette; times read from the label file |
-| R66 | author (A62) | chb24 = "one more unseen CHB-MIT patient" (not external); Siena = only external dataset; not merged into the 8 test patients |
-| R67 | author (A63) | Result pages show the **per-patient mean** only; pooled on E11 and in answers |
-| R68 | author (A59–A61) | "Backup Slides", never "Appendix"; no old backup page deleted; Method keeps Data, Preprocessing, Evaluation |
-| R69 | author (A64) | wPLI/AEC weights: answer "fixed at 0.5/0.5 before any test, not tuned; testing them is future work" — no new run |
-| R70 | author (A66) | Script says early: the GAE learns only from seizure-free windows; "normal" = the patient's whole recording; the task is review triage, not a real-time alarm, because long-term EEG is read after recording |
-
-## 4 · Decisions
-
-- Earlier: rev 22–35 (in git or the project).
-- **31/10 (D9b):** P-V9a = GAE headline, honest page; P-V9b = keep 0.633 / 0.160; K1–K5 approved; Objective 3 → F4 +
-  one line; chb24 separate, reworded; per-patient mean only on result pages; 18 content pages (Data, Preprocessing,
-  Evaluation restored); no wPLI/AEC run; page map rev 10 (94 pages) "Approve, build it"; "Backup Slides".
-- **Open (author):** Canva v7; chb24 ingest and demo rehearsal; demo event number; P1 committee fields; papers (summary
-  §13); check the Mullen 2015 DOI before printing References.
-
-## 5 · Plan (from 31/10)
-
-| # | date | task | output |
-|---|---|---|---|
-| D9b | 31/10 ✔ | slides for 12 min: key messages, page map rev 10, artifact (94 p), Canva list, audit, 70 answers | DECK_BRIEF 4.2, SLIDE_OUTLINE 10, D9B_CANVA_CHANGES, NL §17c, figs/d9b, STUDY_GUIDE_part3, rev 36 |
-| — | 31/10–01/11 | **author:** install bundle; Canva v7 edits + PDF (`D9B_CANVA_CHANGES.md`) | Canva v7 PDF |
-| D9b (cont.) | 01/11 | **same chat:** check Canva v7 PDF; **SCRIPT_v3** (≈ 1,290 words to the page budgets) + demo path; **QA_PAGE_MAP v7**; STUDY_GUIDE parts 1–2 rev 2; rehearsal list | SCRIPT_v3, QA_PAGE_MAP v7, study guides, rev 37 |
-| — | 02/11 | **mock defense** | feedback |
-| D11 | 02–04/11 | fixes, timed read, demo cold-start checklist | final deck |
-
-**If a new chat is ever needed (fallback start prompt):**
-> Continue the defense work of chat D9b. Read `STATUS_BOARD.md` (rev 36), `DECK_BRIEF.md` (rev 4.2: §0b, §3.12, §8,
-> A50–A72, L22–L33), `SLIDE_OUTLINE.md` (rev 10), `V9_RESULTS_SUMMARY.md` (rev 2, §9, §12), `NUMBERS_LOCK.md` (§1, §8,
-> §17 rev 2, §17c), `STUDY_GUIDE_part3_vi.md`, `QA_V9.md`, `QA_BANK.md`, `QA_PAGE_MAP.md`, `DEMO_SCRIPT.md`,
-> `Kangabu_defense_tips.md`, and the speaker notes of the Slides artifact (DECK_BRIEF §6). Attached: my Canva v7 PDF.
-> Tasks: check the PDF against `D9B_CANVA_CHANGES.md`; write `SCRIPT_v3.md` (IELTS 5.5, 110 words/min, per page:
-> message · eye path · transition; count words); `QA_PAGE_MAP.md` v7; correct `STUDY_GUIDE_part1/2_vi.md` (rev 2).
-
-## 6 · Which file for what
-
-| File | Use it to | When |
-|---|---|---|
-| `notes/V9_RESULTS_SUMMARY.md` (rev 2) | every post-review result, its evidence and limits; overturned conclusions §9 | always |
-| `notes/NUMBERS_LOCK.md` (§1–§17 rev 2, §17b, §17c) | every allowed number | always |
-| `outline/DECK_BRIEF.md` (rev 4.2) | author requests A1–A72, lessons L1–L33, design | slide or script work |
-| `outline/SLIDE_OUTLINE.md` (rev 10) | key messages, page map 1–94, page budgets, 70 questions → pages | script, Q&A |
-| `outline/D9B_CANVA_CHANGES.md` | Canva v6 → v7, page by page; audit of old sentences | author; PDF check |
-| `notes/STUDY_GUIDE_part3_vi.md` | answers to the author's 70 questions | rehearsal |
-| `slides/figs/final/FIGURE_INDEX.md`, `slides/figs/d9b/` | slide figures and selection rules | Canva |
-| `qa/QA_V9.md`, `qa/QA_BANK.md`, `qa/QA_PAGE_MAP.md` | answers; page map (v5 → v7 next) | rehearsal |
-| `script/SCRIPT_v2.md`, `script/DEMO_SCRIPT.md` | old script; demo path | script v3 |
-| `notes/REPORT_REVISION_NOTES.md` | what the final report must change | after the defense |
-| `Defense/v9_reports/` | full V9 reports | detail |
-| `docs/V9_RESULTS_INDEX.md` (repo) | task → script → results → commit | provenance |
-
-## 7 · Layout
-
-```
-F:/Study/Thesis/
-  Code/                       repository (public): docs/STATUS_BOARD.md, docs/V9_RESULTS_INDEX.md, results/v9_*, src/v9_*.py, web_demo/
-  Reports/final/              submitted report (.docx) + Thesis_Final_Report.md
-  Dataset/                    CHB-MIT, siena (14/14), clinical (2 EDF; names in file names, never in the repo)
-  Defense/
-    notes/       NUMBERS_LOCK.md (+§17c), V9_RESULTS_SUMMARY.md, STUDY_GUIDE_part1-3_vi.md, REPORT_REVISION_NOTES.md, ...
-    qa/          QA_BANK.md, QA_PAGE_MAP.md, QA_V9.md
-    outline/     DECK_BRIEF.md (4.2), SLIDE_OUTLINE.md (10), D9B_CANVA_CHANGES.md
-    slides/      Canva PDFs; figs/ (final/, d9b/, d9/, eeg_samples/, eeg_evidence/, x1, x6); gen/ (d9/, d9b/)
-    v9_reports/ · clinical/ · script/ · demo/ · content/ · inputs/ · review/
-  Agent/inbox/                hand-over tray (D9b2/ install bundle)
-  Archive/2026-10-31-d9b/     backups made by the D9b install script (incl. D9_CANVA_CHANGES.md)
-```
-
-## 8 · Where the numbers are
-
-| content | file |
+| item | value |
 |---|---|
-| every number of the thesis system | `docs/PERF_PHASE_RECORD.md` (rev R) |
-| what the committee read | `Thesis_Final_Report.md` |
-| numbers allowed on slides | `NUMBERS_LOCK.md` (§1–§15; §16 spoken only; §17 rev 2 + §17c post-review and deck) |
-| post-review results | `V9_RESULTS_SUMMARY.md` rev 2; `results/v9_*`; `results/v9_final/NUMBERS_CHECK.md` |
+| Defense date | cô (02/11 17:16): **"almost certainly" moved**; new date not announced. Likely **Mon 09/11 afternoon** (cô Lụa, 02/11: "Chiều thứ 2 tuần sau kẹt hội đồng thesis") — unconfirmed until the faculty announces it. **Fallback = 05/11, 08:00** (6 students × 30 min, **Boti last, ≈ 10:30**) → aim to finish both tracks **before 05/11** |
+| Format | **13 min talk + 3 min demo (right after the Conclusion) + 15 min Q&A**. The Q&A checks that the student understands his own work and did not hand it to AI |
+| Slide submission | fallback **04/11, 16:00** (moves with the date) |
+| Rehearsal with cô | **03/11, 09:00 — kept** |
+| Results review | cô asked **anh Trí** to review the results with Boti — **02/11, 21:00**. cô: *is the kNN implemented correctly? is the gain due to good features?* Anh Trí: *why kNN, why not SVM or trees?* (answers: `V10_PLAN.md` §1–§2) |
+| Report | **not read by the committee yet**; revised after the defense (`REPORT_REVISION_NOTES.md`); constrains the slides only through the registered title and objectives |
 
-## 9 · Decisions log
+**Committee.**
+- **Chair: PGS. TS. Nguyễn Thị Hiệp** — Dean, School of BME, IU; biomaterials / regenerative medicine. Not EEG/ML → plain words, clinical meaning.
+- **PGS. TS. Hà Thị Thanh Hương** (supervisor) — head of the Brain Health Lab; AI for brain health (MRI, EEG); Stanford neuroscience PhD (incl. network deficits in epilepsy); 2026 ASEAN-US Science Prize for Women (AI + neuro). Wants the thesis to grow into a **real product with IP → accuracy and reliability, fewer false alarms**. Expect clinical/neuro questions.
+- **TS. Ngô Thị Lụa** (reviewer) — AI (author 02/11). Her 12 points of 26/10 → `V9_RESULTS_SUMMARY.md` §0. Expect ML questions (why GAE, why Mahalanobis, why kNN, CV design, overfitting, threshold).
+- **TS. Tô (Thị) Ngọc Hân** — Dept. of Tissue Engineering & Regenerative Medicine. Not EEG/ML.
 
-- 2026-10-15 → 24: defense phase D1–D7 (rev 22–32).
-- 2026-10-26: reviewer's feedback (12 points).
-- 2026-10-27/28 (V9): research loop; rev 33.
-- 2026-10-30 (D9): page map v6 (78 p); rev 34.
-- 2026-10-30/31 (V9 part 2): X1, X3, X6, V1-FIX, FINAL; three conclusions withdrawn; cô's slide feedback; rev 35.
-- 2026-10-31 (D9b): P-V9a, P-V9b, K1–K5; first 12-minute map (86 p, never installed) → author's 70 questions → page map
-  rev 10 (94 p, 22 main, 705 s): Data, Preprocessing, Evaluation restored; per-patient mean only; chb24 reworded;
-  "Backup Slides"; new backups A2, A3, A5, A6, B7–B9, D6, E13; 31 old sentences corrected (incl. a mislabelled row on
-  v6 p24, the chb03 annotation times, the detector behind "chb14 8/8"); Slides artifact with all pages; rev 36.
+**Mentor anh Trí (02/11), paraphrased:** do not be nervous; the work is broad and deep. Results need not beat other
+studies — a little lower is fine. Grading = **how you present, whether you understand your method, how you set up the
+experiments**, and the effort; the analysis beyond plain numbers is what sets the work apart.
+
+---
+
+## 1 · Chat protocol (parallel phase)
+
+1. Two tracks run at once; each works only on its own items (§5). **A track never rewrites this board.**
+2. **End of a track:** it delivers (a) `TRACK_A_HANDBACK.md` / `TRACK_B_HANDBACK.md` (done, decisions, numbers with
+   sources, open items); (b) changed files with exact local paths; (c) append-only additions to `NUMBERS_LOCK_S18.md` as
+   a separate block.
+3. The author uploads deliverables once per finished track. **The next single chat merges both handbacks into rev 40.**
+4. Deliveries: **one zip (files at their local paths) + one list** of project actions (add / replace / delete / paste);
+   the author installs locally and updates the project by hand (author 02/11).
+5. Conversation in Vietnamese; slide text and script in English (IELTS 5.5); no internal labels on slides; every number
+   from `NUMBERS_LOCK.md` + `NUMBERS_LOCK_S18.md` or a committed file; computed values labelled.
+6. Heavy laptop jobs: one at a time, Git Bash, browsers/MATLAB/Cursor closed → Track B's long runs go **overnight**.
+
+---
+
+## 2 · Author decisions (binding; R1–R70 of earlier boards stand unless replaced here)
+
+| # | decision (02/11) |
+|---|---|
+| R71 | **The author's own deck is the base** (`BEBEIU22184_NguyenQuocTrungNhan_Slide_Thesis_HD.pdf`, 54 pages, ≈ 70–80 % done, built in the author's logic). All slide work follows **its** order, style and rules. Page map rev 10, `SLIDE_OUTLINE.md`, `D9B_CANVA_CHANGES.md`, the Slides artifact and `SCRIPT_v2.md` are **retired**. Format, page numbers, layout and unreviewed backup pages are left to the author — not commented on unless asked |
+| R72 | **Per-patient mean only** (SzCORE aggregate = mean of per-subject sensitivity, precision, F1, FP/day) on slides, script, answers and the revised report. Pooled values are recomputed per-patient or removed. Counts (26/76, 37/76, 33/76) stay as counts. Record files keep their pooled columns as record only |
+| R73 | **Minimal slides:** no header text or callout unless needed; main idea only |
+| R74 | **No cross-dataset comparison at one matched FP/day.** Method comparisons on the same dataset: full curve + each method's own label-free operating point + paired F1 bootstrap; no "@27.5" lists on main pages |
+| R75 | Report revised after the defense; it constrains slides only via title/objectives |
+| R76 | **Research reopened for Track B only** (`V10_PLAN.md`); defense prep continues in Track A; a verified better result enters the slides before the defense, otherwise it becomes an insight / future-work page. Track A never waits for Track B |
+| R77 | **The author writes the script himself** from his deck; Claude checks numbers, figures, overclaims and timing |
+| R78 | cô's rule: **what the author is not yet solid on is not presented** — it goes to Backup and is said only if asked |
+| R79 | Q&A prepares an honest answer to **"how did you use AI tools?"** (AI for code and drafting; design choices, failures and decisions are the author's — 2–3 concrete examples) |
+| R80 | cô's product goal → **reliability = fewer false alarms at the same sensitivity** |
+| R81 | **Look for weaknesses in protocol and method, never blame the data.** "The test patients are harder" stays a measured fact, not the explanation of choice |
+| R82 | Date moving → **Track B is the priority**; Track A keeps the rehearsal and the method understanding, fixes hard errors only, and does not polish result pages until Track B decides |
+| R83 | **Audit and fix the kNN implementation before using kNN results further** (cô 02/11) → B0 |
+| R84 | "Why kNN, not other models?": supervised SVM/trees need the patient's labels (outside the problem; supervised reference exists); their **unsupervised** counterparts are compared on the same inputs (B1) |
+| R85 | **P-V9a ("GAE is always the headline") is suspended** until B1's pre-registered decision rule decides |
+| R86 | Study guides are updated now (part 2 replaced; part 1 and 3 patched); **Q&A files are corrected by Track A as it finds issues** (patch headers mark what is stale) |
+| R87 | Rehearsal 03/11 09:00 is kept; 05/11 is the fallback date; both tracks aim to finish before 05/11 |
+
+---
+
+## 3 · Corrections on the author's deck (02/11) — Track A applies with the author
+
+Pages as numbered in the author's PDF (may still change). Verified sources in brackets.
+
+**Main pages**
+| page | now | fix |
+|---|---|---|
+| p5 | "Data pipleine" | typo |
+| p6 | "Patient-split: 12/3/8/**1 external**" | chb24 = "+1 unseen patient" (R66) |
+| p6 | CHB-MIT "0.32 % recording" | lock: 0.33 % (23 original cases, §17c.1); 0.32 % with chb24 is not in the lock → use 0.33 % (23 cases) or give the source |
+| p6 | Siena "0.62 % recording" | lock **0.59 %** (2,988 s / 141.0 h, §17c.1) |
+| p6 | Hospital "7 technician-marked spikes" | correct, but part of **27 marked segments** (4 eyes-closed, 4 eyes-open, 2 hyperventilation, 10 photic, 7 spikes) [V9 summary §6.4] |
+| p7 | "Loss: MSE between (A,A') and (X,X')" | "MSE(A) + 0.1·MSE(X); the X decoder rebuilds 12 of the 30 features" |
+| p10 | "External validation: Unseen Child (chb24)" | chb24 not external (R66) |
+| p12 | 4 seeds "…at **23.9** ± 1.2" / "…at **29.2** ± 1.3" (pooled FP/day) | **23.8 ± 1.3** / **28.7 ± 1.3** (per-patient, computed — S18.1) |
+| p12 | "Aannotated" | typo |
+| p13–17 | table header "External data" over chb24 and the review app | e.g. "Beyond the test set" |
+| p13–17 | Hospital "Record 2: 6.6 % flagged (~5 min)" | verified: clin02 3 events, 6.60 % [V9 summary §6.4]; "≈ 5 min" = 0.066 × 75 min (computed) |
+| **p16** | "Detected **seizure** of patient 1" | **forbidden** → "Flagged event (no annotation)" |
+| **p17** | "Detected **spike** of patient 2" | "Technician-marked spike" |
+| p18 | two lists "same FA/day (27.5)": 0.106 / 0.342 / 0.467 (pooled, detector stage) and 0.554 / 0.601 / 0.607 (per-patient, system stage) | **remove both** (R74); keep the CV curve + 2–3 lines. Wording of those lines waits for B0 (kNN numbers may change) |
+| p18 | "kNN **matches** GAE … (F1: −0.076)" | understates: kNN has **higher** F1 (pending B0) |
+| p20 | "0.508 at **22.2** FA/day" | **21.8** (per-patient) |
+| p20 | "within 12 seconds" | "median onset error 12 s (4 seeds)" |
+| p20 | "Missed seizures are **caused by** low amplitude, not by model design" | "Missed seizures are low-amplitude and short in all three detectors" (association, not proven cause) |
+| p20 | "**Validated** on … Vietnamese hospital data" | "qualitative run on hospital EEG" |
+| p20 | "graph connectivity adds no detection value (kNN matches GAE)" | pending B0/B1 — keep the wording neutral until then |
+| Discussion table | "This work: 26/76 at 22.2/day" | "0.508 at 21.8/day (held-out, per-patient)" |
+| Limits table | "held-out 0.342 vs final 0.487" | **0.508 vs 0.577** |
+| Limits table | "Connectivity alone 0.106 vs GAE 0.342" | **0.102 vs 0.504** (per-patient, computed — S18.2) |
+| Limits table | "Offsets: median error 24 s (**better than onset**)" | wrong → "CPD does not improve offset (20 → 24 s); a run rule gives 16 s" |
+| Limits table | "False alarms 22–44/day" (pooled) | per-patient 21.8 – 41.5 |
+
+**Backup pages**
+| page | fix |
+|---|---|
+| Five Representations | per-patient bars (computed, S18.2): kNN 0.588 · GAE + kNN 0.552 · GAE 0.504 · Isolation Forest 0.466 · Mahalanobis 0.299 · connectivity only 0.102 (kNN rows pending B0) |
+| Test patients per seed | Total row FA/day → 21.8 / 26.8; footnote per-patient 0.498 / 0.567 (4 seeds) |
+| Seeds & Intervals | per-patient: held-out 0.498 [0.226, 0.770]; final − held-out +0.070 [0.000, 0.201]. "Lower bound zero means … driven by one patient" is a non sequitur → "not significant; the gain is chb15 alone" |
+| Evaluation timeline | Development "0.670 at 23.3" (pooled) → per-patient 0.832 (per-patient FP/day: open, S18.5) |
+| Evolution / Models evaluated | record holds pooled only → author chooses: label "pooled, development history" or drop the numbers |
+| External validation in full | panel (a) and the "Proof" lines **withdrawn** (R74, S18.3). "Why Siena higher": higher FA rate (41.0 vs 26.8 per-patient) and 6 of 14 patients with 1–2 seizures |
+| Siena validation | "41.0 vs **27.5** FA/day" → 26.8 |
+| Artifact removal | "max case (chb03) 96 %" verified (0.963, V9 summary §6.2) |
+| Missed seizure / FA on EEG | drop "This confirms why removing artifacts destroys seizures" (overclaim) |
+| Channel attribution | "does not map to the anatomical onset zone" → "does not match the annotated ictal channels better than a simple anatomical prior" (not SOZ) |
+| Graphs & latent distance | "Graph captures how channels interact during a seizure" → soften or drop |
+
+---
+
+## 4 · Method review (02/11) → Track B
+
+Full design, evidence and pre-registered hypotheses: **`V10_PLAN.md`** (the single source for Track B). Summary:
+- **Main weakness = the scorer:** Mahalanobis assumes one Gaussian "normal" state; same features, Mahalanobis 0.299 vs
+  kNN 0.588 (per-patient, computed). kNN on the GAE latent never tested. kNN = scoring rule, title unchanged.
+- **kNN audit (cô's question):** two real flaws — the ±60 s exclusion compares in-file time without the file id;
+  calibration asymmetry (kNN 23 cases vs GAE 17–19). Fix first (B0).
+- **B1** scorer × representation study (Mahalanobis, Gaussian mixture, kNN ± exclusion, Isolation Forest, One-Class SVM ×
+  channel features / GAE latent) with H1–H4 and a decision rule. **B2** offset rule. **B3/B4** only if the date allows.
+- **Siena vs CHB-MIT at one matched rate** is withdrawn (per-patient 0.540 vs 0.519).
+
+---
+
+## 5 · Plan — two parallel tracks
+
+### Track A — defense preparation (account 1, chat "D10-A")
+| when | step | output |
+|---|---|---|
+| 02/11 eve | author writes `SCRIPT_v3` on his deck, **Intro + Method first** (they will not change) | draft |
+| 02/11 eve | chat checks the script against the deck and the locks (numbers, figures, overclaims, §3, R71–R87); word count → minutes (13:00 limit, aim 12:00–12:30 at ≈ 110 words/min) | marked script |
+| 02/11 eve | **hard fixes only** in Canva (§3 main pages); no redesign of result pages | — |
+| 02/11 | **method drill** (10 questions below), aloud, ≤ 30 s each; shaky item → Backup (R78) | — |
+| 03/11 09:00 | **rehearsal with cô** on the current deck; ask cô for the new date | feedback |
+| 03/11 → | Q&A files corrected as issues appear (R86); "how did you use AI" answer (R79); demo cold start + fallback video | `TRACK_A_HANDBACK.md` |
+| 04/11 | add Track B result if verified (V10_PLAN §3 decision rule); `xanh` number check; timed read | deck |
+
+**Method drill (own words, ≤ 30 s, no slides):** (1) one 4 s window → one number, step by step; (2) what wPLI and AEC
+measure, why CAR first; (3) what the GAE learns from, why the latent and not the reconstruction error; (4) why "normal"
+= the patient's whole recording, and the cost (no real time); (5) Mahalanobis + robust z — and why one Gaussian is the
+weak point; (6) why the 6th/9th/12th largest channel, not the maximum; (7) what drift correction fixes (0.612 → 0.681);
+(8) how the alarm budget is set without labels, why the final system is test-informed; (9) what CPD does, why onset
+improves and offset not; (10) what "kNN ≥ GAE" says about the graph idea, and the honest answer.
+
+### Track B — method fix (account 2, chat "D10-B") — priority (R82)
+Steps, timeline, gates and decision rule: **`V10_PLAN.md` §2–§7**. Deliverables: `docs/prompts/V10_B0_KNN_FIX.md`,
+`docs/prompts/V10_B1_SCORERS.md`, committed `results/v10_b0/`, `results/v10_b1/`, reports in
+`F:/Study/Thesis/Agent/inbox/`, `TRACK_B_HANDBACK.md`, an S18 append block.
+
+---
+
+## 6 · Start prompts
+
+**Track A (account 1):**
+> Defense track A (D10-A). Read `STATUS_BOARD.md` rev 39 (all), `DECK_BRIEF.md` rev 5, `NUMBERS_LOCK.md` (header,
+> §1, §8, §17, §17c), `NUMBERS_LOCK_S18.md`, `V9_RESULTS_SUMMARY.md` rev 3, `STUDY_GUIDE_part1_vi.md` +
+> `STUDY_GUIDE_part2_vi.md` rev 2, `QA_V9.md`, `Kangabu_defense_tips.md`. Attached: my deck PDF (the base — R71) and my
+> script draft. Tasks: check the script against the deck and the locks (numbers, figures, overclaims, §3 list,
+> R71–R87); count words → minutes for 13:00; list the Canva fixes still open; drill me on the 10 method questions in
+> Vietnamese. Do not touch Track B. End with `TRACK_A_HANDBACK.md`.
+
+**Track B (account 2):**
+> Method track B (D10-B). Read `STATUS_BOARD.md` rev 39 (§0, §2, §4), **`V10_PLAN.md`** (the pre-registered design — change it
+> only with my approval and log it in its §8), `NUMBERS_LOCK_S18.md`, `V9_RESULTS_SUMMARY.md` rev 3 (§2–§5, §9),
+> `VERIFIED_CORRECTIONS.md`. Clone github.com/Nhanvas/Thesis; read `src/v9_e1_baselines.py` (`d_knn`, `load_raw12_18`,
+> `file_start_offsets`), `src/v9_e4_knn24.py`, `src/v9_x3_knn_b4.py`, `src/v9_x3_cv_eval.py` (`dump_D`, calibration),
+> `src/v9_e1b_calibrate.py`, `src/v9_x3_sys_sweep.py`, `results/v9_x3/SUMMARY.md`. Tasks: confirm the B0 findings in the
+> code; write `docs/prompts/V10_B0_KNN_FIX.md` for Claude Code on my laptop (gate first, smoke, resumable, single worker,
+> measured runtime, report to `F:/Study/Thesis/Agent/inbox/V10_B0_REPORT.md`, commit `results/v10_b0/`); after B0, the B1
+> prompt the same way; verify every result before it is used; B2 in the container. Do not touch Track A. End with
+> `TRACK_B_HANDBACK.md` and an S18 append block.
+
+---
+
+## 7 · Files (project) and where they live locally
+
+| file | role | local path |
+|---|---|---|
+| author's deck PDF | base of all slide work (R71) | `F:/Study/Thesis/Defense/slides/` |
+| `STATUS_BOARD.md` (rev 39) | this board | `Code/docs/` (repo) |
+| `V10_PLAN.md` | Track B pre-registered design | `Code/docs/` (repo) |
+| `DECK_BRIEF.md` (rev 5) | slide rules on the author's deck | `Defense/outline/` |
+| `NUMBERS_LOCK.md` (+ header R72) · `NUMBERS_LOCK_S18.md` | allowed numbers; per-patient recomputations | `Defense/notes/` |
+| `V9_RESULTS_SUMMARY.md` (rev 3) | post-review results; §9 withdrawn conclusions | `Defense/notes/` |
+| `STUDY_GUIDE_part1_vi.md` (+ patch header) · `STUDY_GUIDE_part2_vi.md` (rev 2) · `STUDY_GUIDE_part3_vi.md` (+ patch header) | study | `Defense/notes/` |
+| `QA_V9.md`, `QA_BANK.md` (+ patch headers) | Q&A (Track A corrects) | `Defense/qa/` |
+| `DEMO_SCRIPT.md` (+ patch header), `APP_FACTS.md`, `GATE.md`, `TIMING.md`, `DEMO_FINAL_HANDBACK.md` | demo | `Defense/script/`, `Defense/notes/` |
+| `REPORT_REVISION_NOTES.md` (rewritten 02/11) | report changes after the defense | `Defense/notes/` |
+| `VERIFIED_CORRECTIONS.md` (+ V10 block) | findings not to rediscover | `Code/docs/` |
+| record files (PERF_PHASE_RECORD, HANDOFF_REPORT, PROVENANCE, PROVENANCE_V2, RESULTS_OF_RECORD_phaseB, ATTRIBUTION_SPEC, Thesis_Reference_Sheet, CLAIM_AUDIT_v8, Thesis_Final_Report, Registration Form, p2_ledger.csv, REPRODUCE, RUBRIC_MAP, FIGURE_INDEX, Kangabu tips, THESIS_REPORT_WRITING_GUIDE) | unchanged; pooled columns = record only (R72) | as before |
+| retired (removed from the project; kept in `Archive/2026-11-02-d10/`) | SLIDE_OUTLINE, D9B_CANVA_CHANGES, SCRIPT_v2, QA_PAGE_MAP, D5_HANDOFF, BRIEFING_2026-10-08_vi, BME11 template | — |
+
+## 8 · Decisions log
+- rev 22–36: see git.
+- **02/11 (rev 37–38, superseded):** format 13 + 3 + 15; committee; R71–R84; deck corrections; per-patient recomputations;
+  Siena matched comparison withdrawn; method review; kNN audit; two tracks.
+- **02/11 evening (rev 39):** full project reset (instructions, board, DECK_BRIEF rev 5, V9 summary rev 3, V10_PLAN,
+  S18, study guide part 2 rev 2, patch headers, report notes); R85 P-V9a suspended; R86 study guides now, Q&A by Track A;
+  R87 rehearsal kept, 05/11 fallback; deliveries = zip + list.

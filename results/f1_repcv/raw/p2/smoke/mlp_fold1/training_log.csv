@@ -1,0 +1,3 @@
+model,epoch,train_loss,s,partition,fold
+mlp,1,0.04959209823608399,0.2,2,1
+mlp,2,0.026635190963745118,0.3,2,1

@@ -1,0 +1,39 @@
+[
+ {
+  "gate": "D0",
+  "status": "PASS"
+ },
+ {
+  "gate": "G-const",
+  "status": "PASS",
+  "max_rel": 0.0,
+  "bad": "[]"
+ },
+ {
+  "gate": "G-vec",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "exact": true,
+  "case": "chb01",
+  "windows": 2000,
+  "epochs": 2
+ },
+ {
+  "gate": "G-mlp",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "exact": true
+ },
+ {
+  "gate": "GG0",
+  "status": "PASS",
+  "mismatches": "[]",
+  "seconds": 257,
+  "fold_seconds": [
+   77,
+   60,
+   60,
+   60
+  ]
+ }
+]

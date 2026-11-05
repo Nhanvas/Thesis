@@ -1,0 +1,91 @@
+{
+ "score_s_per_fold": 64.25,
+ "mode": "gpu",
+ "workers": 4,
+ "devices": [
+  "cuda:0",
+  "cuda:1",
+  "cuda:0",
+  "cuda:1"
+ ],
+ "ms_per_step": {
+  "gae": 7.706405719121298,
+  "mlp": 3.286407391230265
+ },
+ "timing_workers": [
+  {
+   "device": "cuda:0",
+   "gae": 7.709364891052246,
+   "mlp": 3.2781608899434405
+  },
+  {
+   "device": "cuda:1",
+   "gae": 7.703446547190349,
+   "mlp": 3.3219091097513833
+  },
+  {
+   "device": "cuda:0",
+   "gae": 7.71195650100708,
+   "mlp": 3.29465389251709
+  },
+  {
+   "device": "cuda:1",
+   "gae": 7.7002255121866865,
+   "mlp": 3.2010086377461753
+  }
+ ],
+ "jobs": [
+  {
+   "model": "gae",
+   "fold": 1,
+   "n_train": 396084,
+   "proj_h": 5.88827799946732
+  },
+  {
+   "model": "gae",
+   "fold": 4,
+   "n_train": 332123,
+   "proj_h": 4.946854914146441
+  },
+  {
+   "model": "gae",
+   "fold": 2,
+   "n_train": 328792,
+   "proj_h": 4.897876424464916
+  },
+  {
+   "model": "gae",
+   "fold": 3,
+   "n_train": 268869,
+   "proj_h": 4.016263610197439
+  },
+  {
+   "model": "mlp",
+   "fold": 1,
+   "n_train": 396084,
+   "proj_h": 2.5448439309729474
+  },
+  {
+   "model": "mlp",
+   "fold": 4,
+   "n_train": 332123,
+   "proj_h": 2.14337275249649
+  },
+  {
+   "model": "mlp",
+   "fold": 2,
+   "n_train": 328792,
+   "proj_h": 2.1224858077433377
+  },
+  {
+   "model": "mlp",
+   "fold": 3,
+   "n_train": 268869,
+   "proj_h": 1.746520802186595
+  }
+ ],
+ "projected_wall_h": 7.634798801653915,
+ "smoke_s": 32,
+ "elapsed_h": 0.09884183976385329,
+ "fits": true
+}

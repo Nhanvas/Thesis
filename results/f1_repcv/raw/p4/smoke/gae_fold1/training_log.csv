@@ -1,0 +1,3 @@
+model,epoch,train_loss,s,partition,fold
+gae,1,0.06007228088378906,0.3,4,1
+gae,2,0.02460576057434082,0.6,4,1

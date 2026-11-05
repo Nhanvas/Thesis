@@ -1,0 +1,2 @@
+model,partition,fold,subject,auroc
+mlp,1,1,chb24,0.8576746108237707

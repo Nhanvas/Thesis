@@ -1,0 +1,17 @@
+model,partition,subject,fold,file,onset_s,duration_s,caught
+mlp,1,chb24,1,chb24_01.edf,480,28,True
+mlp,1,chb24,1,chb24_01.edf,2448,28,True
+mlp,1,chb24,1,chb24_03.edf,228,32,True
+mlp,1,chb24,1,chb24_03.edf,2880,28,True
+mlp,1,chb24,1,chb24_04.edf,1088,32,True
+mlp,1,chb24,1,chb24_04.edf,1408,32,True
+mlp,1,chb24,1,chb24_04.edf,1744,20,True
+mlp,1,chb24,1,chb24_06.edf,1228,28,True
+mlp,1,chb24,1,chb24_07.edf,36,24,True
+mlp,1,chb24,1,chb24_09.edf,1744,20,True
+mlp,1,chb24,1,chb24_11.edf,3524,76,True
+mlp,1,chb24,1,chb24_13.edf,3288,16,True
+mlp,1,chb24,1,chb24_14.edf,1936,32,True
+mlp,1,chb24,1,chb24_15.edf,3552,20,True
+mlp,1,chb24,1,chb24_17.edf,3512,72,True
+mlp,1,chb24,1,chb24_21.edf,2804,68,True

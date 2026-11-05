@@ -1,0 +1,9 @@
+{
+ "status": "done",
+ "seconds": 5,
+ "core_sha": "bf4bfd69d7669226",
+ "partitions_sha": "fbf73129105e0fea",
+ "device": "cpu",
+ "epochs": 2,
+ "seed": 3
+}

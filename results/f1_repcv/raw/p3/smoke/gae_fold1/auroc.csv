@@ -1,0 +1,2 @@
+model,partition,fold,subject,auroc
+gae,3,1,chb12,0.5911357649962435

@@ -1,0 +1,14 @@
+{
+ "model": "cnn",
+ "fold": 2,
+ "n_train": 644171,
+ "n_ictal": 1476,
+ "smoke": false,
+ "epochs": 30,
+ "fit_s": 146.5,
+ "n_params": 6081,
+ "first_loss": 0.8722852993532433,
+ "last_loss": 0.07090122129992765,
+ "G2": "PASS",
+ "device": "cuda"
+}

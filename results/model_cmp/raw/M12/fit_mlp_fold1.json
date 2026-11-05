@@ -1,0 +1,13 @@
+{
+ "model": "mlp",
+ "fold": 1,
+ "n_train": 277780,
+ "epochs": 200,
+ "n_params": 3964,
+ "smoke": false,
+ "first_loss": 0.01902975362134603,
+ "last_loss": 0.01807645734146627,
+ "fit_s": 3832.2,
+ "G2": "PASS",
+ "device": "cuda"
+}

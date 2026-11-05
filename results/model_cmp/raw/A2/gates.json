@@ -1,0 +1,18 @@
+[
+ {
+  "gate": "D0",
+  "status": "PASS"
+ },
+ {
+  "gate": "G-mini",
+  "status": "PASS",
+  "got": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "ref": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "seconds": 26
+ },
+ {
+  "gate": "GG",
+  "status": "PASS",
+  "mismatches": "[]"
+ }
+]

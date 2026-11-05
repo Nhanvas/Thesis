@@ -1,0 +1,29 @@
+[
+ {
+  "gate": "D0",
+  "status": "PASS"
+ },
+ {
+  "gate": "G-mini",
+  "status": "PASS",
+  "got": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "ref": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "seconds": 39
+ },
+ {
+  "gate": "G2",
+  "model": "mlp",
+  "fold": 1,
+  "status": "PASS",
+  "first": 0.01902975362134603,
+  "last": 0.01807645734146627
+ },
+ {
+  "gate": "G2",
+  "model": "mlp",
+  "fold": 2,
+  "status": "PASS",
+  "first": 0.019227390305058566,
+  "last": 0.018421698309844952
+ }
+]

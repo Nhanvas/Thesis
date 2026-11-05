@@ -1,0 +1,10 @@
+{
+ "model": "svm",
+ "fold": 3,
+ "n_train": 573382,
+ "n_ictal": 1760,
+ "smoke": false,
+ "converged": true,
+ "n_iter": 144,
+ "fit_s": 6800.6
+}

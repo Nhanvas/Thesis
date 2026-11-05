@@ -1,0 +1,15 @@
+{
+ "notebook": "MC3_mlp_folds12",
+ "python": "3.13.16",
+ "sklearn": "1.6.1",
+ "numpy": "2.1.3",
+ "pandas": "2.3.3",
+ "started": "2026-11-04 01:13:49 UTC",
+ "repo_commit": "6c5d4d8a83e707e9ab9a9c6e161e5c2f9936fff8",
+ "torch": "2.11.0+cu130",
+ "gpu": "Tesla T4",
+ "core_sha": "179b91278035b37a",
+ "run_sha": "e874577fb94015a3",
+ "notebook_runtime_h": 2.523,
+ "finished": "2026-11-04 03:44:29 UTC"
+}

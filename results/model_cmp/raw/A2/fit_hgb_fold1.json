@@ -1,0 +1,10 @@
+{
+ "model": "hgb",
+ "fold": 1,
+ "n_train": 543222,
+ "n_ictal": 1980,
+ "smoke": false,
+ "converged": true,
+ "n_iter": 200,
+ "fit_s": 228.3
+}

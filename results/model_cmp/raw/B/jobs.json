@@ -1,0 +1,26 @@
+[
+ {
+  "model": "cnn",
+  "fold": 1,
+  "status": "done",
+  "seconds": 170
+ },
+ {
+  "model": "cnn",
+  "fold": 2,
+  "status": "done",
+  "seconds": 170
+ },
+ {
+  "model": "cnn",
+  "fold": 3,
+  "status": "done",
+  "seconds": 151
+ },
+ {
+  "model": "cnn",
+  "fold": 4,
+  "status": "done",
+  "seconds": 160
+ }
+]

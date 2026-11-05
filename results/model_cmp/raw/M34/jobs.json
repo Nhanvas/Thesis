@@ -1,0 +1,14 @@
+[
+ {
+  "model": "mlp",
+  "fold": 3,
+  "status": "done",
+  "seconds": 4652
+ },
+ {
+  "model": "mlp",
+  "fold": 4,
+  "status": "done",
+  "seconds": 5018
+ }
+]

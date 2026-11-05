@@ -1,0 +1,8 @@
+{
+ "ms_per_step": 2.145939668019613,
+ "steps_per_epoch_total": 20071,
+ "epochs": 200,
+ "projected_h": 2.951768241019161,
+ "safe_h": 10.5,
+ "elapsed_h": 0.018349300821622214
+}

@@ -1,0 +1,6 @@
+partition,notebook,torch,gpus,cpu_count,core_sha,partitions_sha,epochs,repo_commit,notebook_runtime_h
+1,F1_p1,2.11.0+cu130,"['Tesla T4', 'Tesla T4']",4,bf4bfd69d7669226,fbf73129105e0fea,200,1e653fa233344f262379bfc11b8c8b172fe0d562,6.59
+2,F1_p2,2.11.0+cu130,"['Tesla T4', 'Tesla T4']",4,bf4bfd69d7669226,fbf73129105e0fea,200,1e653fa233344f262379bfc11b8c8b172fe0d562,7.109
+3,F1_p3,2.11.0+cu130,"['Tesla T4', 'Tesla T4']",4,bf4bfd69d7669226,fbf73129105e0fea,200,1e653fa233344f262379bfc11b8c8b172fe0d562,7.304
+4,F1_p4,2.11.0+cu130,"['Tesla T4', 'Tesla T4']",4,bf4bfd69d7669226,fbf73129105e0fea,200,1e653fa233344f262379bfc11b8c8b172fe0d562,6.797
+5,F1_p5,2.11.0+cu130,"['Tesla T4', 'Tesla T4']",4,bf4bfd69d7669226,fbf73129105e0fea,200,1e653fa233344f262379bfc11b8c8b172fe0d562,6.684

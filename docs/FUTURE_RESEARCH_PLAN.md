@@ -1,4 +1,4 @@
-# FUTURE_RESEARCH_PLAN — Track F: validation and limits after the model comparison (rev 1 FIXED, 2026-11-05, chat D12-F; §9 updated 13:30)
+# FUTURE_RESEARCH_PLAN — Track F: validation and limits after the model comparison (rev 1 FIXED, 2026-11-05, chat D12-F; §9 updated 06/11 07:40)
 
 *Repo: `docs/FUTURE_RESEARCH_PLAN.md` + project file. **Rev 1 = fixed with the author (05/11, 11:12).** Every
 assumption of rev 0 was checked in the code (§10). Any change from now on is logged in §9 **before** results are seen.
@@ -179,6 +179,7 @@ feature extraction (Kaggle with the raw EDF datasets). Designed after F1–F3.
 | 05/11 08:45 | rev 0 draft | author: future research track after slides submitted; cô 04/11 | no |
 | 05/11 12:30 | **rev 1 fixed**: partition rule "rank blocks of 4" (rev 0 wording ambiguous; literal reading near-copies partition 0); R = 5 now / 10 committed; seed r; GAE + MLP-AE only; Kaggle GPU or CPU by measured smoke (tensor training loop, verified equal to the PyG loop); gates D0, G-const, G-vec, G-mlp, GG0, smoke, per-job, aggregate; F2 rule as a count (5 of 6); secondary readings pre-registered; SD vs CI wording; F5 needs a Kaggle recomputation (no committed score arrays) incl. Siena; F3 needs MLP-AE checkpoints (O5) | chat D12-F: rev 0 verified against the code; author decisions 05/11 11:12 | no (no Track F run exists; synthetic tests only) |
 | 05/11 13:30 | **Device decided by the fixed rule (§3): GPU T4 x2.** Smoke (`F1_SMOKE`, partition 1, both modes; every gate PASS in both: D0, G-const 0, G-vec 0 (exact, real windows), G-mlp 0, GG0 exact) measured with 4 concurrent workers: GPU GAE 7.86 / MLP-AE 3.31 ms/step, projected 7.38 h; CPU 6.99 / 3.61 ms/step, projected 7.02 h → CPU faster by 4.9 % < 10 % → GPU. Notebooks unchanged | smoke measurement (speed only) | no (timing and gates only; no detection result exists) |
+| 06/11 07:40 | **F1/F2 results read** (no rule changed): 5 notebooks, 40/40 jobs, every gate PASS; `src/f1_aggregate.py` verification PASS; independent cross-checks (per-partition means recomputed without the aggregate code; partition 0 = S18 §18.6; fold assignment; leave-one-subject-out of ΔF1 0.063–0.083). Pre-registered verdict F2: **stable advantage of the MLP-AE** (ΔF1 > 0 in 6/6; mean +0.075 [+0.034, +0.121]). `results/f1_repcv/SUMMARY.md` | runs finished | yes — this row records the reading; nothing in §3 changed |
 
 ## 10 · Rev 0 assumptions checked in the code (05/11)
 

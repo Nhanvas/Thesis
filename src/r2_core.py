@@ -77,6 +77,8 @@ SKIPPED_BY_DESIGN = {"chb12": ["chb12_27.edf", "chb12_28.edf", "chb12_29.edf"]}
 EXPECTED = dict(chb_seizures_listed=198, siena_seizures=47, siena_hours=141.0)
 TOL = dict(stats_rel=1e-6, f7=1e-3, bp5=1e-3, adj_entry=1e-3, adj_frac=0.005)
 FLAGS = ("is_ictal", "is_buffer", "is_flag5sd", "is_signal_loss")
+REF_KEYS_REQUIRED = ("files", "file_idx") + FLAGS + ("f7", "bp5", "adj")
+BUILD_VERSION = "r0-build-1"          # stats_record + features_record on the pinned record code (resume key)
 STATS_FLOAT_KEYS = ("ch_mean_uV", "ch_std_uV", "artifact_thresh_uV")
 STATS_INT_KEYS = ("n_interictal", "n_ictal", "n_rejected")
 UA = "r2-data-rebuild/1.0 (research; python-urllib)"
@@ -512,9 +514,15 @@ def compare_features(new_npz, ref_npz, n_files=None):
     nf = [str(x) for x in N["files"]]
     m = np.ones(len(R["file_idx"]), bool) if n_files is None else R["file_idx"].astype(int) < n_files
     rep = dict(files_equal=nf == (rf if n_files is None else rf[:n_files]), n_windows=[int(len(N["file_idx"])), int(m.sum())])
+    rep["keys_only_in_new"] = sorted(set(N.files) - set(R.files))           # descriptive
+    rep["keys_only_in_reference"] = sorted(set(R.files) - set(N.files))
     if n_files is None:
-        rep["skipped_equal"] = [str(x) for x in N["skipped_files"]] == [str(x) for x in R["skipped_files"]]
-    ok = rep["files_equal"] and rep["n_windows"][0] == rep["n_windows"][1] and rep.get("skipped_equal", True)
+        if "skipped_files" in R.files:
+            rep["skipped_equal"] = [str(x) for x in N["skipped_files"]] == [str(x) for x in R["skipped_files"]]
+        else:                            # some record files were saved without it (§12 06/11 07:10); 'files' is exact
+            rep["skipped_equal"] = "n/a: reference has no skipped_files (file list compared exactly)"
+            rep["skipped_new"] = [str(x) for x in N["skipped_files"]]
+    ok = rep["files_equal"] and rep["n_windows"][0] == rep["n_windows"][1] and rep.get("skipped_equal", True) is not False
     if ok:
         for k in FLAGS + ("file_idx",):
             eq = np.array_equal(np.asarray(N[k]).astype(np.int64), np.asarray(R[k])[m].astype(np.int64))
@@ -551,6 +559,95 @@ def locate_earlier(case):
 def committed_stats(case):
     p = REPO / "data" / "processed" / f"{case}_stats.json"
     return json.loads(p.read_text()) if p.exists() else None
+
+
+def provenance_v2():
+    """{case: (bytes, sha256)} of data/trainset_v2 + data/testset_v2 as committed in docs/PROVENANCE_V2.md (record)."""
+    p = REPO / "docs" / "PROVENANCE_V2.md"
+    out = {}
+    if p.exists():
+        for m in re.finditer(r"^\| (chb\d\d)\.npz \| (\d+) \| `([0-9a-f]{64})`", p.read_text(), re.M):
+            out[m.group(1)] = (int(m.group(2)), m.group(3))
+    return out
+
+
+def reference_preflight(cases):
+    """before any build: every earlier .npz located, required keys present (STOP otherwise), sha256 compared with
+    docs/PROVENANCE_V2.md (reported; chb24 has no committed sha). Takes seconds."""
+    t = time.time()
+    prov = provenance_v2()
+    rep, bad = {}, []
+    for c in cases:
+        try:
+            p = locate_earlier(c)
+        except SystemExit as e:
+            bad.append(f"{c}: {e}")
+            continue
+        with np.load(p, allow_pickle=True) as z:
+            keys = sorted(z.files)
+        miss = [k for k in REF_KEYS_REQUIRED if k not in keys]
+        h = sha256_file(p)
+        pv = prov.get(c)
+        rep[c] = dict(path=str(p.relative_to(INPUT)) if INPUT in p.parents else str(p), bytes=p.stat().st_size, sha256=h,
+                      provenance_v2_sha256=None if pv is None else pv[1],
+                      sha_equal_provenance_v2=None if pv is None else (h == pv[1] and p.stat().st_size == pv[0]),
+                      keys=keys, missing_required=miss)
+        if miss:
+            bad.append(f"{c}: reference lacks {miss}")
+    n_eq = sum(1 for r in rep.values() if r["sha_equal_provenance_v2"])
+    n_pv = sum(1 for r in rep.values() if r["sha_equal_provenance_v2"] is not None)
+    log(f"reference preflight: {len(rep)} earlier .npz; sha256 = PROVENANCE_V2 for {n_eq} of {n_pv} with a committed sha; "
+        f"without skipped_files: {[c for c, r in rep.items() if 'skipped_files' not in r['keys']]}")
+    phase("reference_preflight", t)
+    return rep, bad
+
+
+def _job_dir(case, kind):
+    return WORK / "r2" / "r0_jobs" / f"{case}_{kind}"
+
+
+def import_jobs():
+    """resume: job folders of a previous version's output attached as an input -> WORK/r2/r0_jobs (if not present)."""
+    n = 0
+    for j in sorted(INPUT.rglob("job.json")):
+        if "r0_jobs" not in j.parts or WORK in j.parents:
+            continue
+        dst = _job_dir(*j.parent.name.rsplit("_", 1))
+        if not (dst / "job.json").exists():
+            dst.mkdir(parents=True, exist_ok=True)
+            for f in j.parent.iterdir():
+                shutil.copyfile(f, dst / f.name)
+            n += 1
+    if n:
+        log(f"resume: {n} finished jobs imported from a previous output")
+    return n
+
+
+def persist_job(res, repo_commit):
+    """a finished job (gates passed) -> WORK/r2/r0_jobs/{case}_{kind}/ (npz + job.json); returns the new npz path."""
+    d = _job_dir(res["case"], res["kind"])
+    d.mkdir(parents=True, exist_ok=True)
+    dst = d / f"{res['case']}.npz"
+    shutil.move(res["npz"], dst)
+    keep = {k: res.get(k) for k in ("case", "kind", "stats", "stats_s", "features_s", "wall_s")}
+    _jdump(d / "job.json", dict(keep, repo_commit=repo_commit, build_version=BUILD_VERSION,
+                                npz_sha256=sha256_file(dst), saved=time.strftime("%Y-%m-%d %H:%M:%S %Z")))
+    return str(dst)
+
+
+def load_job(case, kind, repo_commit):
+    """a persisted job usable for this run (same pinned commit and build version, npz hash intact) or None."""
+    d = _job_dir(case, kind)
+    if not (d / "job.json").exists():
+        return None
+    j = json.loads((d / "job.json").read_text())
+    npz = d / f"{case}.npz"
+    if j.get("repo_commit") != repo_commit or j.get("build_version") != BUILD_VERSION or not npz.exists() \
+            or sha256_file(npz) != j.get("npz_sha256"):
+        log(f"{case}:{kind}: persisted job not usable (commit / build version / hash) -> rebuilt")
+        return None
+    return dict(case=case, kind=kind, stats=j["stats"], stats_s=j.get("stats_s"), features_s=j.get("features_s"),
+                wall_s=j.get("wall_s"), npz=str(npz), reused=True)
 
 
 # ============================================================================ one case: gates + build (worker)
@@ -590,51 +687,94 @@ def _hours_used(cases_df, case, kind):
     return float(r.earlier_hours_used_windows if kind == "earlier" else r.hours_used_windows)
 
 
-def run_chb(cases_df, complete, earlier, cases=None, workers=None):
-    """R0.2 + R0.3 for the CHB-MIT cases: every case 'earlier' (gates), then chb11 and chb21 'complete'. Jobs run in
-    parallel, largest first; the first failed gate terminates the pool (STOP). The dataset folder is written only after
-    every gate passed."""
+def _gate_reuse(res):
+    """gates of a reused job recomputed with the current code (cheap: no EEG is read)."""
+    if res["kind"] == "earlier":
+        ref = committed_stats(res["case"])
+        res["g_stats"] = compare_stats(res["stats"], ref) if ref else dict(status="n/a (no committed stats.json; proven by G-feat)")
+        if res["g_stats"]["status"] != "FAIL":
+            res["g_feat"] = compare_features(res["npz"], locate_earlier(res["case"]))
+    return res
+
+
+def run_chb(cases_df, complete, earlier, cases=None, workers=None, repo_commit=None):
+    """R0.2 + R0.3 for the CHB-MIT cases: reference preflight (STOP on a missing key); every case 'earlier' (gates),
+    then chb11 and chb21 'complete'. Jobs run in parallel, largest first; a finished job whose gates passed is persisted
+    under WORK/r2/r0_jobs (resume: attach this notebook's previous output); the first failed gate terminates the pool
+    (STOP). The dataset folder is written only after every gate passed."""
     t = time.time()
     cases = list(cases or CHB_CASES)
+    repo_commit = repo_commit or json.loads((out_dir() / "run_meta.json").read_text())["repo_commit"]
     workers = workers or min(4, os.cpu_count() or 1)
     views = {"earlier": str(earlier), "complete": str(complete)}
     scratch_out = SCRATCH / "build"
     logs = out_dir() / "logs"
+    gates = dict(G_stats={}, G_feat={}, jobs={}, status="RUNNING", tolerances=TOL)
+    refs, bad = reference_preflight(cases)
+    gates["references"] = refs
+    if bad:
+        gates["status"] = "STOP at reference preflight"
+        _jdump(out_dir() / "gates.json", gates)
+        raise SystemExit(f"STOP R0.2 reference preflight: {bad}")
+    _jdump(out_dir() / "gates.json", gates)
     jobs = sorted(((c, "earlier") for c in cases), key=lambda j: -_hours_used(cases_df, j[0], "earlier"))
     jobs += [(c, "complete") for c in GAP_CASES if c in cases]
-    gates = dict(G_stats={}, G_feat={}, jobs={}, status="RUNNING", tolerances=TOL)
     done = {}
-    log(f"R0_CHB: {len(jobs)} jobs on {workers} workers: {[f'{c}:{k}' for c, k in jobs]}")
-    with Pool(workers, maxtasksperchild=1) as pool:
-        for res in pool.imap_unordered(case_job, [(c, k, views, str(scratch_out), str(logs)) for c, k in jobs]):
-            c, k = res["case"], res["kind"]
-            done[(c, k)] = res
-            h = _hours_used(cases_df, c, k)
-            gates["jobs"][f"{c}:{k}"] = dict(wall_s=res["wall_s"], stats_s=res.get("stats_s"),
-                                             features_s=res.get("features_s"), eeg_hours=round(h, 3),
-                                             s_per_h=round(res["wall_s"] / max(h, 1e-9), 1), error=res.get("error"))
-            if k == "earlier":
-                if "g_stats" in res:
-                    gates["G_stats"][c] = res["g_stats"]
-                if "g_feat" in res:
-                    gates["G_feat"][c] = res["g_feat"]
-            fail = res.get("error") or (k == "earlier" and (res.get("g_stats", {}).get("status") == "FAIL"
-                                                            or res.get("g_feat", {}).get("status") != "PASS"))
-            log(f"{c}:{k} {'FAIL' if fail else 'ok'} in {res['wall_s']:.0f} s ({h:.1f} h EEG)"
-                + (f" G-stats {res['g_stats']['status']}" if "g_stats" in res else "")
-                + (f" G-feat {res['g_feat']['status']}" if "g_feat" in res else ""))
-            if fail:
+
+    def take(res, pool=None):
+        c, k = res["case"], res["kind"]
+        h = _hours_used(cases_df, c, k)
+        gates["jobs"][f"{c}:{k}"] = dict(wall_s=res["wall_s"], stats_s=res.get("stats_s"),
+                                         features_s=res.get("features_s"), eeg_hours=round(h, 3),
+                                         s_per_h=round((res["wall_s"] or 0) / max(h, 1e-9), 1), error=res.get("error"),
+                                         reused=bool(res.get("reused")))
+        if k == "earlier":
+            if "g_stats" in res:
+                gates["G_stats"][c] = res["g_stats"]
+            if "g_feat" in res:
+                gates["G_feat"][c] = res["g_feat"]
+        fail = res.get("error") or (k == "earlier" and (res.get("g_stats", {}).get("status") == "FAIL"
+                                                        or res.get("g_feat", {}).get("status") != "PASS"))
+        log(f"{c}:{k} {'FAIL' if fail else 'ok'}{' (reused)' if res.get('reused') else ''} in {res['wall_s'] or 0:.0f} s "
+            f"({h:.1f} h EEG)" + (f" G-stats {res['g_stats']['status']}" if "g_stats" in res else "")
+            + (f" G-feat {res['g_feat']['status']}" if "g_feat" in res else ""))
+        if fail:
+            if pool is not None:
                 pool.terminate()
-                gates["status"] = f"STOP at {c}:{k}"
-                _jdump(out_dir() / "gates.json", gates)
-                raise SystemExit(f"STOP R0.2 {c}:{k}: {res.get('error') or res.get('g_stats') or res.get('g_feat')}")
+            gates["status"] = f"STOP at {c}:{k}"
             _jdump(out_dir() / "gates.json", gates)
+            raise SystemExit(f"STOP R0.2 {c}:{k}: {res.get('error') or res.get('g_stats') or res.get('g_feat')}")
+        if not res.get("reused"):
+            res["npz"] = persist_job(res, repo_commit)
+        done[(c, k)] = res
+        _jdump(out_dir() / "gates.json", gates)
+
+    todo = []
+    for c, k in jobs:
+        j = load_job(c, k, repo_commit)
+        if j is None:
+            todo.append((c, k))
+            continue
+        try:
+            take(_gate_reuse(j))
+        except SystemExit:
+            raise
+        except Exception:                # noqa: BLE001
+            take(dict(j, error=traceback.format_exc()))
+    log(f"R0_CHB: {len(jobs)} jobs, {len(jobs) - len(todo)} reused, {len(todo)} to run on {workers} workers: "
+        f"{[f'{c}:{k}' for c, k in todo]}")
+    if todo:
+        with Pool(min(workers, len(todo)), maxtasksperchild=1) as pool:
+            for res in pool.imap_unordered(case_job, [(c, k, views, str(scratch_out), str(logs)) for c, k in todo]):
+                take(res, pool)
     gates["status"] = "PASS"
     _jdump(out_dir() / "gates.json", gates)
     phase("chb_jobs", t)
     _finalise_chb(done, cases, cases_df)
-    STATE["rates"]["chb_s_per_h_parallel"] = round(sum(j["wall_s"] for j in gates["jobs"].values())
-                                                   / max(sum(j["eeg_hours"] for j in gates["jobs"].values()), 1e-9), 1)
+    built = [j for j in gates["jobs"].values() if not j["reused"]]
+    if built:
+        STATE["rates"]["chb_s_per_h_per_worker"] = round(sum(j["wall_s"] for j in built)
+                                                         / max(sum(j["eeg_hours"] for j in built), 1e-9), 1)
     return gates, done
 
 
@@ -654,6 +794,9 @@ def _finalise_chb(done, cases, cases_df):
     inv.to_csv(DS_CHB / "inventory.csv", index=False)
     if any(c in cases for c in GAP_CASES):
         diff_report(done, [c for c in GAP_CASES if c in cases], cases_df)
+    # the dataset holds every needed file now; the job folders (incl. the earlier builds of chb11 / chb21) would only
+    # duplicate it in the notebook output, which becomes the dataset
+    shutil.rmtree(WORK / "r2" / "r0_jobs", ignore_errors=True)
 
 
 def _clean(z):

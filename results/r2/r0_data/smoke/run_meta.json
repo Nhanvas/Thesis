@@ -1,0 +1,22 @@
+{
+ "notebook": "R0_SMOKE",
+ "tag": "smoke",
+ "repo_commit": "235682a652392ec40fc001ff5ad60dfa77fa8e28",
+ "r2_core_sha256": "634dc09530de50a76874ea78b5d0e7f933a3ecc8a837f2469008a75ee32f184d",
+ "started": "2026-11-06 09:17:07 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "mne": "1.12.1",
+  "torch": "2.11.0+cpu"
+ },
+ "input": "/kaggle/input",
+ "work": "/kaggle/working",
+ "scratch": "/tmp/r2",
+ "test_mode": false
+}

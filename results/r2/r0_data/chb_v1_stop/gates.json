@@ -1,0 +1,96 @@
+{
+ "G_stats": {
+  "chb06": {
+   "ch_mean_uV_max_rel": 0.0,
+   "ch_std_uV_max_rel": 0.0,
+   "artifact_thresh_uV_max_rel": 0.0,
+   "n_interictal": [
+    19826,
+    19826
+   ],
+   "n_ictal": [
+    45,
+    45
+   ],
+   "n_rejected": [
+    27697,
+    27697
+   ],
+   "ratio": [
+    440.6,
+    440.6
+   ],
+   "status": "PASS"
+  },
+  "chb07": {
+   "ch_mean_uV_max_rel": 0.0,
+   "ch_std_uV_max_rel": 0.0,
+   "artifact_thresh_uV_max_rel": 0.0,
+   "n_interictal": [
+    28019,
+    28019
+   ],
+   "n_ictal": [
+    83,
+    83
+   ],
+   "n_rejected": [
+    29666,
+    29666
+   ],
+   "ratio": [
+    337.6,
+    337.6
+   ],
+   "status": "PASS"
+  }
+ },
+ "G_feat": {
+  "chb06": {
+   "files_equal": true,
+   "n_windows": [
+    60060,
+    60060
+   ],
+   "skipped_equal": true,
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 9.5367431640625e-07,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 2.384185791015625e-07,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00043058793058793057,
+   "zgamma_raw_max_abs": 5.960464477539063e-08,
+   "status": "PASS"
+  }
+ },
+ "jobs": {
+  "chb06:earlier": {
+   "wall_s": 4746.5,
+   "stats_s": 2618.9,
+   "features_s": 2117.2,
+   "eeg_hours": 66.733,
+   "s_per_h": 71.1,
+   "error": null
+  },
+  "chb07:earlier": {
+   "wall_s": 5482.4,
+   "stats_s": 3451.0,
+   "features_s": 2029.3,
+   "eeg_hours": 67.05,
+   "s_per_h": 81.8,
+   "error": "Traceback (most recent call last):\n  File \"/tmp/r2/src/r2_core.py\", line 579, in case_job\n    res[\"g_feat\"] = compare_features(npz, locate_earlier(case))\n                    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/r2/src/r2_core.py\", line 516, in compare_features\n    rep[\"skipped_equal\"] = [str(x) for x in N[\"skipped_files\"]] == [str(x) for x in R[\"skipped_files\"]]\n                                                                                    ~^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/dist-packages/numpy/lib/_npyio_impl.py\", line 265, in __getitem__\n    raise KeyError(f\"{key} is not a file in the archive\")\nKeyError: 'skipped_files is not a file in the archive'\n"
+  }
+ },
+ "status": "STOP at chb07:earlier",
+ "tolerances": {
+  "stats_rel": 1e-06,
+  "f7": 0.001,
+  "bp5": 0.001,
+  "adj_entry": 0.001,
+  "adj_frac": 0.005
+ }
+}

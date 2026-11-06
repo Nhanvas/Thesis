@@ -1,0 +1,132 @@
+{
+ "G_stats": {
+  "chb11": {
+   "ch_mean_uV_max_rel": 0.0,
+   "ch_std_uV_max_rel": 0.0,
+   "artifact_thresh_uV_max_rel": 0.0,
+   "n_interictal": [
+    14231,
+    14231
+   ],
+   "n_ictal": [
+    204,
+    204
+   ],
+   "n_rejected": [
+    12078,
+    12078
+   ],
+   "ratio": [
+    69.8,
+    69.8
+   ],
+   "status": "PASS"
+  }
+ },
+ "G_feat": {
+  "chb11[files 1-2]": {
+   "files_equal": true,
+   "n_windows": [
+    1799,
+    1799
+   ],
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 4.76837158203125e-07,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 1.7881393432617188e-07,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00039802633836356275,
+   "zgamma_raw_max_abs": 0.0,
+   "status": "PASS"
+  },
+  "chb11[chb11_03.edf]": {
+   "files_equal": true,
+   "n_windows": [
+    900,
+    900
+   ],
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 4.656612873077393e-10,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 0.0,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00041838134430727025,
+   "zgamma_raw_max_abs": 0.0,
+   "status": "PASS",
+   "seconds": 44.8,
+   "eeg_h": 1.0
+  },
+  "chb11[chb11_04.edf]": {
+   "files_equal": true,
+   "n_windows": [
+    900,
+    900
+   ],
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 3.725290298461914e-09,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 0.0,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00041152263374485596,
+   "zgamma_raw_max_abs": 0.0,
+   "status": "PASS",
+   "seconds": 42.1,
+   "eeg_h": 1.0
+  },
+  "chb11[chb11_05.edf]": {
+   "files_equal": true,
+   "n_windows": [
+    900,
+    900
+   ],
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 2.9802322387695312e-08,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 0.0,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00037037037037037035,
+   "zgamma_raw_max_abs": 0.0,
+   "status": "PASS",
+   "seconds": 45.2,
+   "eeg_h": 1.0
+  },
+  "chb11[chb11_06.edf]": {
+   "files_equal": true,
+   "n_windows": [
+    900,
+    900
+   ],
+   "is_ictal_equal": true,
+   "is_buffer_equal": true,
+   "is_flag5sd_equal": true,
+   "is_signal_loss_equal": true,
+   "file_idx_equal": true,
+   "f7_max_abs": 2.9802322387695312e-08,
+   "f7_finite_mask_diff": 0,
+   "bp5_max_abs": 0.0,
+   "bp5_finite_mask_diff": 0,
+   "adj_frac_differing": 0.00036694101508916323,
+   "zgamma_raw_max_abs": 0.0,
+   "status": "PASS",
+   "seconds": 44.0,
+   "eeg_h": 1.0
+  }
+ },
+ "status": "PASS"
+}

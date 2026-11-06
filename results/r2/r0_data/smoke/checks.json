@@ -1,0 +1,78 @@
+[
+ {
+  "check": "five files of plan \u00a71 present and verified",
+  "got": [
+   "chb11_12.edf",
+   "chb11_13.edf",
+   "chb11_14.edf",
+   "chb11_15.edf",
+   "chb21_11.edf"
+  ],
+  "expected": [
+   "chb11_12.edf",
+   "chb11_13.edf",
+   "chb11_14.edf",
+   "chb11_15.edf",
+   "chb21_11.edf"
+  ],
+  "status": "PASS",
+  "required": true
+ },
+ {
+  "check": "CHB-MIT seizures listed, 24 cases",
+  "got": 198,
+  "expected": 198,
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "CHB-MIT files skipped by design (missing common channel)",
+  "got": [
+   "chb12_27.edf",
+   "chb12_28.edf",
+   "chb12_29.edf"
+  ],
+  "expected": [
+   "chb12_27.edf",
+   "chb12_28.edf",
+   "chb12_29.edf"
+  ],
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "CHB-MIT chb01-23: every EDF listed in its summary",
+  "got": 0,
+  "expected": 0,
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "committed data/summaries = PhysioNet summaries",
+  "got": 0,
+  "expected": 0,
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "Siena patients with all electrodes",
+  "got": 14,
+  "expected": 14,
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "Siena seizures (SzCORE converter)",
+  "got": 47,
+  "expected": 47,
+  "status": "PASS",
+  "required": false
+ },
+ {
+  "check": "Siena hours (4 s windows)",
+  "got": 141.0,
+  "expected": 141.0,
+  "status": "PASS",
+  "required": false
+ }
+]

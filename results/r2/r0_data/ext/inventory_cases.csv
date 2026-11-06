@@ -1,0 +1,16 @@
+db,case,files_physionet,files_on_kaggle,files_kaggle_sha_equal,files_from_physionet,files_skipped_by_design,seizures_listed,seizures_in_used_files,hours,hours_used_windows,files_listed_in_summary,summary_entries,earlier_files,earlier_hours_used_windows
+chbmit,chb24,22,22,22,0,0,16,16,21.2964,21.2956,12.0,12.0,22.0,21.2956
+siena,PN00,5,5,5,0,0,5,5,3.2447,3.2422,,,,
+siena,PN01,1,1,1,0,0,2,2,13.4881,13.4878,,,,
+siena,PN03,2,2,2,0,0,2,2,24.2269,24.2267,,,,
+siena,PN05,3,3,3,0,0,3,3,6.0353,6.0344,,,,
+siena,PN06,5,5,5,0,0,5,5,12.0728,12.0711,,,,
+siena,PN07,1,1,1,0,0,1,1,8.7356,8.7356,,,,
+siena,PN09,3,3,3,0,0,3,3,6.8475,6.8467,,,,
+siena,PN10,6,6,6,0,0,10,10,18.7269,18.7244,,,,
+siena,PN11,1,1,1,0,0,1,1,2.4103,2.41,,,,
+siena,PN12,3,3,3,0,0,4,4,6.0992,6.0978,,,,
+siena,PN13,3,3,3,0,0,3,3,8.665,8.6633,,,,
+siena,PN14,4,4,4,0,0,4,4,20.4639,20.4622,,,,
+siena,PN16,2,2,2,0,0,2,2,4.8797,4.8789,,,,
+siena,PN17,2,2,2,0,0,2,2,5.1247,5.1244,,,,

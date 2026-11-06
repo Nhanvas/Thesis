@@ -218,6 +218,7 @@ for i, case in enumerate(cases):
 def run_notebook(nb_path, env):
     """executes the code cells in one namespace (as Kaggle would); %%writefile is emulated with IPython-style {var}."""
     os.environ.update(env)
+    sys.modules.pop("r2_core", None)             # a fresh import per notebook (Kaggle starts a new kernel)
     nb = json.loads(Path(nb_path).read_text())
     ns = {"__name__": "__main__"}
     t = time.time()
@@ -230,10 +231,15 @@ def run_notebook(nb_path, env):
             path = re.sub(r"\{(\w+)\}", lambda m: str(ns[m.group(1)]), first.split(None, 1)[1].strip())
             Path(path).write_text(body if body.endswith("\n") else body + "\n")
             continue
-        exec(compile(src, f"{Path(nb_path).name}[cell {i}]", "exec"), ns)
+        try:
+            exec(compile(src, f"{Path(nb_path).name}[cell {i}]", "exec"), ns)
+        except BaseException:
+            sys.modules.pop("r2_core", None)
+            sys.path[:] = [x for x in sys.path if "/scratch_" not in x]
+            raise
     print(f"--- {Path(nb_path).name} done in {time.time() - t:.0f} s")
-    for k in ("R",):
-        sys.modules.pop("r2_core", None)
+    sys.modules.pop("r2_core", None)
+    sys.path[:] = [x for x in sys.path if "/scratch_" not in x]
     return ns
 
 
@@ -251,7 +257,24 @@ def main():
     rec.write_text(RECORD)
     subprocess.check_call([sys.executable, "-I", str(rec), str(repo), str(lap), str(out1), str(out3), ",".join(CHB)])
     subprocess.check_call([sys.executable, str(ROOT / "src" / "r2_make_notebooks.py")])
+    # like the record's chb07: one reference saved without skipped_files (chb12, which has a design skip)
+    z = dict(np.load(out1 / "chb12.npz", allow_pickle=True))
+    z.pop("skipped_files")
+    np.savez(out1 / "chb12.npz", **z)
+    # a PROVENANCE_V2.md for the synthetic references: chb21 deliberately wrong (reported, not a stop); chb24 absent
+    rows = []
+    for c in ("chb03", "chb11", "chb12", "chb21"):
+        f = (out1 if c in ("chb03", "chb12") else out3) / f"{c}.npz"
+        rows.append(f"| {c}.npz | {f.stat().st_size} | `{'0' * 64 if c == 'chb21' else sha(f)}` |")
+    (repo / "docs").mkdir(exist_ok=True)
+    (repo / "docs" / "PROVENANCE_V2.md").write_text("# synthetic\n\n| file | bytes | sha256 |\n|---|---|---|\n" + "\n".join(rows) + "\n")
     print(f"world built in {time.time() - t0:.0f} s")
+
+    def same_npz(a, b):
+        A, B = np.load(a, allow_pickle=True), np.load(b, allow_pickle=True)
+        return sorted(A.files) == sorted(B.files) and all(
+            np.array_equal(A[k], B[k], equal_nan=A[k].dtype.kind == "f") if A[k].dtype != object else
+            [str(x) for x in A[k]] == [str(x) for x in B[k]] for k in A.files)
 
     def env(tag):
         return dict(R2_TEST="1", R2_TEST_EARLIER_MISSING=json.dumps({"chb11": ["chb11_12.edf", "chb11_13.edf"],
@@ -313,7 +336,12 @@ def main():
     assert d["chb21"]["seizure_windows_identical_in_common_files"] is True and d["chb21"]["seizure_windows_in_added_files"] == 0
     st11 = json.loads((ds / "chb11_stats.json").read_text())
     assert st11["r2"]["files_globbed"] == [f for f, *_ in CHB["chb11"]]
-    results["R0_CHB"] = "PASS"
+    assert g["G_feat"]["chb12"]["skipped_equal"].startswith("n/a") and g["G_feat"]["chb12"]["keys_only_in_new"] == ["skipped_files"]
+    rf = g["references"]
+    assert rf["chb03"]["sha_equal_provenance_v2"] is True and rf["chb21"]["sha_equal_provenance_v2"] is False
+    assert rf["chb24"]["sha_equal_provenance_v2"] is None and "skipped_files" not in rf["chb12"]["keys"]
+    assert not (ch / "r2" / "r0_jobs").exists(), "job folders left in the output after success"
+    results["R0_CHB"] = "PASS (incl. reference without skipped_files, provenance sha reported)"
     # ---- R0_EXT
     run_notebook(nbdir / "R0_EXT.ipynb", env("ext"))
     ex = root / "work_ext" / "thesis-r2-external-features"
@@ -342,7 +370,7 @@ def main():
         assert "STOPPED" in str(e) and "G-stats" in str(e), e
         results["negative G-stats"] = "STOP as expected"
     sj.write_text(keep)
-    ref = out1 / "chb03.npz"
+    ref = out1 / "chb12.npz"                     # the shortest earlier job: fails after others finished
     keepb = ref.read_bytes()
     z = dict(np.load(ref, allow_pickle=True))
     i = int(np.flatnonzero(~z["is_ictal"])[5])
@@ -353,10 +381,38 @@ def main():
         run_notebook(nbdir / "R0_CHB.ipynb", env("neg2"))
         raise AssertionError("G-feat did not stop")
     except RuntimeError as e:
-        assert "STOPPED" in str(e) and "chb03" in str(e), e
+        assert "STOPPED" in str(e) and "chb12" in str(e), e
         assert not (root / "work_neg2" / "thesis-r2-chbmit-features").exists(), "dataset written after a failed gate"
         results["negative G-feat"] = "STOP as expected, no dataset written"
     ref.write_bytes(keepb)
+    kept = sorted(p.parent.name for p in (root / "work_neg2" / "r2" / "r0_jobs").glob("*/job.json"))
+    assert kept and "chb12_earlier" not in kept, kept
+    # ---- R0_CHB resume after the STOP: previous output attached -> finished jobs reused, gates recomputed, same data
+    prev = root / "input" / "r0-chb-previous-output" / "r2" / "r0_jobs"
+    shutil.copytree(root / "work_neg2" / "r2" / "r0_jobs", prev)
+    run_notebook(nbdir / "R0_CHB.ipynb", env("res"))
+    g2 = json.loads((root / "work_res" / "r2" / "r0_data" / "chb" / "gates.json").read_text())
+    reused = sorted(k for k, j in g2["jobs"].items() if j["reused"])
+    assert g2["status"] == "PASS" and reused == sorted(n.replace("_", ":") for n in kept), (reused, kept)
+    ds2 = root / "work_res" / "thesis-r2-chbmit-features"
+    assert all(same_npz(ds / f"{c}.npz", ds2 / f"{c}.npz") for c in CHB)
+    shutil.rmtree(prev.parents[1])
+    results["R0_CHB resume"] = f"PASS ({len(reused)} jobs reused: {reused}; dataset arrays identical)"
+    # ---- reference missing a required key -> STOP at the preflight, before any build
+    r24 = out1 / "chb24.npz"
+    keep24 = r24.read_bytes()
+    z = dict(np.load(r24, allow_pickle=True))
+    z.pop("f7")
+    np.savez(r24, **z)
+    t1 = time.time()
+    try:
+        run_notebook(nbdir / "R0_CHB.ipynb", env("neg3"))
+        raise AssertionError("preflight did not stop")
+    except RuntimeError as e:
+        assert "reference preflight" in str(e) and "chb24" in str(e), e
+        assert not (root / "work_neg3" / "r2" / "r0_jobs").exists()
+        results["negative preflight"] = f"STOP before any build ({time.time() - t1:.0f} s)"
+    r24.write_bytes(keep24)
     print(json.dumps(results, indent=1))
     print(f"ALL SYNTHETIC TESTS PASS in {time.time() - t0:.0f} s")
 

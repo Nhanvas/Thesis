@@ -1,0 +1,2 @@
+case,scored,files,windows,hours,ictal_windows,signal_loss_windows,skipped,x1_hours,hours_equal_x1,x1_n_ref,x1_nonict_h,nonict_h,wall_s,procs
+PN00,True,5,2918,3.2422222222222223,85,0,0,3.2422222222222223,True,5,3.147777777777778,3.147778,37.7,4

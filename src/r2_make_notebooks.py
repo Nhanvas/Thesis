@@ -161,16 +161,21 @@ print(json.dumps(PROJ, indent=1))
 def chb():
     n = "R0_CHB"
     return save(n, [
-        head(n, "R0.1 inventory of CHB-MIT (24 cases); R0.2 gates G-stats (23 cases) and G-feat (24 cases) on the earlier "
-                "file set — for the 22 cases without a gap (and chb24) this build is the new data; R0.3 chb11 and chb21 "
-                "on every file + diff report. Writes the dataset folder only after every gate passed.",
-             f"`{RAW}` (raw EEG) + `v9-x3-fold1` + `v9-x3-fold3` (earlier features)",
+        head(n, "R0.1 inventory of CHB-MIT (24 cases); reference preflight (24 earlier .npz: keys, sha256 vs "
+                "PROVENANCE_V2); R0.2 gates G-stats (23 cases) and G-feat (24 cases) on the earlier file set — for the 22 "
+                "cases without a gap (and chb24) this build is the new data; R0.3 chb11 and chb21 on every file + diff "
+                "report. Writes the dataset folder only after every gate passed. **Resumable:** every finished job whose "
+                "gates passed is kept in `r2/r0_jobs/`; after a STOP, attach that version's output as an input and the "
+                "finished jobs are reused (their gates recomputed with the current code).",
+             f"`{RAW}` (raw EEG) + `v9-x3-fold1` + `v9-x3-fold3` (earlier features); to resume, also the previous "
+             "version's output of this notebook",
              "`/kaggle/working/thesis-r2-chbmit-features/` (→ dataset `thesis-r2-chbmit-features`) and "
              "`/kaggle/working/r2/r0_data/chb/` (→ `results/r2/r0_data/chb/`)",
              "see `projection.json` of R0_SMOKE"),
         setup(n), code("%%writefile {SRC}/r2_core.py\n" + CORE), start("chb"),
         code("""
-# R0.1 INVENTORY (CHB-MIT)
+# R0.1 INVENTORY (CHB-MIT); resume: finished jobs of a previous version (if its output is attached)
+R.import_jobs()
 try:
     INV, CASES_DF, COMPLETE, EARLIER = R.inventory({"chbmit": CASES})
 except SystemExit as e:
@@ -181,11 +186,12 @@ print(CASES_DF.to_string(index=False))
 # R0.2 + R0.3: every case on the earlier view (G-stats, build, G-feat; STOP at the first failure), then chb11 / chb21
 # on the complete view; dataset folder + diff report only after every gate passed
 try:
-    GATES, DONE = R.run_chb(CASES_DF, COMPLETE, EARLIER, cases=CASES)
+    GATES, DONE = R.run_chb(CASES_DF, COMPLETE, EARLIER, cases=CASES, repo_commit=REPO_COMMIT)
 except SystemExit as e:
     stopped(e)
 print("G-stats:", {c: g["status"] for c, g in GATES["G_stats"].items()})
 print("G-feat:", {c: g["status"] for c, g in GATES["G_feat"].items()})
+print("references = PROVENANCE_V2:", {c: r["sha_equal_provenance_v2"] for c, r in GATES["references"].items()})
 print(open(R.out_dir() / "diff_chb11_chb21.md").read() if (R.out_dir() / "diff_chb11_chb21.md").exists() else "")
 """),
         end(),

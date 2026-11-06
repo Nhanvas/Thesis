@@ -272,8 +272,26 @@ def main():
     g = json.loads((sm / "gates.json").read_text())
     assert g["status"] == "PASS" and g["G_stats"]["chb11"]["status"] == "PASS", g
     assert len(g["G_feat"]) == 3 and all(v["status"] == "PASS" for v in g["G_feat"].values()), g["G_feat"]
-    assert (sm / "projection.json").exists()
+    pj = json.loads((sm / "projection.json").read_text())
+    assert isinstance(pj["split_R0_CHB"], bool) and isinstance(pj["split_R0_EXT"], bool), pj
+    assert "runtime_h" in json.loads((sm / "run_meta.json").read_text()), "END cell did not run"
     results["R0_SMOKE"] = "PASS"
+    # projection with a parallel slowdown > 1 (the Kaggle case, numpy scalars throughout): must serialise
+    sys.path.insert(0, str(root / "scratch_smoke" / "src"))
+    import importlib
+    os.environ.update(env("smoke"))
+    Rm = importlib.import_module("r2_core")
+    Rm.STATE["tag"] = "smoke"
+    Rm.STATE["rates"].update(stats_count_s_per_h_1proc=np.float64(42.0), features_s_per_h_1proc=np.float64(34.0),
+                             features_s_per_h_per_worker_parallel=np.float64(44.0), hash_chbmit_MB_per_s=np.float64(500.0),
+                             hash_siena_MB_per_s=np.float64(500.0))
+    import pandas as pd
+    cdf = pd.read_csv(sm / "inventory_cases.csv")
+    pj2 = Rm.projection(cdf, ext_rate_s_per_h=np.float64(11.6))
+    assert pj2["parallel_slowdown"] > 1 and type(pj2["split_R0_CHB"]) is bool and type(pj2["split_R0_EXT"]) is bool
+    json.dumps(pj2)
+    sys.modules.pop("r2_core", None)
+    results["projection, slowdown > 1"] = "PASS (serialisable)"
     # ---- R0_CHB
     run_notebook(nbdir / "R0_CHB.ipynb", env("chb"))
     ch = root / "work_chb"

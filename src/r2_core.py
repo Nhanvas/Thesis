@@ -96,9 +96,26 @@ def out_dir():
     return d
 
 
+def _np_default(o):
+    """numpy scalars / arrays -> plain JSON types (bug fix 06/11 D14-F: np.bool_ broke json.dumps in projection)."""
+    if isinstance(o, np.bool_):
+        return bool(o)
+    if isinstance(o, np.integer):
+        return int(o)
+    if isinstance(o, np.floating):
+        return float(o)
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    return str(o)
+
+
+def jdumps(obj, **kw):
+    return json.dumps(obj, default=_np_default, **kw)
+
+
 def _jdump(path, obj):
     tmp = Path(str(path) + ".tmp")
-    tmp.write_text(json.dumps(obj, indent=1, default=str))
+    tmp.write_text(jdumps(obj, indent=1))
     tmp.replace(path)
 
 
@@ -124,7 +141,7 @@ def run_meta(tag, notebook, repo_commit):
                 started=time.strftime("%Y-%m-%d %H:%M:%S %Z"), cpu_count=os.cpu_count(), platform=platform.platform(),
                 versions=vers, input=str(INPUT), work=str(WORK), scratch=str(SCRATCH), test_mode=bool(os.environ.get("R2_TEST")))
     _jdump(out_dir() / "run_meta.json", meta)
-    log("run_meta", json.dumps({k: meta[k] for k in ("notebook", "repo_commit", "cpu_count", "versions")}))
+    log("run_meta", jdumps({k: meta[k] for k in ("notebook", "repo_commit", "cpu_count", "versions")}))
     return meta
 
 
@@ -690,7 +707,7 @@ def diff_report(done, cases, cases_df):
         L.append("")
     _jdump(out_dir() / "diff_chb11_chb21.json", js)
     (out_dir() / "diff_chb11_chb21.md").write_text("\n".join(L) + "\n")
-    log("R0.3 diff report written:", json.dumps({c: {k: js[c][k] for k in ("files_added", "hours_added",
+    log("R0.3 diff report written:", jdumps({c: {k: js[c][k] for k in ("files_added", "hours_added",
                                                                             "seizure_windows_identical_in_common_files",
                                                                             "clean_windows")} for c in js}))
 
@@ -753,7 +770,7 @@ def run_ext(cases_df, complete, cases, out_folder=None, procs=None):
                 rows.append(dict(case=c, scored=False, note="no file with all electrodes", **{k: meta.get(k) for k in ("hours",)}))
                 continue
             tmp = out_folder / f".{c}_lf.npz.part.npz"
-            np.savez(tmp, **z, meta=json.dumps(meta, default=str))
+            np.savez(tmp, **z, meta=jdumps(meta))
             tmp.replace(dst)
             h = meta["hours"]
             STATE["rates"][f"ext_{c}_s_per_h"] = round(meta["wall_s"] / max(h, 1e-9), 1)
@@ -793,7 +810,7 @@ def smoke_probe_files(cases_df, earlier, case="chb11", n_first=2, workers=None):
     STATE["rates"]["stats_count_s_per_h_1proc"] = round((st["r2"]["stats_s"] + st["r2"]["count_s"]) / h_all, 2)
     STATE["rates"]["stats_s_per_h_1proc"] = round(st["r2"]["stats_s"] / h_all, 2)
     STATE["rates"]["count_s_per_h_1proc"] = round(st["r2"]["count_s"] / h_all, 2)
-    log(f"G-stats {case} (earlier, {h_all:.1f} h): {g_stats['status']} {json.dumps(g_stats)}; "
+    log(f"G-stats {case} (earlier, {h_all:.1f} h): {g_stats['status']} {jdumps(g_stats)}; "
         f"stats {st['r2']['stats_s']:.0f} s + count {st['r2']['count_s']:.0f} s")
     res = dict(G_stats={case: g_stats})
     if g_stats["status"] != "PASS":
@@ -806,7 +823,7 @@ def smoke_probe_files(cases_df, earlier, case="chb11", n_first=2, workers=None):
     h_sub = len(z["file_idx"]) * 4 / 3600
     STATE["rates"]["features_s_per_h_1proc"] = round((time.time() - t1) / h_sub, 2)
     g_feat = compare_features(npz, ref, n_files=n_first)
-    log(f"G-feat {case} first {n_first} files ({h_sub:.2f} h): {g_feat['status']} {json.dumps(g_feat)}")
+    log(f"G-feat {case} first {n_first} files ({h_sub:.2f} h): {g_feat['status']} {jdumps(g_feat)}")
     res["G_feat"] = {f"{case}[files 1-{n_first}]": g_feat}
     if g_feat["status"] != "PASS":
         _jdump(out_dir() / "gates.json", res)
@@ -850,7 +867,7 @@ def smoke_probe_files(cases_df, earlier, case="chb11", n_first=2, workers=None):
             raise SystemExit(f"STOP G-feat probe {f}: {rep}")
     res["G_feat"].update({f"{case}[{f}]": r for f, r in probe_rep.items()})
     tot_h = sum(r["eeg_h"] for r in probe_rep.values())
-    STATE["rates"]["features_s_per_h_per_worker_parallel"] = round(np.mean([r["seconds"] / r["eeg_h"] for r in probe_rep.values()]), 2)
+    STATE["rates"]["features_s_per_h_per_worker_parallel"] = round(float(np.mean([r["seconds"] / r["eeg_h"] for r in probe_rep.values()])), 2)
     STATE["rates"]["parallel_workers"] = len(jobs)
     STATE["rates"]["parallel_wall_s"] = round(wall, 1)
     STATE["rates"]["parallel_eeg_h"] = round(tot_h, 3)
@@ -892,7 +909,7 @@ def projection(cases_df, ext_rate_s_per_h=None, workers=None, limit_h=10.5):
     out = dict(note="computed estimate from the smoke measurements, not a measurement",
                per_hour_of_eeg_s=round(per_h, 2), parallel_slowdown=round(slow, 2), workers=workers,
                chb_jobs_s={k: round(v) for k, v in jobs.items()}, chb_hash_s=round(hash_s),
-               R0_CHB_projected_h=round(chb_h, 2), split_R0_CHB=chb_h > limit_h, limit_h=limit_h)
+               R0_CHB_projected_h=round(float(chb_h), 2), split_R0_CHB=bool(chb_h > limit_h), limit_h=limit_h)
     if ext_rate_s_per_h:
         sn = cases_df[cases_df.db == "siena"]
         ext_hours = float(sn.hours_used_windows.sum()) + float(ch.loc["chb24", "hours_used_windows"]) if "chb24" in ch.index \
@@ -900,9 +917,9 @@ def projection(cases_df, ext_rate_s_per_h=None, workers=None, limit_h=10.5):
         gb_ext = float(inv[(inv.db == "siena") | (inv.case == "chb24")].size_bytes.sum()) / 1e9
         out.update(ext_s_per_h_measured=ext_rate_s_per_h, ext_hours=round(ext_hours, 2),
                    R0_EXT_projected_h=round((ext_hours * ext_rate_s_per_h + gb_ext * 1e3 / max(r.get("hash_siena_MB_per_s", 100.0), 1e-9) + 600) / 3600, 2))
-        out["split_R0_EXT"] = out["R0_EXT_projected_h"] > limit_h
+        out["split_R0_EXT"] = bool(out["R0_EXT_projected_h"] > limit_h)
     _jdump(out_dir() / "projection.json", out)
-    log("projection", json.dumps(out))
+    log("projection", jdumps(out))
     return out
 
 

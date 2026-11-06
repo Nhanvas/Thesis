@@ -1,4 +1,4 @@
-# FUTURE_RESEARCH_PLAN — independent research track: rerun on complete data, then Track F (rev 2, 2026-11-06, chat D13-F)
+# FUTURE_RESEARCH_PLAN — independent research track: rerun on complete data, then Track F (rev 2, 2026-11-06, chat D13-F; §12 updated 06/11 D14-F)
 
 *Repo: `docs/FUTURE_RESEARCH_PLAN.md` + project file. **Rev 2 replaces rev 1 in full** (author decisions 06/11, 09:12 –
 10:38). The F1/F2 design of rev 1 is kept unchanged as §7. Rev 1's run on the earlier data copy stays as a record
@@ -103,7 +103,7 @@ recording, and they change chb11's and chb21's z-score statistics and ±5 SD thr
 | dataset | content | convention |
 |---|---|---|
 | `thesis-r2-chbmit-features` | 24 cases (chb01–chb24): `{case}.npz` + `{case}_stats.json` + `inventory.csv` | thesis convention (stats from interictal windows without the 4 h buffer; c1b construction) |
-| `thesis-r2-external-features` | chb24 + Siena PN00…PN17 (14): `{case}.npz` + `inventory.csv` | x1 convention (label-free stats, every 10th window; Siena 18 bipolar from the referential montage, 512 → 256 Hz, notch 50 Hz) |
+| `thesis-r2-external-features` | chb24 + Siena PN00…PN17 (14): `{case}_lf.npz` (x1 save format + `meta` incl. the label-free statistics) + `inventory.csv` (§12, 06/11 D14-F) | x1 convention (label-free stats, every 10th window; Siena 18 bipolar from the referential montage, 512 → 256 Hz, notch 50 Hz) |
 
 - Each dataset description cites the sources. Siena: Detti 2020, PhysioNet, DOI 10.13026/5d4a-j060, licence
   CC BY 4.0 (checked 06/11). CHB-MIT's licence is checked before publishing.
@@ -128,13 +128,16 @@ Report: per case files listed / present / hashed-equal / skipped by design, seiz
 
 **R0.2 Identity gates (STOP on failure)** — run before anything new, to prove that the Kaggle data and code equal the
 record:
-- **G-stats:** `preprocessing.compute_subject_stats` on the **earlier file set** reproduces the committed
-  `data/processed/{subj}_stats.json` for the 23 thesis cases (relative ≤ 1e-6).
+- **G-stats:** `preprocessing.compute_subject_stats` (then `count_windows`, i.e. `process_subject` without its write
+  pass) on the **earlier file set** reproduces the committed `data/processed/{subj}_stats.json` for the 23 thesis
+  cases (float values relative ≤ 1e-6; window counts and ratio exact — §12, 06/11 D14-F). chb24 has no committed
+  stats file; its statistics are proven by its G-feat.
 - **G-feat:** with those stats, the c1b construction (`c1b_build_trainset` / `c1t_build_testset` / the chb24 builder)
-  on the earlier file set reproduces the earlier `.npz` (`v9-x3-fold1…4`) for every case:
+  on the earlier file set reproduces the earlier `.npz` (`v9-x3-fold1` + `v9-x3-fold3` = all 24 cases) for every case:
   - flags (`is_ictal`, `is_buffer`, `is_flag5sd`, `is_signal_loss`) and `file_idx` exact;
   - `f7` and `bp5` max |diff| ≤ 1e-3;
-  - adjacency entries differing ≤ 0.5 % (the x1 R-feat tolerance).
+  - adjacency entries differing ≤ 0.5 % (the x1 R-feat tolerance);
+  - file list and skipped-file list exact; `zgamma_raw` compared descriptively (not used by the frozen system).
 
   For the 22 cases without a gap this rebuild **is** the new data.
 
@@ -147,12 +150,14 @@ record:
 **R0.4 External features.** chb24 + Siena 14 with the x1 convention. Feature identity cannot be checked here (the x1
 features were never committed); it is proven downstream by gate GE (§5).
 
-**Outputs:** the two datasets (§3); `results/r2/r0_data/` (`inventory.csv`, `gates.json`, `diff_chb11_chb21.md`,
-`run_meta.json`, measured runtime).
+**Outputs:** the two datasets (§3); `results/r2/r0_data/<smoke|chb|ext>/` (one folder per notebook: `inventory.csv`,
+`inventory_cases.csv`, `checks.json`, PhysioNet `SHA256SUMS` copies, `gates.json`, `diff_chb11_chb21.{md,json}`,
+`stats_earlier/`, `external_cases.csv`, `projection.json`, `run_meta.json` with measured runtime, `logs/`).
 
 **Runtime:** the laptop measured 16 s per hour of EEG with 2 processes (chb24, REPRODUCE check 2b). That gives
-≈ 5 h for ≈ 1,145 h of EEG (computed estimate). The smoke (one CHB-MIT case + one Siena patient) measures Kaggle; if
-the projection exceeds 10.5 h, R0 is split into notebooks by case.
+≈ 5 h for ≈ 1,145 h of EEG (computed estimate). The smoke measures Kaggle (chb11 whole earlier set for G-stats, its
+first 2 files for G-feat, one more file per worker in parallel, Siena PN00); if the projection exceeds 10.5 h, R0 is
+split into notebooks by case.
 
 ## 5 · Stage R1 — the thesis system on complete data (Kaggle CPU)
 
@@ -339,8 +344,8 @@ per-patient sensitivity is lower there).
 
 | # | notebook | needs | does | runtime |
 |---|---|---|---|---|
-| 1 | `R0_SMOKE` | raw dataset | inventory + hashes of all files; G-stats and G-feat on chb11 (file subset) + one Siena patient; speed → projection | measured |
-| 2 | `R0_CHB` (split by case if > 10.5 h) | 1 | G-stats / G-feat all cases; complete chb11 / chb21; dataset `thesis-r2-chbmit-features` | ≈ 4–5 h est. |
+| 1 | `R0_SMOKE` | raw dataset + `v9-x3-fold1`/`3` | inventory + hashes of all files; G-stats on chb11 (whole earlier set), G-feat on its first 2 files + 1 file per worker in parallel; PN00 (x1); speed → projection | measured |
+| 2 | `R0_CHB` (split by case if > 10.5 h) | 1 (+ `v9-x3-fold1`/`3`) | G-stats / G-feat all cases; complete chb11 / chb21; dataset `thesis-r2-chbmit-features` | ≈ 4–5 h est. |
 | 3 | `R0_EXT` | 1 | chb24 + Siena features (x1 convention); dataset `thesis-r2-external-features` | ≈ 1 h est. |
 | 4 | `R1_SMOKE` | 2, 3 | R1.0 gates on chb03 + PN00; G-vec on the thesis recipe; 2-epoch job; speed | measured |
 | 5 | `R1_RUN` | 4 | R1.0 full; 4 seeds training (4 workers); k; scoring of all sets | measured (≈ 4–7 h est.) |
@@ -393,6 +398,7 @@ not deleted when R3 replaces them for research.
 | 05/11 13:30 | device GPU T4 x2 by the rev 1 rule (CPU 4.9 % faster < 10 %) | smoke timing | no |
 | 06/11 07:40 | F1/F2 results read on the earlier copy; verdict F2 "stable advantage of the MLP-AE" | runs finished | yes (record, §11) |
 | **06/11 10:38** | **rev 2:** independent track; Stage R (R0–R3) on complete data before Track F; D1, D2, P1–P6; F5 split into F5a / F5b with nested CV; no pre-fixed decision thresholds; F3 grid reading; device CPU for the rerun; §2 corrections below | five files missing from every earlier run (§1); author decisions 06/11 | no new result; the hybrid medians of §2 were already in the record |
+| 06/11 13:25 | **R0 implementation (D14-F, `src/r2_core.py`):** (a) the record code is called verbatim (`compute_subject_stats`, `count_windows`, `c1b.build`, `v9_x3_build_chb24.build`, `x1_external.build_subject`); only their path globals are pointed, inside each worker, at two symlink views of the verified files (`complete`; `earlier` = complete minus the five files); (b) G-stats also checks the window counts and ratio of `stats.json` exactly; chb24 (no committed stats) is proven by G-feat; (c) G-feat reference = `v9-x3-fold1` + `v9-x3-fold3`; file and skipped-file lists exact; `zgamma_raw` descriptive; (d) the chb11 / chb21 complete builds are queued in the same worker pool after the gate jobs; they are written and reported only after every gate passed; (e) external files named `{case}_lf.npz` (x1's `chb03_lf` convention), because a second `chb24.npz` would be matched by name by `model_cmp_core.locate_all` / `locate_earlier`; their `meta` adds the label-free mean / SD; (f) `r0_data/` gets one sub-folder per notebook; (g) smoke scope as in §4 Runtime; (h) summaries: chb01–23 from the committed `data/summaries` (what the record read), checked equal to PhysioNet's; chb24 from the verified copy; (i) Siena workers per subject 4, or 2 when a file is longer than 6 h (memory only; results do not depend on it); (j) inventory checks against the record are reported (PASS / DIFF); only the five files of §1 are required (STOP) | implementation of §4 on the actual code paths; name collision found while reading `model_cmp_core.py` | no (synthetic test data only) |
 
 ## 13 · Corrections to rev 1 found in this revision (06/11)
 

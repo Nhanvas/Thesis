@@ -1,0 +1,74 @@
+[
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 3,
+  "status": "done",
+  "seconds": 12404,
+  "ms_per_step": 7.68,
+  "device": "cuda:1"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 2,
+  "status": "done",
+  "seconds": 16423,
+  "ms_per_step": 7.652,
+  "device": "cuda:0"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 1,
+  "status": "done",
+  "seconds": 16811,
+  "ms_per_step": 7.718,
+  "device": "cuda:1"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 4,
+  "status": "done",
+  "seconds": 18458,
+  "ms_per_step": 7.675,
+  "device": "cuda:0"
+ },
+ {
+  "model": "mlp",
+  "partition": 5,
+  "fold": 4,
+  "status": "done",
+  "seconds": 8022,
+  "ms_per_step": 3.33,
+  "device": "cuda:1"
+ },
+ {
+  "model": "mlp",
+  "partition": 5,
+  "fold": 1,
+  "status": "done",
+  "seconds": 7016,
+  "ms_per_step": 3.219,
+  "device": "cuda:0"
+ },
+ {
+  "model": "mlp",
+  "partition": 5,
+  "fold": 3,
+  "status": "done",
+  "seconds": 5101,
+  "ms_per_step": 3.155,
+  "device": "cuda:0"
+ },
+ {
+  "model": "mlp",
+  "partition": 5,
+  "fold": 2,
+  "status": "done",
+  "seconds": 6860,
+  "ms_per_step": 3.199,
+  "device": "cuda:1"
+ }
+]

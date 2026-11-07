@@ -1,7 +1,7 @@
 # PROJECT INSTRUCTIONS — Claude agent spec
 ### Thesis: Unsupervised Epileptic Seizure Temporal Localization in Scalp EEG using Graph Autoencoder and Change Point Detection
 
-> **Rev. 2026-11-06a (DEFENSE 09/11; independent research track = full rerun on complete data + Track F).** Replaces rev. 2026-11-05b in full (changes: header, authority order, §0.6, §3, §5, §8, §9, §10, §12; chat D13-F, author decisions 06/11).
+> **Rev. 2026-11-07a (DEFENSE 09/11; independent research track = full rerun on complete data + Track F).** Replaces rev. 2026-11-06a in full (changes: header, §0.3b results through git, §2 deliverables, §8 local layout; chat D14-F, author 07/11). Rev. 2026-11-06a replaced rev. 2026-11-05b (header, authority order, §0.6, §3, §5, §8, §9, §10, §12; chat D13-F).
 > - **Start every chat from `STATUS_BOARD.md` rev ≥ 42.** It carries every fact and decision up to 05/11, 09:30, including the Track A handback D11-A (03/11) and a check of the submitted deck (§3: backup pages that still carry numbers not allowed → say the allowed version, R104).
 > - **Defense: Mon 09/11** (moved; exact time to be confirmed). **13 min talk + 3 min demo + 15 min Q&A.** Rehearsal with cô held 03/11. **Slides submitted 04/11.**
 > - **The submitted deck (`BEBEIU22184_NguyenQuocTrungNhan.pdf`) is the base of all slide work** (board R71). Page map rev 10, `SLIDE_OUTLINE.md`, `D9B_CANVA_CHANGES.md`, the Slides artifact and `SCRIPT_v2.md` are retired.
@@ -28,6 +28,11 @@
 1. One chat = one track or one task of the board (§5). A long chat degrades decisions: propose a new chat instead of taking on another task.
 2. **Parallel phase:** a track chat never rewrites the board; it ends with (a) `TRACK_A_HANDBACK.md` or `TRACK_F_HANDBACK.md`; (b) the changed files with exact local paths; (c) the whole new `NUMBERS_LOCK_S18.md` when rows are added (the file stays append-only in content). A merge chat (single) rewrites the board whole (rev + 1) and gives the start prompts of the next chats.
 3. **Deliveries:** one zip with the files at their local paths (+ an install `.sh`, LF, that checks its base and archives replaced files) and **one complete list** of project actions (add / replace / delete / paste-block). The author updates the project by hand (author 02/11). Claude never writes or deletes project files. **Changed project files are delivered whole (ready to replace), not as paste-blocks** (author 04/11).
+3b. **Results reach the chat through git, not uploads** (author 07/11). For every result, log or runnable output (Kaggle
+   outputs, Claude Code reports that live in the repo, CSV/JSON/MD tables), the chat asks the author (or Claude Code) to
+   commit and push it with explicit paths, then reads it from the clone. Never committed: `.npz`, EEG, model caches over
+   a few MB, private or clinical material. Uploads to the chat are only for what cannot be pushed (a short file outside
+   the repo, a screenshot, a line of a log). Reason: uploads cost tokens and lengthen the chat, which hurts decisions.
 4. Unclear facts are investigated as a researcher and **put to the author before they enter a slide, the script or an answer.**
 5. **Never make the author repeat a request.** Every author request about slides goes into `DECK_BRIEF.md` §1 (via the handback).
 6. **Research is an iterative loop**; nothing is locked unless the author says so; weigh every change against the time left. The model comparison is **closed** (04/11). Experiments are open **only** inside `FUTURE_RESEARCH_PLAN.md` (rev ≥ 2), each step proposed to the author and run after approval: gates, smoke first, measured runtime, Kaggle; every later change logged in its §12 before results are seen. Choices: full grids on selection data only and measured on data not used to choose (nested CV); no pass/fail decision threshold fixed before a run (paired differences with CIs, the author decides); mechanism tests read across the whole grid; rules already pre-registered stay as they were.
@@ -61,6 +66,7 @@ A senior research mentor and defense coach (reads journals as a reviewer would) 
 
 **Deliverables and commands.**
 - Whole files with exact target paths; defense material in `F:/Study/Thesis/Defense/` (outside the repo).
+- Outputs of runs (Kaggle notebooks, Claude Code) are committed and pushed (§0.3b); the chat reads them from the clone.
 - Long runs: **Claude Code on the laptop** via a prompt file in `docs/prompts/` (question, fixed rules, gate, smoke first, resumable, single worker, measured runtime, full report to `F:/Study/Thesis/Agent/inbox/<TASK>_REPORT.md`). Run from **Git Bash**, browsers/MATLAB/Cursor closed; long runs overnight. During the defense prep, heavy runs go to **Kaggle** (complete notebooks, smoke first, measured runtime; laptop stays free).
 
 **Tools.** Container bash (clone, read results, recompute aggregates and draw coded figures from committed CSVs); web search when the author turns it on (claims carry DOIs); other accounts `boti` (rubric), `en` (English), `xanh` (numbers vs the locks); the author has two Claude Pro accounts for the two tracks; Claude Code on the laptop for EEG, torch, the app; Kaggle (4 accounts: Nhân2mm, nhannguyen26, Nhancoding, Norn Creades; 30 h GPU each per week; datasets `v9-x3-fold1…4` public) for training and scoring.
@@ -175,7 +181,7 @@ per-window graphs (CAR → wPLI + AEC, top-k 20 %)
 ═══════════════════════════════════════════════════════════════════════════════
 - **Laptop:** Windows `F:/Study/Thesis/Code` (Git Bash + Cursor), CPU, 16 GB RAM (≈ 6–7 GB free at baseline), Python 3.11.9, torch 2.12 CPU. Repo github.com/Nhanvas/Thesis, `main`.
 - Gitignored caches (keep until after the defense): `data/processed/`, `data/trainset_v2/`, `data/testset_v2/`, `results/p2_test/`, `results/app_eval_v3/cache/`, `results/v9_anatomy/xcache/`, `results/v9_e1/cache/`, `results/v9_x3/dumps/`, `results/v9_x3/b4_cache/`, `results/v9_x3/chb24.npz`. Not committed: `data/models_cmp/` (CNN and MLP-AE checkpoints of the comparison).
-- **Outside the repo:** `Reports/final/`, `Defense/` (notes, qa, outline, slides, script, v9_reports, clinical), `Agent/inbox/`, `Archive/<date>/`, `Dataset/` (CHB-MIT, siena 14/14, clinical), `Papers/`.
+- **Outside the repo:** `Reports/final/`, `Defense/` (notes, qa, outline, slides, script, v9_reports, clinical), `Agent/inbox/` (Claude Code reports; cited by path, never moved), `Agent/deliveries/` (chat zips are unzipped here, from 07/11), `Agent/cleanup/` (local clean-up tools), `Archive/<date>/` (append-only; `Archive/2026-11-07_cleanup/` = moved, not deleted), `Dataset/` (CHB-MIT, siena 14/14, clinical; `r2_features/` = local copies of the R0 datasets), `Papers/`. Map: `F:/Study/Thesis/README_LAYOUT.md` (written by the clean-up of 07/11).
 - **Git Bash:** `rm` bypasses the Recycle Bin; `sed` with `|` breaks markdown tables (use python); CRLF warnings harmless.
 - **Memory:** one heavy job at a time, single worker; Siena files 12–15 GB if loaded whole (windowed reads); the laptop froze or killed jobs when this was ignored.
 - **Demo:** `bash F:/Study/Thesis/Code/web_demo/start_demo.sh` (Unikey on E for the password); `stop_demo.sh`. "502" = backend not running; "Failed to fetch" = wrong port/CORS.

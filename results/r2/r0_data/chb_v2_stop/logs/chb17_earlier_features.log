@@ -1,0 +1,150 @@
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17a_03.edf: 900 windows, flagged 320 (25s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17a_04.edf: 900 windows, flagged 189 (50s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17a_05.edf: 900 windows, flagged 476 (75s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17a_06.edf: 900 windows, flagged 306 (100s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17a_08.edf: 900 windows, flagged 634 (123s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_57.edf: 900 windows, flagged 488 (148s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_58.edf: 900 windows, flagged 418 (172s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_59.edf: 900 windows, flagged 509 (196s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_60.edf: 900 windows, flagged 598 (220s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_63.edf: 906 windows, flagged 513 (244s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_67.edf: 900 windows, flagged 378 (269s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17b_68.edf: 900 windows, flagged 693 (294s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/c1b_build_trainset.py:62: RuntimeWarning: Precision loss occurred in moment calculation due to catastrophic cancellation. This occurs when the data are nearly identical. Results may be unreliable.
+  k = kurtosis(W, axis=-1, fisher=True)
+  chb17/chb17b_69.edf: 900 windows, flagged 319 (319s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_02.edf: 900 windows, flagged 424 (343s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_03.edf: 900 windows, flagged 272 (368s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_04.edf: 900 windows, flagged 363 (393s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_05.edf: 900 windows, flagged 303 (418s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_06.edf: 900 windows, flagged 340 (443s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_07.edf: 900 windows, flagged 286 (467s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3, --4
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_08.edf: 900 windows, flagged 395 (491s)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb17/chb17c_13.edf: 900 windows, flagged 783 (515s)
+chb17: 18906 windows, ictal 74, flagged 9007, skipped files [], saved chb17.npz, 515s

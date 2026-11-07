@@ -3,7 +3,8 @@
 rev 2, §4 and §9) from src/r2_core.py (embedded verbatim with %%writefile; sha256 checked in the notebook). The
 repository is cloned at the pinned commit for the record code it imports read only (preprocessing, c1b, chb24 builder,
 x1_external, committed stats.json, summaries, x1 rows). Nothing to fill in.
-  python src/r2_make_notebooks.py            -> notebooks/r2/R0_SMOKE.ipynb, R0_CHB.ipynb, R0_EXT.ipynb
+  python src/r2_make_notebooks.py            -> notebooks/r2/R0_SMOKE.ipynb, R0_CHB.ipynb, R0_EXT.ipynb, R0_DIAG17.ipynb
+(R0_DIAG17, chat D14b-F: the diagnosis of the R0_CHB v2 STOP at chb17; also embeds src/r2_diag.py, sha checked.)
 Test mode (synthetic data, build container only): environment R2_TEST_REPO / R2_TEST_INPUT / R2_TEST_WORK /
 R2_TEST_SCRATCH / R2_TEST_CASES / R2_PHYSIONET_* (src/r2_synthetic_test.py)."""
 import hashlib
@@ -15,6 +16,8 @@ COMMIT = "235682a652392ec40fc001ff5ad60dfa77fa8e28"
 OUTDIR = ROOT / "notebooks" / "r2"
 CORE = (ROOT / "src" / "r2_core.py").read_text()
 SHA = hashlib.sha256(CORE.encode()).hexdigest()[:16]
+DIAG = (ROOT / "src" / "r2_diag.py").read_text()
+DSHA = hashlib.sha256(DIAG.encode()).hexdigest()[:16]
 RAW = "bonesclarke26/combined-siena-scalp-and-chb-mit-eeg-datasets"
 PKGS = '"mne==1.12.1", "torch_geometric==2.7.0", "ruptures==1.1.10", "timescoring==0.0.7"'
 
@@ -162,7 +165,9 @@ def chb():
     n = "R0_CHB"
     return save(n, [
         head(n, "R0.1 inventory of CHB-MIT (24 cases); reference preflight (24 earlier .npz: keys, sha256 vs "
-                "PROVENANCE_V2); R0.2 gates G-stats (23 cases) and G-feat (24 cases) on the earlier file set — for the 22 "
+                "PROVENANCE_V2); R0.2 gates G-stats (23 cases) and G-feat (24 cases; f7 / bp5 / adj tolerances read on the "
+                "windows the chain uses, i.e. not signal-loss, with the all-window reading reported: plan §12 07/11 12:49) "
+                "on the earlier file set — for the 22 "
                 "cases without a gap (and chb24) this build is the new data; R0.3 chb11 and chb21 on every file + diff "
                 "report. Writes the dataset folder only after every gate passed. **Resumable:** every finished job whose "
                 "gates passed is kept in `r2/r0_jobs/`; after a STOP, attach that version's output as an input and the "
@@ -233,6 +238,61 @@ print("Siena hours:", round(EXT[EXT.case.str.startswith("PN")].hours.sum(), 2), 
     ])
 
 
+def diag17():
+    n = "R0_DIAG17"
+    return save(n, [
+        md(f"""
+# {n} — independent track, stage R0: diagnosis of the R0_CHB v2 STOP at chb17 (descriptive)
+
+**Plan:** `docs/FUTURE_RESEARCH_PLAN.md` rev 2, §4 and §12 (07/11 12:49). **Does:** R0.1 inventory of chb17 only
+(sha256 vs PhysioNet); rebuild of chb17 on the earlier view with the record code, unchanged, and the committed
+`chb17_stats.json` (G-stats of v2: difference 0); localization of every difference against the record `chb17.npz`
+(per window, per file, every non-finite cell); raw evidence and a conditioning test on the files concerned (raw data
+x (1 + 2**-40), record filter replicated bit-equal first); G-feat read on all / chain / signal-loss windows with the v3
+gate code; a scan of the 24 earlier `.npz` (signal-loss windows, non-finite cells). Changes no data and no gate.
+**Accelerator:** None (CPU). **Internet:** ON. **Inputs:** `{RAW}` (raw EEG) + `v9-x3-fold1` + `v9-x3-fold3`.
+**Outputs:** `/kaggle/working/r2/r0_data/chb17_diag/` (→ `results/r2/r0_data/chb17_diag/`). **Runtime:** measured
+(computed estimate ≈ 0.3–0.5 h). Code: `github.com/Nhanvas/Thesis` at `{COMMIT[:7]}` (record code, read only) +
+`r2_core.py` (sha256 `{SHA}`) + `r2_diag.py` (sha256 `{DSHA}`). Do not edit; *Save Version → Save & Run All (Commit)*.
+"""),
+        setup(n), code("%%writefile {SRC}/r2_core.py\n" + CORE), code("%%writefile {SRC}/r2_diag.py\n" + DIAG),
+        code(f"""
+# START: sha check of the embedded files, imports, run metadata
+for f, want in (("r2_core.py", "{SHA}"), ("r2_diag.py", "{DSHA}")):
+    sha = hashlib.sha256(open(f"{{SRC}}/{{f}}", "rb").read()).hexdigest()[:16]
+    assert sha == want, f"{{f}}: sha {{sha}} != {{want}} (cell edited?)"
+os.environ.update(THESIS_REPO=REPO, R2_WORK=WORK, R2_INPUT=INPUT, R2_SCRATCH=SCRATCH)
+sys.path.insert(0, SRC)
+import pandas as pd, numpy as np
+import r2_core as R, r2_diag as D
+print("CPU cores:", os.cpu_count())
+CASE = os.environ.get("R2_TEST_DIAG_CASE", "chb17")
+META = R.run_meta(f"{{CASE}}_diag", NOTEBOOK, REPO_COMMIT)
+SCAN = os.environ["R2_TEST_CASES"].split(",") if os.environ.get("R2_TEST_CASES") else None
+def stopped(e):
+    raise RuntimeError(f"STOPPED: {{e}}") from None
+"""),
+        code("""
+# R0.1 INVENTORY of the one case (sha256 vs PhysioNet; absent or different files from PhysioNet) -> views
+try:
+    INV, CASES_DF, COMPLETE, EARLIER = R.inventory({"chbmit": [CASE]})
+except SystemExit as e:
+    stopped(e)
+print(CASES_DF.to_string(index=False))
+"""),
+        code("""
+# DIAGNOSIS: rebuild (record code, committed stats) -> localize -> raw evidence + conditioning -> scan of the references
+try:
+    SUMM = D.diagnose(CASE, EARLIER, scan_cases=SCAN)
+except SystemExit as e:
+    stopped(e)
+print(json.dumps(SUMM, indent=1, default=str))
+print(open(R.out_dir() / "SUMMARY.md").read())
+"""),
+        end(),
+    ])
+
+
 if __name__ == "__main__":
-    built = [smoke(), chb(), ext()]
-    print("built", [b.name for b in built], "r2_core sha", SHA)
+    built = [smoke(), chb(), ext(), diag17()]
+    print("built", [b.name for b in built], "r2_core sha", SHA, "r2_diag sha", DSHA)

@@ -19,8 +19,10 @@ R0.1 inventory     every EDF and summary of CHB-MIT 1.0.0 and Siena Scalp EEG 1.
                    plan §1: chb11_12-15, chb21_11), so the record code sees exactly the earlier or the complete copy.
 R0.2 gates (STOP)  G-stats: stats on the earlier view = committed data/processed/{case}_stats.json (23 cases; float values
                    relative <= 1e-6, window counts exact). G-feat: features on the earlier view with those stats = the
-                   earlier .npz of v9-x3-fold1/3 (24 cases; flags and file_idx exact, files exact, f7 and bp5 max |diff|
-                   <= 1e-3, adjacency entries differing by > 1e-3 <= 0.5 %).
+                   earlier .npz of v9-x3-fold1/3 (24 cases; flags and file_idx exact on all windows, files exact,
+                   f7 and bp5 max |diff| <= 1e-3, adjacency entries differing by > 1e-3 <= 0.5 %; since 07/11 12:49 the
+                   three tolerances are read on the windows the chain uses = not is_signal_loss, GFEAT_SCOPE, with the
+                   all-window and signal-loss readings reported beside it).
 R0.3 complete      chb11 and chb21 on every file: stats, then features; diff report vs the earlier copy.
 R0.4 external      chb24 + Siena (14) with x1_external.build_subject (label-free statistics); feature identity is proven
                    downstream by gate GE (plan §5).
@@ -76,6 +78,12 @@ SKIPPED_BY_DESIGN = {"chb12": ["chb12_27.edf", "chb12_28.edf", "chb12_29.edf"]}
 # expected from the record (plan §4, R0.1): checked and reported, never tuned
 EXPECTED = dict(chb_seizures_listed=198, siena_seizures=47, siena_hours=141.0)
 TOL = dict(stats_rel=1e-6, f7=1e-3, bp5=1e-3, adj_entry=1e-3, adj_frac=0.005)
+# G-feat read scope (plan §12, 07/11 12:49, author decision after the v2 STOP at chb17, before the chb17 diagnosis was
+# seen): f7 / bp5 / adj tolerances are read on the windows the frozen chain uses (every window NOT flagged
+# is_signal_loss); the four flags, file_idx, the file list and the window count stay exact on ALL windows; the
+# signal-loss windows and the all-window reading (the pre-registered one) are reported beside it. Any difference beyond
+# tolerance outside the signal-loss windows still fails the gate (STOP).
+GFEAT_SCOPE = "chain"
 FLAGS = ("is_ictal", "is_buffer", "is_flag5sd", "is_signal_loss")
 REF_KEYS_REQUIRED = ("files", "file_idx") + FLAGS + ("f7", "bp5", "adj")
 BUILD_VERSION = "r0-build-1"          # stats_record + features_record on the pinned record code (resume key)
@@ -354,6 +362,7 @@ def inventory(dbs, cases=None, workers=8):
     for r in inv[inv.file.str.endswith("-summary.txt")].itertuples():
         mine = REPO / "data" / "summaries" / r.file
         summ.append(None if not mine.exists() else sha256_file(mine) == r.sha256_physionet)
+    inv["committed_summary_equal"] = pd.Series([None] * len(inv), index=inv.index, dtype=object)   # one-case runs (pandas 3)
     inv.loc[inv.file.str.endswith("-summary.txt"), "committed_summary_equal"] = summ
     inv.drop(columns=["path"]).to_csv(out_dir() / "inventory.csv", index=False)
     # per case
@@ -497,17 +506,66 @@ def compare_stats(new, ref):
     return rep
 
 
-def _nanmaxdiff(a, b):
-    a = np.asarray(a, np.float64)
-    b = np.asarray(b, np.float64)
-    fa, fb = np.isfinite(a), np.isfinite(b)
-    if not np.array_equal(fa, fb):
-        return float("inf"), int((fa != fb).sum())
-    return (float(np.max(np.abs(a[fa] - b[fb]))) if fa.any() else 0.0), 0
+def window_diffs(N, R, m):
+    """per-window differences new vs reference (reference rows m): one value per window, so that any window set can be
+    read without recomputing. f7 / bp5 / zgamma: max |diff| over the finite cells of both, and the number of cells
+    whose finiteness differs; adj: number of entries differing by > TOL['adj_entry'] or in NaN-ness (both NaN = equal)."""
+    out = {}
+    for k in ("f7", "bp5", "zgamma_raw"):
+        if k not in N.files or k not in R.files:
+            continue
+        a = np.asarray(N[k], np.float64)
+        b = np.asarray(R[k][m], np.float64)
+        a = a.reshape(len(a), -1)
+        b = b.reshape(len(b), -1)
+        fa, fb = np.isfinite(a), np.isfinite(b)
+        both = fa & fb
+        out[f"{k}_maxabs"] = np.where(both, np.abs(np.where(both, a, 0.0) - np.where(both, b, 0.0)), 0.0).max(axis=1)
+        out[f"{k}_finite_flips"] = (fa != fb).sum(axis=1)
+    An = N["adj"]                                        # float16 as saved (read once: NpzFile re-reads per access)
+    Ar = R["adj"]
+    if not m.all():
+        Ar = Ar[m]
+    n = len(An)
+    cnt = np.zeros(n, np.int64)
+    for s in range(0, n, 8192):                          # bounded float32 temporaries on the 140k-window cases
+        a = An[s:s + 8192].astype(np.float32)
+        b = Ar[s:s + 8192].astype(np.float32)
+        d = (np.abs(a - b) > TOL["adj_entry"]) | (np.isnan(a) != np.isnan(b))
+        d &= ~(np.isnan(a) & np.isnan(b))
+        cnt[s:s + len(a)] = d.reshape(len(a), -1).sum(axis=1)
+    out["adj_entries_differing"] = cnt
+    out["adj_entries_per_window"] = int(np.prod(An.shape[1:]))
+    return out
 
 
-def compare_features(new_npz, ref_npz, n_files=None):
-    """G-feat on one case; n_files limits the reference to its first n files (smoke on a file subset)."""
+def feat_block(W, sel):
+    """f7 / bp5 / adj / zgamma metrics of G-feat on the windows sel (same definitions as the pre-registered gate)."""
+    sel = np.asarray(sel, bool)
+    blk = dict(n_windows=int(sel.sum()))
+    for k in ("f7", "bp5", "zgamma_raw"):
+        if f"{k}_maxabs" not in W:
+            continue
+        flips = int(W[f"{k}_finite_flips"][sel].sum())
+        mx = float(W[f"{k}_maxabs"][sel].max()) if sel.any() else 0.0
+        blk[f"{k}_max_abs"] = float("inf") if flips else mx
+        blk[f"{k}_finite_mask_diff"] = flips
+        if k != "zgamma_raw":
+            blk[f"{k}_windows_over_tol"] = int(((W[f"{k}_maxabs"] > TOL[k]) | (W[f"{k}_finite_flips"] > 0))[sel].sum())
+    tot = int(sel.sum()) * W["adj_entries_per_window"]
+    blk["adj_frac_differing"] = float(W["adj_entries_differing"][sel].sum() / tot) if tot else 0.0
+    blk["adj_windows_differing"] = int((W["adj_entries_differing"][sel] > 0).sum())
+    blk["status"] = "PASS" if (blk["f7_max_abs"] <= TOL["f7"] and blk["bp5_max_abs"] <= TOL["bp5"]
+                               and blk["adj_frac_differing"] <= TOL["adj_frac"]) else "FAIL"
+    return blk
+
+
+def compare_features(new_npz, ref_npz, n_files=None, return_windows=False):
+    """G-feat on one case; n_files limits the reference to its first n files (smoke on a file subset).
+    Exact on ALL windows: file list, window count, skipped files (when the reference has them), the four flags,
+    file_idx. f7 / bp5 / adj read on three window sets: 'all' (the pre-registered reading, also kept as the top-level keys
+    so that v2 and v3 reports compare), 'chain' (not is_signal_loss = the windows every downstream path uses) and
+    'signal_loss' (descriptive). The gate status is the reading of GFEAT_SCOPE (plan §12, 07/11 12:49)."""
     N = np.load(new_npz, allow_pickle=True)
     R = np.load(ref_npz, allow_pickle=True)
     rf = [str(x) for x in R["files"]]
@@ -522,33 +580,48 @@ def compare_features(new_npz, ref_npz, n_files=None):
         else:                            # some record files were saved without it (§12 06/11 07:10); 'files' is exact
             rep["skipped_equal"] = "n/a: reference has no skipped_files (file list compared exactly)"
             rep["skipped_new"] = [str(x) for x in N["skipped_files"]]
-    ok = rep["files_equal"] and rep["n_windows"][0] == rep["n_windows"][1] and rep.get("skipped_equal", True) is not False
-    if ok:
+    exact = rep["files_equal"] and rep["n_windows"][0] == rep["n_windows"][1] and rep.get("skipped_equal", True) is not False
+    W = None
+    if exact:
         for k in FLAGS + ("file_idx",):
             eq = np.array_equal(np.asarray(N[k]).astype(np.int64), np.asarray(R[k])[m].astype(np.int64))
             rep[f"{k}_equal"] = bool(eq)
-            ok &= eq
-        for k in ("f7", "bp5"):
-            d, nfin = _nanmaxdiff(N[k], R[k][m])
-            rep[f"{k}_max_abs"], rep[f"{k}_finite_mask_diff"] = d, nfin
-            ok &= d <= TOL[k]
-        a = N["adj"].astype(np.float32)
-        b = R["adj"][m].astype(np.float32)
-        both_nan = np.isnan(a) & np.isnan(b)
-        diff = (np.abs(a - b) > TOL["adj_entry"]) | (np.isnan(a) != np.isnan(b))
-        diff &= ~both_nan
-        rep["adj_frac_differing"] = float(diff.mean())
-        ok &= rep["adj_frac_differing"] <= TOL["adj_frac"]
-        if "zgamma_raw" in N.files and "zgamma_raw" in R.files:          # descriptive (not used by the frozen system)
-            rep["zgamma_raw_max_abs"] = _nanmaxdiff(N["zgamma_raw"], R["zgamma_raw"][m])[0]
-    rep["status"] = "PASS" if ok else "FAIL"
+            exact &= eq
+    rep["exact_on_all_windows"] = bool(exact)
+    if exact:
+        W = window_diffs(N, R, m)
+        sl = np.asarray(N["is_signal_loss"], bool)
+        blocks = {"all": feat_block(W, np.ones(len(sl), bool)), "chain": feat_block(W, ~sl), "signal_loss": feat_block(W, sl)}
+        for k, v in blocks["all"].items():                                   # pre-registered reading, v2 key names
+            if k in ("f7_max_abs", "f7_finite_mask_diff", "bp5_max_abs", "bp5_finite_mask_diff", "adj_frac_differing"):
+                rep[k] = v
+        if "zgamma_raw_max_abs" in blocks["all"]:                            # descriptive (not used by the frozen system)
+            rep["zgamma_raw_max_abs"] = blocks["all"]["zgamma_raw_max_abs"]
+        rep["windows"] = blocks
+        rep["status_all_windows"] = blocks["all"]["status"]
+        rep["status_chain_windows"] = blocks["chain"]["status"]
+        rep["gate_scope"] = GFEAT_SCOPE
+        rep["status"] = blocks[GFEAT_SCOPE]["status"]
+    else:
+        rep["status"] = "FAIL"
+    if return_windows:
+        return rep, W
     return rep
+
+
+def is_reference_path(p):
+    """an earlier .npz of the record: inside a v9-x3-fold* input, never a job copy of a previous R0_CHB version
+    (r2/r0_jobs/<case>_<kind>/<case>.npz, attached to resume) nor a thesis-r2 dataset. Fix 07/11 (D14b-F): without it a
+    resumed run could find the job copy beside the reference and, sizes being equal, compare a build with itself."""
+    p = Path(p)
+    parts = p.parts
+    return (SCRATCH not in p.parents and WORK not in p.parents and "thesis-r2" not in str(p) and "r0_jobs" not in parts
+            and any(x.startswith("v9-x3-fold") for x in parts))
 
 
 def locate_earlier(case):
     """the earlier .npz of a case under the Kaggle inputs (v9-x3-fold1/3; any nesting); copies must agree in size."""
-    hits = [p for p in sorted(INPUT.rglob(f"{case}.npz")) if SCRATCH not in p.parents and WORK not in p.parents
-            and "thesis-r2" not in str(p)]
+    hits = [p for p in sorted(INPUT.rglob(f"{case}.npz")) if is_reference_path(p)]
     if not hits:
         raise SystemExit(f"STOP G-feat: no earlier {case}.npz under {INPUT} (attach v9-x3-fold1 and v9-x3-fold3)")
     if len({p.stat().st_size for p in hits}) != 1:
@@ -709,7 +782,7 @@ def run_chb(cases_df, complete, earlier, cases=None, workers=None, repo_commit=N
     views = {"earlier": str(earlier), "complete": str(complete)}
     scratch_out = SCRATCH / "build"
     logs = out_dir() / "logs"
-    gates = dict(G_stats={}, G_feat={}, jobs={}, status="RUNNING", tolerances=TOL)
+    gates = dict(G_stats={}, G_feat={}, jobs={}, status="RUNNING", tolerances=TOL, gfeat_scope=GFEAT_SCOPE)
     refs, bad = reference_preflight(cases)
     gates["references"] = refs
     if bad:
@@ -737,7 +810,9 @@ def run_chb(cases_df, complete, earlier, cases=None, workers=None, repo_commit=N
                                                         or res.get("g_feat", {}).get("status") != "PASS"))
         log(f"{c}:{k} {'FAIL' if fail else 'ok'}{' (reused)' if res.get('reused') else ''} in {res['wall_s'] or 0:.0f} s "
             f"({h:.1f} h EEG)" + (f" G-stats {res['g_stats']['status']}" if "g_stats" in res else "")
-            + (f" G-feat {res['g_feat']['status']}" if "g_feat" in res else ""))
+            + (f" G-feat {res['g_feat']['status']} (scope {res['g_feat'].get('gate_scope')}; all windows "
+               f"{res['g_feat'].get('status_all_windows')}; signal-loss windows "
+               f"{res['g_feat'].get('windows', {}).get('signal_loss', {}).get('n_windows')})" if "g_feat" in res else ""))
         if fail:
             if pool is not None:
                 pool.terminate()

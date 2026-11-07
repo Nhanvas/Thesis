@@ -10,6 +10,11 @@ never on Kaggle, never on real data). Builds:
 Then runs R0_SMOKE, R0_CHB, R0_EXT cell by cell (the %%writefile cell is emulated) and checks: every gate PASS,
 datasets complete, gap files downloaded, diff report, external hours; and two negative paths: a perturbed committed
 stats.json must STOP G-stats, a flipped flag in an earlier .npz must STOP G-feat.
+D14b-F additions (07/11): the reference of chb03 (which has flat, signal-loss windows) is perturbed INSIDE its
+signal-loss windows (one f7 cell NaN, bp5 + 3.8, adjacency replaced: what R0_CHB v2 met at chb17) -> G-feat all windows
+FAIL, chain windows PASS, R0_CHB PASS; R0_DIAG17 on chb03 localizes exactly those windows and cells, replicates the record
+filter bit-equal and shows the conditioning contrast; a perturbation OUTSIDE the signal-loss windows -> R0_CHB STOP and
+the diagnosis reports it; the resumed run compares with the v9-x3-fold reference, never with the attached job copy.
   python src/r2_synthetic_test.py [--root DIR]
 """
 import argparse
@@ -218,7 +223,7 @@ for i, case in enumerate(cases):
 def run_notebook(nb_path, env):
     """executes the code cells in one namespace (as Kaggle would); %%writefile is emulated with IPython-style {var}."""
     os.environ.update(env)
-    sys.modules.pop("r2_core", None)             # a fresh import per notebook (Kaggle starts a new kernel)
+    [sys.modules.pop(m, None) for m in ("r2_core", "r2_diag")]             # a fresh import per notebook (Kaggle starts a new kernel)
     nb = json.loads(Path(nb_path).read_text())
     ns = {"__name__": "__main__"}
     t = time.time()
@@ -234,11 +239,11 @@ def run_notebook(nb_path, env):
         try:
             exec(compile(src, f"{Path(nb_path).name}[cell {i}]", "exec"), ns)
         except BaseException:
-            sys.modules.pop("r2_core", None)
+            [sys.modules.pop(m, None) for m in ("r2_core", "r2_diag")]
             sys.path[:] = [x for x in sys.path if "/scratch_" not in x]
             raise
     print(f"--- {Path(nb_path).name} done in {time.time() - t:.0f} s")
-    sys.modules.pop("r2_core", None)
+    [sys.modules.pop(m, None) for m in ("r2_core", "r2_diag")]
     sys.path[:] = [x for x in sys.path if "/scratch_" not in x]
     return ns
 
@@ -257,6 +262,18 @@ def main():
     rec.write_text(RECORD)
     subprocess.check_call([sys.executable, "-I", str(rec), str(repo), str(lap), str(out1), str(out3), ",".join(CHB)])
     subprocess.check_call([sys.executable, str(ROOT / "src" / "r2_make_notebooks.py")])
+    # D14b-F: what R0_CHB v2 met at chb17 -- the reference differs only inside signal-loss windows
+    r03 = out1 / "chb03.npz"
+    z = dict(np.load(r03, allow_pickle=True))
+    sl03 = np.flatnonzero(z["is_signal_loss"])
+    assert len(sl03) >= 4, sl03
+    for k in ("f7", "bp5", "adj"):
+        z[k] = z[k].copy()
+    z["f7"][sl03[1], 2, 6] = np.nan
+    z["bp5"][sl03[2]] += 3.8
+    z["adj"][sl03[:3]] = np.random.default_rng(7).random((3, 18, 18)).astype(np.float16)
+    np.savez(r03, **z)
+    pert03 = sorted(set(int(x) for x in sl03[:3]))
     # like the record's chb07: one reference saved without skipped_files (chb12, which has a design skip)
     z = dict(np.load(out1 / "chb12.npz", allow_pickle=True))
     z.pop("skipped_files")
@@ -313,7 +330,7 @@ def main():
     pj2 = Rm.projection(cdf, ext_rate_s_per_h=np.float64(11.6))
     assert pj2["parallel_slowdown"] > 1 and type(pj2["split_R0_CHB"]) is bool and type(pj2["split_R0_EXT"]) is bool
     json.dumps(pj2)
-    sys.modules.pop("r2_core", None)
+    [sys.modules.pop(m, None) for m in ("r2_core", "r2_diag")]
     results["projection, slowdown > 1"] = "PASS (serialisable)"
     # ---- R0_CHB
     run_notebook(nbdir / "R0_CHB.ipynb", env("chb"))
@@ -341,7 +358,34 @@ def main():
     assert rf["chb03"]["sha_equal_provenance_v2"] is True and rf["chb21"]["sha_equal_provenance_v2"] is False
     assert rf["chb24"]["sha_equal_provenance_v2"] is None and "skipped_files" not in rf["chb12"]["keys"]
     assert not (ch / "r2" / "r0_jobs").exists(), "job folders left in the output after success"
-    results["R0_CHB"] = "PASS (incl. reference without skipped_files, provenance sha reported)"
+    g03 = g["G_feat"]["chb03"]
+    assert g03["status_all_windows"] == "FAIL" and g03["status_chain_windows"] == "PASS" and g03["status"] == "PASS", g03
+    assert g03["windows"]["signal_loss"]["n_windows"] == len(sl03) and g03["f7_finite_mask_diff"] == 1, g03
+    assert g["gfeat_scope"] == "chain" and all(v["status_all_windows"] == "PASS" for c, v in g["G_feat"].items() if c != "chb03")
+    assert all("v9-x3-fold" in r["path"] for r in g["references"].values()), g["references"]
+    results["R0_CHB"] = ("PASS (incl. reference without skipped_files, provenance sha reported; chb03 differing only in "
+                         "signal-loss windows: all-window reading FAIL, chain reading PASS)")
+    # ---- R0_DIAG17 on chb03 (synthetic stand-in for chb17)
+    ns = run_notebook(nbdir / "R0_DIAG17.ipynb", dict(env("diag"), R2_TEST_DIAG_CASE="chb03"))
+    dg = root / "work_diag" / "r2" / "r0_data" / "chb03_diag"
+    sm3 = json.loads((dg / "summary.json").read_text())
+    import pandas as pd
+    wl = pd.read_csv(dg / "windows_listed.csv")
+    over = sorted(wl[wl.beyond_tolerance].window.tolist())
+    assert over == pert03 and sm3["beyond_tolerance_outside_signal_loss"] == 0, (over, pert03, sm3)
+    assert sm3["gfeat_all_windows"] == "FAIL" and sm3["gfeat_chain_windows"] == "PASS", sm3
+    cn = pd.read_csv(dg / "cells_nonfinite.csv")
+    assert len(cn) == 1 and cn.iloc[0].window == sl03[1] and cn.iloc[0].channel == 2 and cn.iloc[0].feature == "slog1p_kurtosis", cn
+    cs = pd.read_csv(dg / "conditioning_summary.csv")
+    assert cs.replica_filter_bit_equal.all() and (cs.recomputed_vs_build_f7_max == 0).all() and (cs.recomputed_vs_build_adj_entries == 0).all(), cs
+    assert cs.signal_loss_rule_recomputed_equal.all(), cs
+    sc = pd.read_csv(dg / "reference_scan.csv")
+    assert int(sc[sc.case == "chb03"].signal_loss.iloc[0]) == len(sl03)
+    assert (dg / "SUMMARY.md").exists() and "runtime_h" in json.loads((dg / "run_meta.json").read_text())
+    con = cs.set_index("group")
+    results["R0_DIAG17"] = (f"PASS (localized windows {over} = perturbed; non-finite cell found; record filter replica "
+                            f"bit-equal; conditioning: scaled bp5 median signal-loss {con.loc['signal_loss', 'scaled_bp5_median']:.3g} "
+                            f"vs other {con.loc['other', 'scaled_bp5_median']:.3g})")
     # ---- R0_EXT
     run_notebook(nbdir / "R0_EXT.ipynb", env("ext"))
     ex = root / "work_ext" / "thesis-r2-external-features"
@@ -398,6 +442,26 @@ def main():
     assert all(same_npz(ds / f"{c}.npz", ds2 / f"{c}.npz") for c in CHB)
     shutil.rmtree(prev.parents[1])
     results["R0_CHB resume"] = f"PASS ({len(reused)} jobs reused: {reused}; dataset arrays identical)"
+    assert all("v9-x3-fold" in r["path"] for r in g2["references"].values()), "resume compared with a job copy"
+    assert g2["G_feat"]["chb03"]["status_all_windows"] == "FAIL" and g2["G_feat"]["chb03"]["status"] == "PASS"
+    # ---- a difference OUTSIDE the signal-loss windows -> R0_CHB STOP at chb03, the diagnosis reports it
+    keep03 = r03.read_bytes()
+    z = dict(np.load(r03, allow_pickle=True))
+    w_out = int(np.flatnonzero(~z["is_signal_loss"] & ~z["is_ictal"])[40])
+    z["bp5"] = z["bp5"].copy()
+    z["bp5"][w_out, 0, 0] += 0.01
+    np.savez(r03, **z)
+    try:
+        run_notebook(nbdir / "R0_CHB.ipynb", env("neg4"))
+        raise AssertionError("chain G-feat did not stop")
+    except RuntimeError as e:
+        assert "STOPPED" in str(e) and "chb03" in str(e), e
+        assert not (root / "work_neg4" / "thesis-r2-chbmit-features").exists()
+    run_notebook(nbdir / "R0_DIAG17.ipynb", dict(env("diag2"), R2_TEST_DIAG_CASE="chb03"))
+    sm4 = json.loads((root / "work_diag2" / "r2" / "r0_data" / "chb03_diag" / "summary.json").read_text())
+    assert sm4["beyond_tolerance_outside_signal_loss"] == 1 and sm4["gfeat_chain_windows"] == "FAIL", sm4
+    r03.write_bytes(keep03)
+    results["negative chain G-feat"] = f"STOP at chb03 (bp5 +0.01 in window {w_out}, not signal-loss); diagnosis reports 1 window outside"
     # ---- reference missing a required key -> STOP at the preflight, before any build
     r24 = out1 / "chb24.npz"
     keep24 = r24.read_bytes()

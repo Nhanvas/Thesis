@@ -1,0 +1,22 @@
+{
+ "computed_estimate": true,
+ "workers": 4,
+ "chb_s_per_eeg_h_per_worker": 1.56,
+ "ext_s_per_eeg_h_per_worker": 2.22,
+ "task_overhead_s": 24.0,
+ "chb_hours_earlier": 953.6,
+ "chb_hours_new": 958.6,
+ "ext_hours": 162.3,
+ "r10_h": 0.25,
+ "steps_per_seed": 1692400,
+ "ms_per_step_4_concurrent": 8.167,
+ "train_nonepoch_s": 51.8,
+ "train_h": 3.85,
+ "r13_h": 0.26,
+ "gfeat_reread_h": 0.0,
+ "setup_h": 0.25,
+ "total_h": 4.62,
+ "limit_h": 10.5,
+ "split": false,
+ "note": "largest per-case rate used (conservative); training = slowest of 4 concurrent 2-epoch jobs"
+}

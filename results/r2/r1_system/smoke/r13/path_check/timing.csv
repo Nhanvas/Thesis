@@ -1,0 +1,5 @@
+case,src,label,windows,eeg_h,valid,d_s,finite,peak_rss_mb,score_s
+chb01,new,path_check,36496,40.55111111111111,36495,49.8,True,868.1,7.3
+chb10,new,path_check,45020,50.022222222222226,45020,55.4,True,917.0,8.1
+chb03,new,path_check,34201,38.00111111111111,34201,53.7,True,854.6,6.7
+PN00,ext,path_check,2918,3.2422222222222223,2918,5.3,True,846.9,0.8

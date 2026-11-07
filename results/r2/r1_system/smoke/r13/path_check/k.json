@@ -1,0 +1,10 @@
+{
+ "k": 5.050719318175,
+ "k_record": 4.067744298524509,
+ "cases": [
+  "chb01",
+  "chb10"
+ ],
+ "seed": "clean_seed42",
+ "rule": "p3_levers.calibrate: median over patients of q_i(k) = 0.005 (label-free)"
+}

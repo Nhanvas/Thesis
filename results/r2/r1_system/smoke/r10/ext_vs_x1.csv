@@ -1,0 +1,17 @@
+subject,point,seed,stage,tp,tp_ref,fp,fp_ref,dtp,dfp
+PN00,balanced,clean_seed1,detector,3,3,2,2,0,0
+PN00,balanced,clean_seed1,localized,3,3,2,2,0,0
+PN00,balanced,clean_seed2,detector,4,4,2,2,0,0
+PN00,balanced,clean_seed2,localized,4,4,2,2,0,0
+PN00,balanced,clean_seed3,detector,3,3,1,1,0,0
+PN00,balanced,clean_seed3,localized,3,3,1,1,0,0
+PN00,balanced,clean_seed42,detector,5,5,1,1,0,0
+PN00,balanced,clean_seed42,localized,5,5,1,1,0,0
+PN00,sensitivity,clean_seed1,detector,3,3,2,2,0,0
+PN00,sensitivity,clean_seed1,localized,3,3,2,2,0,0
+PN00,sensitivity,clean_seed2,detector,4,4,2,2,0,0
+PN00,sensitivity,clean_seed2,localized,4,4,2,2,0,0
+PN00,sensitivity,clean_seed3,detector,3,3,1,1,0,0
+PN00,sensitivity,clean_seed3,localized,3,3,1,1,0,0
+PN00,sensitivity,clean_seed42,detector,5,5,1,1,0,0
+PN00,sensitivity,clean_seed42,localized,5,5,1,1,0,0

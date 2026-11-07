@@ -1,0 +1,69 @@
+{
+ "case": "chb17",
+ "reference": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb17.npz",
+ "reference_sha256": "38dba59a2d011f10a357d98670afebfb6c5408a6fe69fa7a4a406f8a8071bced",
+ "build_s": 308.9,
+ "windows": 18906,
+ "signal_loss_windows": 534,
+ "beyond_tolerance_windows": 3226,
+ "beyond_tolerance_in_signal_loss": 529,
+ "beyond_tolerance_outside_signal_loss": 2697,
+ "signal_loss_windows_within_tolerance": 5,
+ "files_with_beyond_tolerance": [
+  "chb17a_03.edf",
+  "chb17a_04.edf",
+  "chb17a_05.edf",
+  "chb17a_06.edf",
+  "chb17a_08.edf",
+  "chb17b_57.edf",
+  "chb17b_58.edf",
+  "chb17b_59.edf",
+  "chb17b_60.edf",
+  "chb17b_63.edf",
+  "chb17b_67.edf",
+  "chb17b_68.edf",
+  "chb17b_69.edf",
+  "chb17c_02.edf",
+  "chb17c_03.edf",
+  "chb17c_04.edf",
+  "chb17c_05.edf",
+  "chb17c_06.edf",
+  "chb17c_07.edf",
+  "chb17c_08.edf",
+  "chb17c_13.edf"
+ ],
+ "files_with_signal_loss": [
+  "chb17b_69.edf"
+ ],
+ "min_windows_from_beyond_tolerance_outside_sl_to_signal_loss": 3.0,
+ "nonfinite_flip_cells": 1,
+ "gfeat_all_windows": "FAIL",
+ "gfeat_chain_windows": "PASS",
+ "gfeat_status_with_scope": "PASS",
+ "gfeat_scope": "chain",
+ "outside_signal_loss_distribution": {
+  "f7_outside_sl_quantiles": {
+   "50": 0.0,
+   "99": 0.0,
+   "100": 9.5367431640625e-07
+  },
+  "bp5_outside_sl_quantiles": {
+   "50": 0.0,
+   "99": 0.0,
+   "100": 3.5762786865234375e-07
+  },
+  "zgamma_outside_sl_quantiles": {
+   "50": 0.0,
+   "99": 0.0,
+   "100": 2.9802322387695312e-08
+  }
+ },
+ "reference_cases_with_signal_loss": {
+  "chb01": 1,
+  "chb04": 2,
+  "chb07": 4,
+  "chb09": 3,
+  "chb12": 1,
+  "chb17": 534
+ }
+}

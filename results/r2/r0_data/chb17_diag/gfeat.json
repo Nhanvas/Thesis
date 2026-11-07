@@ -1,0 +1,70 @@
+{
+ "files_equal": true,
+ "n_windows": [
+  18906,
+  18906
+ ],
+ "keys_only_in_new": [],
+ "keys_only_in_reference": [],
+ "skipped_equal": true,
+ "is_ictal_equal": true,
+ "is_buffer_equal": true,
+ "is_flag5sd_equal": true,
+ "is_signal_loss_equal": true,
+ "file_idx_equal": true,
+ "exact_on_all_windows": true,
+ "f7_max_abs": Infinity,
+ "f7_finite_mask_diff": 1,
+ "bp5_max_abs": 3.8435423374176025,
+ "bp5_finite_mask_diff": 0,
+ "adj_frac_differing": 0.009168002058266171,
+ "zgamma_raw_max_abs": 0.005245152860879898,
+ "windows": {
+  "all": {
+   "n_windows": 18906,
+   "f7_max_abs": Infinity,
+   "f7_finite_mask_diff": 1,
+   "f7_windows_over_tol": 528,
+   "bp5_max_abs": 3.8435423374176025,
+   "bp5_finite_mask_diff": 0,
+   "bp5_windows_over_tol": 527,
+   "zgamma_raw_max_abs": 0.005245152860879898,
+   "zgamma_raw_finite_mask_diff": 0,
+   "adj_frac_differing": 0.009168002058266171,
+   "adj_windows_differing": 3226,
+   "status": "FAIL"
+  },
+  "chain": {
+   "n_windows": 18372,
+   "f7_max_abs": 9.5367431640625e-07,
+   "f7_finite_mask_diff": 0,
+   "f7_windows_over_tol": 0,
+   "bp5_max_abs": 3.5762786865234375e-07,
+   "bp5_finite_mask_diff": 0,
+   "bp5_windows_over_tol": 0,
+   "zgamma_raw_max_abs": 2.9802322387695312e-08,
+   "zgamma_raw_finite_mask_diff": 0,
+   "adj_frac_differing": 0.000453084806992928,
+   "adj_windows_differing": 2697,
+   "status": "PASS"
+  },
+  "signal_loss": {
+   "n_windows": 534,
+   "f7_max_abs": Infinity,
+   "f7_finite_mask_diff": 1,
+   "f7_windows_over_tol": 528,
+   "bp5_max_abs": 3.8435423374176025,
+   "bp5_finite_mask_diff": 0,
+   "bp5_windows_over_tol": 527,
+   "zgamma_raw_max_abs": 0.005245152860879898,
+   "zgamma_raw_finite_mask_diff": 0,
+   "adj_frac_differing": 0.3090003236694872,
+   "adj_windows_differing": 529,
+   "status": "FAIL"
+  }
+ },
+ "status_all_windows": "FAIL",
+ "status_chain_windows": "PASS",
+ "gate_scope": "chain",
+ "status": "PASS"
+}

@@ -932,6 +932,32 @@ def r13(cases_dev, cases_test, cases_ext, models_dir, label, workers=None):
     return k, sres, dres
 
 
+def rescore(cases_src, d_label, out_label, k, workers=None):
+    """scoring only, from distances already stored under d_label, at a given k; outputs under r13/<out_label>."""
+    workers = workers or n_workers()
+    o = out_dir() / "r13" / out_label
+    o.mkdir(parents=True, exist_ok=True)
+    sres = scoring(cs := list(cases_src), d_label, k, "r13", workers)
+    pd.DataFrame([r for c, _ in cs for r in sres[c]["rows"]]).to_csv(o / "per_subject.csv", index=False)
+    pd.DataFrame([r for c, _ in cs for r in sres[c]["errs"]]).to_csv(o / "errors.csv", index=False)
+    pd.DataFrame([r for c, _ in cs for r in sres[c]["q"]]).to_csv(o / "q.csv", index=False)
+    _jdump(o / "k.json", dict(k=k, k_record=K_RECORD, distances_from=d_label, rule="fixed k (no calibration)"))
+    return sres
+
+
+def counterfactual(cases_dev, cases_test, cases_ext, workers=None):
+    """descriptive decomposition of rerun - record (plan §12 07/11 18:55): the COMMITTED checkpoints on the NEW data
+    (CHB-MIT complete .npz; external R0.4 features), scored (i) with k recomputed by p3_levers.calibrate (label 'cf') and
+    (ii) at the record's k (label 'cf_krec', same distances). Then cf_krec - record = data, cf - cf_krec = k,
+    rerun - cf = new models (training on complete data + retraining randomness). Scoring only, no training."""
+    t = time.time()
+    k, _, _ = r13(cases_dev, cases_test, cases_ext, REPO / "data" / "models_v2", "cf", workers)
+    cs = [(c, "new") for c in list(cases_dev) + list(cases_test)] + [(c, "ext") for c in cases_ext]
+    rescore(cs, "cf", "cf_krec", K_RECORD, workers)
+    phase("counterfactual", t)
+    return k
+
+
 # ============================================================================ projection (computed estimate)
 def projection(r10_timing, train_smoke, views, gfeat_s_per_case=None, limit_h=REFUSE_H):
     """R1_RUN wall time from smoke measurements: R1.0 distances + scoring (s per hour of EEG per worker, measured on

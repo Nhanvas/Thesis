@@ -22,7 +22,9 @@ Checks that do not depend on the generated record (non-circular):
       record dump code's float32 assignment (p2_test_dump.dump on the fake test case).
 Notebook runs: R1_SMOKE PASS; negative paths: a perturbed p3c_freeze row -> STOP R1.0-dev; a perturbed e23 error pair
 -> STOP R1.0-test; an x1 row fp + 2 -> GE PASS (not exact), fp + 3 -> STOP GE; a changed dataset stats json -> STOP
-G-data. R1_RUN (epochs reduced by R2_TEST_EPOCHS in test mode only) PASS with hashes pinned to the smoke's; a resumed
+G-data. R1_RUN (epochs reduced by R2_TEST_EPOCHS in test mode only) PASS with hashes pinned to the smoke's, incl. the
+counterfactual folders; the aggregate (src/r2_r1_aggregate.py) on that output: A1 and its self-check PASS, every table;
+the aggregate's A0 on the REAL record files of this clone PASS and STOP on one changed count; a resumed
 R1_RUN (previous output attached) reuses the 4 seeds and reproduces R1.3 byte for byte; a pinned hash that differs ->
 STOP G-data.
   python src/r2_r1_synthetic_test.py [--root DIR]
@@ -348,6 +350,32 @@ def run(script, env, args=(), expect_fail=None):
     return tail
 
 
+def a0_real(root):
+    """gate A0 of the aggregate on the REAL committed record files (this clone): PASS; then the same on a copy with
+    one record count changed: STOP."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("R2_TEST")}
+    env.pop("R2_TEST", None)
+    env["THESIS_REPO"] = str(ROOT)
+    p = subprocess.run([sys.executable, str(ROOT / "src" / "r2_r1_aggregate.py"), "--a0-only"], env=env,
+                       capture_output=True, text=True)
+    assert p.returncode == 0 and "A0 PASS" in p.stdout, p.stdout[-2000:] + p.stderr[-2000:]
+    cp = root / "a0_neg"
+    shutil.copytree(ROOT / "src", cp / "src", ignore=shutil.ignore_patterns("__pycache__"))
+    for sub in ("p3c_freeze", "e23_test_look7", "e22_test_oneshot", "x1_external", "p3_levers"):
+        shutil.copytree(ROOT / "results" / sub, cp / "results" / sub)
+    import pandas as pd
+    f = cp / "results" / "e23_test_look7" / "per_subject_seed.csv"
+    d = pd.read_csv(f)
+    i = d[(d.point == "balanced") & (d.stage == "localized") & (d.seed == "clean_seed42")].index[0]
+    d.loc[i, "tp"] += 1
+    d.to_csv(f, index=False)
+    env["THESIS_REPO"] = str(cp)
+    p = subprocess.run([sys.executable, str(cp / "src" / "r2_r1_aggregate.py"), "--a0-only"], env=env,
+                       capture_output=True, text=True)
+    assert p.returncode != 0 and "STOP A0" in (p.stdout + p.stderr), p.stdout[-1500:]
+    print("aggregate A0 on the real record: PASS (23 locked numbers); one changed record count -> STOP")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="/tmp/r2_r1_synth")
@@ -355,6 +383,7 @@ def main():
     t0 = time.time()
     root = Path(a.root)
     repo, inp = build_world(root)
+    a0_real(root)
     for name, body in (("record_gen.py", RECORD_GEN), ("check_n1.py", CHECK_N1), ("runner.py", RUNNER)):
         (root / name).write_text(body)
     base = dict(R2_TEST="1", THESIS_REPO=str(repo), R2_INPUT=str(inp), R1_SRC=str(repo / "src"), OMP_NUM_THREADS="1",
@@ -363,7 +392,8 @@ def main():
     print(run(root / "check_n1.py", dict(base, R2_WORK=str(root / "gen_work"), R2_SCRATCH=str(root / "gen_scratch"))))
     nbdir = root / "notebooks"
     env_b = dict(os.environ, R2_NB_OUTDIR=str(nbdir))
-    subprocess.check_call([sys.executable, str(ROOT / "src" / "r2_r1_make_notebooks.py"), "--run", "0" * 40], env=env_b)
+    subprocess.check_call([sys.executable, str(ROOT / "src" / "r2_r1_make_notebooks.py"), "--smoke", "--run", "0" * 40],
+                          env=env_b)
 
     def nb_env(tag, extra=None):
         e = dict(R2_TEST_REPO=str(repo), R2_TEST_INPUT=str(inp), R2_TEST_WORK=str(root / f"work_{tag}"),
@@ -438,6 +468,24 @@ def main():
     rr = root / "work_run" / "r2" / "r1_system" / "run"
     for f in ("per_subject.csv", "errors.csv", "q.csv", "k.json", "timing.csv"):
         assert (rr / "r13" / "run" / f).exists(), f
+    for lab in ("cf", "cf_krec"):                       # counterfactual: committed checkpoints on the new data
+        for f in ("per_subject.csv", "errors.csv", "q.csv", "k.json"):
+            assert (rr / "r13" / lab / f).exists(), (lab, f)
+    assert json.loads((rr / "r13" / "cf_krec" / "k.json").read_text())["k"] == json.loads(
+        (repo / "results" / "p3_levers" / "calibration.json").read_text())["k"]
+    # the aggregate (committed before R1_RUN): A1 + self-check PASS; every system and step present
+    agg_env = dict(R2_TEST="1", THESIS_REPO=str(repo), PYTHONHASHSEED="0",
+                   R2_TEST_N_CASES=json.dumps({"development": 15, "test": 8, "chb24": 1, "siena": 2}))
+    run(repo / "src" / "r2_r1_aggregate.py", agg_env, ["--run", rr])
+    ag = {g["gate"]: g for g in json.loads((rr / "aggregate" / "gates.json").read_text())}
+    assert ag["A1"]["status"] == "PASS" and ag["A1-self"]["status"] == "PASS", ag
+    Fs = pd.read_csv(rr / "aggregate" / "summary.csv")
+    assert set(Fs.system) == {"record", "rerun", "cf", "cf_krec"}, set(Fs.system)
+    Bs = pd.read_csv(rr / "aggregate" / "bootstrap.csv")
+    assert set(Bs.step) == {"rerun - record", "data (cf_krec - record)", "k (cf - cf_krec)", "new models (rerun - cf)"}
+    for f in ("rows_vs_record.csv", "per_subject.csv", "attribution.csv", "errors.csv", "SUMMARY.md"):
+        assert (rr / "aggregate" / f).exists(), f
+    print("aggregate on the synthetic run: A1, A1-self PASS; 4 systems, 4 steps, all tables written")
     P = pd.read_csv(rr / "r13" / "run" / "per_subject.csv")
     assert set(P.set) == {"development", "test", "external"} and set(P.budget) == {"frozen", "L2", "L2f", "S"}
     assert len(P) == (15 + 8 + 3) * 4 * 4 * 3, len(P)

@@ -3,9 +3,10 @@
 rev 2, §5 and §9; plan §12 rows from 07/11 D15-F) from src/r2_r1.py (embedded verbatim with %%writefile; sha256 checked
 in the notebook). The repository is cloned at a pinned commit for the record code, the committed checkpoints and
 results it reads, and r2_core.py (stage R0, sha checked). Nothing to fill in.
-  python src/r2_r1_make_notebooks.py                 -> notebooks/r2/R1_SMOKE.ipynb (clone pinned at tag r2-r0)
-  python src/r2_r1_make_notebooks.py --run <commit>  -> also notebooks/r2/R1_RUN.ipynb, cloned at <commit>, which must
-                                                        hold the committed R1_SMOKE output (data hashes are pinned to it)
+  python src/r2_r1_make_notebooks.py --smoke          -> notebooks/r2/R1_SMOKE.ipynb (clone pinned at tag r2-r0; the
+                                                        committed one, r2_r1 sha b865507a, is the record of what ran)
+  python src/r2_r1_make_notebooks.py --run <commit>   -> notebooks/r2/R1_RUN.ipynb, cloned at <commit>, which must hold
+                                                        the committed R1_SMOKE output (data hashes are pinned to it)
 Test mode (synthetic data, build container only): environment R2_TEST_REPO / R2_TEST_INPUT / R2_TEST_WORK /
 R2_TEST_SCRATCH (src/r2_r1_synthetic_test.py)."""
 import argparse
@@ -203,12 +204,13 @@ def run(commit):
              "G-data (hashes pinned to R1_SMOKE's committed `data_sha256.csv`; R0's G-feat re-read on the 22 gap-free "
              "cases); G-const, G-count; **R1.0 in full** (15 development + 8 test cases, 4 seeds, every record row) + "
              "**G-k** + **GE** (chb24 + Siena 14); G-vec; **R1.1** training of 4 seeds, 200 epochs (4 workers; refused "
-             "if the measured step time projects past the session); **R1.2** k; **R1.3** scoring of every set. "
+             "if the measured step time projects past the session); **R1.2** k; **R1.3** scoring of every set; a "
+             "**counterfactual** (committed checkpoints on the new data, k recomputed and at the record's k; scoring only). "
              "**Resumable:** attach this notebook's previous output and finished seeds are reused (code sha and "
              "checkpoint hash checked).",
              INPUTS + "; to resume, also this notebook's previous output",
              "`/kaggle/working/r2/r1_system/run/` (→ `results/r2/r1_system/run/`; checkpoints ≈ 20 KB each)",
-             "see `projection.json` of R1_SMOKE"),
+             "≈ 5 h (computed: R1_SMOKE `projection.json` 4.6 h + counterfactual ≈ 0.4 h)"),
         setup(n, commit), code("%%writefile {SRC}/r2_r1.py\n" + CORE), start("run"),
         code("""
 # RESUME + VIEWS + G-data (hashes pinned to the smoke's)
@@ -255,13 +257,29 @@ except SystemExit as e:
     stopped(e)
 print("R1.3 written:", sorted(p.name for p in (R1.out_dir() / "r13" / "run").iterdir()))
 """),
+        code("""
+# COUNTERFACTUAL (descriptive, plan §12 07/11 18:55): committed checkpoints on the new data, k recomputed ('cf') and at
+# the record's k ('cf_krec'); lets the aggregate split rerun - record into data, k and new models. Scoring only.
+if R1.hours() < R1.SESSION_STOP_H - 1.0:
+    try:
+        R1.counterfactual(R1.DEV, R1.TEST, R1.EXT)
+    except SystemExit as e:
+        stopped(e)
+    print("counterfactual written:", sorted(p.name for p in (R1.out_dir() / "r13").iterdir()))
+else:
+    R1.STATE["notes"].append("counterfactual skipped: session time")
+    print("counterfactual SKIPPED (session time); rerun R1.3 outputs are complete")
+"""),
         end(),
     ])
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run", metavar="COMMIT", help="also build R1_RUN, cloned at COMMIT (must hold R1_SMOKE's output)")
+    ap.add_argument("--smoke", action="store_true", help="build R1_SMOKE (the committed one is the record of what ran)")
+    ap.add_argument("--run", metavar="COMMIT", help="build R1_RUN, cloned at COMMIT (must hold R1_SMOKE's output)")
     a = ap.parse_args()
-    built = [smoke()] + ([run(a.run)] if a.run else [])
+    if not (a.smoke or a.run):
+        ap.error("nothing to build: --smoke and/or --run COMMIT")
+    built = ([smoke()] if a.smoke else []) + ([run(a.run)] if a.run else [])
     print("built", [b.name for b in built], "r2_r1 sha", SHA)

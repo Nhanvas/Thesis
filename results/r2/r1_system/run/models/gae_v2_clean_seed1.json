@@ -1,0 +1,82 @@
+{
+ "variant": "clean",
+ "seed": 1,
+ "in_dim": 30,
+ "out_x": 12,
+ "n_add": 7,
+ "add_features": [
+  "logbp_delta",
+  "logbp_theta",
+  "logbp_alpha",
+  "logbp_beta",
+  "logbp_gamma",
+  "log_linelen",
+  "slog_kurtosis"
+ ],
+ "add_mean": [
+  -3.9121946100705083,
+  -4.95208265546866,
+  -6.04597838181873,
+  -7.472773277066605,
+  -9.305438767682837,
+  -2.7021312438879845,
+  0.41017760298382416
+ ],
+ "add_std": [
+  1.372913192636385,
+  1.332788465403198,
+  1.2375521211483997,
+  1.3627706804868969,
+  1.7042912257066862,
+  0.6918915782857674,
+  0.6346908552923572
+ ],
+ "clip": 4.0,
+ "n_train": {
+  "chb01": 15410,
+  "chb02": 17805,
+  "chb04": 94450,
+  "chb05": 18681,
+  "chb07": 28016,
+  "chb08": 7549,
+  "chb09": 36432,
+  "chb12": 7459,
+  "chb19": 12925,
+  "chb20": 11854,
+  "chb21": 11619,
+  "chb23": 8558
+ },
+ "n_val": {
+  "chb10": 28530,
+  "chb11": 16067,
+  "chb22": 11473
+ },
+ "epochs": 200,
+ "batch": 32,
+ "lr": 0.001,
+ "lambda_": 0.1,
+ "final_train": 0.01589581090401761,
+ "final_val": 0.020844111434912032,
+ "val_sanity_auroc": {
+  "chb10": 0.2632,
+  "chb11": 0.7592,
+  "chb22": 0.5117
+ },
+ "elapsed_s": 14039,
+ "loop": "f1_core.train (tensor loop; G-vec)",
+ "device": "cpu",
+ "threads": 1,
+ "torch": "2.11.0+cpu",
+ "first_loss": 0.01817847047397953,
+ "last_loss": 0.01589581090401761,
+ "G2": "PASS",
+ "n_params": 3964,
+ "ms_per_step": 8.263,
+ "fit_s": 13984.3,
+ "load_s": 9.8,
+ "val_and_sanity_s": 43.5,
+ "smoke": false,
+ "r2_r1_sha256": "b865507af380c19938073f2e1ad81b1ad2d2c121c2b731bedf082a75feebae16",
+ "note": "validation loss computed once after the last epoch (the record logged it every epoch; it never affects training); loss curve in training/training_log_seed{s}.csv (no .npz: never committed); plan \u00a712 07/11 16:40",
+ "checkpoint_sha256": "0f92cb04b1767f7a1edc5a2d9032d5bcd2f824dfca2029b57be6c5f6ad49c47d"
+}

@@ -1,0 +1,1141 @@
+[
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "bad": [],
+  "files_hashed": 63,
+  "pinned": {
+   "file": "results/r2/r1_system/smoke/data_sha256.csv",
+   "files_compared": 63,
+   "differ": []
+  },
+  "gfeat_reread": {
+   "chb01": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 3.814697265625e-06,
+    "bp5": 4.76837158203125e-07,
+    "adj": 0.0004090700738643379
+   },
+   "chb02": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 4.76837158203125e-07,
+    "bp5": 2.2351741790771484e-07,
+    "adj": 0.00040667341149397927
+   },
+   "chb03": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 4.76837158203125e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.00043984707688498025
+   },
+   "chb04": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 7.152557373046875e-07,
+    "adj": 0.00042853572850985944
+   },
+   "chb05": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 3.5762786865234375e-07,
+    "adj": 0.0003376403581520099
+   },
+   "chb06": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.00043058793058793057
+   },
+   "chb07": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 3.814697265625e-06,
+    "bp5": 4.76837158203125e-07,
+    "adj": 0.0004421373915858042
+   },
+   "chb08": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 4.76837158203125e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.0003964948008269308
+   },
+   "chb09": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 2.288818359375e-05,
+    "bp5": 9.5367431640625e-07,
+    "adj": 0.00035727597836009216
+   },
+   "chb10": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 2.980232238769531e-07,
+    "adj": 0.0003335965908156046
+   },
+   "chb12": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 4.76837158203125e-07,
+    "bp5": 2.682209014892578e-07,
+    "adj": 0.0003310904730830243
+   },
+   "chb13": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 3.5762786865234375e-07,
+    "adj": 0.0003587313463856674
+   },
+   "chb14": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.00040993985438429883
+   },
+   "chb15": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 4.76837158203125e-07,
+    "adj": 0.00039334537455325427
+   },
+   "chb16": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 4.76837158203125e-07,
+    "adj": 0.0004304743339831059
+   },
+   "chb17": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "FAIL",
+    "f7": 9.5367431640625e-07,
+    "bp5": 3.5762786865234375e-07,
+    "adj": 0.000453084806992928
+   },
+   "chb18": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 3.5762786865234375e-07,
+    "adj": 0.0004575253977603006
+   },
+   "chb19": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.00046165671165671166
+   },
+   "chb20": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 4.76837158203125e-07,
+    "bp5": 2.980232238769531e-07,
+    "adj": 0.0003747591277953477
+   },
+   "chb22": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 5.960464477539062e-07,
+    "adj": 0.0004216698479953205
+   },
+   "chb23": {
+    "status": "PASS",
+    "scope": "chain",
+    "all_windows": "PASS",
+    "f7": 9.5367431640625e-07,
+    "bp5": 2.384185791015625e-07,
+    "adj": 0.00039542331732010953
+   }
+  },
+  "detail": {
+   "chb01": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 36496,
+     "ictal": 115,
+     "clean": 15410,
+     "flag5sd": 17881,
+     "signal_loss": 1
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb02": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 31739,
+     "ictal": 45,
+     "clean": 17805,
+     "flag5sd": 13512,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb03": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 34201,
+     "ictal": 106,
+     "clean": 17208,
+     "flag5sd": 13187,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb04": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 140453,
+     "ictal": 99,
+     "clean": 94450,
+     "flag5sd": 40393,
+     "signal_loss": 2
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb05": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 35102,
+     "ictal": 143,
+     "clean": 18681,
+     "flag5sd": 14074,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb06": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 60060,
+     "ictal": 45,
+     "clean": 19813,
+     "flag5sd": 27710,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb07": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 60345,
+     "ictal": 83,
+     "clean": 28016,
+     "flag5sd": 29665,
+     "signal_loss": 4
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb08": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 18005,
+     "ictal": 234,
+     "clean": 7549,
+     "flag5sd": 9208,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb09": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 61079,
+     "ictal": 73,
+     "clean": 36432,
+     "flag5sd": 21138,
+     "signal_loss": 3
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb10": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 45020,
+     "ictal": 117,
+     "clean": 28530,
+     "flag5sd": 10974,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb11": {
+    "check": "R0 diff report",
+    "counts": {
+     "windows": 31313,
+     "ictal": 204,
+     "clean": 16067,
+     "flag5sd": 13842
+    },
+    "want": {
+     "windows": 31313,
+     "ictal": 204,
+     "clean": 16067,
+     "flag5sd": 13842
+    },
+    "stats_counts": {
+     "n_interictal": 16063,
+     "n_ictal": 204,
+     "n_rejected": 13846
+    },
+    "stats_rel_dev": 0.0,
+    "ok": true
+   },
+   "chb12": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 18617,
+     "ictal": 271,
+     "clean": 7459,
+     "flag5sd": 5738,
+     "signal_loss": 1
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb13": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 29700,
+     "ictal": 144,
+     "clean": 12448,
+     "flag5sd": 12776,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb14": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 23400,
+     "ictal": 49,
+     "clean": 13981,
+     "flag5sd": 6670,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb15": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 36008,
+     "ictal": 515,
+     "clean": 17020,
+     "flag5sd": 10354,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb16": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 17100,
+     "ictal": 28,
+     "clean": 6430,
+     "flag5sd": 7100,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb17": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 18906,
+     "ictal": 74,
+     "clean": 8769,
+     "flag5sd": 9007,
+     "signal_loss": 534
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb18": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 32070,
+     "ictal": 83,
+     "clean": 14851,
+     "flag5sd": 14817,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb19": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 26936,
+     "ictal": 62,
+     "clean": 12925,
+     "flag5sd": 12979,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb20": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 24839,
+     "ictal": 81,
+     "clean": 11854,
+     "flag5sd": 9853,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb21": {
+    "check": "R0 diff report",
+    "counts": {
+     "windows": 29546,
+     "ictal": 53,
+     "clean": 11619,
+     "flag5sd": 16596
+    },
+    "want": {
+     "windows": 29546,
+     "ictal": 53,
+     "clean": 11619,
+     "flag5sd": 16596
+    },
+    "stats_counts": {
+     "n_interictal": 11614,
+     "n_ictal": 53,
+     "n_rejected": 16601
+    },
+    "stats_rel_dev": 0.0,
+    "ok": true
+   },
+   "chb22": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 27902,
+     "ictal": 55,
+     "clean": 11473,
+     "flag5sd": 15669,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb23": {
+    "check": "earlier .npz + committed R0 stats",
+    "counts": {
+     "windows": 23900,
+     "ictal": 109,
+     "clean": 8558,
+     "flag5sd": 8998,
+     "signal_loss": 0
+    },
+    "stats_equal": true,
+    "exact": {
+     "is_ictal": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_signal_loss": true,
+     "file_idx": true,
+     "files": true
+    },
+    "ok": true
+   },
+   "chb24": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 19166,
+     "ictal": 139,
+     "signal_loss": 0,
+     "files": 22
+    },
+    "want": {
+     "windows": 19166,
+     "ictal": 139,
+     "signal_loss": 0,
+     "files": 22
+    },
+    "ok": true
+   },
+   "PN00": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 2918,
+     "ictal": 85,
+     "signal_loss": 0,
+     "files": 5
+    },
+    "want": {
+     "windows": 2918,
+     "ictal": 85,
+     "signal_loss": 0,
+     "files": 5
+    },
+    "ok": true
+   },
+   "PN01": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 12139,
+     "ictal": 33,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "want": {
+     "windows": 12139,
+     "ictal": 33,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "ok": true
+   },
+   "PN03": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 21804,
+     "ictal": 62,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "want": {
+     "windows": 21804,
+     "ictal": 62,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "ok": true
+   },
+   "PN05": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 5431,
+     "ictal": 28,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "want": {
+     "windows": 5431,
+     "ictal": 28,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "ok": true
+   },
+   "PN06": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 10864,
+     "ictal": 76,
+     "signal_loss": 0,
+     "files": 5
+    },
+    "want": {
+     "windows": 10864,
+     "ictal": 76,
+     "signal_loss": 0,
+     "files": 5
+    },
+    "ok": true
+   },
+   "PN07": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 7862,
+     "ictal": 17,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "want": {
+     "windows": 7862,
+     "ictal": 17,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "ok": true
+   },
+   "PN09": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 6162,
+     "ictal": 54,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "want": {
+     "windows": 6162,
+     "ictal": 54,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "ok": true
+   },
+   "PN10": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 16852,
+     "ictal": 91,
+     "signal_loss": 30,
+     "files": 6
+    },
+    "want": {
+     "windows": 16852,
+     "ictal": 91,
+     "signal_loss": 30,
+     "files": 6
+    },
+    "ok": true
+   },
+   "PN11": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 2169,
+     "ictal": 15,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "want": {
+     "windows": 2169,
+     "ictal": 15,
+     "signal_loss": 0,
+     "files": 1
+    },
+    "ok": true
+   },
+   "PN12": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 5488,
+     "ictal": 74,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "want": {
+     "windows": 5488,
+     "ictal": 74,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "ok": true
+   },
+   "PN13": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 7797,
+     "ictal": 68,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "want": {
+     "windows": 7797,
+     "ictal": 68,
+     "signal_loss": 0,
+     "files": 3
+    },
+    "ok": true
+   },
+   "PN14": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 18416,
+     "ictal": 45,
+     "signal_loss": 3,
+     "files": 4
+    },
+    "want": {
+     "windows": 18416,
+     "ictal": 45,
+     "signal_loss": 3,
+     "files": 4
+    },
+    "ok": true
+   },
+   "PN16": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 4391,
+     "ictal": 59,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "want": {
+     "windows": 4391,
+     "ictal": 59,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "ok": true
+   },
+   "PN17": {
+    "check": "results/r2/r0_data/ext/external_cases.csv",
+    "counts": {
+     "windows": 4612,
+     "ictal": 40,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "want": {
+     "windows": 4612,
+     "ictal": 40,
+     "signal_loss": 0,
+     "files": 2
+    },
+    "ok": true
+   }
+  },
+  "summary": "24 CHB-MIT + 15 external cases; G-feat re-read on 21 cases"
+ },
+ {
+  "gate": "G-const",
+  "status": "PASS",
+  "max_rel": 0.0,
+  "four_seeds_equal": true,
+  "summary": "max relative difference 0.00e+00"
+ },
+ {
+  "gate": "G-count",
+  "status": "PASS",
+  "counts": {
+   "chb01": 15410,
+   "chb02": 17805,
+   "chb04": 94450,
+   "chb05": 18681,
+   "chb07": 28016,
+   "chb08": 7549,
+   "chb09": 36432,
+   "chb12": 7459,
+   "chb19": 12925,
+   "chb20": 11854,
+   "chb21": 11051,
+   "chb23": 8558,
+   "chb10": 28530,
+   "chb11": 14228,
+   "chb22": 11473
+  },
+  "bad": [],
+  "summary": "15 cases, clean windows = committed metas"
+ },
+ {
+  "gate": "G-k",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 128,
+  "error_pairs": 296,
+  "rows_look6": 64,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ],
+  "summary": "e23 128 rows + 296 error pairs, look #6 64 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 240,
+  "exact_rows": 148,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 2,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 24.0,
+    "median_abs_ref": 24.0
+   },
+   "det_off": {
+    "median_abs": 16.0,
+    "median_abs_ref": 16.0
+   },
+   "cpd_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "cpd_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 8.0
+   },
+   "pairs": 348,
+   "pairs_ref": 343
+  },
+  "cases": [
+   "chb24",
+   "PN00",
+   "PN01",
+   "PN03",
+   "PN05",
+   "PN06",
+   "PN07",
+   "PN09",
+   "PN10",
+   "PN11",
+   "PN12",
+   "PN13",
+   "PN14",
+   "PN16",
+   "PN17"
+  ],
+  "summary": "240 rows, 148 exact, max |dtp| 1, max |dfp| 2 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "G-vec",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "exact": true,
+  "case": "chb01",
+  "windows": 2000,
+  "reference_windows": 2000,
+  "epochs": 2,
+  "seed": 42,
+  "torch": "2.11.0+cpu",
+  "threads": 1,
+  "seconds": 3.3,
+  "summary": "train_gae_v2.py --smoke vs tensor loop: max |weight difference| 0.000e+00"
+ },
+ {
+  "gate": "R1.1-training",
+  "status": "PASS",
+  "epochs": 200,
+  "expected_n_train": {
+   "chb01": 15410,
+   "chb02": 17805,
+   "chb04": 94450,
+   "chb05": 18681,
+   "chb07": 28016,
+   "chb08": 7549,
+   "chb09": 36432,
+   "chb12": 7459,
+   "chb19": 12925,
+   "chb20": 11854,
+   "chb21": 11619,
+   "chb23": 8558
+  },
+  "expected_n_val": {
+   "chb10": 28530,
+   "chb11": 16067,
+   "chb22": 11473
+  },
+  "jobs": [
+   {
+    "seed": 42,
+    "status": "done",
+    "seconds": 14028,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 8.255,
+    "fit_s": 13971.1,
+    "load_s": 9.8,
+    "val_and_sanity_s": 45.3,
+    "peak_rss_mb": 3229.4,
+    "checkpoint_sha256": "a6f77c465555a3988986286e637ec050f92b7d4dfd018f2af700fcd5d854b8b8",
+    "r2_r1_sha256": "b865507af380c19938073f2e1ad81b1ad2d2c121c2b731bedf082a75feebae16"
+   },
+   {
+    "seed": 1,
+    "status": "done",
+    "seconds": 14039,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 8.263,
+    "fit_s": 13984.3,
+    "load_s": 9.8,
+    "val_and_sanity_s": 43.5,
+    "peak_rss_mb": 3229.6,
+    "checkpoint_sha256": "0f92cb04b1767f7a1edc5a2d9032d5bcd2f824dfca2029b57be6c5f6ad49c47d",
+    "r2_r1_sha256": "b865507af380c19938073f2e1ad81b1ad2d2c121c2b731bedf082a75feebae16"
+   },
+   {
+    "seed": 2,
+    "status": "done",
+    "seconds": 14034,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 8.26,
+    "fit_s": 13979.4,
+    "load_s": 9.8,
+    "val_and_sanity_s": 43.2,
+    "peak_rss_mb": 3227.7,
+    "checkpoint_sha256": "2ee2d052b5273e30925c8e181c70f1e46cd72229f5ce3add1957108282ff29b4",
+    "r2_r1_sha256": "b865507af380c19938073f2e1ad81b1ad2d2c121c2b731bedf082a75feebae16"
+   },
+   {
+    "seed": 3,
+    "status": "done",
+    "seconds": 14028,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 8.256,
+    "fit_s": 13971.8,
+    "load_s": 9.8,
+    "val_and_sanity_s": 44.7,
+    "peak_rss_mb": 3228.5,
+    "checkpoint_sha256": "7640c5da4e1803dd8ed7398fca23d20d17c987358a0155a791149b2594b09b4f",
+    "r2_r1_sha256": "b865507af380c19938073f2e1ad81b1ad2d2c121c2b731bedf082a75feebae16"
+   }
+  ],
+  "trained_now": [
+   42,
+   3,
+   2,
+   1
+  ],
+  "summary": "seeds [42, 1, 2, 3]: n_train 270758, 3,964 parameters, G2 PASS"
+ }
+]

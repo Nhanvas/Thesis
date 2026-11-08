@@ -1,0 +1,888 @@
+{
+ "gate": "G-data",
+ "status": "PASS",
+ "bad": [],
+ "files_hashed": 63,
+ "pinned": {
+  "file": "results/r2/r1_system/smoke/data_sha256.csv",
+  "files_compared": 63,
+  "differ": []
+ },
+ "gfeat_reread": {
+  "chb01": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 3.814697265625e-06,
+   "bp5": 4.76837158203125e-07,
+   "adj": 0.0004090700738643379
+  },
+  "chb02": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 4.76837158203125e-07,
+   "bp5": 2.2351741790771484e-07,
+   "adj": 0.00040667341149397927
+  },
+  "chb03": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 4.76837158203125e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.00043984707688498025
+  },
+  "chb04": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 7.152557373046875e-07,
+   "adj": 0.00042853572850985944
+  },
+  "chb05": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 3.5762786865234375e-07,
+   "adj": 0.0003376403581520099
+  },
+  "chb06": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.00043058793058793057
+  },
+  "chb07": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 3.814697265625e-06,
+   "bp5": 4.76837158203125e-07,
+   "adj": 0.0004421373915858042
+  },
+  "chb08": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 4.76837158203125e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.0003964948008269308
+  },
+  "chb09": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 2.288818359375e-05,
+   "bp5": 9.5367431640625e-07,
+   "adj": 0.00035727597836009216
+  },
+  "chb10": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 2.980232238769531e-07,
+   "adj": 0.0003335965908156046
+  },
+  "chb12": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 4.76837158203125e-07,
+   "bp5": 2.682209014892578e-07,
+   "adj": 0.0003310904730830243
+  },
+  "chb13": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 3.5762786865234375e-07,
+   "adj": 0.0003587313463856674
+  },
+  "chb14": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.00040993985438429883
+  },
+  "chb15": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 4.76837158203125e-07,
+   "adj": 0.00039334537455325427
+  },
+  "chb16": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 4.76837158203125e-07,
+   "adj": 0.0004304743339831059
+  },
+  "chb17": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "FAIL",
+   "f7": 9.5367431640625e-07,
+   "bp5": 3.5762786865234375e-07,
+   "adj": 0.000453084806992928
+  },
+  "chb18": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 3.5762786865234375e-07,
+   "adj": 0.0004575253977603006
+  },
+  "chb19": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.00046165671165671166
+  },
+  "chb20": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 4.76837158203125e-07,
+   "bp5": 2.980232238769531e-07,
+   "adj": 0.0003747591277953477
+  },
+  "chb22": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 5.960464477539062e-07,
+   "adj": 0.0004216698479953205
+  },
+  "chb23": {
+   "status": "PASS",
+   "scope": "chain",
+   "all_windows": "PASS",
+   "f7": 9.5367431640625e-07,
+   "bp5": 2.384185791015625e-07,
+   "adj": 0.00039542331732010953
+  }
+ },
+ "detail": {
+  "chb01": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 36496,
+    "ictal": 115,
+    "clean": 15410,
+    "flag5sd": 17881,
+    "signal_loss": 1
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb02": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 31739,
+    "ictal": 45,
+    "clean": 17805,
+    "flag5sd": 13512,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb03": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 34201,
+    "ictal": 106,
+    "clean": 17208,
+    "flag5sd": 13187,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb04": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 140453,
+    "ictal": 99,
+    "clean": 94450,
+    "flag5sd": 40393,
+    "signal_loss": 2
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb05": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 35102,
+    "ictal": 143,
+    "clean": 18681,
+    "flag5sd": 14074,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb06": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 60060,
+    "ictal": 45,
+    "clean": 19813,
+    "flag5sd": 27710,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb07": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 60345,
+    "ictal": 83,
+    "clean": 28016,
+    "flag5sd": 29665,
+    "signal_loss": 4
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb08": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 18005,
+    "ictal": 234,
+    "clean": 7549,
+    "flag5sd": 9208,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb09": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 61079,
+    "ictal": 73,
+    "clean": 36432,
+    "flag5sd": 21138,
+    "signal_loss": 3
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb10": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 45020,
+    "ictal": 117,
+    "clean": 28530,
+    "flag5sd": 10974,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb11": {
+   "check": "R0 diff report",
+   "counts": {
+    "windows": 31313,
+    "ictal": 204,
+    "clean": 16067,
+    "flag5sd": 13842
+   },
+   "want": {
+    "windows": 31313,
+    "ictal": 204,
+    "clean": 16067,
+    "flag5sd": 13842
+   },
+   "stats_counts": {
+    "n_interictal": 16063,
+    "n_ictal": 204,
+    "n_rejected": 13846
+   },
+   "stats_rel_dev": 0.0,
+   "ok": true
+  },
+  "chb12": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 18617,
+    "ictal": 271,
+    "clean": 7459,
+    "flag5sd": 5738,
+    "signal_loss": 1
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb13": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 29700,
+    "ictal": 144,
+    "clean": 12448,
+    "flag5sd": 12776,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb14": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 23400,
+    "ictal": 49,
+    "clean": 13981,
+    "flag5sd": 6670,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb15": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 36008,
+    "ictal": 515,
+    "clean": 17020,
+    "flag5sd": 10354,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb16": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 17100,
+    "ictal": 28,
+    "clean": 6430,
+    "flag5sd": 7100,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb17": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 18906,
+    "ictal": 74,
+    "clean": 8769,
+    "flag5sd": 9007,
+    "signal_loss": 534
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb18": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 32070,
+    "ictal": 83,
+    "clean": 14851,
+    "flag5sd": 14817,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb19": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 26936,
+    "ictal": 62,
+    "clean": 12925,
+    "flag5sd": 12979,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb20": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 24839,
+    "ictal": 81,
+    "clean": 11854,
+    "flag5sd": 9853,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb21": {
+   "check": "R0 diff report",
+   "counts": {
+    "windows": 29546,
+    "ictal": 53,
+    "clean": 11619,
+    "flag5sd": 16596
+   },
+   "want": {
+    "windows": 29546,
+    "ictal": 53,
+    "clean": 11619,
+    "flag5sd": 16596
+   },
+   "stats_counts": {
+    "n_interictal": 11614,
+    "n_ictal": 53,
+    "n_rejected": 16601
+   },
+   "stats_rel_dev": 0.0,
+   "ok": true
+  },
+  "chb22": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 27902,
+    "ictal": 55,
+    "clean": 11473,
+    "flag5sd": 15669,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb23": {
+   "check": "earlier .npz + committed R0 stats",
+   "counts": {
+    "windows": 23900,
+    "ictal": 109,
+    "clean": 8558,
+    "flag5sd": 8998,
+    "signal_loss": 0
+   },
+   "stats_equal": true,
+   "exact": {
+    "is_ictal": true,
+    "is_buffer": true,
+    "is_flag5sd": true,
+    "is_signal_loss": true,
+    "file_idx": true,
+    "files": true
+   },
+   "ok": true
+  },
+  "chb24": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 19166,
+    "ictal": 139,
+    "signal_loss": 0,
+    "files": 22
+   },
+   "want": {
+    "windows": 19166,
+    "ictal": 139,
+    "signal_loss": 0,
+    "files": 22
+   },
+   "ok": true
+  },
+  "PN00": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 2918,
+    "ictal": 85,
+    "signal_loss": 0,
+    "files": 5
+   },
+   "want": {
+    "windows": 2918,
+    "ictal": 85,
+    "signal_loss": 0,
+    "files": 5
+   },
+   "ok": true
+  },
+  "PN01": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 12139,
+    "ictal": 33,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "want": {
+    "windows": 12139,
+    "ictal": 33,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "ok": true
+  },
+  "PN03": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 21804,
+    "ictal": 62,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "want": {
+    "windows": 21804,
+    "ictal": 62,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "ok": true
+  },
+  "PN05": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 5431,
+    "ictal": 28,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "want": {
+    "windows": 5431,
+    "ictal": 28,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "ok": true
+  },
+  "PN06": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 10864,
+    "ictal": 76,
+    "signal_loss": 0,
+    "files": 5
+   },
+   "want": {
+    "windows": 10864,
+    "ictal": 76,
+    "signal_loss": 0,
+    "files": 5
+   },
+   "ok": true
+  },
+  "PN07": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 7862,
+    "ictal": 17,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "want": {
+    "windows": 7862,
+    "ictal": 17,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "ok": true
+  },
+  "PN09": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 6162,
+    "ictal": 54,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "want": {
+    "windows": 6162,
+    "ictal": 54,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "ok": true
+  },
+  "PN10": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 16852,
+    "ictal": 91,
+    "signal_loss": 30,
+    "files": 6
+   },
+   "want": {
+    "windows": 16852,
+    "ictal": 91,
+    "signal_loss": 30,
+    "files": 6
+   },
+   "ok": true
+  },
+  "PN11": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 2169,
+    "ictal": 15,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "want": {
+    "windows": 2169,
+    "ictal": 15,
+    "signal_loss": 0,
+    "files": 1
+   },
+   "ok": true
+  },
+  "PN12": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 5488,
+    "ictal": 74,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "want": {
+    "windows": 5488,
+    "ictal": 74,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "ok": true
+  },
+  "PN13": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 7797,
+    "ictal": 68,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "want": {
+    "windows": 7797,
+    "ictal": 68,
+    "signal_loss": 0,
+    "files": 3
+   },
+   "ok": true
+  },
+  "PN14": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 18416,
+    "ictal": 45,
+    "signal_loss": 3,
+    "files": 4
+   },
+   "want": {
+    "windows": 18416,
+    "ictal": 45,
+    "signal_loss": 3,
+    "files": 4
+   },
+   "ok": true
+  },
+  "PN16": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 4391,
+    "ictal": 59,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "want": {
+    "windows": 4391,
+    "ictal": 59,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "ok": true
+  },
+  "PN17": {
+   "check": "results/r2/r0_data/ext/external_cases.csv",
+   "counts": {
+    "windows": 4612,
+    "ictal": 40,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "want": {
+    "windows": 4612,
+    "ictal": 40,
+    "signal_loss": 0,
+    "files": 2
+   },
+   "ok": true
+  }
+ },
+ "summary": "24 CHB-MIT + 15 external cases; G-feat re-read on 21 cases"
+}

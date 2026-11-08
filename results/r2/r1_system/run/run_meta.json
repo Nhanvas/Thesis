@@ -1,0 +1,60 @@
+{
+ "notebook": "R1_RUN",
+ "tag": "run",
+ "repo_commit": "f21d233467b751c4566d3c7577a76fc20f1928d6",
+ "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28",
+ "r2_core_sha256": "902d15ad4feb3e8ab76a7a3d3e818c37269811c537cf2b33b23b5a3f7d1850fd",
+ "started": "2026-11-07 13:00:31 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "torch_threads": 1,
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cpu",
+  "torch_geometric": "2.7.0",
+  "ruptures": "v1.1.10",
+  "timescoring": "not importable: module 'timescoring' has no attribute '__version__'",
+  "mne": "1.12.1"
+ },
+ "input": "/kaggle/input",
+ "work": "/kaggle/working",
+ "scratch": "/tmp/r2",
+ "test_mode": false,
+ "finished": "2026-11-07 17:37:49 UTC",
+ "runtime_h": 4.636,
+ "phases_s": {
+  "views": 26.9,
+  "gate_data": 51.6,
+  "gate_const_count": 1.9,
+  "D_r10": 535.5,
+  "score_r10": 243.3,
+  "gate_vec": 3.3,
+  "train": 14052.9,
+  "D_run": 550.8,
+  "score_run": 200.5,
+  "D_cf": 548.1,
+  "score_cf": 198.2,
+  "counterfactual": 947.2
+ },
+ "notes": [
+  {
+   "step_timing": {
+    "workers": 4,
+    "ms_per_step": [
+     7.855,
+     7.855,
+     7.923,
+     7.923
+    ],
+    "mean": 7.889
+   },
+   "projected_training_h": 3.97
+  }
+ ],
+ "peak_rss_self_mb": 852.1,
+ "peak_rss_children_mb": 3229.6
+}

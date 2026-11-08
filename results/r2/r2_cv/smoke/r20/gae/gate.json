@@ -1,0 +1,12 @@
+{
+ "gate": "GG0",
+ "status": "PASS",
+ "mismatches": "[]",
+ "seconds": 580,
+ "fold_seconds": [
+  142,
+  147,
+  139,
+  143
+ ]
+}

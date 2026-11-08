@@ -1,0 +1,20 @@
+{
+ "model": "cnn",
+ "fold": 1,
+ "n_train": 3300,
+ "n_ictal": 300,
+ "smoke": true,
+ "epochs": 2,
+ "fit_s": 0.4,
+ "n_params": 6081,
+ "first_loss": 1.2467608733610673,
+ "last_loss": 1.2110594979199496,
+ "G2": "PASS",
+ "device": "cpu",
+ "name": "cnn_f1",
+ "stage": "smoke",
+ "status": "done",
+ "seconds": 14.4,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2806.4
+}

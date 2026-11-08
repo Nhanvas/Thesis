@@ -1,0 +1,15 @@
+{
+ "model": "if",
+ "folds": [
+  1
+ ],
+ "k": {
+  "1": 5.408812374378968
+ },
+ "name": "if_all",
+ "stage": "smoke",
+ "status": "done",
+ "seconds": 668.7,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2256.9
+}

@@ -1,0 +1,2 @@
+model,fold,subject,auroc
+mlp,1,chb12,0.5649463591937636

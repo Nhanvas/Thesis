@@ -1,0 +1,21 @@
+{
+ "model": "gae",
+ "gate": {
+  "gate": "GG0",
+  "status": "PASS",
+  "mismatches": "[]",
+  "seconds": 580,
+  "fold_seconds": [
+   142,
+   147,
+   139,
+   143
+  ]
+ },
+ "name": "gae",
+ "stage": "r20",
+ "status": "done",
+ "seconds": 580.3,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2452.5
+}

@@ -1,0 +1,19 @@
+{
+ "model": "mlp",
+ "fold": 1,
+ "k": 3.3669437280074908,
+ "n_train": 2000,
+ "epochs": 2,
+ "n_params": 3964,
+ "first_loss": 0.03825120162963867,
+ "last_loss": 0.02318819236755371,
+ "fit_s": 0.6,
+ "ms_per_step": 4.793,
+ "G2": "PASS",
+ "name": "mlp_f1",
+ "stage": "smoke",
+ "status": "done",
+ "seconds": 15.0,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 1050.4
+}

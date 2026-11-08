@@ -1,0 +1,11 @@
+{
+ "model": "mlp",
+ "fold": 3,
+ "k": 5.925483908587829,
+ "name": "mlp_f3",
+ "stage": "r20",
+ "status": "done",
+ "seconds": 82.4,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2382.2
+}

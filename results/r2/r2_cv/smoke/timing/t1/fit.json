@@ -1,0 +1,13 @@
+{
+ "timing": {
+  "gae": 8.72044563293457,
+  "mlp": 4.056963125864664,
+  "cnn": 15.764245986938475
+ },
+ "name": "t1",
+ "stage": "timing",
+ "status": "done",
+ "seconds": 20.8,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 852.2
+}

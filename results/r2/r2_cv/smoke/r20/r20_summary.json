@@ -1,0 +1,50 @@
+{
+ "if": {
+  "status": "PASS",
+  "rows": 96,
+  "exact_rows": 96,
+  "missing": 0,
+  "n_ref_differ": 0,
+  "max_abs_dtp": 0,
+  "max_abs_dfp": 0,
+  "k_max_rel": 0.0,
+  "tolerance": "exact",
+  "differing_rows": []
+ },
+ "hgb": {
+  "status": "PASS",
+  "rows": 96,
+  "exact_rows": 96,
+  "missing": 0,
+  "n_ref_differ": 0,
+  "max_abs_dtp": 0,
+  "max_abs_dfp": 0,
+  "k_max_rel": 2.3876980006650313e-11,
+  "tolerance": "exact",
+  "differing_rows": []
+ },
+ "svm": {
+  "status": "PASS",
+  "rows": 20,
+  "exact_rows": 20,
+  "missing": 0,
+  "n_ref_differ": 0,
+  "max_abs_dtp": 0,
+  "max_abs_dfp": 0,
+  "k_max_rel": 0.0,
+  "tolerance": "exact",
+  "differing_rows": []
+ },
+ "mlp": {
+  "status": "PASS",
+  "rows": 96,
+  "exact_rows": 96,
+  "missing": 0,
+  "n_ref_differ": 0,
+  "max_abs_dtp": 0,
+  "max_abs_dfp": 0,
+  "k_max_rel": 0.0,
+  "tolerance": "tolerance",
+  "differing_rows": []
+ }
+}

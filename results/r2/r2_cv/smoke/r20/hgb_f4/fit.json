@@ -1,0 +1,17 @@
+{
+ "model": "hgb",
+ "fold": 4,
+ "n_train": 613701,
+ "n_ictal": 1630,
+ "smoke": false,
+ "converged": true,
+ "n_iter": 200,
+ "fit_s": 783.7,
+ "k": 0.12303612029590902,
+ "name": "hgb_f4",
+ "stage": "r20",
+ "status": "done",
+ "seconds": 952.1,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 5319.6
+}

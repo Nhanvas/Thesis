@@ -1,0 +1,2 @@
+model,fold,subject,auroc
+gae,1,chb12,0.5867882799841898

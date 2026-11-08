@@ -1,0 +1,3 @@
+model,fold,subject,point,stage,k,tp,fp,n_ref,nonict_h,short_tp,short_n,top,q_raw
+svm,1,chb12,fixed0.005,detector,,1,25,26,20.383333333333333,0,1,0.005,
+svm,1,chb12,fixed0.005,localized,,1,24,26,20.383333333333333,0,1,0.005,

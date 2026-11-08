@@ -14,7 +14,9 @@ Steps:
      (relative 1e-9) and the locked S18 §18.6 numbers (per-case sensitivity / F1 / FP/day of the six models at their own
      point after CPD; MLP-AE - GAE F1 +0.070 [+0.026, +0.117]).
   A1 (gate, STOP) the rerun is complete: 6 models x 24 cases x 2 points x 2 stages, no duplicate, n_ref = the record's;
-     counterfactual rows complete for gae and mlp (and cnn when its checkpoints existed).
+     counterfactual rows complete for gae, mlp and cnn; every run folder's gates.json has G-data and D0' PASS and no
+     failed gate, and the folder holding the CNN rows has R2.0-cnn PASS (plan §12 08/11 19:10: R2_C gates the CNN code
+     path before training).
   A2 the pre-registered analyses A-F of the comparison plan (§4 there), run unchanged on the rerun
      (src/model_cmp_aggregate.py) -> aggregate/model_cmp/; and model_vs_gae.csv: table B (model - GAE, paired subject
      bootstrap) of the record beside the rerun's.
@@ -111,6 +113,18 @@ def per_case(d):
     return d
 
 
+def run_gates(runs):
+    """per run folder: {gate: status} from its gates.json and the models of its run rows (A1 provenance check)."""
+    out = {}
+    for r in runs:
+        r = Path(r)
+        g = json.loads((r / "gates.json").read_text()) if (r / "gates.json").exists() else []
+        ps = r / "model_cmp" / "per_subject.csv"
+        out[str(r)] = dict(gates={x["gate"]: x["status"] for x in g},
+                           models=sorted(set(pd.read_csv(ps).model)) if ps.exists() else [])
+    return out
+
+
 def load_runs(runs):
     run, cf, seiz_run, seiz_cf, folders = [], [], [], [], []
     for r in runs:
@@ -128,8 +142,16 @@ def load_runs(runs):
     return cat(run), cat(cf), cat(seiz_run), cat(seiz_cf), folders
 
 
-def gate_a1(rec, run, cf):
+def gate_a1(rec, run, cf, rg=None):
     bad = []
+    for r, v in (rg or {}).items():
+        g = v["gates"]
+        if g.get("G-data") != "PASS" or g.get("D0'") != "PASS":
+            bad.append(("G-data / D0' not PASS", r))
+        if any(st not in ("PASS", "n/a") for st in g.values()):
+            bad.append(("failed gate", r, {k: st for k, st in g.items() if st not in ("PASS", "n/a")}))
+        if "cnn" in v["models"] and g.get("R2.0-cnn") != "PASS":
+            bad.append(("CNN rows without R2.0-cnn PASS", r))
     if run.duplicated(KEYS).any():
         bad.append(("duplicated run rows", int(run.duplicated(KEYS).sum())))
     want = {(m, s, p, st) for m in ORDER for s in rec.subject.unique() for p in POINTS for st in STAGES}
@@ -144,7 +166,7 @@ def gate_a1(rec, run, cf):
         c = cf[cf.model == m]
         if c.duplicated(KEYS).any() or len(c) != 24 * len(POINTS) * len(STAGES):
             bad.append((f"cf {m} rows", len(c)))
-    for m in ("gae", "mlp"):
+    for m in CF_MODELS:
         if m not in cfm:
             bad.append((f"cf {m} missing",))
     return dict(gate="A1", status="PASS" if not bad else "FAIL", bad=bad, cf_models=cfm, run_rows=len(run))
@@ -247,7 +269,7 @@ def main():
         out.mkdir(parents=True, exist_ok=True)
         rec = pd.read_csv(MC / "per_subject.csv")
         run, cf, seiz_run, _seiz_cf, folders = load_runs(a.runs)
-        a1 = gate_a1(rec, run, cf)
+        a1 = gate_a1(rec, run, cf, run_gates(a.runs))
         log(f"A1 {a1['status']}: {a1['bad']}")
         gates = [a0, a1]
         (out / "gates.json").write_text(json.dumps(gates, indent=1, default=str))

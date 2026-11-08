@@ -6,8 +6,13 @@ run_meta.json) for the closed code, the committed checkpoints and the record res
   python src/r2_r2_make_notebooks.py --smoke REF        -> notebooks/r2/R2_SMOKE.ipynb (REF must hold src/r2_r2.py's
                                                          inputs: R1_SMOKE's data_sha256.csv, the R0 diff report and, if
                                                          approved, results/model_cmp/ckpt/cnn_fold*.pt)
-  python src/r2_r2_make_notebooks.py --runs COMMIT      -> notebooks/r2/R2_A / R2_B / R2_C.ipynb, cloned at COMMIT, which
-                                                         must hold the committed R2_SMOKE output (projection.json)
+  python src/r2_r2_make_notebooks.py --runs COMMIT      -> notebooks/r2/R2_A / R2_B / R2_C.ipynb, cloned at COMMIT (a
+                                                         commit hash, never a tag), which must hold the committed R2_SMOKE
+                                                         output (projection.json) and the CNN checkpoints
+R2_C (plan §12 08/11 19:10, chat D17-F): gate R2.0-cnn runs FIRST -- the committed CNN fold checkpoints (all four must be
+in the pinned repository; sha256 recorded) scored on the earlier data = the record's CNN rows within |dtp| <= 1,
+|dfp| <= 2 per row (the 08/11 09:30 tolerance); the notebook STOPs before any CNN training on failure. R2_C runs on at
+most 2 workers (CNN training memory was not measured by R2_SMOKE). src/r2_r2.py is unchanged (= the smoke's code).
 Test mode (synthetic data, build container only): environment R2_TEST_REPO / R2_TEST_INPUT / R2_TEST_WORK /
 R2_TEST_SCRATCH (src/r2_r2_synthetic_test.py)."""
 import argparse
@@ -195,8 +200,48 @@ print(json.dumps({k: PROJ[k] for k in ("ms_per_step", "workers", "wall_h", "fits
     ])
 
 
+CNN_GATE = """
+# R2.0-cnn FIRST (plan §12 08/11 19:10): the committed CNN fold checkpoints on the EARLIER data, CPU scoring = the record's
+# CNN rows (results/model_cmp/per_subject.csv) within |dtp| <= 1, |dfp| <= 2 per row, n_ref exact; exact rows counted.
+# All four checkpoints must be present (sha256 recorded). STOP here, before any CNN training, on any failure.
+W = min(int(PROJ["workers"]["R2_C"]), W_CAP)
+try:
+    MISSING = [f for f in R2.FOLDS if not R2.cnn_ckpt(f).exists()]
+    if MISSING:
+        raise SystemExit(f"STOP R2.0-cnn: CNN checkpoints absent from the pinned repository for folds {MISSING}")
+    CKPT = {f"cnn_fold{f}.pt": R2.sha256_file(R2.cnn_ckpt(f)) for f in R2.FOLDS}
+    G0 = R2.run_jobs([s for s in R2.r20_specs(cnn=True) if s["model"] == "cnn"], W)
+    BAD = [r for r in G0 if r.get("status") not in ("done", "reused")]
+    if BAD:
+        R2.gate(dict(gate="R2.0-jobs", status="FAIL", failed=BAD, summary=f"{len(BAD)} R2.0-cnn jobs failed"))
+    JD = R2.out_dir() / "r20"
+    ROWS = sum((pd.read_csv(JD / f"cnn_f{f}" / "per_subject.csv").to_dict("records") for f in R2.FOLDS), [])
+    CG = R2._compare(ROWS, "cnn", "tolerance")
+    R2._jdump(JD / "r20_summary.json", dict(cnn=CG, checkpoints_sha256=CKPT))
+    R2.gate(dict(gate="R2.0-cnn", **CG, checkpoints_sha256=CKPT,
+                 summary=f"{CG['rows']} rows, {CG['exact_rows']} exact, max |dtp| {CG['max_abs_dtp']}, |dfp| "
+                         f"{CG['max_abs_dfp']}, own-point k rel {CG['k_max_rel']:.1e} (tolerance)"))
+except SystemExit as e:
+    stopped(e)
+print(pd.DataFrame([dict(name=r["name"], status=r["status"], seconds=r.get("seconds"), peak_mb=r.get("peak_rss_mb"))
+                    for r in G0]).to_string(index=False))
+"""
+
+
+def _proj_text():
+    """runtime line of each run notebook from the committed R2_SMOKE projection (computed estimate)."""
+    p = ROOT / "results" / "r2" / "r2_cv" / "smoke" / "projection.json"
+    if not p.exists():
+        return {n: "R2_SMOKE projection" for n in ("R2_A", "R2_B", "R2_C")}
+    w = json.loads(p.read_text())["wall_h"]
+    return {"R2_A": f"computed estimate ≈ {w['R2_A']:.1f} h (R2_SMOKE projection, 4 workers)",
+            "R2_B": f"computed estimate ≈ {w['R2_B']:.1f} h (R2_SMOKE projection, 2 workers)",
+            "R2_C": "computed estimate ≈ 1.8 h (R2_SMOKE per-job estimates on 2 workers + the R2.0-cnn gate)"}
+
+
 def runs(commit):
     built = []
+    est_txt = _proj_text()
     prj = """
 PROJ_FILE = R2.REPO / "results" / "r2" / "r2_cv" / "smoke" / "projection.json"
 assert PROJ_FILE.exists(), "the pinned commit lacks R2_SMOKE's projection.json"
@@ -205,23 +250,29 @@ PROJ = json.loads(PROJ_FILE.read_text())
     for n, tag, what, models, cf, est in (
             ("R2_A", "a", "the GAE and the MLP-AE, 4 folds each (8 jobs), trained on the new data with the new fold "
              "constants (200 epochs, seed 42), scored by the frozen chain with each fold's own k. This is also "
-             "partition 0 of stage R3.", ["gae", "mlp"], [], "≈ 7 h"),
+             "partition 0 of stage R3.", ["gae", "mlp"], [], est_txt["R2_A"]),
             ("R2_B", "b", "Isolation Forest (4 folds, one job), gradient-boosted trees and linear SVM (4 folds each) on the "
              "new data; counterfactual: the committed GAE and MLP-AE fold models on the new data (scoring only).",
-             ["if", "hgb", "svm"], ["gae", "mlp"], "R2_SMOKE projection"),
-            ("R2_C", "c", "1-D CNN, 4 folds (30 epochs, CPU) on the new data; counterfactual: the committed CNN fold "
-             "models on the new data (scoring only; skipped if the checkpoints are not in the repository).",
-             ["cnn"], ["cnn"], "R2_SMOKE projection")):
+             ["if", "hgb", "svm"], ["gae", "mlp"], est_txt["R2_B"]),
+            ("R2_C", "c", "**first the gate R2.0-cnn** (the committed CNN fold checkpoints scored on the earlier data = "
+             "the record's CNN rows within |Δtp| ≤ 1, |Δfp| ≤ 2 per row; STOP before any training on failure or if a "
+             "checkpoint is absent); then the 1-D CNN, 4 folds (30 epochs, CPU, at most 2 workers) on the new data; "
+             "counterfactual: the committed CNN fold models on the new data (scoring only).",
+             ["cnn"], ["cnn"], est_txt["R2_C"])):
         cells = [head(n, commit, what + " Gates: G-data, D0′ (and G-const, G-vec, G-mlp). **Resumable:** attach this "
                       "notebook's previous output; finished jobs are reused (code sha checked).",
                       f"`/kaggle/working/r2/r2_cv/{tag}/` (→ `results/r2/r2_cv/{tag}/`; job checkpoints ≈ 20–30 KB)", est),
                  setup(n, commit), code("%%writefile {SRC}/r2_r2.py\n" + CORE), start(tag), code(prj + DATA)]
         if tag == "a":
             cells.append(code(EARLIER))
+        if tag == "c":
+            cells.append(code("W_CAP = 2   # plan §12 08/11 19:10: CNN training memory not measured by the smoke\n" + CNN_GATE))
+        wline = (f'W = min(int(PROJ["workers"]["{n}"]), W_CAP)   # at most 2 workers (plan §12 08/11 19:10)' if tag == "c"
+                 else f'W = int(PROJ["workers"]["{n}"])')
         cells.append(code(f"""
 # JOBS ({n}): resumed jobs reused; LPT order on the projected workers; a job that cannot finish in the session waits
 R2.import_previous("jobs"); R2.import_previous("cfjobs")
-W = int(PROJ["workers"]["{n}"])
+{wline}
 SPECS = R2.run_specs({models!r}, METAS) + R2.cf_specs({cf!r})
 print("workers", W, "| jobs", [s["name"] for s in SPECS], "| projected wall h", PROJ["wall_h"]["{n}"])
 try:

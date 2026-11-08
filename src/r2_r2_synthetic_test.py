@@ -20,8 +20,11 @@ Non-circular checks:
 Runs: R2_SMOKE PASS (all gates, R2.0 exact / within tolerance, smoke jobs, projection); negative paths: one record IF row
 tp + 1 -> STOP R2.0-if; one MLP record row fp + 3 -> STOP R2.0-mlp (fp + 2 passes); a pinned hash changed -> STOP
 G-data; a record n_ref changed -> STOP D0'. R2_A, R2_B, R2_C (epochs reduced by R2_TEST_EPOCHS in test mode only) PASS;
+R2_C (plan §12 08/11 19:10) runs R2.0-cnn first (PASS, all rows exact, 4 checkpoint hashes, 2 workers); negative paths: one
+CNN record row fp + 3 -> STOP R2.0-cnn, a missing cnn_fold3.pt -> STOP, both before any CNN training job exists;
 R2_A resumed with its output attached reuses all 8 jobs (byte-identical rows); the aggregate (src/r2_r2_aggregate.py) on
-the three outputs: A1 PASS, the closed analyses A-F run, every table written; A0 on the REAL record files of this clone PASS.
+the three outputs: A1 PASS, the closed analyses A-F run, every table written; A1 STOPs when the R2_C output's gates.json
+lacks R2.0-cnn; A0 on the REAL record files of this clone PASS.
   python src/r2_r2_synthetic_test.py [--root DIR]
 """
 import argparse
@@ -282,10 +285,37 @@ def main():
     pd_.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(sm / "projection.json", pd_ / "projection.json")
     outs = {}
+    stdout = {}
     for n, tag in (("R2_A", "a"), ("R2_B", "b"), ("R2_C", "c")):
-        print(run(root / "runner.py", nb_env(tag), [nbdir / f"{n}.ipynb"])[-1200:])
+        stdout[tag] = run(root / "runner.py", nb_env(tag), [nbdir / f"{n}.ipynb"])
+        print(stdout[tag][-1200:])
         outs[tag] = root / f"work_{tag}" / "r2" / "r2_cv" / tag
         assert (outs[tag] / "model_cmp" / "per_subject.csv").exists(), n
+    # R2_C: the CNN code path gated first (plan §12 08/11 19:10)
+    gc = gates("c", "c")
+    assert gc["R2.0-cnn"]["status"] == "PASS" and gc["R2.0-cnn"]["exact_rows"] == gc["R2.0-cnn"]["rows"] == 96, gc["R2.0-cnn"]
+    assert len(gc["R2.0-cnn"]["checkpoints_sha256"]) == 4, gc["R2.0-cnn"]
+    order = [g for g in gc]
+    assert order.index("R2.0-cnn") > order.index("D0'"), order
+    assert all((outs["c"] / "r20" / f"cnn_f{f}" / "DONE.json").exists() for f in (1, 2, 3, 4))
+    gate_t = max(json.loads((outs["c"] / "r20" / f"cnn_f{f}" / "DONE.json").read_text())["seconds"] for f in (1, 2, 3, 4))
+    first_train = min((outs["c"] / "jobs" / f"cnn_f{f}" / "DONE.json").stat().st_mtime for f in (1, 2, 3, 4))
+    last_gate = max((outs["c"] / "r20" / f"cnn_f{f}" / "DONE.json").stat().st_mtime for f in (1, 2, 3, 4))
+    assert last_gate < first_train, (last_gate, first_train)
+    assert "workers 2 |" in stdout["c"], stdout["c"][-800:]
+    print(f"R2_C: R2.0-cnn PASS before any CNN training (96/96 rows exact, 4 checkpoint hashes, gate jobs <= {gate_t:.0f} s), "
+          "2 workers")
+    pth, keep = perturb("results/model_cmp/per_subject.csv", lambda d: d.__setitem__("fp", d.fp + 3 * sel(d, "cnn")))
+    run(root / "runner.py", nb_env("neg_cnn"), [nbdir / "R2_C.ipynb"], expect_fail="R2.0-cnn FAIL")
+    pth.write_bytes(keep)
+    assert not (root / "work_neg_cnn" / "r2" / "r2_cv" / "c" / "jobs").exists()
+    ck = repo / "results" / "model_cmp" / "ckpt" / "cnn_fold3.pt"
+    ck.rename(ck.with_suffix(".away"))
+    run(root / "runner.py", nb_env("neg_ckpt"), [nbdir / "R2_C.ipynb"], expect_fail="CNN checkpoints absent")
+    ck.with_suffix(".away").rename(ck)
+    assert not (root / "work_neg_ckpt" / "r2" / "r2_cv" / "c" / "jobs").exists()
+    assert not (root / "work_neg_ckpt" / "r2" / "r2_cv" / "c" / "r20").exists()
+    print("R2_C negative paths: CNN record fp + 3 -> STOP R2.0-cnn; cnn_fold3.pt absent -> STOP; no CNN training job started")
     A = pd.read_csv(outs["a"] / "model_cmp" / "per_subject.csv")
     assert set(A.model) == {"gae", "mlp"} and len(A) == 2 * 24 * 4, (set(A.model), len(A))
     Bp = pd.read_csv(outs["b"] / "model_cmp" / "per_subject.csv")
@@ -319,6 +349,13 @@ def main():
     assert {"rerun - record", "data (cf - record)", "new models (rerun - cf)"} <= set(Bt.step), set(Bt.step)
     assert set(pd.read_csv(agg / "summary.csv").system) == {"record", "cf", "rerun"}
     print("aggregate on the synthetic runs: A0, A1 PASS; analyses A-F and every table written")
+    cneg = root / "c_nogate"
+    shutil.copytree(outs["c"], cneg)
+    gj = [x for x in json.loads((cneg / "gates.json").read_text()) if x["gate"] != "R2.0-cnn"]
+    (cneg / "gates.json").write_text(json.dumps(gj))
+    run(repo / "src" / "r2_r2_aggregate.py", dict(R2_TEST="1", THESIS_REPO=str(repo), PYTHONHASHSEED="0"),
+        ["--runs", outs["a"], outs["b"], cneg, "--out", root / "agg_neg"], expect_fail="CNN rows without R2.0-cnn PASS")
+    print("aggregate negative path: R2_C output without R2.0-cnn -> STOP A1")
     print(f"ALL PASS ({time.time() - t0:.0f} s)")
 
 

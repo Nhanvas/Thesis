@@ -1,0 +1,11 @@
+{
+ "model": "cnn",
+ "fold": 2,
+ "k": 0.5205852031707763,
+ "name": "cnn_f2",
+ "stage": "r20",
+ "status": "done",
+ "seconds": 52.8,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2268.4
+}

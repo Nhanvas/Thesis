@@ -1,0 +1,30 @@
+[
+ {
+  "model": "cnn",
+  "fold": 4,
+  "name": "cnn_f4",
+  "status": "done",
+  "seconds": 734.2
+ },
+ {
+  "model": "cnn",
+  "fold": 2,
+  "name": "cnn_f2",
+  "status": "done",
+  "seconds": 774.0
+ },
+ {
+  "model": "cnn",
+  "fold": 3,
+  "name": "cnn_f3",
+  "status": "done",
+  "seconds": 693.7
+ },
+ {
+  "model": "cnn",
+  "fold": 1,
+  "name": "cnn_f1",
+  "status": "done",
+  "seconds": 655.9
+ }
+]

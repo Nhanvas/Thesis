@@ -1,0 +1,20 @@
+{
+ "cnn": {
+  "status": "PASS",
+  "rows": 96,
+  "exact_rows": 96,
+  "missing": 0,
+  "n_ref_differ": 0,
+  "max_abs_dtp": 0,
+  "max_abs_dfp": 0,
+  "k_max_rel": 1.4254331575458733e-07,
+  "tolerance": "tolerance",
+  "differing_rows": []
+ },
+ "checkpoints_sha256": {
+  "cnn_fold1.pt": "9afdff50f3ebdb8c157f4e344083a8942c8acae6aeb0fe6335c6b8201e9ebdc0",
+  "cnn_fold2.pt": "a3c6142f1fd132ca6328f0b50d3ea1eda9760ebc413f20e67d6b513b898de8e3",
+  "cnn_fold3.pt": "9b8a5abbdfa4d899ab54529adcd05fa9eb80e701851e46cbecec45da6dcee3d9",
+  "cnn_fold4.pt": "c06ff52f7a7c5ca923d6779fdffdec2aa473f20e8f02885a2d6689e9462e7686"
+ }
+}

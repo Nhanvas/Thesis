@@ -1,0 +1,11 @@
+{
+ "model": "mlp",
+ "fold": 3,
+ "k": 5.97615566556064,
+ "name": "cf_mlp_f3",
+ "stage": "cfjobs",
+ "status": "done",
+ "seconds": 59.5,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2378.9
+}

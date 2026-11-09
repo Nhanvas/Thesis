@@ -1,0 +1,17 @@
+{
+ "model": "svm",
+ "fold": 3,
+ "n_train": 577882,
+ "n_ictal": 1760,
+ "smoke": false,
+ "converged": true,
+ "n_iter": 107,
+ "fit_s": 5901.3,
+ "k": 0.6512731138198469,
+ "name": "svm_f3",
+ "stage": "jobs",
+ "status": "done",
+ "seconds": 5938.9,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 10135.7
+}

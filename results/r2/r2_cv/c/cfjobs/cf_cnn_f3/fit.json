@@ -1,0 +1,11 @@
+{
+ "model": "cnn",
+ "fold": 3,
+ "k": 0.585110431909561,
+ "name": "cf_cnn_f3",
+ "stage": "cfjobs",
+ "status": "done",
+ "seconds": 28.0,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2243.1
+}

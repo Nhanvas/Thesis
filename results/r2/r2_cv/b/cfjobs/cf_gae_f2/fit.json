@@ -1,0 +1,11 @@
+{
+ "model": "gae",
+ "fold": 2,
+ "k": 3.843970918830361,
+ "name": "cf_gae_f2",
+ "stage": "cfjobs",
+ "status": "done",
+ "seconds": 111.4,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 2444.2
+}

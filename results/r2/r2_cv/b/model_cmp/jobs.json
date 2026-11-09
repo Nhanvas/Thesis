@@ -1,0 +1,65 @@
+[
+ {
+  "model": "svm",
+  "fold": 3,
+  "name": "svm_f3",
+  "status": "done",
+  "seconds": 5938.9
+ },
+ {
+  "model": "svm",
+  "fold": 2,
+  "name": "svm_f2",
+  "status": "done",
+  "seconds": 10377.9
+ },
+ {
+  "model": "svm",
+  "fold": 4,
+  "name": "svm_f4",
+  "status": "done",
+  "seconds": 8682.6
+ },
+ {
+  "model": "if",
+  "fold": null,
+  "name": "if_all",
+  "status": "done",
+  "seconds": 811.1
+ },
+ {
+  "model": "hgb",
+  "fold": 2,
+  "name": "hgb_f2",
+  "status": "done",
+  "seconds": 822.0
+ },
+ {
+  "model": "hgb",
+  "fold": 4,
+  "name": "hgb_f4",
+  "status": "done",
+  "seconds": 734.9
+ },
+ {
+  "model": "hgb",
+  "fold": 3,
+  "name": "hgb_f3",
+  "status": "done",
+  "seconds": 701.0
+ },
+ {
+  "model": "hgb",
+  "fold": 1,
+  "name": "hgb_f1",
+  "status": "done",
+  "seconds": 674.9
+ },
+ {
+  "model": "svm",
+  "fold": 1,
+  "name": "svm_f1",
+  "status": "done",
+  "seconds": 8164.3
+ }
+]

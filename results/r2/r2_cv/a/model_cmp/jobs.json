@@ -1,0 +1,58 @@
+[
+ {
+  "model": "gae",
+  "fold": 1,
+  "name": "gae_f1",
+  "status": "done",
+  "seconds": 15299.9
+ },
+ {
+  "model": "gae",
+  "fold": 3,
+  "name": "gae_f3",
+  "status": "done",
+  "seconds": 17996.8
+ },
+ {
+  "model": "gae",
+  "fold": 4,
+  "name": "gae_f4",
+  "status": "done",
+  "seconds": 19521.4
+ },
+ {
+  "model": "gae",
+  "fold": 2,
+  "name": "gae_f2",
+  "status": "done",
+  "seconds": 20011.6
+ },
+ {
+  "model": "mlp",
+  "fold": 2,
+  "name": "mlp_f2",
+  "status": "done",
+  "seconds": 9978.0
+ },
+ {
+  "model": "mlp",
+  "fold": 4,
+  "name": "mlp_f4",
+  "status": "done",
+  "seconds": 8904.4
+ },
+ {
+  "model": "mlp",
+  "fold": 1,
+  "name": "mlp_f1",
+  "status": "done",
+  "seconds": 6985.9
+ },
+ {
+  "model": "mlp",
+  "fold": 3,
+  "name": "mlp_f3",
+  "status": "done",
+  "seconds": 8015.6
+ }
+]

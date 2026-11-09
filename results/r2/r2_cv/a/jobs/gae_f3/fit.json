@@ -1,0 +1,19 @@
+{
+ "model": "gae",
+ "fold": 3,
+ "k": 3.962001695349085,
+ "n_train": 329383,
+ "epochs": 200,
+ "n_params": 3964,
+ "first_loss": 0.01777045903818655,
+ "last_loss": 0.015908404525468833,
+ "fit_s": 17838.3,
+ "ms_per_step": 8.664,
+ "G2": "PASS",
+ "name": "gae_f3",
+ "stage": "jobs",
+ "status": "done",
+ "seconds": 17996.8,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 3621.2
+}

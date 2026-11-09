@@ -1,0 +1,19 @@
+{
+ "model": "mlp",
+ "fold": 2,
+ "k": 6.473010506441804,
+ "n_train": 366878,
+ "epochs": 200,
+ "n_params": 3964,
+ "first_loss": 0.019174585007652407,
+ "last_loss": 0.018372390225769874,
+ "fit_s": 9878.5,
+ "ms_per_step": 4.308,
+ "G2": "PASS",
+ "name": "mlp_f2",
+ "stage": "jobs",
+ "status": "done",
+ "seconds": 9978.0,
+ "code_sha": "542968bb851bc05c",
+ "peak_rss_mb": 3955.7
+}

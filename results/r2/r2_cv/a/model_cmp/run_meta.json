@@ -1,0 +1,26 @@
+{
+ "notebook": "R2_A",
+ "tag": "a",
+ "repo_commit": "652ab6214a9eba91587249d8005e7864e210d3ac",
+ "r2_r2_sha": "542968bb851bc05c",
+ "f1_core_sha": "bf4bfd69d7669226",
+ "model_cmp_core_sha": "179b91278035b37a",
+ "r2_core_sha": "902d15ad4feb3e8a",
+ "started": "2026-11-08 13:58:02 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "ram_gb": 33.7,
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cpu",
+  "torch_geometric": "2.7.0",
+  "ruptures": "v1.1.10"
+ },
+ "epochs": 200,
+ "seed": 42,
+ "test_mode": false
+}

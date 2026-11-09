@@ -1,0 +1,7 @@
+model,seizures,unmatched,caught_record,caught_rerun,both,record_only,rerun_only,neither
+cnn,185,0,123,121,113,10,8,54
+gae,185,0,114,114,110,4,4,67
+hgb,185,0,120,117,113,7,4,61
+if,185,0,97,98,97,0,1,87
+mlp,185,0,115,119,114,1,5,65
+svm,185,0,92,91,83,9,8,85

@@ -1,0 +1,138 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "checks": [
+   {
+    "check": "model_cmp_aggregate reproduces summary.csv",
+    "ok": true
+   },
+   {
+    "check": "model_cmp_aggregate reproduces paired_bootstrap.csv",
+    "ok": true
+   },
+   {
+    "check": "model_cmp_aggregate reproduces matched_rate.csv",
+    "ok": true
+   },
+   {
+    "check": "model_cmp_aggregate reproduces complementarity.csv",
+    "ok": true
+   },
+   {
+    "check": "model_cmp_aggregate reproduces transfer.csv",
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 gae sens / F1 / FP/day",
+    "locked": [
+     0.735,
+     0.203,
+     28.4
+    ],
+    "computed": [
+     0.735,
+     0.203,
+     28.4
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 mlp sens / F1 / FP/day",
+    "locked": [
+     0.711,
+     0.273,
+     20.2
+    ],
+    "computed": [
+     0.711,
+     0.273,
+     20.2
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 if sens / F1 / FP/day",
+    "locked": [
+     0.68,
+     0.212,
+     24.1
+    ],
+    "computed": [
+     0.68,
+     0.212,
+     24.1
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 svm sens / F1 / FP/day",
+    "locked": [
+     0.626,
+     0.163,
+     33.7
+    ],
+    "computed": [
+     0.626,
+     0.163,
+     33.7
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 hgb sens / F1 / FP/day",
+    "locked": [
+     0.755,
+     0.221,
+     35.2
+    ],
+    "computed": [
+     0.755,
+     0.221,
+     35.2
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 cnn sens / F1 / FP/day",
+    "locked": [
+     0.777,
+     0.218,
+     35.1
+    ],
+    "computed": [
+     0.777,
+     0.218,
+     35.1
+    ],
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.6 MLP-AE - GAE F1 [CI]",
+    "locked": [
+     0.07,
+     0.026,
+     0.117
+    ],
+    "computed": [
+     0.07,
+     0.026,
+     0.117
+    ],
+    "ok": true
+   }
+  ],
+  "bad": []
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "bad": [],
+  "cf_models": [
+   "cnn",
+   "gae",
+   "mlp"
+  ],
+  "run_rows": 576
+ }
+]

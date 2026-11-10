@@ -1,0 +1,17 @@
+{
+ "model": "gae",
+ "partition": 4,
+ "fold": 1,
+ "k": 4.08413393723888,
+ "score_s": 148.5,
+ "checkpoint_sha256": "2ab43fbbe654cd41c2113cc6dd72d5c5129e4c4ce3399c97f4f1ad2602c2c8d9",
+ "name": "gae_fold1",
+ "stage": "r30",
+ "status": "done",
+ "seconds": 156.5,
+ "code_sha": "7dc1697cbf792dff",
+ "core_sha": "7dc1697cbf792dff",
+ "partitions_sha": "fbf73129105e0fea",
+ "view": "earlier",
+ "peak_rss_mb": 2387.7
+}

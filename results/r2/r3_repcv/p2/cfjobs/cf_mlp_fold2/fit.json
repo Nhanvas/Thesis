@@ -1,0 +1,16 @@
+{
+ "model": "mlp",
+ "partition": 2,
+ "fold": 2,
+ "k": 6.4618332548428885,
+ "score_s": 72.4,
+ "name": "cf_mlp_fold2",
+ "stage": "cfjobs",
+ "status": "done",
+ "seconds": 81.7,
+ "code_sha": "7dc1697cbf792dff",
+ "core_sha": "7dc1697cbf792dff",
+ "partitions_sha": "fbf73129105e0fea",
+ "view": "new",
+ "peak_rss_mb": 2418.8
+}

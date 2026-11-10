@@ -1,0 +1,16 @@
+{
+ "model": "gae",
+ "partition": 5,
+ "fold": 2,
+ "k": 3.695969875677581,
+ "score_s": 119.4,
+ "name": "cf_gae_fold2",
+ "stage": "cfjobs",
+ "status": "done",
+ "seconds": 127.6,
+ "code_sha": "7dc1697cbf792dff",
+ "core_sha": "7dc1697cbf792dff",
+ "partitions_sha": "fbf73129105e0fea",
+ "view": "new",
+ "peak_rss_mb": 2396.5
+}

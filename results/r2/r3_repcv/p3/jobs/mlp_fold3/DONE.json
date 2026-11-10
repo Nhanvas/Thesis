@@ -1,0 +1,10 @@
+{
+ "status": "done",
+ "code_sha": "7dc1697cbf792dff",
+ "core_sha": "7dc1697cbf792dff",
+ "partitions_sha": "fbf73129105e0fea",
+ "seconds": 7855.7,
+ "peak_rss_mb": 3739.4,
+ "epochs": 200,
+ "seed": 3
+}

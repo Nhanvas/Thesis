@@ -1,0 +1,17 @@
+{
+ "model": "mlp",
+ "partition": 3,
+ "fold": 1,
+ "k": 6.603094546452022,
+ "score_s": 66.0,
+ "checkpoint_sha256": "80da8e42db48885a7625997bfd2ad247b0d4c08f7bc0f628579d3b28e8af23ae",
+ "name": "mlp_fold1",
+ "stage": "r30",
+ "status": "done",
+ "seconds": 73.7,
+ "code_sha": "7dc1697cbf792dff",
+ "core_sha": "7dc1697cbf792dff",
+ "partitions_sha": "fbf73129105e0fea",
+ "view": "earlier",
+ "peak_rss_mb": 2426.9
+}

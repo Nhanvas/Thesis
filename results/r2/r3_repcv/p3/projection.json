@@ -1,0 +1,40 @@
+{
+ "partition": 3,
+ "workers": 4,
+ "ms_per_step": {
+  "gae": 8.686,
+  "mlp": 4.308
+ },
+ "score_s": {
+  "gae": 161.89999999999964,
+  "mlp": 99.5
+ },
+ "cf_s": {
+  "gae": 119.0,
+  "mlp": 64.2
+ },
+ "est_h": {
+  "gae_fold1": 4.664872055555556,
+  "cf_gae_fold1": 0.049583333333333326,
+  "mlp_fold1": 2.3195064444444444,
+  "cf_mlp_fold1": 0.02675,
+  "gae_fold2": 6.108147466666666,
+  "cf_gae_fold2": 0.049583333333333326,
+  "mlp_fold2": 3.0353285111111106,
+  "cf_mlp_fold2": 0.02675,
+  "gae_fold3": 5.742418611111113,
+  "cf_gae_fold3": 0.049583333333333326,
+  "mlp_fold3": 2.8539377777777775,
+  "cf_mlp_fold3": 0.02675,
+  "gae_fold4": 5.796561344444445,
+  "cf_gae_fold4": 0.049583333333333326,
+  "mlp_fold4": 2.880790977777778,
+  "cf_mlp_fold4": 0.02675
+ },
+ "r30_h": 0.09916666666666667,
+ "wall_h": 8.749665788888889,
+ "elapsed_h": 0.020931683248943754,
+ "source": "results/r2/r2_cv/a/jobs/*/fit.json (measured, R2_A, Kaggle CPU 4 workers) and results/r2/r2_cv/b/cfjobs/*/fit.json",
+ "computed_estimate": true,
+ "fits": true
+}

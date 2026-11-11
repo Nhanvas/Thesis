@@ -1,0 +1,6 @@
+partition,notebook,torch,gpus,cpu_count,core_sha,partitions_sha,epochs,repo_commit,notebook_runtime_h
+1,R3_p1,,,4,7dc1697cbf792dff,fbf73129105e0fea,200,fa69497760f889519fab38aabd9a1930a61bfe8b,7.803
+2,R3_p2,,,4,7dc1697cbf792dff,fbf73129105e0fea,200,fa69497760f889519fab38aabd9a1930a61bfe8b,8.2
+3,R3_p3,,,4,7dc1697cbf792dff,fbf73129105e0fea,200,fa69497760f889519fab38aabd9a1930a61bfe8b,6.76
+4,R3_p4,,,4,7dc1697cbf792dff,fbf73129105e0fea,200,fa69497760f889519fab38aabd9a1930a61bfe8b,6.926
+5,R3_p5,,,4,7dc1697cbf792dff,fbf73129105e0fea,200,fa69497760f889519fab38aabd9a1930a61bfe8b,6.499

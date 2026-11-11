@@ -1,0 +1,17 @@
+{
+ "partitions": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "n_pos": 6,
+ "n_neg": 0,
+ "need": 5,
+ "dF1_mean": 0.07658276799846882,
+ "dF1_lo": 0.0383474849189792,
+ "dF1_hi": 0.12022386559397043,
+ "verdict": "stable advantage of the MLP-AE (without message passing)"
+}

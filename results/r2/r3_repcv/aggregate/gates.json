@@ -1,0 +1,238 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "checks": [
+   {
+    "check": "f1_aggregate reproduces F1_per_partition.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces F1_across_partitions.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces F1_bootstrap.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces F2_per_partition.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces F2_across_partitions.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces per_subject_table.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces notebooks.csv",
+    "ok": true
+   },
+   {
+    "check": "f1_aggregate reproduces VERDICT.json",
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens'} mean",
+    "locked": 0.736,
+    "computed": 0.736,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens'} sd",
+    "locked": 0.012,
+    "computed": 0.012,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens'} min",
+    "locked": 0.723,
+    "computed": 0.723,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens'} max",
+    "locked": 0.753,
+    "computed": 0.753,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'fp_day'} mean",
+    "locked": 27.3,
+    "computed": 27.3,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'fp_day'} sd",
+    "locked": 1.1,
+    "computed": 1.1,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'f1'} mean",
+    "locked": 0.21,
+    "computed": 0.21,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'f1'} sd",
+    "locked": 0.009,
+    "computed": 0.009,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens_test8'} mean",
+    "locked": 0.575,
+    "computed": 0.575,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens_test8'} sd",
+    "locked": 0.013,
+    "computed": 0.013,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens_other16'} mean",
+    "locked": 0.817,
+    "computed": 0.817,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_across_partitions {'model': 'gae', 'set': 'all', 'metric': 'sens_other16'} sd",
+    "locked": 0.016,
+    "computed": 0.016,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_bootstrap {'model': 'gae', 'metric': 'sens'} lo",
+    "locked": 0.612,
+    "computed": 0.612,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F1_bootstrap {'model': 'gae', 'metric': 'sens'} hi",
+    "locked": 0.854,
+    "computed": 0.854,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1'} mean",
+    "locked": 0.075,
+    "computed": 0.075,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1'} lo",
+    "locked": 0.034,
+    "computed": 0.034,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1'} hi",
+    "locked": 0.121,
+    "computed": 0.121,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dSens'} mean",
+    "locked": -0.009,
+    "computed": -0.009,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dSens'} lo",
+    "locked": -0.086,
+    "computed": -0.086,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dSens'} hi",
+    "locked": 0.062,
+    "computed": 0.062,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dFP_day'} mean",
+    "locked": -8.1,
+    "computed": -8.1,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dFP_day'} lo",
+    "locked": -11.0,
+    "computed": -11.0,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dFP_day'} hi",
+    "locked": -5.3,
+    "computed": -5.3,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dAUROC'} mean",
+    "locked": 0.082,
+    "computed": 0.082,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dAUROC'} lo",
+    "locked": 0.058,
+    "computed": 0.058,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dAUROC'} hi",
+    "locked": 0.111,
+    "computed": 0.111,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1_fixed0005'} mean",
+    "locked": 0.06,
+    "computed": 0.06,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1_fixed0005'} lo",
+    "locked": -0.012,
+    "computed": -0.012,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 F2_across_partitions {'quantity': 'dF1_fixed0005'} hi",
+    "locked": 0.127,
+    "computed": 0.127,
+    "ok": true
+   },
+   {
+    "check": "S18 \u00a718.8 dF1 > 0 in 6/6, verdict",
+    "locked": "6/6 stable advantage of the MLP-AE",
+    "computed": "6/6 stable advantage of the MLP-AE (without message passing)",
+    "ok": true
+   }
+  ],
+  "bad": []
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "bad": [],
+  "partitions": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "r2_r3_sha": [
+   "7dc1697cbf792dff"
+  ],
+  "run_rows": 1152,
+  "cf_rows": 1152
+ }
+]

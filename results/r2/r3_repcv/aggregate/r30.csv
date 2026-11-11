@@ -1,0 +1,11 @@
+partition,model,status,rows,exact_rows,missing,n_ref_differ,max_abs_dtp,max_abs_dfp,k_max_rel,seizures,caught_differ,tolerance
+1,gae,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+1,mlp,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+2,gae,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+2,mlp,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+3,gae,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+3,mlp,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+4,gae,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+4,mlp,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+5,gae,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"
+5,mlp,PASS,96,96,0,0,0,0,0.0,185,0,"|dtp| <= 1, |dfp| <= 2"

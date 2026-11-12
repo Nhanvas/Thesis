@@ -1,0 +1,42 @@
+{
+ "rule": "lowest validation loss (final_val: loss of the recipe on the clean windows of chb10, chb11, chb22; no test data) among seeds 1-4; ties within 1e-9 relative -> smaller seed",
+ "validation_loss": {
+  "1": 0.020844111434912032,
+  "2": 0.020848997497762697,
+  "3": 0.020768452966321658,
+  "4": 0.02080145203665401
+ },
+ "tied": [
+  3
+ ],
+ "seed": 3,
+ "tag": "clean_seed3",
+ "checkpoint": "results/r2/r1_system/run/models/gae_v2_clean_seed3.pt",
+ "checkpoint_sha256": "7640c5da4e1803dd8ed7398fca23d20d17c987358a0155a791149b2594b09b4f",
+ "k": 4.038424756932061,
+ "add_mean": [
+  -3.9121946100705083,
+  -4.95208265546866,
+  -6.04597838181873,
+  -7.472773277066605,
+  -9.305438767682837,
+  -2.7021312438879845,
+  0.41017760298382416
+ ],
+ "add_std": [
+  1.372913192636385,
+  1.332788465403198,
+  1.2375521211483997,
+  1.3627706804868969,
+  1.7042912257066862,
+  0.6918915782857674,
+  0.6346908552923572
+ ],
+ "clip": 4.0,
+ "budget_final": [
+  0.005,
+  0.02
+ ],
+ "smooth": 5,
+ "localizer": "cpd"
+}

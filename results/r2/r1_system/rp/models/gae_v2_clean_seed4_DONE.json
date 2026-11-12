@@ -1,0 +1,14 @@
+{
+ "seed": 4,
+ "status": "done",
+ "seconds": 9166,
+ "epochs": 200,
+ "n_train": 270758,
+ "ms_per_step": 5.393,
+ "fit_s": 9127.4,
+ "load_s": 6.3,
+ "val_and_sanity_s": 31.2,
+ "peak_rss_mb": 3228.6,
+ "checkpoint_sha256": "04218713c3910b78bf6d42dbe53cd75207451460f57a94e754a43c729afe3897",
+ "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28"
+}

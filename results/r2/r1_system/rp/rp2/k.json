@@ -1,0 +1,28 @@
+{
+ "k": {
+  "clean_seed42": 3.785202448670545,
+  "clean_seed1": 4.131331519447574,
+  "clean_seed2": 3.944554120801464,
+  "clean_seed3": 4.038424756932061,
+  "clean_seed4": 4.009211994582241
+ },
+ "k_r1": 3.785202448670545,
+ "cases": [
+  "chb01",
+  "chb02",
+  "chb04",
+  "chb05",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb12",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb23",
+  "chb10",
+  "chb11",
+  "chb22"
+ ],
+ "rule": "p3_levers.calibrate on each seed's own model: median over the 15 development cases of q_i(k) = 0.005"
+}

@@ -1,0 +1,178 @@
+[
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files_hashed": 63,
+  "pinned_files": 63,
+  "pin": "results/r2/r1_system/smoke/data_sha256.csv",
+  "differ": [],
+  "summary": "63 files hashed = pinned R1_SMOKE hashes"
+ },
+ {
+  "gate": "G-const-new",
+  "status": "PASS",
+  "max_rel": 0.0,
+  "counts_differ": [],
+  "n_train": 270758,
+  "n_val": {
+   "chb10": 28530,
+   "chb11": 16067,
+   "chb22": 11473
+  },
+  "summary": "constants max relative difference 0.0e+00; n_train 270758"
+ },
+ {
+  "gate": "RP.0",
+  "status": "PASS",
+  "mode": "exact",
+  "rows": 1824,
+  "exact_rows": 1824,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_pairs": 2210,
+  "error_groups_differ": 0,
+  "error_mismatches": [],
+  "q_rows": 152,
+  "q_differ": 0,
+  "k_seed42": 3.785202448670545,
+  "k_r1": 3.785202448670545,
+  "k_rel": 0.0,
+  "summary": "mode exact: 1824 rows (1824 exact), 2210 error pairs (0 groups differ), q 0 differ, k relative 0.0e+00"
+ },
+ {
+  "gate": "G-vec",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "exact": true,
+  "case": "chb01",
+  "windows": 2000,
+  "reference_windows": 2000,
+  "epochs": 2,
+  "seed": 42,
+  "torch": "2.11.0+cpu",
+  "threads": 1,
+  "seconds": 3.9,
+  "summary": "train_gae_v2.py --smoke vs tensor loop: max |weight difference| 0.000e+00"
+ },
+ {
+  "gate": "G-val",
+  "status": "PASS",
+  "mode": "exact",
+  "detail": {
+   "clean_seed42": {
+    "recomputed": 0.02083313383902163,
+    "json": 0.02083313383902163,
+    "rel": 0.0,
+    "n_val": {
+     "chb10": 28530,
+     "chb11": 16067,
+     "chb22": 11473
+    }
+   },
+   "clean_seed1": {
+    "recomputed": 0.020844111434912032,
+    "json": 0.020844111434912032,
+    "rel": 0.0,
+    "n_val": {
+     "chb10": 28530,
+     "chb11": 16067,
+     "chb22": 11473
+    }
+   },
+   "clean_seed2": {
+    "recomputed": 0.020848997497762697,
+    "json": 0.020848997497762697,
+    "rel": 0.0,
+    "n_val": {
+     "chb10": 28530,
+     "chb11": 16067,
+     "chb22": 11473
+    }
+   },
+   "clean_seed3": {
+    "recomputed": 0.020768452966321658,
+    "json": 0.020768452966321658,
+    "rel": 0.0,
+    "n_val": {
+     "chb10": 28530,
+     "chb11": 16067,
+     "chb22": 11473
+    }
+   }
+  },
+  "bad": [],
+  "summary": "validation loss of the 4 R1 checkpoints recomputed: max relative difference 0.0e+00"
+ },
+ {
+  "gate": "R1.1-training",
+  "status": "PASS",
+  "epochs": 200,
+  "expected_n_train": {
+   "chb01": 15410,
+   "chb02": 17805,
+   "chb04": 94450,
+   "chb05": 18681,
+   "chb07": 28016,
+   "chb08": 7549,
+   "chb09": 36432,
+   "chb12": 7459,
+   "chb19": 12925,
+   "chb20": 11854,
+   "chb21": 11619,
+   "chb23": 8558
+  },
+  "expected_n_val": {
+   "chb10": 28530,
+   "chb11": 16067,
+   "chb22": 11473
+  },
+  "jobs": [
+   {
+    "seed": 4,
+    "status": "done",
+    "seconds": 9166,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 5.393,
+    "fit_s": 9127.4,
+    "load_s": 6.3,
+    "val_and_sanity_s": 31.2,
+    "peak_rss_mb": 3228.6,
+    "checkpoint_sha256": "04218713c3910b78bf6d42dbe53cd75207451460f57a94e754a43c729afe3897",
+    "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28"
+   }
+  ],
+  "trained_now": [
+   4
+  ],
+  "summary": "seeds [4]: n_train 270758, 3,964 parameters, G2 PASS"
+ },
+ {
+  "gate": "RP2-complete",
+  "status": "PASS",
+  "rows": 2280,
+  "expected": 2280,
+  "k": {
+   "clean_seed42": 3.785202448670545,
+   "clean_seed1": 4.131331519447574,
+   "clean_seed2": 3.944554120801464,
+   "clean_seed3": 4.038424756932061,
+   "clean_seed4": 4.009211994582241
+  },
+  "scores_files": 23,
+  "scores_mb": 15.04,
+  "summary": "2280 rows (expected 2280); per-window scores of 23 cases"
+ },
+ {
+  "gate": "RP3-demo",
+  "status": "PASS",
+  "seed": 3,
+  "validation_loss": {
+   "1": 0.020844111434912032,
+   "2": 0.020848997497762697,
+   "3": 0.020768452966321658,
+   "4": 0.02080145203665401
+  },
+  "summary": "demo model = seed 3 (validation losses {\"1\": 0.020844111434912032, \"2\": 0.020848997497762697, \"3\": 0.020768452966321658, \"4\": 0.02080145203665401})"
+ }
+]

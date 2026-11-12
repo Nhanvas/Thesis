@@ -1,0 +1,20 @@
+{
+ "rows_compared": 552,
+ "error_pairs_compared": 533,
+ "thr_max_rel": 3.562309480421288e-08,
+ "differences": 0,
+ "hybrid_boundary_differences": [
+  [
+   "PN12",
+   "clean_seed1",
+   "frozen",
+   "hyb_off",
+   "0",
+   "36",
+   "88"
+  ]
+ ],
+ "hybrid_note": "hybrid boundaries are reported, not gated (plan \u00a712 12/11 10:05): the hybrid offset takes the argmax of the unsmoothed score; two windows equal within float32 storage can swap the peak. RP4 reads detector and cpd only; every tp / fp / n_ref (hybrid included) is gated exactly.",
+ "first_differences": [],
+ "elapsed_s": 7.1
+}

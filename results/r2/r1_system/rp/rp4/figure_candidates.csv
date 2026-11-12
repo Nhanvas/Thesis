@@ -1,0 +1,8 @@
+figure,rule,subject,file,onset_s,duration_s,value
+E2,"caught by all 4 seeds, 4-seed median |onset error| closest to the median (20 s)",chb14,chb14_06.edf,1908.0,20.0,20.0
+E3,"highest 4-seed sensitivity (final, cpd)",chb17,,,,1.0
+E3,"lowest 4-seed sensitivity (final, cpd)",chb06,,,,0.125
+E4,"missed by all 4 seeds, lowest amplitude ratio",chb14,chb14_04.edf,1372.0,20.0,0.5112
+E4,"missed by all 4 seeds, shortest",chb16,chb16_18.edf,1908.0,8.0,1.4543
+E5,"false alarm > 600 s from any seizure of its file, in >= 3 of 4 seeds, highest peak score of the demo model (seed 3)",chb18,chb18_35.edf,1248.0,40.0,0.9999844
+E6,"caught by >= 3 of 4 seeds, largest median |offset error| (cpd)",chb03,chb03_34.edf,1980.0,52.0,140.0

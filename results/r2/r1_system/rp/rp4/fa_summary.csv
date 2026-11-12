@@ -1,0 +1,7 @@
+arm,measure,mean,lo,hi,n,edge_mean,mid_mean
+frozen,"FA/h edge - FA/h middle (per patient, 4-seed mean)",0.19687582808352116,-0.006596441751708594,0.39492808948409824,8,1.160424822244864,0.9635489941613428
+frozen,"pooled FA/h edge / FA/h middle (all patients, 4 seeds)",1.0417447949092673,,,8,,
+frozen,share of FA in edge zones (pooled),0.42334494773519166,,,8,0.4133935937443954,
+L2f,"FA/h edge - FA/h middle (per patient, 4-seed mean)",0.23352519826108187,0.03144303586932935,0.4205015112382664,8,1.3748767172066274,1.1413515189455454
+L2f,"pooled FA/h edge / FA/h middle (all patients, 4 seeds)",1.1366779404754184,,,8,,
+L2f,share of FA in edge zones (pooled),0.4447653429602888,,,8,0.4133935937443954,

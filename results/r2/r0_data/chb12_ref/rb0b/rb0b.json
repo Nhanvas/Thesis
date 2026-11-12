@@ -1,0 +1,21 @@
+{
+ "gates": {
+  "A_inputs": "PASS",
+  "B_szcore_equal": "PASS"
+ },
+ "runtime_s": 295.2,
+ "files": 24,
+ "b1_tolerance_uV": 1e-06,
+ "szcore_eeg_py": "F:/Study/Thesis/_tmp/rb0b/epilepsy2bids/src/epilepsy2bids/eeg.py",
+ "szcore_eeg_py_sha256_lf": "a34b539232f03f494411bb458673a2de8a6626e2a9f0435a6c42a2f6ec7b638b",
+ "szcore_commit": "d3fb17526b8a483e292ae9ba2e51b02d5f9128ff",
+ "resampy": "stub: equal-rate branch of resampy 0.4.3 core.resample (resampy not installed)",
+ "versions": {
+  "python": "3.11.9",
+  "numpy": "2.4.4",
+  "scipy": "1.17.1",
+  "pandas": "3.0.3",
+  "mne": "1.12.1",
+  "pyedflib": "0.1.42"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "files": [
+  {
+   "file": "chb12_27.edf",
+   "windows": 900,
+   "windows_any_clipped": 284
+  },
+  {
+   "file": "chb12_28.edf",
+   "windows": 900,
+   "windows_any_clipped": 245
+  },
+  {
+   "file": "chb12_29.edf",
+   "windows": 906,
+   "windows_any_clipped": 458
+  }
+ ],
+ "by_class": {
+  "5-SD flagged": {
+   "windows": 177,
+   "windows_any_clipped": 144
+  },
+  "buffer (non-ictal)": {
+   "windows": 2277,
+   "windows_any_clipped": 783
+  },
+  "clean (training)": {
+   "windows": 123,
+   "windows_any_clipped": 14
+  },
+  "ictal": {
+   "windows": 129,
+   "windows_any_clipped": 46
+  }
+ },
+ "seizures": 13,
+ "seizures_with_clipped_samples": 8,
+ "clean_windows_with_clipped_samples": 14,
+ "histogram_tail_max_top1_share": 0.012461059190031152
+}

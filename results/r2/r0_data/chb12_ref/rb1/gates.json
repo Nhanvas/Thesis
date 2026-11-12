@@ -1,0 +1,767 @@
+{
+ "mode": "exact",
+ "versions_diff": {},
+ "gates": [
+  {
+   "gate": "G-code",
+   "status": "PASS",
+   "bad": [],
+   "detail": {
+    "src/dataprep/preprocessing.py": {
+     "sha256": "0172fbea61b285400a0cf1fb9052b98a39e2b09f2b4cb09bfa2352149b6c5af2",
+     "expected": "0172fbea61b285400a0cf1fb9052b98a39e2b09f2b4cb09bfa2352149b6c5af2",
+     "ok": true
+    },
+    "src/continuous_eval.py": {
+     "sha256": "8fea38dabee5ad252e1d23411805820a44c66802d7468233078d0173684164e8",
+     "expected": "8fea38dabee5ad252e1d23411805820a44c66802d7468233078d0173684164e8",
+     "ok": true
+    },
+    "src/c1b_build_trainset.py": {
+     "sha256": "b4596a8aa37976537de3cbba8fd16a248cdfffc005b0b365288749bc97696deb",
+     "expected": "b4596a8aa37976537de3cbba8fd16a248cdfffc005b0b365288749bc97696deb",
+     "ok": true
+    },
+    "src/dataprep/graph_construction.py": {
+     "sha256": "c22a976fdc531c8ceb45aeb9e7c96322235b71d666e7a44871e5dc1bed527838",
+     "expected": "c22a976fdc531c8ceb45aeb9e7c96322235b71d666e7a44871e5dc1bed527838",
+     "ok": true
+    },
+    "src/dataprep/feature_extraction.py": {
+     "sha256": "df3c01546eedc76e546ee61034929739a9c6feeaf9b77712a0f84dddb5508384",
+     "expected": "df3c01546eedc76e546ee61034929739a9c6feeaf9b77712a0f84dddb5508384",
+     "ok": true
+    },
+    "src/dataprep/compute_gamma_aec.py": {
+     "sha256": "9a45058558b2aaa314bd18a6f52acd4bba87093bcedbe7579da38bbe982136c1",
+     "expected": "9a45058558b2aaa314bd18a6f52acd4bba87093bcedbe7579da38bbe982136c1",
+     "ok": true
+    },
+    "src/evaluation_protocol.py": {
+     "sha256": "7caacac9b31bd0f7809656940e46a7d0d68d0e13f8dadfe50f3113906e5732dc",
+     "expected": "7caacac9b31bd0f7809656940e46a7d0d68d0e13f8dadfe50f3113906e5732dc",
+     "ok": true
+    },
+    "src/szcore_eval.py": {
+     "sha256": "9cad5a6c9322c328b0ecb25cb6249e0d1f04da774097e0de3d1b3b8541e75f0f",
+     "expected": "9cad5a6c9322c328b0ecb25cb6249e0d1f04da774097e0de3d1b3b8541e75f0f",
+     "ok": true
+    },
+    "src/r2_core.py": {
+     "sha256": "902d15ad4feb3e8ab76a7a3d3e818c37269811c537cf2b33b23b5a3f7d1850fd",
+     "expected": "902d15ad4feb3e8ab76a7a3d3e818c37269811c537cf2b33b23b5a3f7d1850fd",
+     "ok": true
+    },
+    "src/r2_rb.py": {
+     "sha256": "00d2c322b1c7669a381d7050455e41329c8cf03b6c9e2a4f6eff61b60e688a84",
+     "expected": "00d2c322b1c7669a381d7050455e41329c8cf03b6c9e2a4f6eff61b60e688a84",
+     "ok": true
+    },
+    "import preprocessing": {
+     "file": "/tmp/Thesis/src/dataprep/preprocessing.py",
+     "ok": true
+    },
+    "import continuous_eval": {
+     "file": "/tmp/Thesis/src/continuous_eval.py",
+     "ok": true
+    },
+    "import c1b_build_trainset": {
+     "file": "/tmp/Thesis/src/c1b_build_trainset.py",
+     "ok": true
+    },
+    "import graph_construction": {
+     "file": "/tmp/Thesis/src/dataprep/graph_construction.py",
+     "ok": true
+    },
+    "import feature_extraction": {
+     "file": "/tmp/Thesis/src/dataprep/feature_extraction.py",
+     "ok": true
+    },
+    "import compute_gamma_aec": {
+     "file": "/tmp/Thesis/src/dataprep/compute_gamma_aec.py",
+     "ok": true
+    },
+    "import evaluation_protocol": {
+     "file": "/tmp/Thesis/src/evaluation_protocol.py",
+     "ok": true
+    },
+    "import szcore_eval": {
+     "file": "/tmp/Thesis/src/szcore_eval.py",
+     "ok": true
+    },
+    "import r2_core": {
+     "file": "/tmp/Thesis/src/r2_core.py",
+     "ok": true
+    },
+    "import r2_rb": {
+     "file": "/tmp/Thesis/src/r2_rb.py",
+     "ok": true
+    },
+    "r2_rb.REFERENTIAL chb12_27.edf": {
+     "ok": true
+    },
+    "r2_rb.REFERENTIAL chb12_28.edf": {
+     "ok": true
+    },
+    "r2_rb.REFERENTIAL chb12_29.edf": {
+     "ok": true
+    },
+    "committed summary = PhysioNet": {
+     "ok": true
+    }
+   },
+   "summary": "10 files byte-equal to R0's, imports from the pinned clone"
+  },
+  {
+   "gate": "G-raw",
+   "status": "PASS",
+   "files": 25,
+   "edfs": 24,
+   "bad": [],
+   "detail": {
+    "chb12-summary.txt": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_06.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_08.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_09.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_10.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_11.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_19.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_20.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_21.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_23.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_24.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_27.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_28.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_29.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_32.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_33.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_34.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_35.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_36.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_37.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_38.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_39.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_40.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_41.edf": {
+     "copies": 1,
+     "equal": 1
+    },
+    "chb12_42.edf": {
+     "copies": 1,
+     "equal": 1
+    }
+   },
+   "summary": "24 EDFs + summary, sha256 = PhysioNet"
+  },
+  {
+   "gate": "G-R0",
+   "status": "PASS",
+   "files": 48,
+   "pinned": 48,
+   "differ": [],
+   "pin": "results/r2/r1_system/smoke/data_sha256.csv",
+   "summary": "48 R0 dataset files = pinned R1_SMOKE hashes"
+  },
+  {
+   "gate": "Job A = R0 (wrapper + 21 bipolar files)",
+   "status": "PASS",
+   "mode": "exact",
+   "detail": {
+    "stats": {
+     "ch_mean_uV_max_rel": 0.0,
+     "ch_std_uV_max_rel": 0.0,
+     "artifact_thresh_uV_max_rel": 0.0,
+     "n_interictal": [
+      7459,
+      7459
+     ],
+     "n_ictal": [
+      271,
+      271
+     ],
+     "n_rejected": [
+      5739,
+      5739
+     ],
+     "ratio": [
+      27.5,
+      27.5
+     ],
+     "status": "PASS"
+    },
+    "stats_ok": true,
+    "files_equal": true,
+    "skipped_new": [],
+    "skipped_reference": [
+     "chb12_27.edf",
+     "chb12_28.edf",
+     "chb12_29.edf"
+    ],
+    "skipped_as_expected": true,
+    "keys_equal": true,
+    "n_windows": [
+     18617,
+     18617
+    ],
+    "is_ictal_equal": true,
+    "is_buffer_equal": true,
+    "is_flag5sd_equal": true,
+    "is_signal_loss_equal": true,
+    "file_idx_equal": true,
+    "chain": {
+     "n_windows": 18616,
+     "f7_max_abs": 0.0,
+     "f7_finite_mask_diff": 0,
+     "f7_windows_over_tol": 0,
+     "bp5_max_abs": 0.0,
+     "bp5_finite_mask_diff": 0,
+     "bp5_windows_over_tol": 0,
+     "zgamma_raw_max_abs": 0.0,
+     "zgamma_raw_finite_mask_diff": 0,
+     "adj_frac_differing": 0.0,
+     "adj_windows_differing": 0,
+     "status": "PASS"
+    },
+    "all_windows": {
+     "n_windows": 18617,
+     "f7_max_abs": 0.0,
+     "f7_finite_mask_diff": 0,
+     "f7_windows_over_tol": 0,
+     "bp5_max_abs": 0.0,
+     "bp5_finite_mask_diff": 0,
+     "bp5_windows_over_tol": 0,
+     "zgamma_raw_max_abs": 0.0,
+     "zgamma_raw_finite_mask_diff": 0,
+     "adj_frac_differing": 0.0,
+     "adj_windows_differing": 0,
+     "status": "PASS"
+    },
+    "bit_equal": {
+     "adj": true,
+     "bp5": true,
+     "f7": true,
+     "file_idx": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_ictal": true,
+     "is_signal_loss": true,
+     "zgamma_raw": true
+    },
+    "count_identity_A": {
+     "n_ictal": [
+      271,
+      271
+     ],
+     "inter_plus_rejected": [
+      13198,
+      13198
+     ]
+    }
+   },
+   "summary": "mode exact: stats and every array equal to R0's chb12; skipped_files [] vs the three referential files (expected)"
+  },
+  {
+   "gate": "Job B (wrapper + 24 files)",
+   "status": "PASS",
+   "bad": [],
+   "detail": {
+    "parsers_agree": {
+     "chb12_06.edf": true,
+     "chb12_08.edf": true,
+     "chb12_09.edf": true,
+     "chb12_10.edf": true,
+     "chb12_11.edf": true,
+     "chb12_19.edf": true,
+     "chb12_20.edf": true,
+     "chb12_21.edf": true,
+     "chb12_23.edf": true,
+     "chb12_24.edf": true,
+     "chb12_27.edf": true,
+     "chb12_28.edf": true,
+     "chb12_29.edf": true,
+     "chb12_32.edf": true,
+     "chb12_33.edf": true,
+     "chb12_34.edf": true,
+     "chb12_35.edf": true,
+     "chb12_36.edf": true,
+     "chb12_37.edf": true,
+     "chb12_38.edf": true,
+     "chb12_39.edf": true,
+     "chb12_40.edf": true,
+     "chb12_41.edf": true,
+     "chb12_42.edf": true
+    },
+    "seizures_new": {
+     "chb12_27.edf": 6,
+     "chb12_28.edf": 1,
+     "chb12_29.edf": 6
+    },
+    "per_file": {
+     "chb12_06.edf": {
+      "windows": 901,
+      "windows_header": 901,
+      "ictal": 25,
+      "buffer": 470,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_08.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 24,
+      "buffer": 541,
+      "signal_loss": 1,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_09.edf": {
+      "windows": 903,
+      "windows_header": 903,
+      "ictal": 18,
+      "buffer": 125,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_10.edf": {
+      "windows": 902,
+      "windows_header": 902,
+      "ictal": 21,
+      "buffer": 746,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_11.edf": {
+      "windows": 607,
+      "windows_header": 607,
+      "ictal": 10,
+      "buffer": 327,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_19.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_20.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_21.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_23.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 57,
+      "buffer": 817,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_24.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_27.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 60,
+      "buffer": 663,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "ok": true
+     },
+     "chb12_28.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 9,
+      "buffer": 847,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "ok": true
+     },
+     "chb12_29.edf": {
+      "windows": 906,
+      "windows_header": 906,
+      "ictal": 60,
+      "buffer": 870,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "ok": true
+     },
+     "chb12_32.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_33.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 13,
+      "buffer": 349,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_34.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_35.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_36.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 7,
+      "buffer": 730,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_37.edf": {
+      "windows": 904,
+      "windows_header": 904,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_38.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 53,
+      "buffer": 507,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_39.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_40.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_41.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 0,
+      "buffer": 0,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     },
+     "chb12_42.edf": {
+      "windows": 900,
+      "windows_header": 900,
+      "ictal": 43,
+      "buffer": 713,
+      "signal_loss": 0,
+      "ictal_expected_equal": true,
+      "buffer_expected_equal": true,
+      "equal_to_A": {
+       "is_ictal": true,
+       "is_buffer": true,
+       "is_signal_loss": true
+      },
+      "ok": true
+     }
+    },
+    "count_identity_B": {
+     "n_ictal": [
+      400,
+      400
+     ],
+     "inter_plus_rejected": [
+      13498,
+      13498
+     ]
+    },
+    "ictal_new_files": 129,
+    "nonictal_nonbuffer_new_files": 300,
+    "n_ictal_A_plus_new": [
+     400,
+     400
+    ],
+    "inter_rej_A_plus_new": [
+     13498,
+     13498
+    ],
+    "f7_finite_outside_signal_loss": true,
+    "n_ref": [
+     27,
+     40
+    ]
+   },
+   "summary": "24 files, seizures {'chb12_27.edf': 6, 'chb12_28.edf': 1, 'chb12_29.edf': 6}, labels = independent recomputation, 21 common files = Job A, counts consistent; n_ref 27 -> 40"
+  },
+  {
+   "gate": "G-clip",
+   "status": "PASS",
+   "bad": [],
+   "summary": "per electrode, per derivation and per file = RB0b's tables; 8 of 13 seizures and 14 clean windows hold clipped samples"
+  },
+  {
+   "gate": "G-copy",
+   "status": "PASS",
+   "bad": [],
+   "copied": 46,
+   "chb12": {
+    "chb12.npz": {
+     "bytes": 32457006,
+     "sha256": "5267a74649aeae6d8acef7554b11cf32c191c42abd80b109483ad29c7a69d7f0"
+    },
+    "chb12_stats.json": {
+     "bytes": 1940,
+     "sha256": "22bb105f87531900dc49ffce89ef329faf8836e2120c23a26006e3cd5675b6c2"
+    }
+   },
+   "summary": "46 files copied, sha256 = pin"
+  }
+ ]
+}

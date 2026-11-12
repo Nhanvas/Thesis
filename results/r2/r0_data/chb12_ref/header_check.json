@@ -1,0 +1,2146 @@
+{
+  "A_headers": {
+    "chb12_27": {
+      "sha256": "3f850341d86a547ddde2cb145dddfc3d0f963738ae2d0a5ff8bdda646978869b",
+      "n_channels": 29,
+      "n_channels_mne": 29,
+      "sfreq_mne_hz": 256.0,
+      "n_samples_mne": 921600,
+      "duration_s": 3600.0,
+      "channels": [
+        {
+          "label": "F7-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P7-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP1-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F3-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C3-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P3-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "O1-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FZ-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CZ-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "PZ-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F4-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C4-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P4-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "O2-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "F8-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P8-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "C2-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C6-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP2-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP4-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP6-CS2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        }
+      ]
+    },
+    "chb12_28": {
+      "sha256": "46783d0e45c494a5e904f80315700daf98b966957ebb770b08d6666fafee7780",
+      "n_channels": 29,
+      "n_channels_mne": 29,
+      "sfreq_mne_hz": 256.0,
+      "n_samples_mne": 921600,
+      "duration_s": 3600.0,
+      "channels": [
+        {
+          "label": "F7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP1",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "01",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "PZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "O2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "F8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "EKG1-CHIN",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C6",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP6",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        }
+      ]
+    },
+    "chb12_29": {
+      "sha256": "033299f599912cd2a11e90c4e84b506efb07d1b454786e3d2a8547aeb4e8cc76",
+      "n_channels": 29,
+      "n_channels_mne": 29,
+      "sfreq_mne_hz": 256.0,
+      "n_samples_mne": 927744,
+      "duration_s": 3624.0,
+      "channels": [
+        {
+          "label": "F7",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P7",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP1",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F3",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C3",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P3",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "01",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FZ",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CZ",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "PZ",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F4",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C4",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P4",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "O2",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "F8",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P8",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "EKG1-CHIN",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C2",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C6",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP2",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP4",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CP6",
+          "fs_hz": 256.0,
+          "n_samples": 927744,
+          "duration_s": 3624.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        }
+      ]
+    },
+    "chb12_24": {
+      "sha256": "35bfcbca0c69c405edddf6b16951ff5456f26b4a59fcd7b7d97c450297c7dc8d",
+      "n_channels": 28,
+      "n_channels_mne": 28,
+      "sfreq_mne_hz": 256.0,
+      "n_samples_mne": 921600,
+      "duration_s": 3600.0,
+      "channels": [
+        {
+          "label": "FP1-F7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F7-T7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7-P7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P7-O1",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP1-F3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F3-C3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C3-P3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P3-O1",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FZ-CZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CZ-PZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2-F4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F4-C4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C4-P4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P4-O2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2-F8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F8-T8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8-P8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P8-O2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "P7-T7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7-FT9",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "FT9-FT10",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "FT10-T8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8-P8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        }
+      ]
+    },
+    "chb12_32": {
+      "sha256": "bc63d16f0096548649183a184f12519fd8efd77f60050346235eca95109ba110",
+      "n_channels": 29,
+      "n_channels_mne": 29,
+      "sfreq_mne_hz": 256.0,
+      "n_samples_mne": 921600,
+      "duration_s": 3600.0,
+      "channels": [
+        {
+          "label": "FP1-F7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F7-T7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7-P7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P7-O1",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP1-F3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F3-C3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C3-P3",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P3-O1",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FZ-CZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "CZ-PZ",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2-F4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F4-C4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "C4-P4",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P4-O2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "FP2-F8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "F8-T8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8-P8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "P8-O2",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "-",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -1.0,
+          "physical_max": 1.0,
+          "digital_min": 0,
+          "digital_max": 0
+        },
+        {
+          "label": "P7-T7",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T7-FT9",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "FT9-FT10",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "FT10-T8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "T8-P8",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        },
+        {
+          "label": "LOC-ROC",
+          "fs_hz": 256.0,
+          "n_samples": 921600,
+          "duration_s": 3600.0,
+          "physical_dimension": "uV",
+          "physical_min": -800.0,
+          "physical_max": 800.0,
+          "digital_min": -2048,
+          "digital_max": 2047
+        }
+      ]
+    }
+  },
+  "B_bipolar_formation": {
+    "chb12_27": {
+      "stored_labels": [
+        "F7-CS2",
+        "T7-CS2",
+        "P7-CS2",
+        "-",
+        "FP1-CS2",
+        "F3-CS2",
+        "C3-CS2",
+        "P3-CS2",
+        "O1-CS2",
+        "-",
+        "FZ-CS2",
+        "CZ-CS2",
+        "PZ-CS2",
+        "-",
+        "FP2-CS2",
+        "F4-CS2",
+        "C4-CS2",
+        "P4-CS2",
+        "O2-CS2",
+        "-",
+        "F8-CS2",
+        "T8-CS2",
+        "P8-CS2",
+        "-",
+        "C2-CS2",
+        "C6-CS2",
+        "CP2-CS2",
+        "CP4-CS2",
+        "CP6-CS2"
+      ],
+      "normalization_mappings_applied": [
+        "strip trailing -CS2"
+      ],
+      "electrode_to_stored_label": {
+        "C3": "C3-CS2",
+        "C4": "C4-CS2",
+        "CZ": "CZ-CS2",
+        "F3": "F3-CS2",
+        "F4": "F4-CS2",
+        "F7": "F7-CS2",
+        "F8": "F8-CS2",
+        "FP1": "FP1-CS2",
+        "FP2": "FP2-CS2",
+        "FZ": "FZ-CS2",
+        "O1": "O1-CS2",
+        "O2": "O2-CS2",
+        "P3": "P3-CS2",
+        "P4": "P4-CS2",
+        "P7": "P7-CS2",
+        "P8": "P8-CS2",
+        "PZ": "PZ-CS2",
+        "T7": "T7-CS2",
+        "T8": "T8-CS2"
+      },
+      "missing_electrodes": [],
+      "duplicated_electrode_names": {},
+      "extra_channels": {
+        "-": [
+          "-",
+          "-",
+          "-",
+          "-",
+          "-"
+        ],
+        "C2": [
+          "C2-CS2"
+        ],
+        "C6": [
+          "C6-CS2"
+        ],
+        "CP2": [
+          "CP2-CS2"
+        ],
+        "CP4": [
+          "CP4-CS2"
+        ],
+        "CP6": [
+          "CP6-CS2"
+        ]
+      }
+    },
+    "chb12_28": {
+      "stored_labels": [
+        "F7",
+        "T7",
+        "P7",
+        "-",
+        "FP1",
+        "F3",
+        "C3",
+        "P3",
+        "01",
+        "-",
+        "FZ",
+        "CZ",
+        "PZ",
+        "-",
+        "FP2",
+        "F4",
+        "C4",
+        "P4",
+        "O2",
+        "-",
+        "F8",
+        "T8",
+        "P8",
+        "EKG1-CHIN",
+        "C2",
+        "C6",
+        "CP2",
+        "CP4",
+        "CP6"
+      ],
+      "normalization_mappings_applied": [
+        "map 01 -> O1"
+      ],
+      "electrode_to_stored_label": {
+        "C3": "C3",
+        "C4": "C4",
+        "CZ": "CZ",
+        "F3": "F3",
+        "F4": "F4",
+        "F7": "F7",
+        "F8": "F8",
+        "FP1": "FP1",
+        "FP2": "FP2",
+        "FZ": "FZ",
+        "O1": "01",
+        "O2": "O2",
+        "P3": "P3",
+        "P4": "P4",
+        "P7": "P7",
+        "P8": "P8",
+        "PZ": "PZ",
+        "T7": "T7",
+        "T8": "T8"
+      },
+      "missing_electrodes": [],
+      "duplicated_electrode_names": {},
+      "extra_channels": {
+        "-": [
+          "-",
+          "-",
+          "-",
+          "-"
+        ],
+        "EKG1-CHIN": [
+          "EKG1-CHIN"
+        ],
+        "C2": [
+          "C2"
+        ],
+        "C6": [
+          "C6"
+        ],
+        "CP2": [
+          "CP2"
+        ],
+        "CP4": [
+          "CP4"
+        ],
+        "CP6": [
+          "CP6"
+        ]
+      }
+    },
+    "chb12_29": {
+      "stored_labels": [
+        "F7",
+        "T7",
+        "P7",
+        "-",
+        "FP1",
+        "F3",
+        "C3",
+        "P3",
+        "01",
+        "-",
+        "FZ",
+        "CZ",
+        "PZ",
+        "-",
+        "FP2",
+        "F4",
+        "C4",
+        "P4",
+        "O2",
+        "-",
+        "F8",
+        "T8",
+        "P8",
+        "EKG1-CHIN",
+        "C2",
+        "C6",
+        "CP2",
+        "CP4",
+        "CP6"
+      ],
+      "normalization_mappings_applied": [
+        "map 01 -> O1"
+      ],
+      "electrode_to_stored_label": {
+        "C3": "C3",
+        "C4": "C4",
+        "CZ": "CZ",
+        "F3": "F3",
+        "F4": "F4",
+        "F7": "F7",
+        "F8": "F8",
+        "FP1": "FP1",
+        "FP2": "FP2",
+        "FZ": "FZ",
+        "O1": "01",
+        "O2": "O2",
+        "P3": "P3",
+        "P4": "P4",
+        "P7": "P7",
+        "P8": "P8",
+        "PZ": "PZ",
+        "T7": "T7",
+        "T8": "T8"
+      },
+      "missing_electrodes": [],
+      "duplicated_electrode_names": {},
+      "extra_channels": {
+        "-": [
+          "-",
+          "-",
+          "-",
+          "-"
+        ],
+        "EKG1-CHIN": [
+          "EKG1-CHIN"
+        ],
+        "C2": [
+          "C2"
+        ],
+        "C6": [
+          "C6"
+        ],
+        "CP2": [
+          "CP2"
+        ],
+        "CP4": [
+          "CP4"
+        ],
+        "CP6": [
+          "CP6"
+        ]
+      }
+    }
+  },
+  "C_plausibility": {
+    "chb12_27": {
+      "n_seizures": 6,
+      "seizure_times_s": [
+        [
+          916,
+          951
+        ],
+        [
+          1097,
+          1124
+        ],
+        [
+          1728,
+          1753
+        ],
+        [
+          1921,
+          1963
+        ],
+        [
+          2388,
+          2440
+        ],
+        [
+          2621,
+          2669
+        ]
+      ],
+      "windows_in_first_10min_total": 150,
+      "windows_excluded_seizure_or_buffer": 0,
+      "windows_kept": 150,
+      "median_rms_uV_per_channel": {
+        "FP1-F7": 175.53584452079542,
+        "F7-T7": 74.69030787057986,
+        "T7-P7": 190.34137050489255,
+        "P7-O1": 167.55077344573158,
+        "FP1-F3": 175.27782510129975,
+        "F3-C3": 175.7767996663694,
+        "C3-P3": 191.23431185418892,
+        "P3-O1": 141.71802915875634,
+        "FP2-F4": 104.03983195975178,
+        "F4-C4": 52.945443688643536,
+        "C4-P4": 82.05336934764918,
+        "P4-O2": 134.06625453831253,
+        "FP2-F8": 69.76774914634007,
+        "F8-T8": 106.07102757319862,
+        "T8-P8": 52.646722297801404,
+        "P8-O2": 146.74134912627645,
+        "FZ-CZ": 187.86385570054415,
+        "CZ-PZ": 45.140981804080994
+      },
+      "ratio_to_mean_comparison_files": {
+        "FP1-F7": 3.5144194979707355,
+        "F7-T7": 1.5045010930784173,
+        "T7-P7": 2.8527133371087867,
+        "P7-O1": 2.5145998825749922,
+        "FP1-F3": 3.508459916047236,
+        "F3-C3": 4.865727855295425,
+        "C3-P3": 4.8361000547165185,
+        "P3-O1": 4.137532502430897,
+        "FP2-F4": 2.088135444558196,
+        "F4-C4": 1.5885412510061865,
+        "C4-P4": 2.5739922750493647,
+        "P4-O2": 3.134207353326021,
+        "FP2-F8": 1.317913320056199,
+        "F8-T8": 1.9841636603875892,
+        "T8-P8": 0.8426232464773019,
+        "P8-O2": 2.5714202023274693,
+        "FZ-CZ": 6.480163920773215,
+        "CZ-PZ": 1.4900206576101833
+      }
+    },
+    "chb12_28": {
+      "n_seizures": 1,
+      "seizure_times_s": [
+        [
+          181,
+          215
+        ]
+      ],
+      "windows_in_first_10min_total": 150,
+      "windows_excluded_seizure_or_buffer": 39,
+      "windows_kept": 111,
+      "median_rms_uV_per_channel": {
+        "FP1-F7": 15.369317893213344,
+        "F7-T7": 22.147611592205422,
+        "T7-P7": 27.49350070166239,
+        "P7-O1": 22.438040550002555,
+        "FP1-F3": 22.551846964949238,
+        "F3-C3": 26.46228552688026,
+        "C3-P3": 28.26703576289904,
+        "P3-O1": 22.54726094761764,
+        "FP2-F4": 21.18649665707332,
+        "F4-C4": 33.554832737696245,
+        "C4-P4": 27.09000427700384,
+        "P4-O2": 30.167492730937575,
+        "FP2-F8": 17.46972185445234,
+        "F8-T8": 24.601811359971695,
+        "T8-P8": 28.173227931423007,
+        "P8-O2": 25.758562449903792,
+        "FZ-CZ": 27.352863124166806,
+        "CZ-PZ": 27.511474073387607
+      },
+      "ratio_to_mean_comparison_files": {
+        "FP1-F7": 0.30771054551209065,
+        "F7-T7": 0.4461235573869458,
+        "T7-P7": 0.41205480409959583,
+        "P7-O1": 0.336749827959011,
+        "FP1-F3": 0.45141050251866227,
+        "F3-C3": 0.7325100926135305,
+        "C3-P3": 0.7148414522173283,
+        "P3-O1": 0.6582791587304172,
+        "FP2-F4": 0.4252243951409212,
+        "F4-C4": 1.0067577540364732,
+        "C4-P4": 0.8498061968013488,
+        "P4-O2": 0.7052570975024416,
+        "FP2-F8": 0.3300031807155902,
+        "F8-T8": 0.4602012556772896,
+        "T8-P8": 0.45091917876741294,
+        "P8-O2": 0.45137984801814596,
+        "FZ-CZ": 0.9435079253862053,
+        "CZ-PZ": 0.9081030817754289
+      }
+    },
+    "chb12_29": {
+      "n_seizures": 6,
+      "seizure_times_s": [
+        [
+          107,
+          146
+        ],
+        [
+          554,
+          592
+        ],
+        [
+          1163,
+          1199
+        ],
+        [
+          1401,
+          1447
+        ],
+        [
+          1884,
+          1921
+        ],
+        [
+          3557,
+          3584
+        ]
+      ],
+      "windows_in_first_10min_total": 150,
+      "windows_excluded_seizure_or_buffer": 68,
+      "windows_kept": 82,
+      "median_rms_uV_per_channel": {
+        "FP1-F7": 23.353697137098354,
+        "F7-T7": 31.735639427491016,
+        "T7-P7": 34.681559731049134,
+        "P7-O1": 30.625628191426603,
+        "FP1-F3": 30.294890418200282,
+        "F3-C3": 27.770327109902503,
+        "C3-P3": 33.15339839391467,
+        "P3-O1": 27.766384684817798,
+        "FP2-F4": 33.59430100110894,
+        "F4-C4": 29.353732088541094,
+        "C4-P4": 30.49534679729889,
+        "P4-O2": 35.46292955131534,
+        "FP2-F8": 27.257432817314417,
+        "F8-T8": 34.910863537049664,
+        "T8-P8": 40.2607705865899,
+        "P8-O2": 31.94933602769393,
+        "FZ-CZ": 26.541022241145615,
+        "CZ-PZ": 29.94390871696308
+      },
+      "ratio_to_mean_comparison_files": {
+        "FP1-F7": 0.46756654626513366,
+        "F7-T7": 0.6392570277114868,
+        "T7-P7": 0.5197847831717478,
+        "P7-O1": 0.45962903942601047,
+        "FP1-F3": 0.6063996323087136,
+        "F3-C3": 0.7687183657103001,
+        "C3-P3": 0.8384120518555219,
+        "P3-O1": 0.8106542250861859,
+        "FP2-F4": 0.6742557089356896,
+        "F4-C4": 0.8807106153996263,
+        "C4-P4": 0.9566308818913551,
+        "P4-O2": 0.8290540744423648,
+        "FP2-F8": 0.5148931163756788,
+        "F8-T8": 0.653042290319685,
+        "T8-P8": 0.6443831588498908,
+        "P8-O2": 0.5598637916424185,
+        "FZ-CZ": 0.915504337469068,
+        "CZ-PZ": 0.9883932687045589
+      }
+    },
+    "chb12_24": {
+      "n_seizures": 0,
+      "seizure_times_s": [],
+      "windows_in_first_10min_total": 150,
+      "windows_excluded_seizure_or_buffer": 0,
+      "windows_kept": 150,
+      "median_rms_uV_per_channel": {
+        "FP1-F7": 48.89685220015788,
+        "F7-T7": 50.61922913566825,
+        "T7-P7": 71.4900031501721,
+        "P7-O1": 72.93207369990375,
+        "FP1-F3": 46.63878315810557,
+        "F3-C3": 37.860570344203396,
+        "C3-P3": 42.78418870997926,
+        "P3-O1": 35.63339839484562,
+        "FP2-F4": 48.80233709719367,
+        "F4-C4": 34.751173625393605,
+        "C4-P4": 35.426289243552546,
+        "P4-O2": 47.24792113236738,
+        "FP2-F8": 50.96239242209924,
+        "F8-T8": 56.37048037098836,
+        "T8-P8": 73.47688199422203,
+        "P8-O2": 71.85463985950506,
+        "FZ-CZ": 29.473904559543655,
+        "CZ-PZ": 31.530604842679093
+      }
+    },
+    "chb12_32": {
+      "n_seizures": 0,
+      "seizure_times_s": [],
+      "windows_in_first_10min_total": 150,
+      "windows_excluded_seizure_or_buffer": 0,
+      "windows_kept": 150,
+      "median_rms_uV_per_channel": {
+        "FP1-F7": 50.99779305898193,
+        "F7-T7": 48.669908259045314,
+        "T7-P7": 61.955841568177874,
+        "P7-O1": 60.33029905910297,
+        "FP1-F3": 53.27846218341989,
+        "F3-C3": 34.39040829409821,
+        "C3-P3": 36.30197976897238,
+        "P3-O1": 32.8702467489659,
+        "FP2-F4": 50.84621034821818,
+        "F4-C4": 31.90802537885981,
+        "C4-P4": 28.3294338353565,
+        "P4-O2": 38.302420261632236,
+        "FP2-F8": 54.91368923608598,
+        "F8-T8": 50.547139068205034,
+        "T8-P8": 51.482220470368155,
+        "P8-O2": 42.27789203353714,
+        "FZ-CZ": 28.50730023631533,
+        "CZ-PZ": 29.060476997061013
+      }
+    }
+  },
+  "runtime_s": 15.16151738166809
+}

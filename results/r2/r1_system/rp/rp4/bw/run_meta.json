@@ -1,0 +1,10 @@
+{
+ "script_sha16": "b1bda1fa40d06d76",
+ "B": 2000,
+ "rng": 42,
+ "elapsed_s": 206.9,
+ "numpy": "2.5.3",
+ "pandas": "3.0.5",
+ "sklearn": "1.8.0",
+ "statsmodels": "0.15.0"
+}

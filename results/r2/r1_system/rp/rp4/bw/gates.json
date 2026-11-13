@@ -1,0 +1,8 @@
+{
+ "G1": "PASS",
+ "G1_rows": 24,
+ "G1_max_abs_diff": 2.220446049250313e-16,
+ "G2": "PASS",
+ "G2_rows_equal_tp": 136,
+ "G2_rows": 144
+}

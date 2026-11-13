@@ -1,45 +1,111 @@
 {
- "stopped": [
-  "G-in chb24: summary sha256"
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "pandas": "2.3.3",
+  "mne": "1.12.1"
+ },
+ "runtime_s": 3879.1,
+ "procs": 4,
+ "cases": [
+  "chb01",
+  "chb02",
+  "chb03",
+  "chb04",
+  "chb05",
+  "chb06",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb10",
+  "chb11",
+  "chb12",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb22",
+  "chb23",
+  "chb24",
+  "PN00",
+  "PN01",
+  "PN03",
+  "PN05",
+  "PN06",
+  "PN07",
+  "PN09",
+  "PN10",
+  "PN11",
+  "PN12",
+  "PN13",
+  "PN14",
+  "PN16",
+  "PN17"
  ],
+ "code_sha": "03e8257c463388a4698978b6031e946e013a2fafb68ce51bfe4ba25baef2118f",
+ "reused": [],
+ "case_runtime_s": {
+  "chb01": 416.6,
+  "chb02": 811.1,
+  "chb03": 401.6,
+  "chb04": 2307.8,
+  "chb05": 377.4,
+  "chb06": 1049.1,
+  "chb07": 983.2,
+  "chb08": 216.2,
+  "chb09": 1010.6,
+  "chb10": 581.3,
+  "chb11": 349.0,
+  "chb12": 232.3,
+  "chb13": 316.7,
+  "chb14": 274.7,
+  "chb15": 438.7,
+  "chb16": 210.6,
+  "chb17": 236.3,
+  "chb18": 395.8,
+  "chb19": 322.7,
+  "chb20": 287.0,
+  "chb21": 354.6,
+  "chb22": 340.1,
+  "chb23": 332.8,
+  "chb24": 195.1,
+  "PN00": 57.4,
+  "PN01": 178.1,
+  "PN03": 374.6,
+  "PN05": 89.0,
+  "PN06": 147.9,
+  "PN07": 127.2,
+  "PN09": 77.0,
+  "PN10": 209.4,
+  "PN11": 27.8,
+  "PN12": 70.0,
+  "PN13": 101.2,
+  "PN14": 192.2,
+  "PN16": 54.5,
+  "PN17": 50.0
+ },
  "gates": {
-  "chb04": {
+  "chb07": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 2.7712272957336274e-11,
-    "sd_max_rel": 5.9109203220634744e-08
+    "mean_max_rel_to_sd": 4.939099607764913e-11,
+    "sd_max_rel": 6.872527621269975e-08
    },
    "G-flags": {
     "status": "PASS",
     "got": {
-     "flag5sd": 40393,
-     "clean": 94450
+     "flag5sd": 29665,
+     "clean": 28016
     },
     "ref": {
-     "flag5sd": 40393,
-     "clean": 94450
-    }
-   },
-   "G-in": {
-    "status": "PASS",
-    "files": 42
-   }
-  },
-  "chb09": {
-   "G-stats": {
-    "status": "PASS",
-    "mean_max_rel_to_sd": 3.305580673844226e-11,
-    "sd_max_rel": 8.740217952951449e-08
-   },
-   "G-flags": {
-    "status": "PASS",
-    "got": {
-     "flag5sd": 21138,
-     "clean": 36432
-    },
-    "ref": {
-     "flag5sd": 21138,
-     "clean": 36432
+     "flag5sd": 29665,
+     "clean": 28016
     }
    },
    "G-in": {
@@ -47,21 +113,21 @@
     "files": 19
    }
   },
-  "chb07": {
+  "chb09": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 4.9390630641149113e-11,
-    "sd_max_rel": 6.872527910034652e-08
+    "mean_max_rel_to_sd": 3.305598979954713e-11,
+    "sd_max_rel": 8.740217801676248e-08
    },
    "G-flags": {
     "status": "PASS",
     "got": {
-     "flag5sd": 29665,
-     "clean": 28016
+     "flag5sd": 21138,
+     "clean": 36432
     },
     "ref": {
-     "flag5sd": 29665,
-     "clean": 28016
+     "flag5sd": 21138,
+     "clean": 36432
     }
    },
    "G-in": {
@@ -72,8 +138,8 @@
   "chb06": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 4.528780891160335e-11,
-    "sd_max_rel": 8.307971178298031e-08
+    "mean_max_rel_to_sd": 4.528718150073799e-11,
+    "sd_max_rel": 8.307970911188076e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -91,33 +157,11 @@
     "files": 18
    }
   },
-  "chb10": {
-   "G-stats": {
-    "status": "PASS",
-    "mean_max_rel_to_sd": 4.55917269287622e-11,
-    "sd_max_rel": 9.617729192012505e-08
-   },
-   "G-flags": {
-    "status": "PASS",
-    "got": {
-     "flag5sd": 10974,
-     "clean": 28530
-    },
-    "ref": {
-     "flag5sd": 10974,
-     "clean": 28530
-    }
-   },
-   "G-in": {
-    "status": "PASS",
-    "files": 25
-   }
-  },
   "chb01": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 4.6905188893555185e-11,
-    "sd_max_rel": 6.999127014855017e-08
+    "mean_max_rel_to_sd": 4.690591707895459e-11,
+    "sd_max_rel": 6.999126570781735e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -138,8 +182,8 @@
   "chb15": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 1.0376376388444893e-10,
-    "sd_max_rel": 7.283709530633945e-08
+    "mean_max_rel_to_sd": 1.0376422379141054e-10,
+    "sd_max_rel": 7.283709038332935e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -157,11 +201,33 @@
     "files": 40
    }
   },
+  "chb10": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 4.559163958448524e-11,
+    "sd_max_rel": 9.61772886598766e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 10974,
+     "clean": 28530
+    },
+    "ref": {
+     "flag5sd": 10974,
+     "clean": 28530
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 25
+   }
+  },
   "chb05": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 2.141025551271075e-11,
-    "sd_max_rel": 4.6396241669591425e-08
+    "mean_max_rel_to_sd": 2.1409382483181673e-11,
+    "sd_max_rel": 4.639624537403312e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -182,8 +248,8 @@
   "chb03": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 7.962231833476576e-11,
-    "sd_max_rel": 8.834572671561045e-08
+    "mean_max_rel_to_sd": 7.962260036101614e-11,
+    "sd_max_rel": 8.834573472836497e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -204,8 +270,8 @@
   "chb18": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 4.294093543032075e-11,
-    "sd_max_rel": 5.3562751176298974e-08
+    "mean_max_rel_to_sd": 4.294041368907941e-11,
+    "sd_max_rel": 5.3562760199903664e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -216,28 +282,6 @@
     "ref": {
      "flag5sd": 14817,
      "clean": 14851
-    }
-   },
-   "G-in": {
-    "status": "PASS",
-    "files": 36
-   }
-  },
-  "chb02": {
-   "G-stats": {
-    "status": "PASS",
-    "mean_max_rel_to_sd": 4.6050596065365816e-11,
-    "sd_max_rel": 8.218797992044818e-08
-   },
-   "G-flags": {
-    "status": "PASS",
-    "got": {
-     "flag5sd": 13512,
-     "clean": 17805
-    },
-    "ref": {
-     "flag5sd": 13512,
-     "clean": 17805
     }
    },
    "G-in": {
@@ -248,8 +292,8 @@
   "chb11": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 8.440418134913545e-11,
-    "sd_max_rel": 7.569704903292528e-08
+    "mean_max_rel_to_sd": 8.440441380321893e-11,
+    "sd_max_rel": 7.56970453382689e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -267,43 +311,43 @@
     "files": 35
    }
   },
-  "chb13": {
+  "chb04": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 4.795585269501329e-11,
-    "sd_max_rel": 8.269649007407834e-08
+    "mean_max_rel_to_sd": 2.771225667042582e-11,
+    "sd_max_rel": 5.910919950623122e-08
    },
    "G-flags": {
     "status": "PASS",
     "got": {
-     "flag5sd": 12776,
-     "clean": 12448
+     "flag5sd": 40393,
+     "clean": 94450
     },
     "ref": {
-     "flag5sd": 12776,
-     "clean": 12448
+     "flag5sd": 40393,
+     "clean": 94450
     }
    },
    "G-in": {
     "status": "PASS",
-    "files": 33
+    "files": 42
    }
   },
-  "chb21": {
+  "chb13": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 7.297871415948351e-11,
-    "sd_max_rel": 9.047428241361831e-08
+    "mean_max_rel_to_sd": 4.795663504382151e-11,
+    "sd_max_rel": 8.269648593405346e-08
    },
    "G-flags": {
     "status": "PASS",
     "got": {
-     "flag5sd": 16596,
-     "clean": 11619
+     "flag5sd": 12776,
+     "clean": 12448
     },
     "ref": {
-     "flag5sd": 16596,
-     "clean": 11619
+     "flag5sd": 12776,
+     "clean": 12448
     }
    },
    "G-in": {
@@ -314,8 +358,8 @@
   "chb22": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 6.370010401168701e-11,
-    "sd_max_rel": 6.227441644958e-08
+    "mean_max_rel_to_sd": 6.369974105649946e-11,
+    "sd_max_rel": 6.227441015563999e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -333,11 +377,55 @@
     "files": 31
    }
   },
+  "chb02": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 4.605085548415885e-11,
+    "sd_max_rel": 8.218797443031669e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 13512,
+     "clean": 17805
+    },
+    "ref": {
+     "flag5sd": 13512,
+     "clean": 17805
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 36
+   }
+  },
+  "chb21": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 7.297791332381968e-11,
+    "sd_max_rel": 9.04742770526218e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 16596,
+     "clean": 11619
+    },
+    "ref": {
+     "flag5sd": 16596,
+     "clean": 11619
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 33
+   }
+  },
   "chb19": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 7.80564191689968e-11,
-    "sd_max_rel": 8.291724043445631e-08
+    "mean_max_rel_to_sd": 7.805620597251312e-11,
+    "sd_max_rel": 8.291724172707585e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -355,11 +443,55 @@
     "files": 30
    }
   },
+  "chb12": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 8.81127579472829e-11,
+    "sd_max_rel": 7.4989465514165e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 5209,
+     "clean": 8288
+    },
+    "ref": {
+     "flag5sd": 5209,
+     "clean": 8288
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 24
+   }
+  },
+  "chb14": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 1.136550462027233e-10,
+    "sd_max_rel": 7.852370781996443e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 6670,
+     "clean": 13981
+    },
+    "ref": {
+     "flag5sd": 6670,
+     "clean": 13981
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 26
+   }
+  },
   "chb20": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 7.232489255430736e-11,
-    "sd_max_rel": 9.18819048792468e-08
+    "mean_max_rel_to_sd": 7.232402808065717e-11,
+    "sd_max_rel": 9.188190236088911e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -380,8 +512,8 @@
   "chb23": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 1.0079011116436066e-10,
-    "sd_max_rel": 5.986899597937285e-08
+    "mean_max_rel_to_sd": 1.0078904552923465e-10,
+    "sd_max_rel": 5.986900084827956e-08
    },
    "G-flags": {
     "status": "PASS",
@@ -399,56 +531,275 @@
     "files": 9
    }
   },
-  "chb14": {
+  "chb24": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 1.1365410423881983e-10,
-    "sd_max_rel": 7.852371195679537e-08
+    "mean_max_rel_to_sd": 6.355442334734568e-11,
+    "sd_max_rel": 8.286737622885853e-08
    },
    "G-flags": {
-    "status": "PASS",
+    "status": "NOT GATED",
     "got": {
-     "flag5sd": 6670,
-     "clean": 13981
+     "flag5sd": 7206,
+     "clean": 7015
     },
-    "ref": {
-     "flag5sd": 6670,
-     "clean": 13981
-    }
+    "note": "no committed flag count for this case"
    },
    "G-in": {
     "status": "PASS",
-    "files": 26
+    "files": 22
    }
   },
-  "chb12": {
+  "chb08": {
    "G-stats": {
     "status": "PASS",
-    "mean_max_rel_to_sd": 8.81127403359204e-11,
-    "sd_max_rel": 7.498946080474664e-08
+    "mean_max_rel_to_sd": 1.079895579404478e-10,
+    "sd_max_rel": 1.0146059299462737e-07
    },
    "G-flags": {
     "status": "PASS",
     "got": {
-     "flag5sd": 5209,
-     "clean": 8288
+     "flag5sd": 9208,
+     "clean": 7549
     },
     "ref": {
-     "flag5sd": 5209,
-     "clean": 8288
+     "flag5sd": 9208,
+     "clean": 7549
     }
    },
    "G-in": {
     "status": "PASS",
-    "files": 24
+    "files": 20
+   }
+  },
+  "chb17": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 8.802774298436201e-11,
+    "sd_max_rel": 8.432242569479905e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 9007,
+     "clean": 8769
+    },
+    "ref": {
+     "flag5sd": 9007,
+     "clean": 8769
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 21
+   }
+  },
+  "PN00": {
+   "G-in": {
+    "status": "PASS",
+    "files": 5
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 5.252545612534142e-18,
+    "sd_max_rel": 6.723258384043701e-16,
+    "windows": 2918,
+    "windows_r0": 2918
+   }
+  },
+  "chb16": {
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 1.0800205569358847e-10,
+    "sd_max_rel": 7.978320336939439e-08
+   },
+   "G-flags": {
+    "status": "PASS",
+    "got": {
+     "flag5sd": 7100,
+     "clean": 6430
+    },
+    "ref": {
+     "flag5sd": 7100,
+     "clean": 6430
+    }
+   },
+   "G-in": {
+    "status": "PASS",
+    "files": 19
+   }
+  },
+  "PN05": {
+   "G-in": {
+    "status": "PASS",
+    "files": 3
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 1.6559228111156775e-18,
+    "sd_max_rel": 4.882061166998188e-16,
+    "windows": 5431,
+    "windows_r0": 5431
+   }
+  },
+  "PN01": {
+   "G-in": {
+    "status": "PASS",
+    "files": 1
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 3.7492839612054445e-18,
+    "sd_max_rel": 1.0930029344536224e-15,
+    "windows": 12139,
+    "windows_r0": 12139
+   }
+  },
+  "PN06": {
+   "G-in": {
+    "status": "PASS",
+    "files": 5
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 3.5454663780290704e-18,
+    "sd_max_rel": 8.926184650397649e-16,
+    "windows": 10864,
+    "windows_r0": 10864
+   }
+  },
+  "PN07": {
+   "G-in": {
+    "status": "PASS",
+    "files": 1
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 1.776752714858204e-18,
+    "sd_max_rel": 7.915005723753837e-16,
+    "windows": 7862,
+    "windows_r0": 7862
+   }
+  },
+  "PN09": {
+   "G-in": {
+    "status": "PASS",
+    "files": 3
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 2.7155188429953724e-18,
+    "sd_max_rel": 7.160465356329696e-16,
+    "windows": 6162,
+    "windows_r0": 6162
+   }
+  },
+  "PN11": {
+   "G-in": {
+    "status": "PASS",
+    "files": 1
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 9.346018927578379e-18,
+    "sd_max_rel": 5.981452113650163e-16,
+    "windows": 2169,
+    "windows_r0": 2169
+   }
+  },
+  "PN12": {
+   "G-in": {
+    "status": "PASS",
+    "files": 3
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 3.231855303923826e-18,
+    "sd_max_rel": 9.076221517420251e-16,
+    "windows": 5488,
+    "windows_r0": 5488
+   }
+  },
+  "PN03": {
+   "G-in": {
+    "status": "PASS",
+    "files": 2
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 1.066066808161258e-17,
+    "sd_max_rel": 1.3485653094734837e-15,
+    "windows": 21804,
+    "windows_r0": 21804
+   }
+  },
+  "PN10": {
+   "G-in": {
+    "status": "PASS",
+    "files": 6
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 7.485147131388978e-18,
+    "sd_max_rel": 1.9996634358961105e-15,
+    "windows": 16852,
+    "windows_r0": 16852
+   }
+  },
+  "PN13": {
+   "G-in": {
+    "status": "PASS",
+    "files": 3
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 3.618013630924651e-18,
+    "sd_max_rel": 1.0353503377464402e-15,
+    "windows": 7797,
+    "windows_r0": 7797
+   }
+  },
+  "PN16": {
+   "G-in": {
+    "status": "PASS",
+    "files": 2
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 3.6349546335460124e-18,
+    "sd_max_rel": 9.93039718596006e-16,
+    "windows": 4391,
+    "windows_r0": 4391
+   }
+  },
+  "PN17": {
+   "G-in": {
+    "status": "PASS",
+    "files": 2
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 6.8315416575444205e-18,
+    "sd_max_rel": 8.10023713231732e-16,
+    "windows": 4612,
+    "windows_r0": 4612
+   }
+  },
+  "PN14": {
+   "G-in": {
+    "status": "PASS",
+    "files": 4
+   },
+   "G-stats": {
+    "status": "PASS",
+    "mean_max_rel_to_sd": 2.838357780026062e-18,
+    "sd_max_rel": 1.0767128925144596e-15,
+    "windows": 18416,
+    "windows_r0": 18416
    }
   }
  },
- "versions": {
-  "python": "3.11.9",
-  "numpy": "2.4.4",
-  "scipy": "1.17.1",
-  "pandas": "3.0.3",
-  "mne": "1.12.1"
- }
+ "not_gated": [
+  "chb24"
+ ]
 }

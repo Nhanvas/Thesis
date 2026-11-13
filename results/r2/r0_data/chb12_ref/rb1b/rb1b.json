@@ -1,0 +1,81 @@
+{
+ "gates": {
+  "G-in": {
+   "status": "PASS",
+   "files": 24,
+   "bad": []
+  },
+  "G-stats": {
+   "status": "PASS",
+   "tolerance": 1e-06,
+   "A": {
+    "mean_max_rel_to_sd": 0.0,
+    "sd_max_rel": 0.0
+   },
+   "B": {
+    "mean_max_rel_to_sd": 0.0,
+    "sd_max_rel": 0.0
+   }
+  },
+  "G-clip": {
+   "status": "PASS",
+   "bad": []
+  },
+  "G-flags": {
+   "status": "PASS",
+   "got": {
+    "common_A": 5738,
+    "common_B": 5032,
+    "added_B": 177
+   },
+   "rb1": {
+    "common_A": 5738,
+    "common_B": 5032,
+    "added_B": 177
+   }
+  }
+ },
+ "versions": {
+  "python": "3.11.9",
+  "numpy": "2.4.4",
+  "scipy": "1.17.1",
+  "pandas": "3.0.3",
+  "mne": "1.12.1"
+ },
+ "runtime_s": 201.7,
+ "sampled_windows": {
+  "A": 1319,
+  "B": 1349,
+  "B_added_files": 30,
+  "B_chb12_27_before_first_seizure": 23,
+  "B_with_clipped": 36
+ },
+ "unflagged_with_B": {
+  "windows": 707,
+  "by_file": {
+   "chb12_06.edf": 39,
+   "chb12_08.edf": 25,
+   "chb12_09.edf": 40,
+   "chb12_11.edf": 29,
+   "chb12_19.edf": 43,
+   "chb12_20.edf": 41,
+   "chb12_21.edf": 52,
+   "chb12_23.edf": 8,
+   "chb12_24.edf": 40,
+   "chb12_27.edf": 1,
+   "chb12_32.edf": 40,
+   "chb12_33.edf": 12,
+   "chb12_34.edf": 20,
+   "chb12_35.edf": 51,
+   "chb12_36.edf": 10,
+   "chb12_37.edf": 53,
+   "chb12_38.edf": 63,
+   "chb12_39.edf": 23,
+   "chb12_40.edf": 48,
+   "chb12_41.edf": 58,
+   "chb12_42.edf": 11
+  },
+  "max_peak_over_thr_A_median": 1.0569981668533506
+ },
+ "flagged_only_with_B": 0
+}

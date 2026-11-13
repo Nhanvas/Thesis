@@ -1,0 +1,31 @@
+subject,kind,file,onset_s,duration_s,rule,set
+chb03,TP,chb03_35.edf,2592,64,lowest p_need (highest score) true detection,
+chb03,FP,chb03_23.edf,2768,132,highest peak-score false alarm,
+chb06,TP,chb06_13.edf,504,16,lowest p_need (highest score) true detection,
+chb06,FN,chb06_01.edf,1724,16,missed seizure closest to the patient's median duration (16 s),
+chb06,FP,chb06_02.edf,6944,40,highest peak-score false alarm,
+chb13,TP,chb13_62.edf,1624,68,lowest p_need (highest score) true detection,
+chb13,FN,chb13_19.edf,2076,48,missed seizure closest to the patient's median duration (54 s),
+chb13,FP,chb13_24.edf,44,124,highest peak-score false alarm,
+chb14,TP,chb14_06.edf,1908,20,lowest p_need (highest score) true detection,
+chb14,FN,chb14_04.edf,1372,20,missed seizure closest to the patient's median duration (22 s),
+chb14,FP,chb14_26.edf,2088,24,highest peak-score false alarm,
+chb15,TP,chb15_62.edf,748,112,lowest p_need (highest score) true detection,
+chb15,FN,chb15_54.edf,2176,76,missed seizure closest to the patient's median duration (94 s),
+chb15,FP,chb15_01.edf,244,52,highest peak-score false alarm,
+chb16,TP,chb16_16.edf,1212,8,lowest p_need (highest score) true detection,
+chb16,FN,chb16_10.edf,2288,12,missed seizure closest to the patient's median duration (12 s),
+chb16,FP,chb16_01.edf,2484,340,highest peak-score false alarm,
+chb17,TP,chb17a_03.edf,2280,92,lowest p_need (highest score) true detection,
+chb17,FP,chb17b_57.edf,1056,48,highest peak-score false alarm,
+chb18,TP,chb18_35.edf,2196,68,lowest p_need (highest score) true detection,
+chb18,FN,chb18_30.edf,540,32,missed seizure closest to the patient's median duration (54 s),
+chb18,FP,chb18_35.edf,1248,40,highest peak-score false alarm,
+PN10,TP,PN10-1.edf,7544,72,lowest p_need (highest score) true detection,siena-3of14
+PN10,FN,PN10-7.8.9.edf,5456,24,missed seizure closest to the patient's median duration (28 s),siena-3of14
+PN10,FP,PN10-1.edf,64,40,highest peak-score false alarm,siena-3of14
+PN00,TP,PN00-4.edf,1004,76,lowest p_need (highest score) true detection,siena-3of14
+PN00,FP,PN00-1.edf,1316,28,highest peak-score false alarm,siena-3of14
+PN11,TP,PN11-1.edf,7552,60,lowest p_need (highest score) true detection,siena-3of14
+PN11,FP,PN11-1.edf,3756,20,highest peak-score false alarm,siena-3of14
+PN10,FN (shortest),PN10-4.5.6.edf,2308,8,"shortest reference seizure, available patients only",siena-3of14

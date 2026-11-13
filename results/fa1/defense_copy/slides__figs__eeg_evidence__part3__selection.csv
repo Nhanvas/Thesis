@@ -1,0 +1,58 @@
+subject,kind,file,onset_s,offset_s,rule
+chb03,TP,chb03_01.edf,388.0,444.0,every TP
+chb03,TP,chb03_02.edf,740.0,816.0,every TP
+chb03,TP,chb03_03.edf,428.0,504.0,every TP
+chb03,TP,chb03_34.edf,1988.0,2132.0,every TP
+chb03,TP,chb03_35.edf,2600.0,2708.0,every TP
+chb03,TP,chb03_36.edf,1728.0,1832.0,every TP
+chb03,FP-top,chb03_23.edf,2768.0,2900.0,highest ensemble peak score
+chb03,FP-random,chb03_29.edf,28.0,64.0,"random FP, RandomState(0)"
+chb03,FP-random,chb03_17.edf,2132.0,2164.0,"random FP, RandomState(0)"
+chb06,TP,chb06_13.edf,508.0,580.0,every TP
+chb06,FP-top,chb06_02.edf,6944.0,6984.0,highest ensemble peak score
+chb06,FP-random,chb06_05.edf,12500.0,12552.0,"random FP, RandomState(0)"
+chb06,FP-random,chb06_12.edf,12480.0,12500.0,"random FP, RandomState(0)"
+chb13,TP,chb13_62.edf,1628.0,1700.0,every TP
+chb13,FP-top,chb13_24.edf,44.0,164.0,highest ensemble peak score
+chb13,FP-random,chb13_05.edf,2656.0,2692.0,"random FP, RandomState(0)"
+chb13,FP-random,chb13_55.edf,2516.0,2536.0,"random FP, RandomState(0)"
+chb14,TP,chb14_03.edf,1980.0,2016.0,every TP
+chb14,TP,chb14_04.edf,2812.0,2872.0,every TP
+chb14,TP,chb14_06.edf,1888.0,1964.0,every TP
+chb14,TP,chb14_11.edf,1840.0,1892.0,every TP
+chb14,TP,chb14_18.edf,1040.0,1064.0,every TP
+chb14,TP,chb14_27.edf,2836.0,2856.0,every TP
+chb14,FP-top,chb14_22.edf,364.0,428.0,highest ensemble peak score
+chb14,FP-random,chb14_29.edf,1668.0,1936.0,"random FP, RandomState(0)"
+chb14,FP-random,chb14_30.edf,3448.0,3472.0,"random FP, RandomState(0)"
+chb15,TP,chb15_20.edf,620.0,704.0,every TP
+chb15,TP,chb15_22.edf,824.0,904.0,every TP
+chb15,TP,chb15_28.edf,1068.0,1096.0,every TP
+chb15,TP,chb15_31.edf,1836.0,1880.0,every TP
+chb15,TP,chb15_46.edf,3328.0,3360.0,every TP
+chb15,TP,chb15_49.edf,1164.0,1300.0,every TP
+chb15,TP,chb15_52.edf,780.0,864.0,every TP
+chb15,TP,chb15_54.edf,888.0,932.0,every TP
+chb15,TP,chb15_54.edf,3428.0,3460.0,every TP
+chb15,TP,chb15_62.edf,764.0,880.0,every TP
+chb15,FP-top,chb15_01.edf,244.0,296.0,highest ensemble peak score
+chb15,FP-random,chb15_61.edf,244.0,380.0,"random FP, RandomState(0)"
+chb15,FP-random,chb15_19.edf,3240.0,3312.0,"random FP, RandomState(0)"
+chb16,TP,chb16_16.edf,1240.0,1244.0,every TP
+chb16,FP-top,chb16_01.edf,2484.0,2784.0,highest ensemble peak score
+chb16,FP-random,chb16_01.edf,1052.0,1280.0,"random FP, RandomState(0)"
+chb16,FP-random,chb16_10.edf,1276.0,1304.0,"random FP, RandomState(0)"
+chb17,TP,chb17a_03.edf,2300.0,2364.0,every TP
+chb17,TP,chb17a_04.edf,3064.0,3120.0,every TP
+chb17,TP,chb17b_63.edf,3128.0,3236.0,every TP
+chb17,FP-top,chb17b_57.edf,1028.0,1104.0,highest ensemble peak score
+chb17,FP-random,chb17b_59.edf,160.0,368.0,"random FP, RandomState(0)"
+chb17,FP-random,chb17b_63.edf,1520.0,1588.0,"random FP, RandomState(0)"
+chb18,TP,chb18_29.edf,3480.0,3588.0,every TP
+chb18,TP,chb18_31.edf,2084.0,2140.0,every TP
+chb18,TP,chb18_32.edf,1908.0,1960.0,every TP
+chb18,TP,chb18_35.edf,2200.0,2348.0,every TP
+chb18,TP,chb18_36.edf,480.0,564.0,every TP
+chb18,FP-top,chb18_35.edf,1244.0,1288.0,highest ensemble peak score
+chb18,FP-random,chb18_14.edf,312.0,336.0,"random FP, RandomState(0)"
+chb18,FP-random,chb18_04.edf,2872.0,2900.0,"random FP, RandomState(0)"

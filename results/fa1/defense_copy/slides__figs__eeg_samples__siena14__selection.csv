@@ -1,0 +1,13 @@
+subject,kind,file,onset_s,duration_s,rule,set
+PN10,TP,PN10-1.edf,7544,72,lowest p_need (highest score) true detection,siena-14
+PN10,FN,PN10-7.8.9.edf,5456,24,missed seizure closest to the patient's median duration (28 s),siena-14
+PN10,FP,PN10-1.edf,64,40,highest peak-score false alarm,siena-14
+PN00,TP,PN00-4.edf,1004,76,lowest p_need (highest score) true detection,siena-14
+PN00,FP,PN00-1.edf,1316,28,highest peak-score false alarm,siena-14
+PN06,TP,PN06-1.edf,5580,68,lowest p_need (highest score) true detection,siena-14
+PN06,FN,PN06-2.edf,8860,72,missed seizure closest to the patient's median duration (68 s),siena-14
+PN06,FP,PN06-5.edf,1772,100,highest peak-score false alarm,siena-14
+PN12,TP,PN12-1.2.edf,9568,72,lowest p_need (highest score) true detection,siena-14
+PN12,FN,PN12-1.2.edf,1312,64,missed seizure closest to the patient's median duration (68 s),siena-14
+PN12,FP,PN12-1.2.edf,7096,84,highest peak-score false alarm,siena-14
+PN10,FN (shortest),PN10-4.5.6.edf,2308,8,"shortest reference seizure, all 14 patients",siena-14

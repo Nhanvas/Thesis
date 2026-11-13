@@ -1,0 +1,5 @@
+set,kind,subject,file,onset_s,duration_s
+chb-test,median-duration,chb03,chb03_34.edf,1980,52
+chb-test,median-amp-ratio,chb13,chb13_58.edf,2472,20
+siena,median-duration,PN00,PN00-3.edf,764,64
+siena,median-amp-ratio,PN10,PN10-2.edf,7796,32

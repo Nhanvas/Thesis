@@ -1,0 +1,4 @@
+kind,subject,seizure_idx,rule
+focal_match,chb15,2,highest AUROC among focal seizures (0.9688)
+focal_mismatch,chb16,7,lowest AUROC among focal seizures (0.2143)
+generalized,chb13,10,most windows among diffuse-labelled seizures (17)

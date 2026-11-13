@@ -115,9 +115,13 @@ def bipolar_file(path, rng, secs, seizures, flat=None):
     write_edf(path, labels, sig)
 
 
-def referential_file(path, rng, secs, seizures, style, pileup=None, clip=None, cm_window=None):
+def referential_file(path, rng, secs, seizures, style, pileup=None, clip=None, cm_window=None, boost=None):
     n = secs * FS
     el = electrode_signals(rng, n, seizures, extra=("FT9", "FT10", "CP1"))
+    if boost:                                                      # a high-amplitude stretch (used by the RB1b test)
+        a, b, g = boost
+        for e in el:
+            el[e][a * FS:b * FS] *= g
     if pileup:                                                     # amplifier-like saturation below the header limit
         e, a, b = pileup
         seg = el[e][a * FS:b * FS]

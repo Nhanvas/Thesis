@@ -1,9 +1,13 @@
 # RB1C — robustness of the z-score statistic in every case (Claude Code, laptop; Track F, chat D23-F)
 
-**Estimated runtime: 1–1.5 h with 2 processes (computed estimate from RB1b's measured rates, not measured).** Reads
-every CHB-MIT EDF (24 cases, ≈ 983 h) and every Siena EDF (14 patients, 141 h): sha256, the statistics loop, the
-clipping, the whole-file filter for the flags, the signal-loss flags. Peak memory ≈ 3 GB per process (chb04); with 2
-processes ≈ 6 GB. If the laptop has less than 12 GB free, use `--procs 1` (≈ 2–3 h).
+**Runtime (measured by the first run, 13/11, 1 process): 20 CHB-MIT cases in 3.53 h (chb04 43 min, ≈ 16.6 s per
+hour of EEG).** Whole run, computed from that: ≈ 5 h with 1 process, ≈ 2.5–3 h with 2. It reads every CHB-MIT EDF
+(24 cases, ≈ 983 h) and every Siena EDF (14 patients, 141 h): sha256, the statistics loop, the clipping, the
+whole-file filter for the flags, the signal-loss flags. Peak memory ≈ 3 GB per process (chb04, computed); use
+`--procs 2` only with ≥ 12 GB free. **Second run (13/11 afternoon):** the first run stopped at chb24 (`G-in chb24:
+summary sha256`) because the script looked for chb24's summary only in `data/summaries/`, where the repository keeps
+none (R0 read the case folder's copy); fixed, and finished cases are now cached in `rb1c/_cache/`, so a later STOP
+does not cost the finished cases again. The fix changes the script, so this run starts from zero.
 
 **What and why (do not interpret results; the chat does that).** RB1b showed that chb12's statistic (per-channel mean
 / SD used for the z-score and the 5-SD flag) is moved by a few large windows. The committed script `src/r2_rb1c.py`
@@ -20,8 +24,9 @@ gated). Plan: `docs/FUTURE_RESEARCH_PLAN.md` §12 row 13/11 09:30.
    torch); `pyedflib` and the SzCORE clone are not needed.
 3. Nothing temporary is created outside the output folder.
 4. Stage explicit paths only; never `git add .` or a parent directory.
-5. On any `STOP RB1c` / traceback: do not retry with changes, do not work around it. Keep whatever the output folder
-   holds (`rb1c.json` and the log), still commit and push it (it is evidence), and write the error in the report.
+5. On any `STOP RB1c` / traceback: do not retry with changes, do not work around it. Commit and push `rb1c.json` and
+   `run.log` (evidence) but **not** `rb1c/_cache/` (leave it on disk: a re-run after the fix resumes from it), and write
+   the error in the report.
 6. Siena and CHB-MIT file names are public; nothing from `Dataset/Clinical/` is read.
 
 ## Steps (Git Bash, from `F:/Study/Thesis/Code`)
@@ -55,23 +60,26 @@ judge the values. MNE prints many `RuntimeWarning: Scaling factor is not defined
 CHB-MIT (seen in RB0b / RB1b); they are expected.
 
 **3 — check the output folder** `results/r2/r0_data/rb1c/`: `rb1c.json`, `SUMMARY.md`, `cases.csv`, `channels.csv`,
-`flag_grid.csv`, `files.csv`, `top_windows.csv`, `run.log`. List them with sizes. No EDF, no `.npz`, nothing over 20 MB
+`flag_grid.csv`, `files.csv`, `top_windows.csv`, `run.log`; `_cache/` must be gone after `END` (the script removes it).
+List them with sizes. No EDF, no `.npz`, nothing over 20 MB
 (if `run.log` is larger, keep only its lines that do not contain `RuntimeWarning` or `read_raw_edf` and say so).
 
 **4 — commit and push** (explicit path only):
 ```bash
-git add results/r2/r0_data/rb1c
+git add results/r2/r0_data/rb1c/*.json results/r2/r0_data/rb1c/*.csv results/r2/r0_data/rb1c/*.md results/r2/r0_data/rb1c/run.log
 git status --short
 git commit -m "RB1c: robustness of the z-score statistic, every case (D23-F)"
 git push
 ```
-`git status --short` must list only paths under `results/r2/r0_data/rb1c/` as staged. Note the new commit hash.
+`git status --short` must list only paths under `results/r2/r0_data/rb1c/` as staged (never `_cache/`; after a STOP
+only `rb1c.json` and `run.log` exist, stage those two). Note the new commit hash.
 
 **5 — report** `F:/Study/Thesis/Agent/inbox/RB1C_REPORT.md` (facts only, no interpretation):
 - the commit hash of step 0 and of step 4;
 - measured runtime (`runtime_s` in `rb1c.json`), the wall time of the Python process, `--procs` used, free memory;
 - the environment line of step 1 and the Siena folder used;
 - the gate line of every case (from `run.log`);
+- the cases reused from the cache (`reused` in `rb1c.json`), if any;
 - the full text of `SUMMARY.md`;
 - any warning or error from `run.log` other than the expected MNE scaling warnings (copy the lines);
 - `git status --short` after the commit.

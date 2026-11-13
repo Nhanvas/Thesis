@@ -187,7 +187,8 @@ def build_world(root):
                 bip(d / f, rng, secs, sz, **ex)
             else:
                 T.referential_file(d / f, rng, secs, sz, kind, **ex)
-        (repo / "data" / "summaries" / f"{case}-summary.txt").write_text(chb_summary(files))
+        if case != "chb24":                       # as on the laptop: no committed chb24 summary, the case folder's copy
+            (repo / "data" / "summaries" / f"{case}-summary.txt").write_text(chb_summary(files))
         (d / f"{case}-summary.txt").write_text(chb_summary(files))
         for p in sorted(d.iterdir()):
             r = dict(db="chbmit", relpath=f"{case}/{p.name}", case=case, file=p.name, sha256_physionet=T.sha(p),
@@ -253,12 +254,13 @@ def build_world(root):
     return root, repo, chb, refmap, K
 
 
-def run(root, tag, cases="chb01,chb11,chb12,chb24,PN05"):
+def run(root, tag, cases="chb01,chb11,chb12,chb24,PN05", keep=False):
     repo = root / "repo"
     env = dict(os.environ, R2_TEST="1", R2_TEST_RB_REFERENTIAL=json.dumps({f: T.sha(root / "chbmit" / "chb12" / f)
                                                                          for f in REFERENTIAL}))
     out = root / f"rb1c_{tag}"
-    shutil.rmtree(out, ignore_errors=True)
+    if not keep:
+        shutil.rmtree(out, ignore_errors=True)
     p = subprocess.run([sys.executable, str(repo / "src" / "r2_rb1c.py"), "--chbmit-dir", str(root / "chbmit"),
                         "--siena-dir", str(root / "siena"), "--out", str(out), "--procs", "2", "--cases", cases],
                        env=env, capture_output=True, text=True, cwd=str(root))
@@ -440,6 +442,23 @@ def main():
         js(lambda d: d["detail"]["chb01"]["counts"].__setitem__("flag5sd", d["detail"]["chb01"]["counts"]["flag5sd"] + 1)), "chb01")
     neg("fl_chb12", "G-flags", r0 / "chb12_ref" / "rb1" / "diff_chb12.json",
         js(lambda d: d["chb12"]["clean_windows"].__setitem__(1, d["chb12"]["clean_windows"][1] - 1)), "chb12")
+
+    # ------------------------------------------------------------ resume after a STOP
+    victim = chb / "chb24" / "chb24_01.edf"
+    keep_b = victim.read_bytes()
+    flip(victim)
+    rc1, txt1, out_r = run(root, "resume")
+    victim.write_bytes(keep_b)
+    cached = sorted(p.stem for p in (out_r / "_cache").glob("*.pkl")) if (out_r / "_cache").exists() else []
+    rc2, txt2, _ = run(root, "resume", keep=True)
+    R2 = json.loads((out_r / "rb1c.json").read_text()) if (out_r / "rb1c.json").exists() else {}
+    same = all((out_r / f).read_bytes() == (out / f).read_bytes()
+               for f in ("cases.csv", "channels.csv", "flag_grid.csv", "files.csv", "top_windows.csv"))
+    check("resume: STOP at chb24 keeps the finished cases in the cache; the re-run reuses them, ends PASS, removes the "
+          "cache, and its tables are byte-equal to a fresh run",
+          rc1 != 0 and "STOP RB1c: G-in chb24" in txt1 and len(cached) >= 1 and "chb24" not in cached and rc2 == 0
+          and sorted(R2.get("reused", [])) == cached and not (out_r / "_cache").exists() and same,
+          f"(cached {cached}, reused {R2.get('reused')}, tables equal {same})")
 
     n_ok = sum(r[1] for r in RES)
     print(f"\n{n_ok}/{len(RES)} checks PASS in {time.time() - t0:.0f} s")

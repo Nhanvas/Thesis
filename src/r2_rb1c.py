@@ -249,7 +249,9 @@ def chb_case(case):
     for f in files:
         if f in inv.index and sha256(cdir / f) != inv.loc[f, "sha256_physionet"]:
             bad.append(f"{f} sha256")
-    summ = CE.SUMMARY_DIR / f"{case}-summary.txt"
+    summ = CE.SUMMARY_DIR / f"{case}-summary.txt"          # r2_core.summary_path: the committed copy, else the
+    if not summ.exists():                                     # case folder's (chb24 has no committed summary)
+        summ = cdir / f"{case}-summary.txt"
     if not summ.exists() or sha256(summ) != inv.loc[f"{case}-summary.txt", "sha256_physionet"]:
         bad.append("summary sha256")
     if bad:
@@ -438,8 +440,24 @@ def finish(case, db, rows, S, cl, sc, share, n_files, skipped):
 
 
 def run_case(case):
+    """one case; a finished case is cached (out/_cache, keyed by this script's sha256) so a re-run after a STOP
+    resumes; the cache is removed when the run ends with every gate PASS."""
+    import pickle
+    cache = Path(CFG["out"]) / "_cache" / f"{case}.pkl"
+    if cache.exists():
+        r = pickle.loads(cache.read_bytes())
+        if r.get("code_sha") == CFG["code_sha"]:
+            r["reused"] = True
+            return r
     try:
-        return chb_case(case) if case.startswith("chb") else siena_case(case)
+        r = chb_case(case) if case.startswith("chb") else siena_case(case)
+        if "stop" not in r:
+            r["code_sha"] = CFG["code_sha"]
+            cache.parent.mkdir(exist_ok=True)
+            tmp = cache.with_suffix(".tmp")
+            tmp.write_bytes(pickle.dumps(r))
+            os.replace(tmp, cache)
+        return r
     except SystemExit as ex:
         return dict(case=case, stop=str(ex))
     except Exception:                                                  # noqa: BLE001 -- a traceback is a STOP too
@@ -460,7 +478,8 @@ def main(argv=None):
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     import continuous_eval as CE
-    cfg = dict(chbmit_dir=str(a.chbmit_dir or CE.DATASET_DIR), summary_dir=a.summary_dir, siena_dir=a.siena_dir)
+    cfg = dict(chbmit_dir=str(a.chbmit_dir or CE.DATASET_DIR), summary_dir=a.summary_dir, siena_dir=a.siena_dir,
+               out=str(out), code_sha=sha256(Path(__file__)))
     if os.environ.get("R2_TEST") and os.environ.get("R2_TEST_RB_REFERENTIAL"):
         cfg["test_referential"] = json.loads(os.environ["R2_TEST_RB_REFERENTIAL"])
     siena = sorted(pd.read_csv(EXT_CASES).case.loc[lambda s: s.str.startswith("PN")])
@@ -482,7 +501,8 @@ def main(argv=None):
                 log("STOP", r["stop"])
                 pool.terminate()
                 break
-            log(f"{r['case']}: {json.dumps({k: v['status'] for k, v in r['gates'].items()})} ({r['runtime_s']} s)")
+            log(f"{r['case']}: {json.dumps({k: v['status'] for k, v in r['gates'].items()})} ({r['runtime_s']} s"
+                + (", reused from the cache)" if r.get("reused") else ")"))
     stops = [r["stop"] for r in res.values() if "stop" in r]
     gates = {c: r.get("gates", {}) for c, r in res.items() if "gates" in r}
     if stops:
@@ -496,9 +516,12 @@ def main(argv=None):
     pd.DataFrame([x for c in done for x in res[c]["files"]]).to_csv(out / "files.csv", index=False)
     pd.DataFrame([x for c in done for x in res[c]["top"]]).to_csv(out / "top_windows.csv", index=False)
     summary = dict(versions=versions, runtime_s=round(time.time() - t0, 1), procs=a.procs, cases=done,
+                   code_sha=cfg["code_sha"], reused=[c for c in done if res[c].get("reused")],
+                   case_runtime_s={c: res[c]["runtime_s"] for c in done},
                    gates=gates, not_gated=[c for c, g in gates.items() if g.get("G-flags", {}).get("status") == "NOT GATED"])
     jdump(summary, out / "rb1c.json")
     write_summary(out, Cs, summary)
+    shutil.rmtree(out / "_cache", ignore_errors=True)
     log("END", f"{len(done)} cases, every gate PASS", f"runtime {summary['runtime_s']} s")
     return summary
 
@@ -506,7 +529,8 @@ def main(argv=None):
 def write_summary(out, Cs, summary):
     pct = lambda v: f"{v:+.1%}" if pd.notna(v) else "-"
     L = ["# RB1c -- robustness of the z-score statistic, every case (descriptive)\n",
-         f"versions {summary['versions']}; runtime {summary['runtime_s']} s; procs {summary['procs']}\n",
+         f"versions {summary['versions']}; runtime {summary['runtime_s']} s; procs {summary['procs']}; "
+         f"cases reused from an earlier run's cache: {summary['reused'] or 'none'}\n",
          f"gates: every case PASS (G-in, G-stats; G-flags on CHB-MIT). Not gated: {summary['not_gated']} "
          "(no committed flag count).\n",
          "| case | role | sampled | with clipped | no-clip SD vs record (median / largest change over ch) | MAD/SD (median) | "

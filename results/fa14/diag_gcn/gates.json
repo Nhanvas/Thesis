@@ -1,0 +1,154 @@
+[
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": {
+   "chb01": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb01.npz",
+    "sha256": "0dd95e8d2e3a94d047257e8406c47c4a14c75ea85b50550f9dce054127d8a1ce",
+    "pinned": "0dd95e8d2e3a94d047257e8406c47c4a14c75ea85b50550f9dce054127d8a1ce",
+    "equal": true
+   },
+   "chb02": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb02.npz",
+    "sha256": "da527953a77c6107032f83e98e0d78448217276fd360e26e4be4ebecb24dcea2",
+    "pinned": "da527953a77c6107032f83e98e0d78448217276fd360e26e4be4ebecb24dcea2",
+    "equal": true
+   },
+   "chb03": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb03.npz",
+    "sha256": "a6a510ac761f0a8c833544813ad6b7df350b62647294ea03b02cd7cc66040e46",
+    "pinned": "a6a510ac761f0a8c833544813ad6b7df350b62647294ea03b02cd7cc66040e46",
+    "equal": true
+   },
+   "chb04": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb04.npz",
+    "sha256": "0d15932ad3071f05c7a6ba4c2b066d7fb0680c53ebca9332501321d16cd49199",
+    "pinned": "0d15932ad3071f05c7a6ba4c2b066d7fb0680c53ebca9332501321d16cd49199",
+    "equal": true
+   },
+   "chb05": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb05.npz",
+    "sha256": "4c9513059d639808cf33dd0921edb1ba1ab3e181c2c2563df8aa89554d7526b4",
+    "pinned": "4c9513059d639808cf33dd0921edb1ba1ab3e181c2c2563df8aa89554d7526b4",
+    "equal": true
+   },
+   "chb06": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb06.npz",
+    "sha256": "601bb264ff43cb66ea8804ef6b3022d893f38adf4f1b6c9c4c255999261efe92",
+    "pinned": "601bb264ff43cb66ea8804ef6b3022d893f38adf4f1b6c9c4c255999261efe92",
+    "equal": true
+   },
+   "chb07": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb07.npz",
+    "sha256": "26f2792db1cc3414f7ded19a6a3440c48acc8c9f6b9672c749744f305bbaa314",
+    "pinned": "26f2792db1cc3414f7ded19a6a3440c48acc8c9f6b9672c749744f305bbaa314",
+    "equal": true
+   },
+   "chb08": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb08.npz",
+    "sha256": "d5ce94bcd19d980c0ea9f72ca4d494ae690f667293e889a26979ef440d282d1e",
+    "pinned": "d5ce94bcd19d980c0ea9f72ca4d494ae690f667293e889a26979ef440d282d1e",
+    "equal": true
+   },
+   "chb09": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb09.npz",
+    "sha256": "6aef274d4657b4e5271227c56e0f86af76b6357d03b5c99204e855ad057f8c9c",
+    "pinned": "6aef274d4657b4e5271227c56e0f86af76b6357d03b5c99204e855ad057f8c9c",
+    "equal": true
+   },
+   "chb10": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb10.npz",
+    "sha256": "1be4a9c975d027429e2c1b5ecdbc461c85592dce1b4ef0ce87b5b5085e90aea3",
+    "pinned": "1be4a9c975d027429e2c1b5ecdbc461c85592dce1b4ef0ce87b5b5085e90aea3",
+    "equal": true
+   },
+   "chb11": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb11.npz",
+    "sha256": "b4da4c387ba8e755b7b880792e17e728a928e40d895f8d9a2977351edb3e11ee",
+    "pinned": "b4da4c387ba8e755b7b880792e17e728a928e40d895f8d9a2977351edb3e11ee",
+    "equal": true
+   },
+   "chb12": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb12.npz",
+    "sha256": "9298ae37971683661de993ace0097e945c4d62871a81b8ed0e63efcfe794886e",
+    "pinned": "9298ae37971683661de993ace0097e945c4d62871a81b8ed0e63efcfe794886e",
+    "equal": true
+   },
+   "chb13": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb13.npz",
+    "sha256": "77279ba73f9e6fb201567ee414d2ac5474696d1a1d0a9d07ff56e23bcb81a748",
+    "pinned": "77279ba73f9e6fb201567ee414d2ac5474696d1a1d0a9d07ff56e23bcb81a748",
+    "equal": true
+   },
+   "chb14": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb14.npz",
+    "sha256": "690065d983e63f177271025b295d7d52b566fbc569af2175f57a3048b62152ff",
+    "pinned": "690065d983e63f177271025b295d7d52b566fbc569af2175f57a3048b62152ff",
+    "equal": true
+   },
+   "chb15": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb15.npz",
+    "sha256": "fd7f3a901f9a1fdbf69b43b195a29f02395dd558e3234c564809bc7700258c7f",
+    "pinned": "fd7f3a901f9a1fdbf69b43b195a29f02395dd558e3234c564809bc7700258c7f",
+    "equal": true
+   },
+   "chb16": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb16.npz",
+    "sha256": "eae95f85e9f6e8b9c14ea9687587f2a1d7ec49e7943bf8d12bcd2a3abf4f2410",
+    "pinned": "eae95f85e9f6e8b9c14ea9687587f2a1d7ec49e7943bf8d12bcd2a3abf4f2410",
+    "equal": true
+   },
+   "chb17": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb17.npz",
+    "sha256": "38dba59a2d011f10a357d98670afebfb6c5408a6fe69fa7a4a406f8a8071bced",
+    "pinned": "38dba59a2d011f10a357d98670afebfb6c5408a6fe69fa7a4a406f8a8071bced",
+    "equal": true
+   },
+   "chb18": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb18.npz",
+    "sha256": "2c73e8241c7ee5bf13f59d05e1b843c3245e794971eca75526639598e14e33a0",
+    "pinned": "2c73e8241c7ee5bf13f59d05e1b843c3245e794971eca75526639598e14e33a0",
+    "equal": true
+   },
+   "chb19": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb19.npz",
+    "sha256": "fd9c894801970ba7e30c59188ee0302ab7cae48197e7b281c7e9be724e2e05ff",
+    "pinned": "fd9c894801970ba7e30c59188ee0302ab7cae48197e7b281c7e9be724e2e05ff",
+    "equal": true
+   },
+   "chb20": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb20.npz",
+    "sha256": "a93f6fde228ea6049b8b5700b739d7e18361aa781a8f0015392f4368eb5b8f80",
+    "pinned": "a93f6fde228ea6049b8b5700b739d7e18361aa781a8f0015392f4368eb5b8f80",
+    "equal": true
+   },
+   "chb21": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb21.npz",
+    "sha256": "8c27b6d7d7b810ce61648252133ca75fee3201fefbf18b2b8b3c14af4f4634fe",
+    "pinned": "8c27b6d7d7b810ce61648252133ca75fee3201fefbf18b2b8b3c14af4f4634fe",
+    "equal": true
+   },
+   "chb22": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb22.npz",
+    "sha256": "d3c9aebccd013e47230996e6fb7a9776cb65b5b155eea652153e0f8fb59cae93",
+    "pinned": "d3c9aebccd013e47230996e6fb7a9776cb65b5b155eea652153e0f8fb59cae93",
+    "equal": true
+   },
+   "chb23": {
+    "path": "/kaggle/input/datasets/nhannguyen26/v9-x3-fold3/fold3/chb23.npz",
+    "sha256": "bb80b937638a1fb5ab132cdd9df0c84f1bb34017fb8250f97e75d7874282065d",
+    "pinned": "bb80b937638a1fb5ab132cdd9df0c84f1bb34017fb8250f97e75d7874282065d",
+    "equal": true
+   },
+   "chb24": {
+    "path": "/kaggle/input/datasets/nhn2mm/v9-x3-fold1/fold1/chb24.npz",
+    "sha256": "2b9bcda1f89fdf4ff7be1b405254a0a5c2f2d904e812146eeaebbadd3352bb3f",
+    "pinned": "2b9bcda1f89fdf4ff7be1b405254a0a5c2f2d904e812146eeaebbadd3352bb3f",
+    "equal": true
+   }
+  },
+  "seconds": 10.4,
+  "summary": "24 earlier .npz, sha256 = R0 references for 24; differing []"
+ }
+]

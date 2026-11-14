@@ -1,0 +1,10 @@
+G1 held-out reproduced: True (0.498 [0.226, 0.770])
+G2 difference reproduced: True (+0.070 [+0.000, +0.201])
+
+quantity (8 test patients, 4-seed means, per-patient mean)   point   95 % interval
+held-out sensitivity                       +0.498  [  +0.226,   +0.770]
+final sensitivity                          +0.567  [  +0.329,   +0.803]
+final - held-out sensitivity               +0.070  [  +0.000,   +0.201]
+held-out FP/day                           +23.778  [ +17.286,  +29.968]
+final FP/day                              +28.727  [ +23.552,  +33.465]
+final - held-out FP/day                    +4.950  [  +0.636,  +12.013]

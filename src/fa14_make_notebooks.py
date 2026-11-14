@@ -106,7 +106,66 @@ if ERR:
     return OUTDIR / f"{name}.ipynb"
 
 
+DIAG = (ROOT / "src" / "fa14_diag_gcn.py").read_text()
+SHA_DIAG = hashlib.sha256(DIAG.encode()).hexdigest()[:16]
+
+
+def build_diag(commit):
+    """FA14_DIAG: the G-gcn diagnosis (fa14_diag_gcn.py embedded; fa14_mech.py from the pinned commit)."""
+    cells = [md(f"""
+# FA14_DIAG — why G-gcn failed (descriptive; no model, no training, no result)
+
+**Plan:** `docs/FUTURE_RESEARCH_PLAN.md` §12 15/11 01:20. Every valid window of the 24 earlier .npz (G-data: R0's pinned
+sha256): one-directional / unequal / diagonal adjacency entries, and the GCN self weight of three closed forms against
+torch_geometric's gcn_norm. **Accelerator:** None (CPU). **Internet:** ON (pip, git clone) → a verified account.
+**Inputs:** `v9-x3-fold1` (nhn2mm) and `v9-x3-fold3` (nhannguyen26). **Output:** `/kaggle/working/fa14_diag/`
+(→ `results/fa14/diag_gcn/`), < 1 MB. **Runtime:** about 10-15 min (computed estimate; measured in `summary.json`).
+Code: `github.com/Nhanvas/Thesis` at `{commit[:7]}` (read only) + `fa14_diag_gcn.py` (sha256 `{SHA_DIAG}`) below.
+Do not edit; *Save Version → Save & Run All (Commit)*.
+"""), code(f"""
+# SETUP: packages + repository at the pinned commit (read only)
+import os, sys, subprocess, time, hashlib
+T_NB = time.time()
+REPO_COMMIT = "{commit}"
+TEST = bool(os.environ.get("FA14_TEST_REPO"))
+WORK = os.environ.get("FA14_WORK", "/kaggle/working")
+SRC = os.environ.get("FA14_SCRATCH", "/tmp/fa14") + "/src"
+os.makedirs(SRC, exist_ok=True)
+if TEST:
+    REPO = os.environ["FA14_TEST_REPO"]
+else:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", {PKGS}])
+    REPO = "/tmp/Thesis"
+    if not os.path.exists(REPO + "/src/fa14_mech.py"):
+        subprocess.check_call(f"rm -rf {{REPO}} && git clone -q https://github.com/Nhanvas/Thesis.git {{REPO}} "
+                              f"&& cd {{REPO}} && git checkout -q {{REPO_COMMIT}}", shell=True)
+    head = subprocess.check_output(["git", "-C", REPO, "rev-parse", "HEAD"]).decode().strip()
+    assert head == REPO_COMMIT, f"wrong commit {{head}}"
+"""), code("%%writefile {SRC}/fa14_diag_gcn.py\n" + DIAG), code(f"""
+# RUN
+sha = hashlib.sha256(open(f"{{SRC}}/fa14_diag_gcn.py", "rb").read()).hexdigest()[:16]
+assert sha == "{SHA_DIAG}", f"fa14_diag_gcn.py: sha {{sha}} != {SHA_DIAG} (cell edited?)"
+import shutil
+shutil.copy(f"{{REPO}}/src/fa14_mech.py", f"{{SRC}}/fa14_mech.py")       # the committed fa14_mech (93ddd9bf...)
+os.environ.update(THESIS_REPO=REPO, FA14_WORK="/tmp/fa14diag_work", FA14_DIAG_OUT=WORK + "/fa14_diag")
+sys.path[:0] = [SRC]
+import fa14_diag_gcn as D
+D.main()
+print(f"notebook {{(time.time()-T_NB)/60:.1f}} min")
+""")]
+    nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+                                       "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
+    OUTDIR.mkdir(parents=True, exist_ok=True)
+    (OUTDIR / "FA14_DIAG.ipynb").write_text(json.dumps(nb, indent=1))
+    return OUTDIR / "FA14_DIAG.ipynb"
+
+
 if __name__ == "__main__":
+    if "--diag" in os.sys.argv:
+        c = os.sys.argv[os.sys.argv.index("--diag") + 1]
+        assert re.fullmatch(r"[0-9a-f]{40}", c), "--diag takes a 40-hex commit"
+        print("built", build_diag(c), "| fa14_diag_gcn sha", SHA_DIAG)
+        raise SystemExit(0)
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", metavar="COMMIT", required=True, help="40-hex commit holding the checkpoints and records")
     a = ap.parse_args()

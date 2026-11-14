@@ -25,8 +25,10 @@ Per arm: Ledoit-Wolf per patient and channel (model_cmp_core.d_from_Z) and k per
 
 Gates (STOP): G-mod (closed modules from the pinned repository); mode (library versions vs R2_A's run_meta: exact or
 tolerance); G-data (each earlier .npz located by r2_core.locate_earlier, sha256 = R0's results/r2/r0_data/chb/gates.json
-references); G-gcn (the GCN self weight 1 / (1 + sum_j w_ij) used for the descriptive neighbour share = torch_geometric's
-gcn_norm on real windows); G-arm (in every job: this module's encoder with the window's own graph = f1_core.encode_D, bit
+references); G-gcn (the GCN self weight 1 / (1 + sum_i w_ij), the target-index sum, used for the descriptive neighbour
+share = torch_geometric's gcn_norm on every valid window of chb01; first run 15/11 STOPPED here with the row sum --
+FA14_DIAG: 7.6 % of valid windows hold one pair kept in one direction only, at the top-k cut; the column form equals
+gcn_norm on all 15.8 M nodes, so node-level graph statistics use incoming edges and the fixed graph undirected pairs); G-arm (in every job: this module's encoder with the window's own graph = f1_core.encode_D, bit
 for bit, on every held-out case); G-base (after the jobs, per partition: the gae and mlp rows = the record -- partition 0
 results/model_cmp/per_subject.csv + seizures.csv, partitions 1-5 results/f1_repcv/raw/p{r}/per_subject.csv + seizures.csv
 -- tp, fp, n_ref of every (fold, subject, point, stage), own-point k 1e-6 relative, caught flags; exact in mode exact,
@@ -248,16 +250,25 @@ def valid_adj(ctx):
     return adj
 
 
+def undirected(adj):
+    """the window graphs as undirected pairs: a pair is selected if either direction is (FA14_DIAG 15/11: 7.6 % of the
+    valid windows hold exactly one pair kept in one direction only, always at the top-k cut -- np.corrcoef is
+    symmetric only up to rounding); its weight = the larger of the two entries (= the entry kept)."""
+    return np.maximum(adj, adj.transpose(0, 2, 1))
+
+
 def fixed_graph(adj):
-    """one time-stable graph per patient: pairs = apply_topk_threshold on the selection frequency (20 %, ties kept),
-    weight = the pair's mean weight when selected; symmetric, zero diagonal (float32)."""
-    sel = adj > 0
+    """one time-stable graph per patient: undirected pairs = apply_topk_threshold on the selection frequency (20 %,
+    ties kept), weight = the pair's mean weight when selected; symmetric, zero diagonal (float32)."""
+    U = undirected(adj)
+    sel = U > 0
     cnt = sel.sum(0)
     freq = cnt / max(1, len(adj))
-    wmean = np.where(cnt > 0, adj.sum(0, dtype=np.float64) / np.maximum(cnt, 1), 0.0)
+    wmean = np.where(cnt > 0, U.sum(0, dtype=np.float64) / np.maximum(cnt, 1), 0.0)
     keep = GC.apply_topk_threshold(freq) > 0
     G = np.where(keep, wmean, 0.0)
     np.fill_diagonal(G, 0.0)
+    assert np.array_equal(G, G.T)
     return G.astype(np.float32)
 
 
@@ -350,7 +361,7 @@ def h1nb_counts(Za, Zm, A, bg, phi, tau, prop_graph, win_adj):
     za, zm = Za[fin], Zm[fin]
     other = np.ones((len(fin), N_CH), bool)
     other[np.arange(len(fin)), fstar] = False
-    wrow = win_adj[fin, fstar, :] > 0
+    wrow = win_adj[fin, fstar, :] > 0          # row f* = the channels that RECEIVE the focal channel's message (i -> j)
     if prop_graph is None:
         prow = np.zeros_like(wrow)
     elif isinstance(prop_graph, str) and prop_graph == "window":
@@ -377,12 +388,14 @@ def consecutive_pairs(idx, wf, bg):
 
 
 def edge_change(win_adj, w):
-    """per channel, between window w - 1 and w: Jaccard distance of the neighbour sets, |change of weighted degree|,
-    isolated <-> connected flip."""
-    N1, N0 = win_adj[w] > 0, win_adj[w - 1] > 0
+    """per channel, between window w - 1 and w: Jaccard distance of the sets of channels it RECEIVES messages from
+    (GCN source_to_target: column j of the window adjacency), |change of weighted in-degree| (the degree gcn_norm
+    uses), isolated <-> connected flip."""
+    I1, I0 = win_adj[w].transpose(0, 2, 1), win_adj[w - 1].transpose(0, 2, 1)
+    N1, N0 = I1 > 0, I0 > 0
     inter, union = (N1 & N0).sum(2), (N1 | N0).sum(2)
     J = np.where(union > 0, 1.0 - inter / np.maximum(union, 1), 0.0)
-    d1, d0 = win_adj[w].sum(2, dtype=np.float64), win_adj[w - 1].sum(2, dtype=np.float64)
+    d1, d0 = I1.sum(2, dtype=np.float64), I0.sum(2, dtype=np.float64)
     return J, np.abs(d1 - d0), (d1 == 0) != (d0 == 0)
 
 
@@ -471,8 +484,10 @@ def seizure_peaks(xs_full, ok, fidx, refs):
 
 
 def gcn_self_weight(win_adj):
-    """GCN self weight per node and window: 1 / (1 + sum_j w_ij) (add_remaining_self_loops fill 1, symmetric norm)."""
-    return 1.0 / (1.0 + win_adj.sum(2, dtype=np.float64))
+    """GCN self weight per node and window: 1 / (1 + sum_i w_ij), the TARGET-index (column) sum -- gcn_norm's degree
+    (add_remaining_self_loops fill 1, symmetric norm, flow source_to_target). Row sums are wrong on the 7.6 % of
+    windows holding a one-directional pair (FA14_DIAG 15/11: column form = gcn_norm on all 15.8 M nodes)."""
+    return 1.0 / (1.0 + win_adj.sum(1, dtype=np.float64))
 
 
 # ============================================================================ per case
@@ -534,9 +549,10 @@ def analyze_case(ctx, arm_out, G, p, f):
     swG = 1.0 / (1.0 + G.sum(1, dtype=np.float64))
     J = edge_change(adj, w)[0] if len(w) else np.zeros((0, N_CH))
     T["desc"].append(dict(key, n_valid=int(len(idx)), n_bg=int(bg.sum()), neighbour_share=float((1 - sw).mean()),
-                          isolated_share=float((adj.sum(2) == 0).mean()), mean_jaccard=float(J.mean()) if len(J) else np.nan,
+                          isolated_share=float((adj.sum(1) == 0).mean()), mean_jaccard=float(J.mean()) if len(J) else np.nan,
                           fixed_edges=int((G > 0).sum() // 2), fixed_neighbour_share=float((1 - swG).mean()),
-                          window_edges=float((adj > 0).sum((1, 2)).mean() / 2)))
+                          window_edges=float((undirected(adj) > 0).sum((1, 2)).mean() / 2),
+                          one_dir_window_share=float(((adj > 0) != (adj.transpose(0, 2, 1) > 0)).any((1, 2)).mean())))
     return T
 
 
@@ -776,12 +792,12 @@ def gate_base(p):
 
 
 # ============================================================================ G-gcn
-def gate_gcn(case=None, n=256):
-    """the self weight 1 / (1 + sum_j w_ij) = torch_geometric's gcn_norm (self loops) on real windows."""
+def gate_gcn(case=None, n=None):
+    """the self weight 1 / (1 + sum_i w_ij) = torch_geometric's gcn_norm (self loops) on every valid window of chb01."""
     import torch
     from torch_geometric.nn.conv.gcn_conv import gcn_norm
     ctx = C.make_ctx(case or C.ALL[0])
-    adj = valid_adj(ctx)[:n]
+    adj = valid_adj(ctx) if n is None else valid_adj(ctx)[:n]
     A = torch.tensor(adj)
     b, i, j = A.nonzero(as_tuple=True)
     ei = torch.stack([b * N_CH + i, b * N_CH + j])
@@ -793,7 +809,7 @@ def gate_gcn(case=None, n=256):
     err = float(np.max(np.abs(got - want)))
     C._CACHE.clear()
     gate(dict(gate="G-gcn", status="PASS" if err <= 1e-6 else "FAIL", max_abs=err,
-              summary=f"self weight 1/(1 + sum w) vs gcn_norm on {len(adj)} windows of {ctx['s']}: max |diff| {err:.1e}"))
+              summary=f"self weight 1/(1 + column sum w) vs gcn_norm on {len(adj)} windows of {ctx['s']}: max |diff| {err:.1e}"))
 
 
 # ============================================================================ notebook driver

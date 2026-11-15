@@ -1,0 +1,4 @@
+case,seed,c,file_idx,n,pen,args,equal,n_bkps_ruptures,n_bkps_exact,first_diff,bk_ruptures_at_diff,bk_exact_at_diff,t_ruptures_s,t_exact_s,exact_costs,max_adm
+PN11,4,1.0,0,2169,0.22394359585822443,"('l2', 2, 1)",True,98,98,,,,5.6144,0.4411,2169,114
+PN11,4,3.0,0,2169,0.6718307875746733,"('l2', 2, 1)",True,32,32,,,,16.5174,0.443,2175,325
+PN11,4,10.0,0,2169,2.2394359585822445,"('l2', 2, 1)",True,9,9,,,,52.8497,0.4552,2191,1025

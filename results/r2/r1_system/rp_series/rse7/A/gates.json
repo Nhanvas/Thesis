@@ -1,0 +1,97 @@
+[
+ {
+  "gate": "G-code",
+  "status": "PASS",
+  "code": {
+   "r2_rse7": "cf272f496d6ab2e3bd4e0aff4e4fa0e378af4e4e166a169dd9bce1a1cbc00211",
+   "r2_e7exact": "4a3e203648e71cb65ec5849ef4771f996c70dc9bc9638e48da652316068acd06",
+   "e7_ensemble_cpd": "38f4291eb0d88ff556349cac67ebdd46b96464b9cac3ddd4d361d0c990c2df6e"
+  },
+  "ruptures": "v1.1.10",
+  "pens": [
+   1.0,
+   3.0,
+   10.0
+  ],
+  "d2_grid_source_sha256": "6711e0628a28f726609206c85411a75b069f054b03bcd07b296a16c4aa0afd39",
+  "bad": [],
+  "summary": "ruptures 1.1.10, E7 PENS [1, 3, 10], d2_grid compiled from the committed source"
+ },
+ {
+  "gate": "G-in",
+  "status": "PASS",
+  "files": {
+   "chb03": {
+    "sha256": "d0917c9b9bc8b83f1e2e2063fe21006bd3da456b432c429884c4f0afa17ea40f",
+    "windows": 34201,
+    "files": 38
+   },
+   "chb13": {
+    "sha256": "53139af2ed7d012f9a9c32548095e822a2c1458e48c59cc8e2ffbe83b7429053",
+    "windows": 29700,
+    "files": 33
+   },
+   "chb14": {
+    "sha256": "aa4407d58be2185572529f4907b2566b07d9b657125916c9997011cb96128fa0",
+    "windows": 23400,
+    "files": 26
+   },
+   "chb17": {
+    "sha256": "fd6b63699c9ffb7f24509729d740edc9ebb2839484bdccb1c4bd801db48155d3",
+    "windows": 18906,
+    "files": 21
+   },
+   "PN00": {
+    "sha256": "ae53cefac6d79ed8c790f8afa52187dca533ed5eea279ee5fb8f78824e1f9dc5",
+    "windows": 2918,
+    "files": 5
+   },
+   "PN03": {
+    "sha256": "5762dab1d062b620cf01bd0ae471e9234ab24ee9734bf15f7c92b75b074e42e9",
+    "windows": 21804,
+    "files": 2
+   },
+   "PN05": {
+    "sha256": "94f62b4eeb6d033cbd7668733cea51fb6687aed6b1c7cc1a98fdd168e694fe6e",
+    "windows": 5431,
+    "files": 3
+   },
+   "PN09": {
+    "sha256": "ba2751fea2d571437956c2add2752e894b721dca378e2105f60a21c335a2534b",
+    "windows": 6162,
+    "files": 3
+   },
+   "PN10": {
+    "sha256": "687023a05d367bf0ca7a0e00608e0e280d9d088f6565608c8769a8aec9fc3b9c",
+    "windows": 16852,
+    "files": 6
+   },
+   "PN11": {
+    "sha256": "fc442a06c6a073e11f776576109d8f02f43dc6ac5a7848f8b62fcd4ab53641bf",
+    "windows": 2169,
+    "files": 1
+   },
+   "PN13": {
+    "sha256": "689e2438d0bc6d6b27cade3648c209b8a72e4688a329d14246a15fceccf22691",
+    "windows": 7797,
+    "files": 3
+   },
+   "PN14": {
+    "sha256": "6bfd9b6d81b1bf1a615703e6e0195b2158bd1a77c193a40d560bccda390754a2",
+    "windows": 18416,
+    "files": 4
+   }
+  },
+  "bad": [],
+  "summary": "12 scores files read, sha256 recorded"
+ },
+ {
+  "gate": "RS-E7[A]",
+  "status": "PASS",
+  "jobs": 48,
+  "calls": 1740,
+  "unequal": 0,
+  "not_run": [],
+  "summary": "48 of 48 jobs, 1740 Pelt calls, 0 differ"
+ }
+]

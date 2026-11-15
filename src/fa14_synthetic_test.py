@@ -498,13 +498,21 @@ def part_e(root):
     subprocess.check_call([sys.executable, str(ROOT / "src" / "fa14_make_notebooks.py"), "--run", "0" * 40],
                           env=dict(os.environ, FA14_NB_OUTDIR=str(nbdir)), stdout=subprocess.DEVNULL)
     t3 = time.time()
-    run(root / "runner.py", dict(env("nb"), FA14_TEST_REPO=str(repo)), [nbdir / "FA14_P0.ipynb"])
+    so = run(root / "runner.py", dict(env("nb"), FA14_TEST_REPO=str(repo)), [nbdir / "FA14_P0.ipynb"])
+    assert "G-worker-sha: PASS -- 4 jobs" in so, so[-2000:]
     for tname in ("rows", "seiz", "f3a", "h1", "h1nb", "h1fa", "h2", "smooth", "h3", "desc"):
         assert (out / "p0" / f"{tname}.csv").read_bytes() == (root / "w_nb" / "fa14" / "p0" / f"{tname}.csv").read_bytes(), tname
     G = gates("nb")
     assert all(G[k]["status"] == "PASS" for k in ("G-mod", "mode", "G-data", "G-gcn", "G-jobs", "G-arm", "G-base p0"))
     print(f"E9 notebook FA14_P0 (cells as Kaggle runs them): every gate PASS, the ten tables byte-equal to the direct run "
           f"({time.time() - t3:.0f} s)")
+    dj = root / "w_nb" / "fa14" / "p0" / "jobs" / "f1" / "DONE.json"   # a job that ran another fa14_mech.py (15/11 case)
+    keep_dj = dj.read_text()
+    dj.write_text(json.dumps(dict(json.loads(keep_dj), code_sha="93ddd9bf6543a8d4")))
+    run(root / "runner.py", dict(env("nb"), FA14_TEST_REPO=str(repo)), [nbdir / "FA14_P0.ipynb"],
+        expect_fail="G-worker-sha FAIL: 1 of 4 jobs")
+    dj.write_text(keep_dj)
+    print("E10 a job record with another code sha -> STOP G-worker-sha (after the outputs) -> PASS")
     print(f"PART E ALL PASS ({time.time() - t:.0f} s)")
 
 

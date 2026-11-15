@@ -88,6 +88,14 @@ try:
 except SystemExit as e:
     ERR = str(e)
 """), code("""
+# WORKER SHA GATE (plan §0 notebook rule, board R205): every job must have run this embedded fa14_mech.py
+# (the 15/11 rerun's pool workers loaded an older copy from the clone; DONE.json records the code each job ran)
+_bad = sorted(str(p.relative_to(M.OUT)) for p in M.OUT.glob("p*/jobs/f*/DONE.json")
+              if json.loads(p.read_text()).get("code_sha") != M.CODE_SHA)
+_n = len(list(M.OUT.glob("p*/jobs/f*/DONE.json")))
+print(f"G-worker-sha: {'PASS' if not _bad and _n else 'FAIL'} -- {_n} jobs, code sha {M.CODE_SHA}, differing {_bad}")
+if _bad or not _n:
+    ERR = (ERR + "; " if ERR else "") + f"G-worker-sha FAIL: {len(_bad)} of {_n} jobs ran another fa14_mech.py"
 # END: summary, measured runtime, outputs
 if (M.OUT / "SUMMARY.md").exists():
     print(open(M.OUT / "SUMMARY.md").read())
@@ -171,6 +179,11 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if not re.fullmatch(r"[0-9a-f]{40}", a.run):
         ap.error("--run takes a 40-hex commit hash, never a tag")
+    if a.run != "0" * 40:                       # plan §0 notebook rule (R205): the clone's copy = the embedded copy
+        import subprocess
+        clone = subprocess.run(["git", "-C", str(ROOT), "show", f"{a.run}:src/fa14_mech.py"], capture_output=True).stdout
+        if clone != CORE.encode():
+            ap.error(f"src/fa14_mech.py at {a.run[:7]} differs from the local file: pin a commit that holds this code")
     for name in NB:
         print("built", build(a.run, name))
     print("fa14_mech sha", SHA_CORE)

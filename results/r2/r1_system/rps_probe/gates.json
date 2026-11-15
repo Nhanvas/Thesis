@@ -1,0 +1,11 @@
+[
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files_hashed": 63,
+  "pinned_files": 63,
+  "pin": "results/r2/r1_system/smoke/data_sha256.csv",
+  "differ": [],
+  "summary": "63 files hashed = pinned R1_SMOKE hashes"
+ }
+]

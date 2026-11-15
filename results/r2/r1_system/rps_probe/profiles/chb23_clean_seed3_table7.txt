@@ -1,0 +1,33 @@
+         23143797 function calls (23141083 primitive calls) in 48.818 seconds
+
+   Ordered by: cumulative time
+   List reduced from 418 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.002    0.002   48.816   48.816 /tmp/r2/src_probe/r2_rps.py:311(table7_patient)
+        2    0.001    0.000   28.335   14.167 /tmp/r2/src_probe/r2_rps.py:293(pelt_locked)
+        2    0.000    0.000   28.319   14.160 /tmp/Thesis/src/cpd_pipeline_v14.py:151(detect_events)
+        2    0.001    0.000   28.319   14.159 /tmp/Thesis/src/cpd_pipeline_v14.py:121(detect_changepoints)
+        2    0.009    0.005   28.303   14.151 /usr/local/lib/python3.13/dist-packages/ruptures/detection/pelt.py:106(predict)
+       47    2.074    0.044   26.047    0.554 {built-in method time.sleep}
+   411957    0.519    0.000   19.489    0.000 {method 'var' of 'numpy.ndarray' objects}
+   411957    9.287    0.000   18.968    0.000 /usr/local/lib/python3.13/dist-packages/numpy/_core/_methods.py:153(_var)
+   336508    0.622    0.000   17.155    0.000 /usr/local/lib/python3.13/dist-packages/ruptures/costs/costl2.py:34(error)
+        1    0.005    0.005   12.060   12.060 /tmp/Thesis/src/e7_ensemble_cpd.py:94(d2_grid)
+       27    0.000    0.000   11.953    0.443 /tmp/Thesis/src/r2_e7exact.py:143(predict)
+       27    3.466    0.128   10.560    0.391 /tmp/Thesis/src/r2_e7exact.py:64(pelt_l2)
+  1009524    8.199    0.000    8.199    0.000 {built-in method builtins.sum}
+        3    0.016    0.005    8.125    2.708 /tmp/Thesis/src/e10_kernel_cpd.py:109(k_segments)
+       27    0.000    0.000    6.831    0.253 /usr/local/lib/python3.13/dist-packages/ruptures/detection/kernelcpd.py:65(fit)
+       27    0.000    0.000    6.830    0.253 /usr/local/lib/python3.13/dist-packages/ruptures/costs/costrbf.py:42(fit)
+       27    2.304    0.085    6.095    0.226 /usr/local/lib/python3.13/dist-packages/ruptures/costs/costrbf.py:21(gram)
+    75449    0.163    0.000    4.850    0.000 /tmp/Thesis/src/r2_e7exact.py:102(tot)
+    75449    0.170    0.000    4.687    0.000 /tmp/Thesis/src/r2_e7exact.py:78(cost)
+        2    0.214    0.107    4.569    2.285 /usr/local/lib/python3.13/dist-packages/ruptures/detection/pelt.py:39(_seg)
+  1382844    3.901    0.000    3.901    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+    11873    0.128    0.000    3.201    0.000 {built-in method builtins.min}
+   336508    0.227    0.000    3.073    0.000 /usr/local/lib/python3.13/dist-packages/ruptures/detection/pelt.py:76(<lambda>)
+  1647830    0.913    0.000    2.550    0.000 {built-in method builtins.next}
+       27    0.002    0.000    2.258    0.084 /usr/local/lib/python3.13/dist-packages/scipy/spatial/distance.py:2354(squareform)
+
+

@@ -1,0 +1,33 @@
+         7337763 function calls (7301029 primitive calls) in 13.387 seconds
+
+   Ordered by: cumulative time
+   List reduced from 981 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       88    0.001    0.000   10.511    0.119 {method 'run' of '_contextvars.Context' objects}
+        5    0.004    0.001    9.938    1.988 /tmp/Thesis/src/e16_recording_baseline.py:126(c_scalar)
+     3690    0.039    0.000    9.050    0.002 /tmp/Thesis/src/e16_recording_baseline.py:94(lw_dist)
+        4    0.424    0.106    9.018    2.254 /tmp/Thesis/src/e16_recording_baseline.py:99(arm_distances)
+     3690    0.035    0.000    4.964    0.001 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:1372(wrapper)
+    11070    0.116    0.000    4.351    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/_param_validation.py:185(wrapper)
+     3690    0.114    0.000    4.106    0.001 /usr/local/lib/python3.13/dist-packages/sklearn/covariance/_shrunk_covariance.py:582(fit)
+     3690    0.091    0.000    3.956    0.001 /usr/local/lib/python3.13/dist-packages/sklearn/covariance/_empirical_covariance.py:343(mahalanobis)
+    25830    0.487    0.000    2.919    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:736(check_array)
+        6    0.000    0.000    2.536    0.423 /tmp/r2/src_probe/r2_rps.py:209(grid)
+        6    0.277    0.046    2.230    0.372 /tmp/Thesis/src/e1_normal_definition.py:157(event_grid)
+     7380    0.065    0.000    1.648    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:2835(validate_data)
+     3690    0.097    0.000    1.606    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/covariance/_shrunk_covariance.py:25(_ledoit_wolf)
+     3690    0.067    0.000    1.541    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/metrics/pairwise.py:2266(pairwise_distances)
+     3690    0.021    0.000    1.336    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/covariance/_empirical_covariance.py:198(_set_covariance)
+     3690    0.362    0.000    1.024    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/covariance/_shrunk_covariance.py:289(ledoit_wolf_shrinkage)
+    22140    0.263    0.000    1.009    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:90(_assert_all_finite)
+7380/3690    0.085    0.000    0.875    0.000 /usr/local/lib/python3.13/dist-packages/scipy/_lib/_util.py:1203(wrapper)
+     7380    0.126    0.000    0.846    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/_param_validation.py:28(validate_parameter_constraints)
+     3690    0.222    0.000    0.817    0.000 /usr/local/lib/python3.13/dist-packages/scipy/linalg/_basic.py:1656(pinvh)
+     3690    0.036    0.000    0.803    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/metrics/pairwise.py:75(check_pairwise_arrays)
+     3600    0.775    0.000    0.788    0.000 /tmp/Thesis/src/e1_normal_definition.py:125(events_for_file)
+     7380    0.013    0.000    0.758    0.000 /usr/lib/python3.13/inspect.py:3394(signature)
+     7380    0.013    0.000    0.745    0.000 /usr/lib/python3.13/inspect.py:3115(from_callable)
+     3600    0.731    0.000    0.733    0.000 /tmp/Thesis/src/e1_normal_definition.py:144(ref_for_file)
+
+

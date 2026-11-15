@@ -3,7 +3,8 @@
 pass A; docs/FUTURE_RESEARCH_PLAN.md §12 15/11 11:30, D27-F) from src/r2_e7exact.py, src/r2_rps.py and src/r2_rpsprobe.py
 (embedded verbatim with %%writefile; sha256 checked in the notebook); the SETUP cell is RP_SERIES' (same pinned clone,
 same sha checks of r2_core / r2_r1 / r2_rp).
-  python src/r2_rpsprobe_make_notebook.py --run <commit>   -> notebooks/r2/RPS_PROBE.ipynb
+  python src/r2_rpsprobe_make_notebook.py --run <commit>          -> notebooks/r2/RPS_PROBE.ipynb
+  python src/r2_rpsprobe_make_notebook.py --run <commit> --pool   -> notebooks/r2/RPS_PROBE2.ipynb (pool mode, plan §12 15/11 12:30)
 Test mode (synthetic data, build container only): R2_TEST_REPO / R2_TEST_INPUT / R2_TEST_WORK / R2_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -31,11 +32,14 @@ def code(t):
             "source": t.strip("\n").splitlines(keepends=True)}
 
 
-def build(commit):
-    name = "RPS_PROBE"
+def build(commit, pool=False):
+    name = "RPS_PROBE2" if pool else "RPS_PROBE"
+    POOLTXT = ("**Pool mode:** chb10, chb23, chb01, chb05 at the same time in RP_SERIES' own pool (4 spawned workers), "
+               "first seed only; every step with CPU time, memory and threads (lines `POOL {...}`, printed every 60 s). "
+               "Compare with RPS_PROBE (main process: chb10 512 s for 4 seeds).\n") if pool else ""
     cells = [md(f"""
-# RPS_PROBE — step timing of RP_SERIES' series_job on real development patients (diagnosis; timing only)
-
+# {name} — step timing of RP_SERIES' series_job on real development patients (diagnosis; timing only)
+{POOLTXT}
 **Plan:** `docs/FUTURE_RESEARCH_PLAN.md` §12 15/11 11:30 (D27-F). **Does:** G-data, versions; then **chb10, then chb23**,
 in the main process: every step of RP_SERIES' series_job timed and logged at once (lines `PROBE {{...}}`), the e16 arms
 and the Table 7 detectors also profiled per seed (`profiles/`). The final scalar is checked against the RPS_DEVX export.
@@ -93,7 +97,7 @@ import r2_rpsprobe as PR
 RP, R1 = PR.RP, PR.R1
 W = R1.n_workers()
 print("CPU cores:", os.cpu_count(), "| workers:", W)
-META = R1.run_meta(PR.TAG, NOTEBOOK, REPO_COMMIT)
+META = R1.run_meta(PR.TAG + ("2" if NOTEBOOK.endswith("2") else ""), NOTEBOOK, REPO_COMMIT)
 MODE, VDIFF = RP.check_versions(META)
 print("mode:", MODE, "| version differences vs R1_RUN:", VDIFF)
 """), code("""
@@ -101,12 +105,15 @@ print("mode:", MODE, "| version differences vs R1_RUN:", VDIFF)
 try:
     V = RP.build_views()
     RP.gate_data(V)
-    PR.run(["chb10", "chb23"])
+    if NOTEBOOK.endswith("2"):
+        PR.run_pool(["chb10", "chb23", "chb01", "chb05"], W, seeds=1)
+    else:
+        PR.run(["chb10", "chb23"])
 except SystemExit as e:
     stopped(e)
 """), code("""
 # END: SUMMARY.md, measured runtime, outputs
-print(PR.summary_md())
+print(PR.summary_pool() if NOTEBOOK.endswith("2") else PR.summary_md())
 meta = R1.finish_meta(dict(mode=RP.STATE["mode"]))
 print(f"MEASURED notebook runtime: {meta['runtime_h']} h")
 for p in sorted(R1.out_dir().rglob("*")):
@@ -123,7 +130,8 @@ for p in sorted(R1.out_dir().rglob("*")):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", metavar="COMMIT", required=True)
+    ap.add_argument("--pool", action="store_true")
     a = ap.parse_args()
     if not re.fullmatch(r"[0-9a-f]{40}", a.run):
         ap.error("--run takes a 40-hex commit hash, never a tag")
-    print("built", build(a.run).name, SHAS)
+    print("built", build(a.run, a.pool).name, SHAS)

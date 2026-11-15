@@ -15,10 +15,19 @@ Per case: load; model_outputs_z; chb_ctx; final_scalar + q + run_budget (4 seeds
 e16 arms a-e (c_scalar, robust z, e16 grid, mechanism, diagnostics), the D1b grid, the locked PELT (2 points), E7 D2
 (exact), E10 D1, E10 K; the A-latent save. The final scalar is checked against the RPS_DEVX export (same path).
 Output: WORK/r2/r1_system/rps_probe/ (probe.csv rows as they finish, profiles/*.txt, run_meta.json, SUMMARY.md).
+
+POOL MODE (RPS_PROBE2; plan §12 15/11 12:30). RPS_PROBE measured chb10 at 512 s in the main process against 16,054 s in
+RP_SERIES' pool. run_pool runs the same steps inside RP_SERIES' own pool (r2_rp._run, spawn, 4 workers, one case each),
+first seed only, and adds to every step the process CPU time, the resident memory, the system's available memory and
+the process's thread count; each worker also records its thread pools (threadpoolctl) and torch threads once. A step
+whose wall time is far above its CPU time waited (memory or CPU contention); a step slow in CPU time too computed more.
+Rows go to rps_probe2/<case>.csv as they end; the parent prints new rows every 60 s, so the log shows them live.
 """
 import cProfile
 import io
+import os
 import pstats
+import threading
 import time
 from pathlib import Path
 
@@ -37,16 +46,28 @@ def _out():
 
 
 ROWS = []
+STATE = dict(out=None, cpu0=None, wall0=None, extra=False)
+
+
+def _res():
+    import psutil
+    p = psutil.Process()
+    return dict(cpu_s=round(time.process_time(), 2), rss_gb=round(p.memory_info().rss / 1e9, 2),
+                avail_gb=round(psutil.virtual_memory().available / 1e9, 2), threads=p.num_threads(),
+                load1=round(os.getloadavg()[0], 2))
 
 
 def put(row):
-    """log the row at once and rewrite probe.csv with every row so far (rows carry different extra columns)."""
+    """log the row at once and rewrite the table with every row so far (rows carry different extra columns)."""
+    if STATE["extra"]:
+        row = dict(row, **_res())
     ROWS.append(row)
-    pd.DataFrame(ROWS).to_csv(_out() / "probe.csv", index=False)
+    f = STATE["out"] if STATE["out"] is not None else _out() / "probe.csv"
+    pd.DataFrame(ROWS).to_csv(f, index=False)
     R1.log(f"PROBE {row}")
 
 
-def prof(name, case, tag, fn):
+def prof(name, case, tag, fn, profdir=None):
     """run fn under cProfile; write the top 25 functions by cumulative time; return (result, seconds)."""
     pr = cProfile.Profile()
     t = time.perf_counter()
@@ -58,8 +79,8 @@ def prof(name, case, tag, fn):
     s = time.perf_counter() - t
     buf = io.StringIO()
     pstats.Stats(pr, stream=buf).sort_stats("cumulative").print_stats(25)
-    d = _out() / "profiles"
-    d.mkdir(exist_ok=True)
+    d = Path(profdir) if profdir else _out() / "profiles"
+    d.mkdir(parents=True, exist_ok=True)
     (d / f"{case}_{tag}_{name}.txt").write_text(buf.getvalue())
     return r, s
 
@@ -103,7 +124,7 @@ def e16_one_seed(case, z, idx, ctx, Z, tag):
     return nh
 
 
-def probe_case(case, kmap):
+def probe_case(case, kmap, seeds=None, profdir=None):
     t0 = time.perf_counter()
     t = time.perf_counter()
     z, _ = R1.load_case(case, "new")
@@ -126,15 +147,15 @@ def probe_case(case, kmap):
         same = bool(np.array_equal(x, ref[f"x_s{RS.SEED_N[tag]}"].values, equal_nan=True))
         put(dict(case=case, seed=tag, step="x_equals_rpsdevx", s=0.0, value=same))
     put(dict(case=case, seed="", step="ctx_final_scalar_budget", s=round(time.perf_counter() - t, 2)))
-    for tag in R1.TAGS:
-        _, s = prof("e16", case, tag, lambda: e16_one_seed(case, z, idx, ctx, Z, tag))
+    for tag in (R1.TAGS if seeds is None else R1.TAGS[:seeds]):
+        _, s = prof("e16", case, tag, lambda: e16_one_seed(case, z, idx, ctx, Z, tag), profdir)
         put(dict(case=case, seed=tag, step="e16_total", s=round(s, 2)))
         d = E8.d_for_grid(z)
         t = time.perf_counter()
         RS.grid(d, X[tag], *RS.D1B_GRID)
         put(dict(case=case, seed=tag, step="d1b_grid", s=round(time.perf_counter() - t, 2)))
         tm = {}
-        _, s = prof("table7", case, tag, lambda: RS.table7_patient(case, z, X[tag], tag, tm))
+        _, s = prof("table7", case, tag, lambda: RS.table7_patient(case, z, X[tag], tag, tm), profdir)
         put(dict(case=case, seed=tag, step="table7_total", s=round(s, 2), **{k: round(v, 2) for k, v in tm.items()}))
     t = time.perf_counter()
     if case in RS.TRAIN:
@@ -162,4 +183,78 @@ def summary_md():
         df = pd.read_csv(p)
         L += ["```", df.to_string(index=False), "```"]
     (_out() / "SUMMARY.md").write_text("\n".join(L) + "\n")
+    return "\n".join(L)
+
+
+# ============================================================================ pool mode (RPS_PROBE2)
+def pool_job(a):
+    """one case inside RP_SERIES' pool (r2_rp._pool: spawn, r2_r1._init_worker -> torch 1 thread, threadpool_limits(1)),
+    first `seeds` seeds; every step with CPU time and memory."""
+    case, kmap, outdir, seeds = a
+    try:
+        import json as _json
+        STATE.update(out=Path(outdir) / f"{case}.csv", extra=True)
+        try:
+            from threadpoolctl import threadpool_info
+            tp = [dict(api=i.get("internal_api"), threads=i.get("num_threads")) for i in threadpool_info()]
+        except Exception as e:                   # noqa: BLE001
+            tp = str(e)
+        try:
+            import torch
+            tt = torch.get_num_threads()
+        except Exception:                        # noqa: BLE001
+            tt = None
+        (Path(outdir) / f"{case}_worker.json").write_text(_json.dumps(dict(
+            threadpools=tp, torch_threads=tt, env={k: os.environ.get(k) for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+                                                                                "MKL_NUM_THREADS")}, pid=os.getpid()), indent=1))
+        RS.PD.CKPT = RP.ckpt_dir_all(RS.RP_DIR / "models")
+        put(dict(case=case, seed="", step="worker_start", s=0.0))
+        probe_case(case, kmap, seeds=seeds, profdir=Path(outdir) / "profiles")
+        return dict(case=case, s=0.0)
+    except Exception:                            # noqa: BLE001
+        import traceback
+        return dict(case=case, error=traceback.format_exc()[-3000:])
+
+
+def _tail(outdir, stop):
+    seen = {}
+    while not stop.is_set():
+        stop.wait(60)
+        for f in sorted(Path(outdir).glob("chb*.csv")):
+            try:
+                df = pd.read_csv(f)
+            except Exception:                    # noqa: BLE001
+                continue
+            for r in df.iloc[seen.get(f.name, 0):].to_dict("records"):
+                R1.log(f"POOL {r}")
+            seen[f.name] = len(df)
+
+
+def run_pool(cases, workers, seeds=1):
+    kmap = {k: float(v) for k, v in RS.json.loads((RS.RP_DIR / "rp2" / "k.json").read_text())["k"].items() if k in RS.TAGS}
+    outdir = R1.out_dir()
+    stop = threading.Event()
+    th = threading.Thread(target=_tail, args=(outdir, stop), daemon=True)
+    th.start()
+    t = time.time()
+    try:
+        specs = [(c, kmap, str(outdir), seeds) for c in cases]
+        RP._run(pool_job, specs, workers, RS.TAGS, "probe2")
+    finally:
+        stop.set()
+        th.join(timeout=5)
+    for f in sorted(Path(outdir).glob("chb*.csv")):
+        for r in pd.read_csv(f).to_dict("records"):
+            R1.log(f"POOL {r}")
+    R1.phase("pool", t)
+
+
+def summary_pool():
+    o = R1.out_dir()
+    L = ["# RPS_PROBE2 — step timing inside RP_SERIES' pool (timing only)\n"]
+    for f in sorted(o.glob("chb*.csv")):
+        L += [f"## {f.stem}", "```", pd.read_csv(f).to_string(index=False), "```"]
+    for f in sorted(o.glob("*_worker.json")):
+        L += [f"- {f.stem}: {f.read_text()}"]
+    (o / "SUMMARY.md").write_text("\n".join(L) + "\n")
     return "\n".join(L)

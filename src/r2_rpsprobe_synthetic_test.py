@@ -6,6 +6,7 @@ step of both cases is logged in probe.csv (load, model_outputs_z, x_equals_rpsde
 d1b, table7 with its detector seconds, alat_save, case_total); one profile per case, seed and part; SUMMARY.md written.
   python src/r2_rpsprobe_synthetic_test.py [--world /tmp/rps_synth]"""
 import argparse
+import json
 import os
 import shutil
 import subprocess
@@ -62,7 +63,24 @@ def main():
         assert len(t7) == 4 and {"t7_pelt_s", "t7_e7_s", "t7_e10_s"} <= set(t7.columns), t7
         assert len(list((out / "profiles").glob(f"{c}_*.txt"))) == 8, c
     assert (out / "SUMMARY.md").exists()
-    print(f"RPS_PROBE PASS: every step of chb10 and chb23 logged, x = RPS_DEVX export for 4 seeds, 16 profiles "
+    # pool mode (RPS_PROBE2)
+    subprocess.check_call([sys.executable, str(ROOT / "src/r2_rpsprobe_make_notebook.py"), "--run", "0" * 40, "--pool"],
+                          env=dict(os.environ, R2_NB_OUTDIR=str(root)), stdout=subprocess.DEVNULL)
+    env2 = dict(env, R2_TEST_WORK=str(root / "work2"), R2_TEST_SCRATCH=str(root / "scr2"))
+    p = subprocess.run([sys.executable, str(root / "runner.py"), str(root / "RPS_PROBE2.ipynb")], env=env2,
+                       capture_output=True, text=True)
+    assert p.returncode == 0, p.stdout[-3000:] + p.stderr[-3000:]
+    out2 = root / "work2/r2/r1_system/rps_probe2"
+    for c in ("chb10", "chb23", "chb01", "chb05"):
+        d2 = pd.read_csv(out2 / f"{c}.csv")
+        assert {"worker_start", "model_outputs_z", "e16_total", "table7_total", "case_total"} <= set(d2.step), c
+        assert {"cpu_s", "rss_gb", "avail_gb", "threads", "load1"} <= set(d2.columns), c
+        assert (d2.step == "e16_total").sum() == 1 and (d2.step == "x_equals_rpsdevx").sum() == 4, c
+        wj = json.loads((out2 / f"{c}_worker.json").read_text())
+        assert wj["torch_threads"] == 1, wj
+    assert "POOL {" in p.stdout and (out2 / "SUMMARY.md").exists()
+    print(f"RPS_PROBE PASS: every step of chb10 and chb23 logged, x = RPS_DEVX export for 4 seeds, 16 profiles; "
+          f"RPS_PROBE2 (pool, 4 cases, seed 1): every step with CPU time / memory / threads, torch 1 thread per worker "
           f"({time.time() - t0:.0f} s)")
 
 

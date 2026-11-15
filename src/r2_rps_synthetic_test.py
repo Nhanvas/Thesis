@@ -17,8 +17,10 @@ output), plus
 Checks:
   N1  r2_rps.model_outputs_z gives D = x1_external.model_outputs(z) bit for bit (and latents of the right shape)
   N2  the aggregate's macro / micro selection = a hand computation on a toy table
-  RP_SERIES PASS in mode exact: every gate; RS.0 all rows exact and every test score equal; every output present;
-  aggregate: A0 on the REAL record grids of this clone, A1 on the synthetic output, every table and the figure
+  RP_SERIES PASS in mode exact: every gate (incl. G-e7x, fix B); RS.0 all rows exact and every test score equal; every
+      output present; timing.csv has every pass-A component and the exact E7 D2 calls of each development patient;
+  aggregate: A0 on the REAL record grids of this clone, A1 on the synthetic output, every table and the figure; the E7
+      D2 rows withheld without rse7/gate.json and with a FAIL gate, included with a PASS gate
   negative paths (each a fresh run that must STOP): one rp2 row tp + 1 -> RS.0; one stored test score changed -> RS.0;
   one training count in the seed-4 json -> G-alat; one committed attribution_v8 value -> RS-attr; one is_flag5sd of an R0
   reference flipped -> G-flags; one RB1c count -> G-flags; aggregate on an output whose RS.0 failed -> STOP A1
@@ -48,7 +50,7 @@ RAWNAME = "combined-siena-scalp-and-chb-mit-eeg-datasets"
 TRAIN = ["chb01", "chb02", "chb04", "chb05", "chb07", "chb08", "chb09", "chb12", "chb19", "chb20", "chb21", "chb23"]
 TEST = ["chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18"]
 CH = T0.CHB18
-GATES = ["G-grid", "G-data", "RS.0", "G-alat", "RS-attr", "G-flags"]
+GATES = ["G-grid", "G-e7x", "G-data", "RS.0", "G-alat", "RS-attr", "G-flags"]
 
 HELPER_ATTR = r'''
 # attribution world: blocks, labels, synthetic attribution_v8 record (made with cmd_eval7 itself)
@@ -321,7 +323,24 @@ def main():
         assert (out / "aggregate" / f).exists(), f
     t6 = pd.read_csv(out / "aggregate/table6.csv")
     assert len(t6) == 7 * 3 * 2, len(t6)
-    print("aggregate PASS (A0 real record, A1 synthetic output, every table, figure)")
+    t7a = pd.read_csv(out / "aggregate/table7.csv")
+    assert list(t7a[t7a.detector == "E7_D2"].rule) == ["withheld"], t7a[t7a.detector == "E7_D2"]
+    tm = pd.read_csv(out / "timing.csv")
+    for col in ("load_s", "distances_s", "budget_s", "e16_s", "d1b_s", "t7_pelt_s", "t7_e7_s", "t7_e10_s", "e7x_calls",
+                "e7x_exact_costs"):
+        assert col in tm.columns, col
+    dv = tm[tm.set == "development"]
+    assert (dv.e7x_calls > 0).all() and (tm[tm.set == "test"].e7x_calls == 0).all(), tm[["case", "e7x_calls"]]
+    for st, want in (("FAIL", ["withheld"]), ("PASS", ["macro", "micro"])):
+        (out / "rse7").mkdir(exist_ok=True)
+        (out / "rse7" / "gate.json").write_text(json.dumps(dict(gate="RS-E7", status=st, summary=f"synthetic {st}")))
+        p = subprocess.run([sys.executable, str(ROOT / "src" / "r2_rps_aggregate.py"), "--series", str(out), "--out",
+                            str(root / f"agg_rse7_{st}")], env=env_agg, capture_output=True, text=True)
+        assert p.returncode == 0, p.stdout[-2000:] + p.stderr[-2000:]
+        t7b = pd.read_csv(root / f"agg_rse7_{st}" / "table7.csv")
+        assert list(t7b[t7b.detector == "E7_D2"].rule) == want, (st, t7b[t7b.detector == "E7_D2"])
+    shutil.rmtree(out / "rse7")
+    print("aggregate PASS (A0 real record, A1 synthetic output, every table, figure; E7 D2 withheld / included by RS-E7)")
     gj = out / "gates.json"
     keep = gj.read_bytes()
     gg = json.loads(keep)

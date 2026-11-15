@@ -1,0 +1,28 @@
+{
+ "factor_measured": 8.28,
+ "factor_used": 8.28,
+ "kaggle_chb06_total_s": 105.0,
+ "distance_rate_s_per_h": 0.931,
+ "exponents": {
+  "test": 1.1,
+  "e16": 1.0,
+  "d1b": 1.03,
+  "pelt": 1.57,
+  "e7": 1.0,
+  "e10": 1.0
+ },
+ "pass_a_wall_h_4_workers": 2.21,
+ "pass_a_cpu_h": 7.23,
+ "largest_case": "chb04",
+ "largest_case_h": 2.21,
+ "other_phases_h": {
+  "pass_b_c_h": 0.3,
+  "flags_h": 0.6,
+  "rp5_h": 0.1,
+  "setup_gates_h": 0.3
+ },
+ "notebook_wall_h": 3.51,
+ "session_h": 12,
+ "cpu": 2,
+ "numpy": "2.5.3"
+}

@@ -18,7 +18,10 @@ thesis's own experiments on them, so that Chapter 2 of report version A2 and RP5
           and 75/5/300, magnitude threshold from the non-ictal, non-buffer, non-flagged windows); the kernel bump detector
           of src/e10_kernel_cpd.py (k_segments, penalties {2, 4, 8} x p {1 ... 20 %}) with E10's own D1 (smoothing 15);
           the threshold detector D1 = the D1b grid below. Added beside (D26-F, routine): the PELT segmenter D2 of
-          src/e7_ensemble_cpd.py (d2_grid), which produced the thesis value 0.213.
+          src/e7_ensemble_cpd.py (d2_grid), which produced the thesis value 0.213. Fix B (D27-F, plan §12 14/11 18:30
+          (c)): d2_grid runs with its committed code, only its ruptures.Pelt call is answered by the exact vectorised
+          implementation of src/r2_e7exact.py (ruptures' pure-Python PELT needed ~26-29 h on chb04); gate RS-E7 (its own
+          notebook) compares the breakpoints with ruptures on every committed path-2 series.
   F-dm.3a best single development budget: the D1b grid of src/p3b_diag.py (event_grid, smoothing {1, 2, 3, 5, 9} x fine
           top-p grid) on the final scalar.
   F-dm.4-5 drift diagnostics of e16 (a) under S9 base (share of the top-2 % non-ictal windows in the patient's top-quartile
@@ -39,6 +42,9 @@ Gates (STOP):
   G-data      the 63 dataset files = R1_SMOKE's pinned hashes (r2_rp.gate_data).
   G-grid      the literal grids of the record scripts this module re-executes (e1_normal_definition defaults, p3b_diag
               SMOOTHS / FINE, e10 PENS / PS, e7 PENS) = the constants used here.
+  G-e7x       the D2 function used is E7's d2_grid code object with `rpt` = r2_e7exact.ExactRpt, and r2_e7exact.py is the
+              embedded file (sha256 checked by the notebook); r2_e7exact.STATS (calls, exact recomputations) per case in
+              timing.csv.
   versions    library versions vs R1_RUN (= RP_RUN's): equal -> mode exact, else tolerance (r2_rp.check_versions).
   RS.0        the recomputed series reproduce the committed path-2 output: run_budget rows of the 15 development and 8
               test patients, seeds 1-4, 4 arms x 3 stages = rp2/per_subject.csv (exact: integers equal, floats relative
@@ -57,11 +63,12 @@ Gates (STOP):
 Outputs: WORK/r2/r1_system/rp_series/ (-> results/r2/r1_system/rp_series/): gates.json, run_meta.json, data_sha256.csv,
 rs0/ (per_subject.csv, errors.csv, q.csv, scores_cmp.csv), grid_e16.csv, mechanism.csv, diagnostics.csv, grid_d1b.csv,
 table7.csv, flags.csv, flags_files.csv, rp5/ (alignment.csv, attribution_scores.csv, seed_map.json, seed{1-4}/), e1_chb03_seed3.csv,
-timing.csv, SUMMARY.md. Scratch (latents, distances) in SCRATCH only.
+timing.csv (seconds per pass-A component and case, measured), SUMMARY.md. Scratch (latents, distances) in SCRATCH only.
 Test mode (synthetic data, build container only): src/r2_rps_synthetic_test.py.
 """
 import contextlib
 import csv
+import hashlib
 import importlib.util
 import io
 import json
@@ -89,6 +96,7 @@ import cpd_pipeline_v14 as V14           # noqa: E402
 import szcore_eval as SE                 # noqa: E402
 import p3b_diag as P3B                   # noqa: E402
 import attribution_pipeline as AP        # noqa: E402
+import r2_e7exact as E7X                 # noqa: E402  (fix B: exact vectorised E7 D2 segmentation; embedded)
 
 REPO = R1.REPO
 
@@ -129,6 +137,7 @@ D1B_GRID = (list(P3B.SMOOTHS), list(P3B.FINE))                            # p3b_
 E16_ARMS = ("a", "b", "c", "d", "e")
 PELT_POINTS = ((50.0, 2.0, 90), (75.0, 5.0, 300))                          # diag_detector_ceiling q1_q2
 E1_CASE, E1_TAG, E1_FILES = "chb03", "clean_seed3", (0, 1, 2)
+D2 = E7X.d2_grid_exact(E7)                                                 # E7's d2_grid, ruptures call answered exactly
 
 def _n_train():
     """training windows per training patient of the path-2 checkpoints (seed 4's json; seeds 1-3 = R1's, same data)."""
@@ -166,6 +175,25 @@ def gate_grid():
         bad.append("cpd_pipeline_v14 constants")
     R1.gate(dict(gate="G-grid", status="PASS" if not bad else "FAIL", bad=bad,
                  summary="record grids = e1 defaults, p3b D1b, e10, e7, v14 PELT constants" if not bad else str(bad)))
+
+
+def gate_e7x():
+    """fix B in force: D2 is E7's own d2_grid (same code object) with rpt = r2_e7exact.ExactRpt, and the exact Pelt
+    refuses any other parameters than E7's (model l2, min_size 2, jump 1)."""
+    bad = []
+    if D2.__code__ is not E7.d2_grid.__code__:
+        bad.append("D2 code is not e7_ensemble_cpd.d2_grid")
+    if D2.__globals__.get("rpt") is not E7X.ExactRpt or E7.__dict__.get("rpt") is E7X.ExactRpt:
+        bad.append("rpt binding")
+    try:
+        E7X.ExactRpt.Pelt(model="l2", min_size=2, jump=5)
+        bad.append("exact Pelt accepted jump 5")
+    except ValueError:
+        pass
+    R1.gate(dict(gate="G-e7x", status="PASS" if not bad else "FAIL", bad=bad,
+                 r2_e7exact_sha256=hashlib.sha256(Path(E7X.__file__).read_bytes()).hexdigest(),
+                 summary="E7 d2_grid code unchanged, its Pelt call answered by r2_e7exact (gate RS-E7 in its own notebook)"
+                 if not bad else str(bad)))
 
 
 @contextlib.contextmanager
@@ -280,18 +308,22 @@ def pelt_locked(z, x, mag, pen, ms):
     return int(s["tp"]), int(s["fp"]), int(s["n_ref"]), h, len(ev)
 
 
-def table7_patient(case, z, x, tag):
-    """detectors of Table 7 on the final scalar x of one seed."""
+def table7_patient(case, z, x, tag, tm=None):
+    """detectors of Table 7 on the final scalar x of one seed; tm (dict) accumulates seconds per detector."""
+    tm = {} if tm is None else tm
     rows = []
     d = E8.d_for_grid(z)
+    t0 = time.perf_counter()
     for mag, pen, ms in PELT_POINTS:
         tp, fp, nr, h, ne = pelt_locked(z, x, mag, pen, ms)
         rows.append(dict(subject=case, seed=tag, detector="PELT_locked", param=f"{int(mag)}_{pen}_{ms}", p=np.nan,
                          tp=tp, fp=fp, n_ref=nr, nonict_h=h, n_ev=ne))
+    t1 = time.perf_counter(); tm["t7_pelt_s"] = tm.get("t7_pelt_s", 0.0) + t1 - t0
     with e1_grid(*E16_GRID):                                  # e7 ran with the e1 defaults
-        for r in E7.d2_grid(d, x):
+        for r in D2(d, x):                                    # = E7.d2_grid, ruptures call answered exactly (fix B)
             rows.append(dict(subject=case, seed=tag, detector="E7_D2", param=str(r["param"]), p=r["top"], tp=r["tp"],
                              fp=r["fp"], n_ref=r["n_ref"], nonict_h=r["nonict_h"], n_ev=np.nan))
+    t2 = time.perf_counter(); tm["t7_e7_s"] = tm.get("t7_e7_s", 0.0) + t2 - t1
     for top in E10.TOPS:                                      # e10's own D1 reference (smoothing 15)
         tp, fp, nr, h, durs = E10.score_events(z, E10.d1_events(z, x, top))
         rows.append(dict(subject=case, seed=tag, detector="E10_D1", param="15", p=top, tp=tp, fp=fp, n_ref=nr,
@@ -306,6 +338,7 @@ def table7_patient(case, z, x, tag):
             tp, fp, nr, h, durs = E10.score_events(z, ev)
             rows.append(dict(subject=case, seed=tag, detector="E10_K", param=str(pen), p=p, tp=tp, fp=fp, n_ref=nr,
                              nonict_h=h, n_ev=len(durs)))
+    tm["t7_e10_s"] = tm.get("t7_e10_s", 0.0) + time.perf_counter() - t2
     return rows
 
 
@@ -316,16 +349,25 @@ def series_job(a):
     and the clean latents of training patients for A-latent; test: per-channel distances for RP5 and the RP9-E1 data."""
     case, ckpt_dir, kmap, scratch = a
     t = time.time()
+    tm = {}
+
+    def lap(key, t_):
+        tm[key] = round(tm.get(key, 0.0) + time.perf_counter() - t_, 2)
+        return time.perf_counter()
     try:
         PD.CKPT = Path(ckpt_dir)
         scratch = Path(scratch)
+        E7X.reset_stats()
+        tp_ = time.perf_counter()
         z, _ = R1.load_case(case, "new")
+        tp_ = lap("load_s", tp_)
         idx, D, Z = model_outputs_z(z)
+        tp_ = lap("distances_s", tp_)
         Ds = {t_: D[t_].astype(np.float32) for t_ in R1.TAGS}           # the dump convention of r2_rp (d_job)
         ctx = R1.chb_ctx(case, z, idx, Ds)
         set_name = "development" if case in DEV else "test"
         out = dict(case=case, set=set_name, rows=[], errs=[], q=[], scmp=[], grid=[], mech=[], diag=[], d1b=[], t7=[],
-                   e1=[], n_windows=int(ctx["n"]), n_dumped=int(len(idx)))
+                   e1=[], n_windows=int(ctx["n"]), n_dumped=int(len(idx)), timing=tm)
         X = {}
         for tag in R1.TAGS:
             x = E22.final_scalar(ctx, tag)
@@ -336,6 +378,7 @@ def series_job(a):
                 P3C.run_budget(ctx, case, tag, x, q, fl, cp, name, out["rows"], out["errs"])
         for r in out["rows"] + out["errs"]:
             r["set"] = set_name
+        tp_ = lap("budget_s", tp_)
         if set_name == "test":
             ref = pd.read_csv(RP_DIR / "rp2" / "scores" / f"{case}.csv.gz")
             for tag in R1.TAGS:
@@ -360,13 +403,18 @@ def series_job(a):
                         out["e1"].append(dict(window=int(w), file_idx=int(ctx["fidx"][w]), t_in_file_s=int(tif[w]),
                                               ictal=int(ctx["ict"][w]), s9=float(v[j]), running_median=float(v[j] - mem[j]),
                                               s9_corrected=float(mem[j])))
+            tp_ = lap("test_extra_s", tp_)
         else:
             out["grid"], out["mech"], out["diag"] = e16_patient(case, z, idx, ctx, Z)
+            tp_ = lap("e16_s", tp_)
             d = E8.d_for_grid(z)
             for tag in R1.TAGS:
                 for r_ in grid(d, X[tag], *D1B_GRID):
                     r_.update(subject=case, seed=tag, nonict_h=ctx["nh"]); out["d1b"].append(r_)
-                out["t7"] += table7_patient(case, z, X[tag], tag)
+            tp_ = lap("d1b_s", tp_)
+            for tag in R1.TAGS:
+                out["t7"] += table7_patient(case, z, X[tag], tag, tm)
+            tp_ = time.perf_counter()
             if case in TRAIN:
                 pos = np.flatnonzero(TGV2.mask(z, "clean")[idx])
                 al = scratch / "alat"
@@ -374,6 +422,8 @@ def series_job(a):
                 for tag in R1.TAGS:
                     np.save(al / f"{case}_{tag}.npy", Z[tag][pos])
                 out["n_clean"] = int(len(pos))
+            tp_ = lap("alat_save_s", tp_)
+        tm.update({f"e7x_{k}": v for k, v in E7X.STATS.items()})
         out["s"] = round(time.time() - t, 1)
         return out
     except SystemExit as e:
@@ -712,5 +762,5 @@ def summary_md():
 
 
 def timing(res):
-    pd.DataFrame([dict(case=c, set=r["set"], windows=r["n_windows"], dumped=r["n_dumped"], s=r["s"])
+    pd.DataFrame([dict(case=c, set=r["set"], windows=r["n_windows"], dumped=r["n_dumped"], s=r["s"], **r.get("timing", {}))
                   for c, r in res.items()]).to_csv(out_dir() / "timing.csv", index=False)

@@ -25,7 +25,10 @@ Gates (STOP):
      b 0.582, c 0.295, d 0.487, e 0.628 with their cells; seizure z 4.72 / 4.08 / 4.62; drift 0.851 / 0.845 / 0.083 /
      0.459 / 0.459), e7 (D1 0.479, D2 0.213), e10 (D1 0.489 at 19.78, K 0.250 at 5.78), p3b D1b (smoothing 5: 0.668, top
      0.005, 20.0) — read from the committed SUMMARY files, compared to the printed precision.
-  A1 every RP_SERIES gate PASS (G-grid, G-data, RS.0, G-alat, RS-attr, G-flags) and every table complete.
+  A1 every RP_SERIES gate PASS (G-grid, G-e7x, G-data, RS.0, G-alat, RS-attr, G-flags) and every table complete.
+  RS-E7 (fix B, D27-F): the E7 D2 rows enter table7 / SUMMARY only if the merged gate of the RS_E7 notebooks
+     (<series>/rse7/gate.json, src/r2_rse7.py --merge) says PASS; otherwise they are withheld and the reason is written
+     (plan §12 14/11 18:30 (c)). Not a STOP: the other tables do not depend on it.
 Outputs (--out, default <series>/aggregate): table6.csv, table7.csv, budget.csv, drift.csv, seizure_z.csv, flags.csv,
 rp5.csv, rp5_per_seed.csv, e1_figure.png, gates.json, SUMMARY.md.
   python src/r2_rps_aggregate.py --series results/r2/r1_system/rp_series [--out DIR]
@@ -50,7 +53,7 @@ GROUPS = {"all15": DEV, "train12": TRAIN, "val3": VAL}
 CAP = 25.0
 T6_KINDS = ["A_latent", "E16a", "E16c", "E16d", "S9base", "E16b", "E16e"]
 T7_DET = ["D1", "E7_D2", "E10_K", "E10_D1"]
-GATES = ["G-grid", "G-data", "RS.0", "G-alat", "RS-attr", "G-flags"]
+GATES = ["G-grid", "G-e7x", "G-data", "RS.0", "G-alat", "RS-attr", "G-flags"]
 
 
 def log(*a):
@@ -205,11 +208,24 @@ def table6(series):
     return pd.DataFrame(rows)
 
 
+def rse7_status(series):
+    """the merged RS-E7 gate (src/r2_rse7.py --merge) or absent."""
+    p = Path(series) / "rse7" / "gate.json"
+    if not p.exists():
+        return dict(status="ABSENT", summary=f"{p} not found")
+    g = json.loads(p.read_text())
+    return dict(status=g.get("status"), summary=g.get("summary"))
+
+
 def table7(series):
     d1b = pd.read_csv(Path(series) / "grid_d1b.csv").rename(columns={"smooth": "param", "top": "p"})
     t7 = pd.read_csv(Path(series) / "table7.csv")
     rows = []
+    e7 = rse7_status(series)
     for det in T7_DET:
+        if det == "E7_D2" and e7["status"] != "PASS":
+            rows.append(dict(detector=det, rule="withheld", note=f"RS-E7 {e7['status']}: {e7['summary']}"))
+            continue
         src = d1b if det == "D1" else t7[t7.detector == det]
         for rule in ("macro", "micro"):
             r = select(src, ["param", "p"], rule)
@@ -376,7 +392,12 @@ def main():
             L.append(f"| {names[k]} | {gname} | {fmt(ma, 'macro')} | {fmt(mi, 'micro')} | {cell} |")
     L += ["\n## F-dm.2 Table 7 — detection on the final score (development patients)\n",
           "| detector | macro | micro | macro cell |", "|---|---|---|---|"]
+    e7 = rse7_status(series)
+    L.insert(-2, f"E7 D2 rows: {'included' if e7['status'] == 'PASS' else 'WITHHELD'} (RS-E7 {e7['status']}: {e7['summary']}).\n")
     for det in T7_DET:
+        if det == "E7_D2" and e7["status"] != "PASS":
+            L.append(f"| {det} | withheld (RS-E7 {e7['status']}) | — | — |")
+            continue
         ma, mi = pick(T7, detector=det, rule="macro"), pick(T7, detector=det, rule="micro")
         cell = f"({ma.get('cell_param')}, {ma.get('cell_p')})" if not pd.isna(ma.get("sens", np.nan)) else "—"
         L.append(f"| {det} | {fmt(ma, 'macro')} | {fmt(mi, 'micro')} | {cell} |")

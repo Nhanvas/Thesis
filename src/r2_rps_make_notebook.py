@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """r2_rps_make_notebook.py -- builds the Kaggle notebook RP_SERIES of stage RP, path 2 (docs/FUTURE_RESEARCH_PLAN.md §12
-rows 14/11 01:27 and D26-F) from src/r2_rps.py (embedded verbatim with %%writefile; sha256 checked in the notebook). The
+rows 14/11 01:27 and D26-F) from src/r2_rps.py and src/r2_e7exact.py (fix B, D27-F; both embedded verbatim with %%writefile; sha256 checked in the
+notebook). The
 repository is cloned at a pinned commit (40-hex hash) holding r2_rp.py, r2_r1.py, r2_core.py (shas checked), the RP_RUN
 output (results/r2/r1_system/rp: checkpoints, rp2 rows, scores, k), the R1 checkpoints, R1_SMOKE's pinned data hashes,
 the attribution record and RB1c's cases.csv. Nothing to fill in.
@@ -20,6 +21,9 @@ RP_SHA = hashlib.sha256((ROOT / "src" / "r2_rp.py").read_bytes()).hexdigest()[:1
 OUTDIR = Path(os.environ.get("R2_NB_OUTDIR", ROOT / "notebooks" / "r2"))
 CORE = (ROOT / "src" / "r2_rps.py").read_text()
 SHA = hashlib.sha256(CORE.encode()).hexdigest()[:16]
+EXACT = (ROOT / "src" / "r2_e7exact.py").read_text()
+SHA_X = hashlib.sha256(EXACT.encode()).hexdigest()[:16]
+RUNTIME = os.environ.get("R2_RPS_RUNTIME", "see the chat")
 PKGS = '"mne==1.12.1", "torch_geometric==2.7.0", "ruptures==1.1.10", "timescoring==0.0.7"'
 RAW = "bonesclarke26/combined-siena-scalp-and-chb-mit-eeg-datasets"
 
@@ -48,9 +52,11 @@ flag rule on their seizure windows (G-flags: = the R0 dataset window by window).
 **Accelerator:** None (CPU). **Internet:** ON (pip, git clone, PhysioNet SHA256SUMS and any missing file).
 **Inputs:** `thesis-r2-chbmit-features` + `thesis-r2-external-features` + `{RAW}`.
 **Output:** `/kaggle/working/r2/r1_system/rp_series/` (→ `results/r2/r1_system/rp_series/`), a few MB.
-**Runtime:** ≈ 1.5–2.5 h (computed estimate, not measured: distances ≈ 1 s per hour of EEG for 4 seeds (R1_SMOKE),
-959 h; the thesis experiments' recorded run times scaled to 4 seeds; raw-file hashing and filtering of 566 h ≈ 0.5 h).
-Code: `github.com/Nhanvas/Thesis` at `{commit[:7]}` (read only) + `r2_rps.py` below (sha256 `{SHA}`). Gates STOP the
+**Runtime:** {RUNTIME} (computed from the measured components, `results/r2/r1_system/rps_fixb/`; fix B: E7's D2
+segmentation by `r2_e7exact.py`, its equality with ruptures checked by the notebooks RS_E7_*). `timing.csv` records the
+seconds of every component per case.
+Code: `github.com/Nhanvas/Thesis` at `{commit[:7]}` (read only) + `r2_e7exact.py` (sha256 `{SHA_X}`) and `r2_rps.py` below
+(sha256 `{SHA}`). Gates STOP the
 notebook (`STOPPED: ...`). **Nothing printed here is a research result.** Do not edit; *Save Version → Save & Run All (Commit)*.
 """), code(f"""
 # SETUP: packages + repository at the pinned commit (read only)
@@ -83,10 +89,11 @@ for f, want in (("r2_core.py", "{R0_SHA}"), ("r2_r1.py", "{R1_SHA}"), ("r2_rp.py
     got = hashlib.sha256(open(f"{{REPO}}/src/{{f}}", "rb").read()).hexdigest()[:16]
     assert TEST or got == want, f"{{f}} sha {{got}} != {{want}}"
 print("repository", REPO, f"({{time.time()-T_NB:.0f}}s)")
-"""), code("%%writefile {SRC}/r2_rps.py\n" + CORE), code(f"""
-# START: sha check of the embedded file, imports, run metadata, library versions vs R1_RUN (mode), G-grid
-sha = hashlib.sha256(open(f"{{SRC}}/r2_rps.py", "rb").read()).hexdigest()[:16]
-assert sha == "{SHA}", f"r2_rps.py: sha {{sha}} != {SHA} (cell edited?)"
+"""), code("%%writefile {SRC}/r2_e7exact.py\n" + EXACT), code("%%writefile {SRC}/r2_rps.py\n" + CORE), code(f"""
+# START: sha checks of the embedded files, imports, run metadata, library versions vs R1_RUN (mode), G-grid, G-e7x
+for f, want in (("r2_e7exact.py", "{SHA_X}"), ("r2_rps.py", "{SHA}")):
+    sha = hashlib.sha256(open(f"{{SRC}}/{{f}}", "rb").read()).hexdigest()[:16]
+    assert sha == want, f"{{f}}: sha {{sha}} != {{want}} (cell edited?)"
 os.environ.update(THESIS_REPO=REPO, R2_WORK=WORK, R2_INPUT=INPUT, R2_SCRATCH=SCRATCH)
 sys.path[:0] = [SRC, REPO + "/src"]
 import pandas as pd, numpy as np
@@ -105,6 +112,7 @@ SCR = R1.SCRATCH / "rps"
 shutil.rmtree(SCR, ignore_errors=True); SCR.mkdir(parents=True)
 try:
     RS.gate_grid()
+    RS.gate_e7x()
 except SystemExit as e:
     stopped(e)
 """), code("""
@@ -155,7 +163,9 @@ print(FL.to_string(index=False))
 """), code("""
 # END: SUMMARY.md, measured runtime, outputs
 print(RS.summary_md())
-meta = R1.finish_meta(dict(r2_rps_sha256=hashlib.sha256(open(f"{SRC}/r2_rps.py", "rb").read()).hexdigest(), mode=RP.STATE["mode"]))
+meta = R1.finish_meta(dict(r2_rps_sha256=hashlib.sha256(open(f"{SRC}/r2_rps.py", "rb").read()).hexdigest(),
+                          r2_e7exact_sha256=hashlib.sha256(open(f"{SRC}/r2_e7exact.py", "rb").read()).hexdigest(),
+                          mode=RP.STATE["mode"]))
 print(f"MEASURED notebook runtime: {meta['runtime_h']} h | phases (s): {meta['phases_s']}")
 for p in sorted(R1.out_dir().rglob("*")):
     if p.is_file():
@@ -174,4 +184,4 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if not re.fullmatch(r"[0-9a-f]{40}", a.run):
         ap.error("--run takes a 40-hex commit hash, never a tag")
-    print("built", build(a.run).name, "r2_rps sha", SHA)
+    print("built", build(a.run).name, "r2_rps sha", SHA, "r2_e7exact sha", SHA_X)

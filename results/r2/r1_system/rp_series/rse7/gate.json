@@ -1,0 +1,48 @@
+{
+ "gate": "RS-E7",
+ "status": "PASS",
+ "jobs": 92,
+ "calls": 3528,
+ "unequal": 0,
+ "bad": [],
+ "parts": {
+  "A": [
+   [
+    "G-code",
+    "PASS"
+   ],
+   [
+    "G-in",
+    "PASS"
+   ],
+   [
+    "RS-E7[A]",
+    "PASS"
+   ]
+  ],
+  "B": [
+   [
+    "G-code",
+    "PASS"
+   ],
+   [
+    "G-in",
+    "PASS"
+   ],
+   [
+    "RS-E7[B]",
+    "PASS"
+   ]
+  ]
+ },
+ "code": {
+  "e7_ensemble_cpd": "38f4291eb0d88ff556349cac67ebdd46b96464b9cac3ddd4d361d0c990c2df6e",
+  "r2_e7exact": "4a3e203648e71cb65ec5849ef4771f996c70dc9bc9638e48da652316068acd06",
+  "r2_rse7": "cf272f496d6ab2e3bd4e0aff4e4fa0e378af4e4e166a169dd9bce1a1cbc00211"
+ },
+ "runtime_h": {
+  "A": 5.166,
+  "B": 6.817
+ },
+ "summary": "92 of 92 jobs, 3528 Pelt calls, 0 differ"
+}

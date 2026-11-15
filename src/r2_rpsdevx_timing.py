@@ -79,8 +79,11 @@ def main():
     f = out / "devx_timing.csv"
     D2 = E7X.d2_grid_exact(E7)
 
-    def put(row):
-        pd.DataFrame([row]).to_csv(f, mode="a", header=not f.exists(), index=False)
+    rows = []
+
+    def put(row):                                # rows carry different columns: rewrite the whole table each time
+        rows.append(row)
+        pd.DataFrame(rows).to_csv(f, index=False)
         log(row)
     for case in a.cases:
         z, X = load(case, a.devx)

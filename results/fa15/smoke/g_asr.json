@@ -1,0 +1,64 @@
+{
+ "gate": "G-asr",
+ "status": "FAIL",
+ "files": 5,
+ "seizure_rows": 8,
+ "max_abs": {
+  "share_seizure": 3.999586459602078e-05,
+  "share_preictal60": 0.0038673787443492813,
+  "contrast_before": 4.618527782440651e-14,
+  "contrast_after": 0.001050765908599094,
+  "highamp_share": 2.1328567972767054e-05,
+  "background_share_sorted": 8.448797217397441e-14
+ },
+ "highamp_windows_in_one_set_only": 0,
+ "tol": 0.001,
+ "detail": [
+  {
+   "subject": "chb06",
+   "file": "chb06_01.edf",
+   "seizures": 3,
+   "highamp_here": 252,
+   "highamp_record": 252,
+   "background_here": 179,
+   "background_record": 179
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17a_03.edf",
+   "seizures": 1,
+   "highamp_here": 320,
+   "highamp_record": 320,
+   "background_here": 250,
+   "background_record": 250
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17a_04.edf",
+   "seizures": 1,
+   "highamp_here": 189,
+   "highamp_record": 189,
+   "background_here": 567,
+   "background_record": 567
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17b_63.edf",
+   "seizures": 1,
+   "highamp_here": 513,
+   "highamp_record": 513,
+   "background_here": 271,
+   "background_record": 271
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_01.edf",
+   "seizures": 2,
+   "highamp_here": 105,
+   "highamp_record": 105,
+   "background_here": 15,
+   "background_record": 15
+  }
+ ],
+ "summary": "5 V9-X6 files, 8 seizures; max |diff| {'share_seizure': 3.999586459602078e-05, 'share_preictal60': 0.0038673787443492813, 'contrast_before': 4.618527782440651e-14, 'contrast_after': 0.001050765908599094, 'highamp_share': 2.1328567972767054e-05, 'background_share_sorted': 8.448797217397441e-14}; windows in one set only 0"
+}

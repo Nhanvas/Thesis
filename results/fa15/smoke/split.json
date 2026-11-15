@@ -1,0 +1,54 @@
+{
+ "a": {
+  "cases": [
+   "chb04",
+   "chb10",
+   "chb15",
+   "chb03",
+   "chb02",
+   "chb13",
+   "chb22",
+   "chb19",
+   "chb14",
+   "chb24",
+   "chb17",
+   "PN14",
+   "chb16",
+   "PN01",
+   "PN13",
+   "PN12",
+   "PN05",
+   "PN00",
+   "PN11"
+  ],
+  "hours": 561.0,
+  "computed_wall_h": 7.21,
+  "over_limit": false
+ },
+ "b": {
+  "cases": [
+   "chb09",
+   "chb07",
+   "chb06",
+   "chb01",
+   "chb05",
+   "chb18",
+   "chb11",
+   "chb21",
+   "chb20",
+   "chb23",
+   "PN03",
+   "chb12",
+   "chb08",
+   "PN10",
+   "PN06",
+   "PN07",
+   "PN09",
+   "PN17",
+   "PN16"
+  ],
+  "hours": 559.9,
+  "computed_wall_h": 5.85,
+  "over_limit": false
+ }
+}

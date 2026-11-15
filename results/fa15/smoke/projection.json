@@ -1,0 +1,12 @@
+{
+ "asr_s_per_h_per_process_q75": 80.67235714285715,
+ "feature_s_per_h": 28.35373683759952,
+ "asr_processes": 3,
+ "feature_processes": 1,
+ "peak_rss_mb_asr": 3805.2,
+ "disk_free_gb": 1037.0,
+ "mem_total_gb": 33.7,
+ "largest_case_cache_gb": 10.4,
+ "notebooks": 2,
+ "note": "computed estimate from the smoke's measured rates (instructions \u00a75 item 6)"
+}

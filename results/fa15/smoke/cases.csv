@@ -1,0 +1,3 @@
+case,set,status,seconds,build_s,conv_status,conv_mean_over_sd,conv_sd_rel,conv_s,lab_status,flag5sd_asr,flag5sd_r0,clean_asr,clean_r0,fallback_asr,peak_rss_mb,hours
+chb17,chb,done,442.9,304.3,PASS,0.00012884018190268385,0.00021076382826985807,138.5,PASS,12176.0,9007.0,5600.0,8769.0,0,1387.4,21.006666666666668
+PN00,ext,done,92.0,70.8,FAIL,0.0003495143063089891,0.0013181424368976023,21.2,PASS,,,,,0,1530.9,3.2447222222222223

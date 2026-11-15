@@ -1,0 +1,213 @@
+[
+ {
+  "gate": "G-mod",
+  "status": "PASS",
+  "summary": "closed modules from /tmp/Thesis/src; fa15_asr 132d6179a1c77723, v9_x6_asr 9cb96ecdc50b45e7"
+ },
+ {
+  "gate": "mode",
+  "status": "PASS",
+  "mode": "exact",
+  "versions": {
+   "python": "3.13.18",
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "pandas": "2.3.3",
+   "mne": "1.12.1",
+   "asrpy": "0.0.8"
+  },
+  "differing": {
+   "chb": {},
+   "ext": {}
+  },
+  "summary": "exact (versions vs R0's run_meta); asrpy 0.0.8"
+ },
+ {
+  "gate": "R0.1-inventory",
+  "status": "PASS",
+  "files": 70,
+  "from_physionet": 0,
+  "summary": "70 files sha256 = PhysioNet (0 downloaded)"
+ },
+ {
+  "gate": "G-ref",
+  "status": "PASS",
+  "missing": [],
+  "differ_from_pin": [],
+  "pinned_checked": 3,
+  "files": {
+   "chb17.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb17.npz",
+    "sha256": "a74507cd0425028ac3cfca26e2846bcc211837d4fceaf28cf2b1596c865c1678"
+   },
+   "chb17_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb17_stats.json",
+    "sha256": "890b51b80ad9775ff7eecbc0ed31a9e97b44743b82282645c847cb75a8f57eea"
+   },
+   "PN00_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN00_lf.npz",
+    "sha256": "1f98ba11ab11117d6174ba787ba3dbce6a2aa1de885b1aa7480ba515f51f8cfa"
+   }
+  },
+  "summary": "3 R0 reference files; 3 checked against the pin; missing []; differ []"
+ },
+ {
+  "gate": "G-ref",
+  "status": "PASS",
+  "missing": [],
+  "differ_from_pin": [],
+  "pinned_checked": 2,
+  "files": {
+   "chb06.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06.npz",
+    "sha256": "eb45bb3e88038acc87c0623de35380574da75a39ef6a11a800dd656563152d71"
+   },
+   "chb06_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06_stats.json",
+    "sha256": "603f679ff80a6c70ab6fb01c68f6c7c3919b327a0b802720ed00b86e4390f151"
+   }
+  },
+  "summary": "2 R0 reference files; 2 checked against the pin; missing []; differ []"
+ },
+ {
+  "gate": "G-ref",
+  "status": "PASS",
+  "missing": [],
+  "differ_from_pin": [],
+  "pinned_checked": 1,
+  "files": {
+   "chb24_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/chb24_lf.npz",
+    "sha256": "9a320ed3d861ff68a37468ad40062c8a867df73df8ca4c1c6617b95b4f8db6b8"
+   }
+  },
+  "summary": "1 R0 reference files; 1 checked against the pin; missing []; differ []"
+ },
+ {
+  "gate": "G-conv",
+  "status": "FAIL",
+  "failed": [
+   "PN00"
+  ],
+  "tol": 0.001,
+  "worst": 0.0013181424368976023,
+  "summary": "2 cases; worst relative difference 1.32e-03; beyond 0.001: ['PN00']"
+ },
+ {
+  "gate": "G-lab",
+  "status": "PASS",
+  "failed": [],
+  "summary": "labels / buffer / signal loss / file index / files = R0 in 2 of 2 cases"
+ },
+ {
+  "gate": "G-asr",
+  "status": "FAIL",
+  "files": 5,
+  "seizure_rows": 8,
+  "max_abs": {
+   "share_seizure": 3.999586459602078e-05,
+   "share_preictal60": 0.0038673787443492813,
+   "contrast_before": 4.618527782440651e-14,
+   "contrast_after": 0.001050765908599094,
+   "highamp_share": 2.1328567972767054e-05,
+   "background_share_sorted": 8.448797217397441e-14
+  },
+  "highamp_windows_in_one_set_only": 0,
+  "tol": 0.001,
+  "detail": [
+   {
+    "subject": "chb06",
+    "file": "chb06_01.edf",
+    "seizures": 3,
+    "highamp_here": 252,
+    "highamp_record": 252,
+    "background_here": 179,
+    "background_record": 179
+   },
+   {
+    "subject": "chb17",
+    "file": "chb17a_03.edf",
+    "seizures": 1,
+    "highamp_here": 320,
+    "highamp_record": 320,
+    "background_here": 250,
+    "background_record": 250
+   },
+   {
+    "subject": "chb17",
+    "file": "chb17a_04.edf",
+    "seizures": 1,
+    "highamp_here": 189,
+    "highamp_record": 189,
+    "background_here": 567,
+    "background_record": 567
+   },
+   {
+    "subject": "chb17",
+    "file": "chb17b_63.edf",
+    "seizures": 1,
+    "highamp_here": 513,
+    "highamp_record": 513,
+    "background_here": 271,
+    "background_record": 271
+   },
+   {
+    "subject": "chb24",
+    "file": "chb24_01.edf",
+    "seizures": 2,
+    "highamp_here": 105,
+    "highamp_record": 105,
+    "background_here": 15,
+    "background_record": 15
+   }
+  ],
+  "summary": "5 V9-X6 files, 8 seizures; max |diff| {'share_seizure': 3.999586459602078e-05, 'share_preictal60': 0.0038673787443492813, 'contrast_before': 4.618527782440651e-14, 'contrast_after': 0.001050765908599094, 'highamp_share': 2.1328567972767054e-05, 'background_share_sorted': 8.448797217397441e-14}; windows in one set only 0"
+ },
+ {
+  "gate": "G-done",
+  "status": "PASS",
+  "missing": [],
+  "summary": "2 of 2 cases written"
+ },
+ {
+  "gate": "G-ident",
+  "status": "PASS",
+  "mode": "exact",
+  "cases": [
+   {
+    "case": "chb17",
+    "set": "chb",
+    "status": "PASS",
+    "equal": {
+     "adj": true,
+     "bp5": true,
+     "f7": true,
+     "file_idx": true,
+     "files": true,
+     "is_buffer": true,
+     "is_flag5sd": true,
+     "is_ictal": true,
+     "is_signal_loss": true,
+     "zgamma_raw": true
+    },
+    "seconds": 449.7
+   },
+   {
+    "case": "PN00",
+    "set": "ext",
+    "status": "PASS",
+    "equal": {
+     "adj": true,
+     "bp5": true,
+     "f7": true,
+     "file_idx": true,
+     "files": true,
+     "is_ictal": true,
+     "is_signal_loss": true
+    },
+    "seconds": 42.4
+   }
+  ],
+  "summary": "mode off -> R0 .npz bit for bit: [('chb17', 'PASS'), ('PN00', 'PASS')]"
+ }
+]

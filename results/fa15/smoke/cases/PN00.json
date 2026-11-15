@@ -1,0 +1,25 @@
+{
+ "case": "PN00",
+ "set": "ext",
+ "status": "done",
+ "conv": {
+  "mean_over_sd": 0.0003495143063089891,
+  "sd_rel": 0.0013181424368976023,
+  "counts": {},
+  "seconds": 21.2,
+  "status": "FAIL"
+ },
+ "lab": {
+  "status": "PASS",
+  "equal": {
+   "is_ictal": true,
+   "is_signal_loss": true,
+   "file_idx": true,
+   "files": true
+  }
+ },
+ "build_s": 70.8,
+ "fallback_asr": 0,
+ "seconds": 92.0,
+ "peak_rss_mb": 1530.9
+}

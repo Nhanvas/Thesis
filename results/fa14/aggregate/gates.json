@@ -1,0 +1,19 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "allow_test": false
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "partitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ }
+]

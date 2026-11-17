@@ -1,0 +1,78 @@
+[
+ {
+  "model": "km",
+  "reference": "gae",
+  "partitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "n_pos": 6,
+  "n_neg": 0,
+  "need": 5,
+  "dF1_mean": 0.03807817570773322,
+  "dF1_lo": 0.007617945512481871,
+  "dF1_hi": 0.07258431157165458,
+  "verdict": "stable advantage of K-means"
+ },
+ {
+  "model": "km_u",
+  "reference": "gae",
+  "partitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "n_pos": 6,
+  "n_neg": 0,
+  "need": 5,
+  "dF1_mean": 0.04650526941085995,
+  "dF1_lo": 0.005632457542632646,
+  "dF1_hi": 0.08945341373011244,
+  "verdict": "stable advantage of K-means (u-CBLOF)"
+ },
+ {
+  "model": "km_u",
+  "reference": "km",
+  "partitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "n_pos": 5,
+  "n_neg": 1,
+  "need": 5,
+  "dF1_mean": 0.008427093703126741,
+  "dF1_lo": -0.010854324515277913,
+  "dF1_hi": 0.027301789612012767,
+  "verdict": "not stable"
+ },
+ {
+  "model": "km",
+  "reference": "mlp",
+  "partitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "n_pos": 0,
+  "n_neg": 6,
+  "need": 5,
+  "dF1_mean": -0.03736634446145322,
+  "dF1_lo": -0.06477765203658614,
+  "dF1_hi": -0.011098255827404386,
+  "verdict": "stable advantage of MLP-AE"
+ }
+]

@@ -1,0 +1,124 @@
+{
+ "gates": [
+  {
+   "gate": "D0",
+   "status": "PASS"
+  },
+  {
+   "gate": "G-parts",
+   "status": "PASS",
+   "partitions_sha": "fbf73129105e0fea",
+   "record_sha": "fbf73129105e0fea",
+   "partition0_folds_equal": true
+  },
+  {
+   "gate": "G-base",
+   "status": "PASS",
+   "partition": 1,
+   "seconds": 373,
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-base",
+   "status": "PASS",
+   "partition": 2,
+   "seconds": 304,
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-base",
+   "status": "PASS",
+   "partition": 3,
+   "seconds": 318,
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-base",
+   "status": "PASS",
+   "partition": 4,
+   "seconds": 309,
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-base",
+   "status": "PASS",
+   "partition": 5,
+   "seconds": 317,
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-kmD",
+   "status": "PASS",
+   "rows": 432,
+   "detail": "every column equal (24 x 18 rows)"
+  },
+  {
+   "gate": "G-km0",
+   "status": "PASS",
+   "model": "km",
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-km0",
+   "status": "PASS",
+   "model": "km_u",
+   "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+   "mismatches": "[]"
+  },
+  {
+   "gate": "G-done",
+   "status": "PASS",
+   "coverage": {
+    "km_p0": 24,
+    "km_p1": 24,
+    "km_p2": 24,
+    "km_p3": 24,
+    "km_p4": 24,
+    "km_p5": 24,
+    "km_u_p0": 24,
+    "km_u_p1": 24,
+    "km_u_p2": 24,
+    "km_u_p3": 24,
+    "km_u_p4": 24,
+    "km_u_p5": 24
+   }
+  }
+ ],
+ "run_meta": {
+  "notebook": "FA16_REPL",
+  "repo_commit": "7012b84e59315fadb8929d64b3e7b226687973b7",
+  "code_sha": "a9f91c92b4c24439",
+  "parts": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "shas": {
+   "fa16_kmeans": "644fb1761930808a",
+   "f1_core": "bf4bfd69d7669226",
+   "model_cmp_core": "179b91278035b37a",
+   "model_cmp_run": "e874577fb94015a3"
+  },
+  "versions": {
+   "python": "3.13.18",
+   "numpy": "2.1.3",
+   "pandas": "2.3.3",
+   "sklearn": "1.6.1",
+   "torch": "2.11.0+cpu"
+  },
+  "cpu_count": 4,
+  "started": "2026-11-17 01:35:27 UTC",
+  "versions_equal_fa16": true,
+  "runtime_h": 1.439,
+  "finished": "2026-11-17 03:01:37 UTC",
+  "stopped": null
+ }
+}

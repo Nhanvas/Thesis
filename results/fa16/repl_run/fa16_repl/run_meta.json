@@ -1,0 +1,31 @@
+{
+ "notebook": "FA16_REPL",
+ "repo_commit": "7012b84e59315fadb8929d64b3e7b226687973b7",
+ "code_sha": "a9f91c92b4c24439",
+ "parts": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "shas": {
+  "fa16_kmeans": "644fb1761930808a",
+  "f1_core": "bf4bfd69d7669226",
+  "model_cmp_core": "179b91278035b37a",
+  "model_cmp_run": "e874577fb94015a3"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "sklearn": "1.6.1",
+  "torch": "2.11.0+cpu"
+ },
+ "cpu_count": 4,
+ "started": "2026-11-17 01:35:27 UTC",
+ "versions_equal_fa16": true,
+ "runtime_h": 1.439,
+ "finished": "2026-11-17 03:01:37 UTC",
+ "stopped": null
+}

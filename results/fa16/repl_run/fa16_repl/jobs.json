@@ -1,0 +1,573 @@
+[
+ {
+  "model": "gae",
+  "partition": 1,
+  "fold": 1,
+  "status": "done",
+  "seconds": 108,
+  "k": 4.1750967750403,
+  "checkpoint_sha256": "f26950d486900f5c4adabc3351201caadfede8362172c348bd5587c7241619d1"
+ },
+ {
+  "model": "gae",
+  "partition": 1,
+  "fold": 2,
+  "status": "done",
+  "seconds": 76,
+  "k": 4.141017133382684,
+  "checkpoint_sha256": "5b1874cab7e96e30a566c7d44d5ba62477785443f3cef6f5c3c7a4d3c95b5a0b"
+ },
+ {
+  "model": "gae",
+  "partition": 1,
+  "fold": 3,
+  "status": "done",
+  "seconds": 76,
+  "k": 3.945532559140073,
+  "checkpoint_sha256": "2974991cb70195c56a8da03ca5937a86c16b5d92a8638403a285c2f76660a06e"
+ },
+ {
+  "model": "gae",
+  "partition": 1,
+  "fold": 4,
+  "status": "done",
+  "seconds": 79,
+  "k": 3.649509883591702,
+  "checkpoint_sha256": "5ee86762e3046d41edb222ade537067d73751abdd5f4954fa9a4502d25d480e8"
+ },
+ {
+  "model": "gae",
+  "partition": 2,
+  "fold": 1,
+  "status": "done",
+  "seconds": 77,
+  "k": 3.8366994202503912,
+  "checkpoint_sha256": "bc805da65e8b73650637549c0a183fc5bc76752cf6cd0ac79cb01915649e765a"
+ },
+ {
+  "model": "gae",
+  "partition": 2,
+  "fold": 2,
+  "status": "done",
+  "seconds": 76,
+  "k": 3.7495285692292777,
+  "checkpoint_sha256": "ddd7aace01b2dfee09aa95f9ef6c34affb06cd39c3763a5759d147b1354dd205"
+ },
+ {
+  "model": "gae",
+  "partition": 2,
+  "fold": 3,
+  "status": "done",
+  "seconds": 76,
+  "k": 4.006460452773171,
+  "checkpoint_sha256": "b4d77f8f89314bf9ae823fe545d9eb2f6fb76adc7b108c1c8b3922fc1da445f0"
+ },
+ {
+  "model": "gae",
+  "partition": 2,
+  "fold": 4,
+  "status": "done",
+  "seconds": 75,
+  "k": 3.858221540346861,
+  "checkpoint_sha256": "65aa313a04b66b843cd5c5c3c2477769edcf1849af9c7ad51453a195a576496b"
+ },
+ {
+  "model": "gae",
+  "partition": 3,
+  "fold": 1,
+  "status": "done",
+  "seconds": 80,
+  "k": 3.763675533499814,
+  "checkpoint_sha256": "402b5746771bbc9eb234529c323975bff7ce0159a6dbd8d174f8953dda8573bb"
+ },
+ {
+  "model": "gae",
+  "partition": 3,
+  "fold": 2,
+  "status": "done",
+  "seconds": 82,
+  "k": 3.716948559926708,
+  "checkpoint_sha256": "06f4dce0e5b5181a4ccd3b50974f9c21b9f58010e8bdf0fa5a2354605fbafdfb"
+ },
+ {
+  "model": "gae",
+  "partition": 3,
+  "fold": 3,
+  "status": "done",
+  "seconds": 78,
+  "k": 4.385894054851402,
+  "checkpoint_sha256": "0025e9616932d9629c4eb4a54888ff8bf0a57aeaf3e03eb993970961fcb90232"
+ },
+ {
+  "model": "gae",
+  "partition": 3,
+  "fold": 4,
+  "status": "done",
+  "seconds": 78,
+  "k": 3.788421538817947,
+  "checkpoint_sha256": "dcd7bd02a8df8eda8114072a8e48cda265285e124840b1469d9f1d42b46ed642"
+ },
+ {
+  "model": "gae",
+  "partition": 4,
+  "fold": 1,
+  "status": "done",
+  "seconds": 78,
+  "k": 4.08413393723888,
+  "checkpoint_sha256": "2ab43fbbe654cd41c2113cc6dd72d5c5129e4c4ce3399c97f4f1ad2602c2c8d9"
+ },
+ {
+  "model": "gae",
+  "partition": 4,
+  "fold": 2,
+  "status": "done",
+  "seconds": 75,
+  "k": 3.792248715787398,
+  "checkpoint_sha256": "636655c3247265542604cb1fbb727527651fd2fe30349e715ef72702b66fde65"
+ },
+ {
+  "model": "gae",
+  "partition": 4,
+  "fold": 3,
+  "status": "done",
+  "seconds": 77,
+  "k": 4.2905096553515225,
+  "checkpoint_sha256": "97622da54341a02dda6b3fd13c36296cd2533ee432f0a8d41b4bb40d2e1fd700"
+ },
+ {
+  "model": "gae",
+  "partition": 4,
+  "fold": 4,
+  "status": "done",
+  "seconds": 78,
+  "k": 3.646254202408489,
+  "checkpoint_sha256": "09fa1fb4852f5d00f1541e96ee69dcc1646f3e2e06005362ef9a2b3f199efa92"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 1,
+  "status": "done",
+  "seconds": 78,
+  "k": 3.88567267129119,
+  "checkpoint_sha256": "9eb15e67b374053411e2e451c3baf91fc86a8b720c4d73196f5d0f8fe3bd0ede"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 2,
+  "status": "done",
+  "seconds": 77,
+  "k": 3.708469802041516,
+  "checkpoint_sha256": "e8d23b28f3b1af8ff506632d4731e999c940ba935969d998b57f3de94a650881"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 3,
+  "status": "done",
+  "seconds": 84,
+  "k": 3.478184257453089,
+  "checkpoint_sha256": "085bcdca07a4e2d7df566d0945a8adf5ac7cb2c6a5fe0b3b97251bb08b81c9f0"
+ },
+ {
+  "model": "gae",
+  "partition": 5,
+  "fold": 4,
+  "status": "done",
+  "seconds": 78,
+  "k": 4.008006723506343,
+  "checkpoint_sha256": "fa2a9c9f32bc9b21634ec36a8bdde9f014b62055f006e8218186dc9e9e318e42"
+ },
+ {
+  "model": "km_fit",
+  "partition": -1,
+  "fold": 0,
+  "status": "done",
+  "seconds": 2597
+ },
+ {
+  "model": "km",
+  "partition": 0,
+  "fold": 1,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.479117315933944
+ },
+ {
+  "model": "km",
+  "partition": 0,
+  "fold": 2,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.096497093965352
+ },
+ {
+  "model": "km",
+  "partition": 0,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.8139182405525975
+ },
+ {
+  "model": "km",
+  "partition": 0,
+  "fold": 4,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.022947828113404
+ },
+ {
+  "model": "km_u",
+  "partition": 0,
+  "fold": 1,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.94038266867219
+ },
+ {
+  "model": "km_u",
+  "partition": 0,
+  "fold": 2,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.385803501852823
+ },
+ {
+  "model": "km_u",
+  "partition": 0,
+  "fold": 3,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.594426765132528
+ },
+ {
+  "model": "km_u",
+  "partition": 0,
+  "fold": 4,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.588129152163507
+ },
+ {
+  "model": "km",
+  "partition": 1,
+  "fold": 1,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.022947828113404
+ },
+ {
+  "model": "km",
+  "partition": 1,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.1951056317208675
+ },
+ {
+  "model": "km",
+  "partition": 1,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.706713281265207
+ },
+ {
+  "model": "km",
+  "partition": 1,
+  "fold": 4,
+  "status": "done",
+  "seconds": 21,
+  "k": 7.684368689742762
+ },
+ {
+  "model": "km_u",
+  "partition": 1,
+  "fold": 1,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.588129152163507
+ },
+ {
+  "model": "km_u",
+  "partition": 1,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.887751506817043
+ },
+ {
+  "model": "km_u",
+  "partition": 1,
+  "fold": 3,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.426382563736437
+ },
+ {
+  "model": "km_u",
+  "partition": 1,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.94038266867219
+ },
+ {
+  "model": "km",
+  "partition": 2,
+  "fold": 1,
+  "status": "done",
+  "seconds": 18,
+  "k": 6.756405212106397
+ },
+ {
+  "model": "km",
+  "partition": 2,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.479117315933944
+ },
+ {
+  "model": "km",
+  "partition": 2,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.215315084541412
+ },
+ {
+  "model": "km",
+  "partition": 2,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.706713281265207
+ },
+ {
+  "model": "km_u",
+  "partition": 2,
+  "fold": 1,
+  "status": "done",
+  "seconds": 18,
+  "k": 7.569528286258674
+ },
+ {
+  "model": "km_u",
+  "partition": 2,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.887751506817043
+ },
+ {
+  "model": "km_u",
+  "partition": 2,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 9.221419534611464
+ },
+ {
+  "model": "km_u",
+  "partition": 2,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.514803054050105
+ },
+ {
+  "model": "km",
+  "partition": 3,
+  "fold": 1,
+  "status": "done",
+  "seconds": 21,
+  "k": 7.479117315933944
+ },
+ {
+  "model": "km",
+  "partition": 3,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.683179907632452
+ },
+ {
+  "model": "km",
+  "partition": 3,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.684368689742762
+ },
+ {
+  "model": "km",
+  "partition": 3,
+  "fold": 4,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.096497093965352
+ },
+ {
+  "model": "km_u",
+  "partition": 3,
+  "fold": 1,
+  "status": "done",
+  "seconds": 21,
+  "k": 8.622373940273938
+ },
+ {
+  "model": "km_u",
+  "partition": 3,
+  "fold": 2,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.497921574348171
+ },
+ {
+  "model": "km_u",
+  "partition": 3,
+  "fold": 3,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.94038266867219
+ },
+ {
+  "model": "km_u",
+  "partition": 3,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.594426765132528
+ },
+ {
+  "model": "km",
+  "partition": 4,
+  "fold": 1,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.096497093965352
+ },
+ {
+  "model": "km",
+  "partition": 4,
+  "fold": 2,
+  "status": "done",
+  "seconds": 19,
+  "k": 6.567564010610662
+ },
+ {
+  "model": "km",
+  "partition": 4,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.8139182405525975
+ },
+ {
+  "model": "km",
+  "partition": 4,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.215315084541412
+ },
+ {
+  "model": "km_u",
+  "partition": 4,
+  "fold": 1,
+  "status": "done",
+  "seconds": 19,
+  "k": 8.594426765132528
+ },
+ {
+  "model": "km_u",
+  "partition": 4,
+  "fold": 2,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.514803054050105
+ },
+ {
+  "model": "km_u",
+  "partition": 4,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.594426765132528
+ },
+ {
+  "model": "km_u",
+  "partition": 4,
+  "fold": 4,
+  "status": "done",
+  "seconds": 21,
+  "k": 8.94038266867219
+ },
+ {
+  "model": "km",
+  "partition": 5,
+  "fold": 1,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.43156446353033
+ },
+ {
+  "model": "km",
+  "partition": 5,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 6.8139182405525975
+ },
+ {
+  "model": "km",
+  "partition": 5,
+  "fold": 3,
+  "status": "done",
+  "seconds": 20,
+  "k": 7.349495638205118
+ },
+ {
+  "model": "km",
+  "partition": 5,
+  "fold": 4,
+  "status": "done",
+  "seconds": 19,
+  "k": 7.096497093965352
+ },
+ {
+  "model": "km_u",
+  "partition": 5,
+  "fold": 1,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.594426765132528
+ },
+ {
+  "model": "km_u",
+  "partition": 5,
+  "fold": 2,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.431892613342622
+ },
+ {
+  "model": "km_u",
+  "partition": 5,
+  "fold": 3,
+  "status": "done",
+  "seconds": 21,
+  "k": 8.83049613305526
+ },
+ {
+  "model": "km_u",
+  "partition": 5,
+  "fold": 4,
+  "status": "done",
+  "seconds": 20,
+  "k": 8.594426765132528
+ }
+]

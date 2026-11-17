@@ -1,0 +1,98 @@
+[
+ {
+  "model": "gae",
+  "fold": 1,
+  "status": "done",
+  "seconds": 91
+ },
+ {
+  "model": "gae",
+  "fold": 2,
+  "status": "done",
+  "seconds": 69
+ },
+ {
+  "model": "gae",
+  "fold": 3,
+  "status": "done",
+  "seconds": 68
+ },
+ {
+  "model": "gae",
+  "fold": 4,
+  "status": "done",
+  "seconds": 70
+ },
+ {
+  "model": "if",
+  "fold": 1,
+  "status": "done",
+  "seconds": 582
+ },
+ {
+  "model": "if",
+  "fold": 2,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "if",
+  "fold": 3,
+  "status": "done",
+  "seconds": 20
+ },
+ {
+  "model": "if",
+  "fold": 4,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km",
+  "fold": 1,
+  "status": "done",
+  "seconds": 2308
+ },
+ {
+  "model": "km",
+  "fold": 2,
+  "status": "done",
+  "seconds": 18
+ },
+ {
+  "model": "km",
+  "fold": 3,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km",
+  "fold": 4,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km_u",
+  "fold": 1,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km_u",
+  "fold": 2,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km_u",
+  "fold": 3,
+  "status": "done",
+  "seconds": 19
+ },
+ {
+  "model": "km_u",
+  "fold": 4,
+  "status": "done",
+  "seconds": 19
+ }
+]

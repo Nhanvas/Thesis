@@ -1,0 +1,53 @@
+[
+ {
+  "gate": "D0",
+  "status": "PASS"
+ },
+ {
+  "gate": "G-mini",
+  "status": "PASS",
+  "got": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "ref": "{'detector': (7, 32), 'localized': (7, 29)}",
+  "seconds": 28
+ },
+ {
+  "gate": "GG",
+  "status": "PASS",
+  "mismatches": "[]"
+ },
+ {
+  "gate": "GG-mc",
+  "model": "gae",
+  "status": "PASS",
+  "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+  "mismatches": "[]"
+ },
+ {
+  "gate": "G-IF",
+  "model": "if",
+  "status": "PASS",
+  "rows": "{'per_subject': (96, 96, 96), 'curves': (312, 312, 312), 'seizures': (185, 185, 185), 'auroc': (24, 24, 24)}",
+  "mismatches": "[]"
+ },
+ {
+  "gate": "G-km",
+  "status": "PASS",
+  "cases": 24,
+  "rows": 432,
+  "arm_cases": {
+   "km": 24,
+   "km_u": 24
+  },
+  "k_counts": {
+   "2": 390,
+   "3": 33,
+   "4": 9
+  },
+  "small_rule_counts": {
+   "none": 337,
+   "alpha+beta": 46,
+   "beta": 43,
+   "alpha": 6
+  }
+ }
+]

@@ -1,0 +1,18 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+1a,2.5632469318229374,diagonal covariance instead of Mahalanobis
+1b,2.8100842552841288,Euclidean distance instead of Mahalanobis
+4a,4.267178099363113,reference = clean windows of the training patients (leave-self-out)
+4b,3.869886050776146,reference = first 10 min of each file
+4c,4.267013261304113,reference = first 30 min of each file
+2a,4.555563428874811,no drift correction
+2b,3.5260164496279307,drift correction of level and spread
+3a,4.0713820013527116,one member: 9th largest
+3m,4.22741621133204,one member: channel mean
+3c,4.163758435543306,one member: largest
+3g,4.439783828569496,+ gamma-AEC readout (fifth member)
+3r,3.5657307229902466,+ reconstruction-error readout (fifth member)
+5a1,6.463555084754232,smoothing 1 window
+5a3,4.610929334067954,smoothing 3 windows
+5a9,3.5564796711593427,smoothing 9 windows
+8a,3.9634306761259825,no edges at inference (self loops only)

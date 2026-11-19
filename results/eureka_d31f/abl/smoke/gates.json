@@ -1,0 +1,136 @@
+[
+ {
+  "gate": "G-self",
+  "status": "PASS",
+  "bad": [],
+  "summary": "member construction = e17b; distances by definition"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 38,
+  "bad": [],
+  "pinned": 38,
+  "summary": "38 files hashed, 0 differ"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 48,
+  "error_pairs": 112,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01"
+  ],
+  "summary": "p3c_freeze: 48 rows, 112 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 16,
+  "error_pairs": 55,
+  "rows_look6": 8,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03"
+  ],
+  "summary": "e23 16 rows + 55 error pairs, look #6 8 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 16,
+  "exact_rows": 10,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 1,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "det_off": {
+    "median_abs": 8.0,
+    "median_abs_ref": 8.0
+   },
+   "cpd_on": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "cpd_off": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "hyb_on": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "hyb_off": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "pairs": 108,
+   "pairs_ref": 106
+  },
+  "cases": [
+   "chb24"
+  ],
+  "summary": "16 rows, 10 exact, max |dtp| 1, max |dfp| 1 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "G-D0[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 distances = stored r10 distances in 3 cases x 4 seeds"
+ },
+ {
+  "gate": "G-enc[smoke]",
+  "status": "PASS",
+  "max_abs": {
+   "chb24": 0.0,
+   "chb01": 0.0,
+   "chb03": 0.0
+  },
+  "summary": "8a encoder with the window graph = run_model: max |dZ| {'chb24': 0.0, 'chb01': 0.0, 'chb03': 0.0}"
+ },
+ {
+  "gate": "G-x0[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 scalar and budget signal = the record functions"
+ },
+ {
+  "gate": "G-eng[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "run_budget_s = p3c_freeze.run_budget for V0 (own = L2f, fixed = frozen)"
+ },
+ {
+  "gate": "G-worker[smoke]",
+  "status": "PASS",
+  "bad": [],
+  "want": {
+   "eur_abl": "d7da61331a4c098f",
+   "r2_r1": "76cbe51ff0180d4a",
+   "e16": "f170e1c59f5b0447",
+   "e17b": "3b4f034dca00eaf3",
+   "p3c_freeze": "dabe4139f6005fd2",
+   "p3_levers": "feb247d2d08c52ba",
+   "p2_scalars": "11feeaf3ba95ced4",
+   "e22": "669350bbfaaf0f4e",
+   "x1_external": "9962e3e7fe4ddc35",
+   "p2_dump_seeds23": "0bc887542989310f"
+  },
+  "summary": "6 jobs ran eur_abl d7da61331a4c098f, r2_r1 76cbe51ff0180d4a"
+ }
+]

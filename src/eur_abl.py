@@ -7,7 +7,9 @@ data/models_v2/gae_v2_clean_seed{42,1,2,3}.pt on the defense-time data copy (v9-
 
 Every stage of V5 is the record code, imported read only through r2_r1 (whose import guard requires every record
 module to come from this repository). A variant swaps ONE function; everything else is the record code:
-  latent        p2_dump_seeds23.run_model (8a: the same construction with an empty propagation graph, self loops only)
+  latent        p2_dump_seeds23.run_model (8a: the same construction with an empty propagation graph, self loops only;
+                8b (added 20/11, chat D32-F, approved by the author 13:04): no encoder -- the distance is taken on the
+                30-value node input the encoder receives, built by node_x = the record construction)
   distance      per-channel LedoitWolf Mahalanobis (x1_external.model_outputs); 1a diagonal, 1b Euclidean; 4a reference
                 fitted on the clean windows of the 12 training patients (leave the scored patient out); 4b / 4c per-file
                 baselines of 10 / 30 min (e16_recording_baseline.arm_distances arms a / c)
@@ -34,7 +36,10 @@ Gates (STOP unless PASS):
   G-kv0    V0's k from the variant pass = results/p3_levers/calibration.json (relative 1e-6)
   G-worker every pool job ran the same eur_abl.py / r2_r1.py / record modules as the parent (sha256)
   G-self   unit checks on synthetic arrays at start (member construction = e17b, distances by definition)
-Outputs: WORK/eureka/abl/ (run_meta.json, gates.json, data_sha256.csv, r10/, per_subject.csv, errors.csv, curve.csv,
+Variant selection (added 20/11, D32-F): EUR_VARIANTS="V0,8b" runs only those variants (V0 is always included: the
+record gates and the paired differences need it); EUR_TAG names the output folder (default abl). The 4a reference
+pass runs only when a 4a-type variant is selected.
+Outputs: WORK/eureka/<tag>/ (run_meta.json, gates.json, data_sha256.csv, r10/, per_subject.csv, errors.csv, curve.csv,
 k.csv, jobs.csv, projection.json, SUMMARY.md). The reading is done by src/eur_abl_aggregate.py (committed first).
   python src/eur_abl.py [--workers N]
 Test mode (synthetic world, build container only): R2_TEST=1 (see src/eur_abl_synthetic_test.py).
@@ -107,7 +112,19 @@ VARIANTS = {
     "5a3": _v(smooth=3, text="smoothing 3 windows"),
     "5a9": _v(smooth=9, text="smoothing 9 windows"),
     "8a": _v(enc="self", text="no edges at inference (self loops only)"),
+    "8b": _v(enc="input", text="no encoder: Mahalanobis on the 30-value node input the GAE receives"),
 }
+
+
+def selected():
+    """EUR_VARIANTS (comma list) or every variant; V0 always first."""
+    want = [v.strip() for v in os.environ.get("EUR_VARIANTS", "").split(",") if v.strip()]
+    if not want:
+        return list(VARIANTS)
+    bad = [v for v in want if v not in VARIANTS]
+    if bad:
+        raise SystemExit(f"STOP: unknown variants {bad}")
+    return ["V0"] + [v for v in VARIANTS if v in want and v != "V0"]
 STATE = R1.STATE
 
 
@@ -185,6 +202,28 @@ def model_inputs(z):
     return idx, adj, xn, f7
 
 
+def node_x(tag, adj, xn, f7):
+    """the node input the encoder receives (n x 18 x 30, float32): normalised adjacency row 18 + relative band powers 5
+    + the 7 clipped absolute features with the checkpoint's constants -- p2_dump_seeds23.run_model's construction, line
+    for line (torch ops). encode() builds its graphs from this array, so gate G-enc (encode with the window graph =
+    run_model, exactly) also proves that this is the record's input."""
+    import torch
+    ck = PD.CKPT / f"gae_v2_{tag}.pt"
+    meta = json.loads(ck.with_suffix(".json").read_text())
+    mu, sd, clip = np.array(meta["add_mean"]), np.array(meta["add_std"]), meta["clip"]
+    fa = ((np.clip((f7 - mu) / sd, -clip, clip) + clip) / (2 * clip)).astype(np.float32)
+    n = len(adj)
+    X = None
+    for i in range(n):
+        A = torch.tensor(adj[i]); An = A / (A.amax() + 1e-8)
+        xt = torch.cat([torch.tensor(xn[i].astype(np.float32)), torch.tensor(fa[i])], dim=1)
+        xi = torch.cat([An, xt], dim=1).numpy()
+        if X is None:
+            X = np.empty((n,) + xi.shape, np.float32)
+        X[i] = xi
+    return X if X is not None else np.empty((0, 18, 30), np.float32)
+
+
 def encode(tag, adj, xn, f7, prop="own"):
     """p2_dump_seeds23.run_model's construction; prop 'self' = empty propagation graph (GCN self loops only). The node
     input keeps the window's own connectivity row in both cases (as F-A1.4's I-self)."""
@@ -195,8 +234,7 @@ def encode(tag, adj, xn, f7, prop="own"):
     E8 = R1.E8
     ck = PD.CKPT / f"gae_v2_{tag}.pt"
     meta = json.loads(ck.with_suffix(".json").read_text())
-    mu, sd, clip = np.array(meta["add_mean"]), np.array(meta["add_std"]), meta["clip"]
-    fa = ((np.clip((f7 - mu) / sd, -clip, clip) + clip) / (2 * clip)).astype(np.float32)
+    X = node_x(tag, adj, xn, f7)
     model = G.GAEModel(in_dim=meta["in_dim"], bands=meta["out_x"])
     model.load_state_dict(torch.load(str(ck), map_location="cpu"), strict=True)
     model.eval()
@@ -207,10 +245,9 @@ def encode(tag, adj, xn, f7, prop="own"):
             e = min(s + E8.CHUNK, n)
             dl = []
             for i in range(s, e):
-                A = torch.tensor(adj[i]); An = A / (A.amax() + 1e-8)
-                xt = torch.cat([torch.tensor(xn[i].astype(np.float32)), torch.tensor(fa[i])], dim=1)
+                A = torch.tensor(adj[i])
                 ei, ew = dense_to_sparse(A if prop == "own" else torch.zeros_like(A))
-                dl.append(Data(x=torch.cat([An, xt], dim=1), edge_index=ei, edge_attr=ew))
+                dl.append(Data(x=torch.from_numpy(X[i]), edge_index=ei, edge_attr=ew))
             b = Batch.from_data_list(dl)
             Z[s:e] = model.encoder(b.x, b.edge_index, b.edge_attr).view(b.num_graphs, G.N_CH, G.LATENT_DIM).numpy()
     return Z
@@ -426,12 +463,14 @@ def prep_job(a):
                 Ds["base30"] = conv(E16.arm_distances("c", D0raw, Z, wf)[0], ext)
             if "enc_self" in need:
                 Ds["self"] = conv(d_maha(encode(tag, adj, xn, f7, "self")), ext)
+            if "enc_input" in need:
+                Ds["input"] = conv(d_maha(node_x(tag, adj, xn, f7)), ext)
             if check_enc and tag == TAGS[0]:
                 enc_bad = float(np.abs(encode(tag, adj, xn, f7, "own") - Z).max())
             recf = PS._full(lite, rec.astype(np.float64))
             for vid in variants:
                 v = VARIANTS[vid]
-                key = "self" if v["enc"] == "self" else v["dist"]
+                key = v["enc"] if v["enc"] in ("self", "input") else v["dist"]
                 if key not in Ds or ("gamma" in v["extra"] and gam is None):
                     na.append(vid)
                     continue
@@ -533,7 +572,7 @@ def set_of(case, src):
 # ============================================================================ phases
 def variant_pass(cases_src, workers, ks=None, check_enc=(), label="full"):
     """prep (x, m per variant), k per variant, scoring. ks given (smoke) -> no calibration."""
-    variants = list(VARIANTS)
+    variants = selected()
     t = time.time()
     specs = sorted([(c, s, c in DEV, c in check_enc, variants) for c, s in cases_src], key=lambda a: -_size(a[0], a[1]))
     prep = _run(prep_job, specs, workers, f"prep[{label}]")
@@ -586,8 +625,11 @@ def write_outputs(sc, label):
 def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False):
     R1.OUT_ROOT = R1.WORK / "eureka"
     workers = int(workers or os.environ.get("EUR_WORKERS") or R1.n_workers())
-    meta = R1.run_meta("abl", notebook, repo_commit)
-    meta.update(eur_abl_sha=CODE_SHA, code_shas=code_shas(), variants=VARIANTS, workers=workers)
+    tag = os.environ.get("EUR_TAG", "abl")
+    sel = selected()
+    need_ref = any(VARIANTS[v]["dist"] == "ref" for v in sel)
+    meta = R1.run_meta(tag, notebook, repo_commit)
+    meta.update(eur_abl_sha=CODE_SHA, code_shas=code_shas(), variants={v: VARIANTS[v] for v in sel}, workers=workers)
     R1._jdump(R1.out_dir() / "run_meta.json", meta)
     self_checks()
     src = build_views(DEV, TEST, EXT)
@@ -595,12 +637,13 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     # ---- SMOKE (the small check before the full run): chb01 + chb03 (+ first external case), measured
     t = time.time()
     s_dev, s_test, s_ext = [DEV[0]], [TEST[0]], EXT[:1]
-    STATE["tag"] = "abl/smoke"
+    STATE["tag"] = f"{tag}/smoke"
     R1.r10(s_dev, s_test, s_ext, workers=min(workers, 3), with_k=False)
-    p1 = _run(p1_job, [(c,) for c in s_dev], 1, "p1[smoke]")
-    reference_fits(s_dev)
+    if need_ref:
+        p1 = _run(p1_job, [(c,) for c in s_dev], 1, "p1[smoke]")
+        reference_fits(s_dev)
     cs = [(c, "earlier") for c in s_dev + s_test] + [(c, "ext") for c in s_ext]
-    prep, sc, _, na, jobs = variant_pass(cs, min(workers, 3), ks={v: K_RECORD for v in VARIANTS},
+    prep, sc, _, na, jobs = variant_pass(cs, min(workers, 3), ks={v: K_RECORD for v in sel},
                                          check_enc=set(s_dev + s_test + s_ext), label="smoke")
     write_outputs(sc, "")
     jobs.to_csv(R1.out_dir() / "jobs.csv", index=False)
@@ -612,7 +655,7 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
                 note="computed: smoke seconds x (all hours / smoke hours) / workers x 1.3 (training-patient pass 1)",
                 projected_h=round(smoke_s * (h_all / max(h_smoke, 1e-9)) / max(workers, 1) * 1.3 / 3600, 2),
                 not_available=na)
-    STATE["tag"] = "abl"
+    STATE["tag"] = tag
     R1._jdump(R1.out_dir() / "projection.json", proj)
     R1.gate(dict(gate="SMOKE", status="PASS" if proj["projected_h"] <= REFUSE_H else "FAIL", **proj,
                  summary=f"smoke {smoke_s:.0f} s on {h_smoke:.1f} h of EEG; full run projected {proj['projected_h']} h"))
@@ -623,10 +666,11 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     R1.r10(DEV, TEST, EXT, workers=workers, with_k=True)
     R1.phase("r10_full", t)
     t = time.time()
-    p1 = _run(p1_job, [(c,) for c in TRAIN], workers, "p1")
-    counts = reference_fits(TRAIN)
-    R1._jdump(R1.out_dir() / "reference_fits.json", counts)
-    R1.phase("p1", t)
+    if need_ref:
+        p1 = _run(p1_job, [(c,) for c in TRAIN], workers, "p1")
+        counts = reference_fits(TRAIN)
+        R1._jdump(R1.out_dir() / "reference_fits.json", counts)
+        R1.phase("p1", t)
     cs = [(c, "earlier") for c in DEV + TEST] + [(c, "ext") for c in EXT]
     prep, sc, ks, na, jobs = variant_pass(cs, workers, check_enc={DEV[0], TEST[0], EXT[0]} if EXT else {DEV[0], TEST[0]})
     write_outputs(sc, "")
@@ -635,7 +679,7 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     R1.finish_meta(dict(ks=ks))
     (R1.out_dir() / "SUMMARY.md").write_text(
         f"# EUR_ABL run ({notebook}, commit {repo_commit})\n\nEvery gate PASS (gates.json). Variants: "
-        f"{', '.join(VARIANTS)}. Rows: per_subject.csv; errors.csv; curve.csv; k.csv. Not available: {na}.\n"
+        f"{', '.join(sel)}. Rows: per_subject.csv; errors.csv; curve.csv; k.csv. Not available: {na}.\n"
         "No reading here: src/eur_abl_aggregate.py makes the tables (committed before this run).\n")
     log("EUR_ABL done")
 

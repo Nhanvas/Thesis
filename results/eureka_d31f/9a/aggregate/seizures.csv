@@ -1,0 +1,17 @@
+set,variant,arm,tp_mean,tp_min,tp_max,n_ref,fp_mean
+development,LF,fixed,61.25,60,63,94,549.25
+development,LF,own,63.5,62,65,94,639.25
+development,LF_krec,fixed,61.25,60,63,94,549.25
+development,LF_krec,own,63.5,62,65,94,643.75
+development,REBUILD,fixed,56.5,55,57,85,471.0
+development,REBUILD,own,57.25,56,58,85,570.75
+development,V5,fixed,62.25,61,63,94,547.75
+development,V5,own,63.0,61,64,94,651.25
+test,LF,fixed,23.0,21,25,76,276.25
+test,LF,own,34.0,31,37,76,327.5
+test,LF_krec,fixed,23.0,21,25,76,276.25
+test,LF_krec,own,34.0,31,37,76,329.25
+test,REBUILD,fixed,25.25,24,27,76,277.25
+test,REBUILD,own,35.75,33,38,76,339.0
+test,V5,fixed,25.5,25,26,76,276.25
+test,V5,own,36.25,34,38,76,337.25

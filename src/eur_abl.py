@@ -9,10 +9,15 @@ Every stage of V5 is the record code, imported read only through r2_r1 (whose im
 module to come from this repository). A variant swaps ONE function; everything else is the record code:
   latent        p2_dump_seeds23.run_model (8a: the same construction with an empty propagation graph, self loops only;
                 8b (added 20/11, chat D32-F, approved by the author 13:04): no encoder -- the distance is taken on the
-                30-value node input the encoder receives, built by node_x = the record construction)
+                30-value node input the encoder receives, built by node_x = the record construction;
+                O7 (D32-F 20/11, approved 14:14): the latent averaged with its previous and next valid window of the same
+                file before the distance)
   distance      per-channel LedoitWolf Mahalanobis (x1_external.model_outputs); 1a diagonal, 1b Euclidean; 4a reference
                 fitted on the clean windows of the 12 training patients (leave the scored patient out); 4b / 4c per-file
-                baselines of 10 / 30 min (e16_recording_baseline.arm_distances arms a / c)
+                baselines of 10 / 30 min (e16_recording_baseline.arm_distances arms a / c); O6a / O6b (D32-F 20/11,
+                approved 14:14; design results/eureka_d32f/DESIGN_O6_O7.md): a per-patient Gaussian-mixture normal model
+                of each channel's latent -- K components (O6a: BIC over 1-4; O6b: 2), Ledoit-Wolf per component, score =
+                the smallest Mahalanobis distance to a component (K = 1 is exactly the V5 distance, gate G-mix1)
   members       e17b_latent_family.member (robust z per channel, order statistic, minus a +-15 min running median per
                 file); 2a no drift correction, 2b level + spread (running median and running MAD, same window); 3a / 3m /
                 3c one member; 3g / 3r the gamma-AEC / reconstruction readout added as a fifth member (as E17)
@@ -113,7 +118,11 @@ VARIANTS = {
     "5a9": _v(smooth=9, text="smoothing 9 windows"),
     "8a": _v(enc="self", text="no edges at inference (self loops only)"),
     "8b": _v(enc="input", text="no encoder: Mahalanobis on the 30-value node input the GAE receives"),
+    "O6a": _v(dist="mixbic", text="latent mixture normal model, K by BIC (1-4), smallest component Mahalanobis"),
+    "O6b": _v(dist="mix2", text="latent mixture normal model, K = 2, smallest component Mahalanobis"),
+    "O7": _v(enc="ctx3", text="latent averaged over 3 windows (previous, own, next valid window of the file)"),
 }
+MIX_SAMPLE, MIX_KMAX, MIX_MIN, MIX_MIN_SHARE, MIX_SEED = 5000, 4, 64, 0.05, 42
 
 
 def selected():
@@ -259,6 +268,79 @@ def d_maha(Z):
                             for c in range(Z.shape[1])]).astype(np.float64)
 
 
+def mix_channel(X, kmode):
+    """O6 for one channel: X (n x d, float64). kmode 'bic' (K in 1..MIX_KMAX by the lowest BIC) or an int K.
+    Returns (distance n, info dict). K = 1 is exactly LedoitWolf().fit(X).mahalanobis(X)."""
+    from sklearn.covariance import LedoitWolf
+    from sklearn.mixture import GaussianMixture
+    n = len(X)
+    rng = np.random.default_rng(MIX_SEED)
+    S = X[np.sort(rng.choice(n, MIX_SAMPLE, replace=False))] if n > MIX_SAMPLE else X
+    fits = {}
+    ks = range(1, MIX_KMAX + 1) if kmode == "bic" else [int(kmode)]
+    for k in ks:
+        if k == 1:
+            fits[1] = None
+            continue
+        g = GaussianMixture(k, covariance_type="full", reg_covar=1e-6, n_init=3, random_state=MIX_SEED).fit(S)
+        fits[k] = g
+    if kmode == "bic":
+        bic = {k: (GaussianMixture(1, covariance_type="full", reg_covar=1e-6, n_init=3, random_state=MIX_SEED).fit(S)
+                   if k == 1 else fits[k]).bic(S) for k in ks}
+        K = min(bic, key=lambda k: (bic[k], k))
+    else:
+        K, bic = int(kmode), {}
+    if K == 1:
+        return LedoitWolf().fit(X).mahalanobis(X), dict(K=1, K_used=1, dropped=0, bic=bic, lab=np.zeros(n, int))
+    g = fits[K]
+    P = g.predict_proba(X)
+    lab = P.argmax(1)
+    keep = [c for c in range(K) if (lab == c).sum() >= max(MIX_MIN, MIX_MIN_SHARE * n)]   # a component must be a
+    # substantial background state (>= 5 % of the windows): a small component could hold a patient's seizures and mask them
+    dropped = K - len(keep)
+    if not keep:
+        return LedoitWolf().fit(X).mahalanobis(X), dict(K=K, K_used=1, dropped=dropped, bic=bic, lab=np.zeros(n, int))
+    lab = np.asarray(keep)[P[:, keep].argmax(1)]
+    if len(keep) == 1:
+        return LedoitWolf().fit(X).mahalanobis(X), dict(K=K, K_used=1, dropped=dropped, bic=bic, lab=np.zeros(n, int))
+    D = np.column_stack([LedoitWolf().fit(X[lab == c]).mahalanobis(X) for c in keep])
+    return D.min(axis=1), dict(K=K, K_used=len(keep), dropped=dropped, bic=bic, lab=lab)
+
+
+def d_mix(Z, kmode, flags=None):
+    """O6 on every channel; flags: optional (flagged, unflagged) bool arrays (n) of background windows with / without
+    the 5-SD flag -> the share of each outside the channel's largest component (descriptive premise)."""
+    cols, info = [], []
+    for c in range(Z.shape[1]):
+        d, inf = mix_channel(Z[:, c, :].astype(np.float64), kmode)
+        cols.append(d)
+        lab = inf.pop("lab")
+        big = np.bincount(lab).argmax()
+        r = dict(channel=c, K=inf["K"], K_used=inf["K_used"], dropped=inf["dropped"],
+                 share_outside_largest=float((lab != big).mean()))
+        if flags is not None:
+            fg, ug = flags
+            r["flag_share_outside_largest"] = float((lab[fg] != big).mean()) if fg.any() else np.nan
+            r["unflag_share_outside_largest"] = float((lab[ug] != big).mean()) if ug.any() else np.nan
+        info.append(r)
+    return np.column_stack(cols).astype(np.float64), info
+
+
+def ctx3(Z, wf):
+    """O7: each window's latent averaged with the previous and next window of the same file (valid-window sequence)."""
+    Z = Z.astype(np.float64)
+    out = np.empty_like(Z)
+    for f in np.unique(wf):
+        w = np.flatnonzero(wf == f)
+        X = Z[w]
+        s = X.copy(); c = np.ones(len(w))
+        if len(w) > 1:
+            s[1:] += X[:-1]; c[1:] += 1
+            s[:-1] += X[1:]; c[:-1] += 1
+        out[w] = s / c[:, None, None]
+    return out
+
+
 def d_diag(Z):
     X = Z.astype(np.float64)
     mu, var = X.mean(axis=0), X.var(axis=0) + 1e-12
@@ -359,11 +441,28 @@ def self_checks():
     loc = np.zeros((18, 16)); prec = np.tile(np.eye(16), (18, 1, 1)); loc[2], prec[2] = lw.location_, lw.precision_
     if not np.allclose(d_ref(Z, loc, prec)[:, 2], lw.mahalanobis(X[:, 2]), rtol=1e-8):
         bad.append("ref vs sklearn mahalanobis")
+    # O6: K = 1 is the V5 distance exactly; on a two-mode world (70 % / 30 % of background, a few true outliers) the
+    # mixture lowers the second mode's rank below the outliers, which one Gaussian does not
+    X2 = np.concatenate([rng.normal(0, 1, (1400, 16)), rng.normal(6, 1.5, (600, 16)), rng.normal(0, 1, (20, 16)) + 
+                         np.r_[np.full(8, 4.0), np.zeros(8)]])
+    if not np.array_equal(mix_channel(X2, 1)[0], LedoitWolf().fit(X2).mahalanobis(X2)):
+        bad.append("mix K=1 vs LedoitWolf")
+    dm, inf = mix_channel(X2, "bic")
+    d1 = LedoitWolf().fit(X2).mahalanobis(X2)
+    def mode2_above_outliers(d):          # share of second-mode windows scored above the median outlier
+        return float((d[1400:2000] > np.median(d[2000:])).mean())
+    if not (inf["K_used"] >= 2 and mode2_above_outliers(dm) < mode2_above_outliers(d1)):
+        bad.append(f"mix two-mode (K {inf['K_used']}, {mode2_above_outliers(dm):.3f} vs {mode2_above_outliers(d1):.3f})")
+    Zc = rng.normal(0, 1, (10, 2, 3)); wfc = np.array([0] * 6 + [1] * 4)
+    cz = ctx3(Zc, wfc)
+    if not (np.allclose(cz[1], Zc[0:3].mean(0)) and np.allclose(cz[0], Zc[0:2].mean(0)) and np.allclose(cz[6], Zc[6:8].mean(0))
+            and np.allclose(cz[5], Zc[4:6].mean(0))):
+        bad.append("ctx3")
     lv = member_series(D, wf, (9,), "levspread")[0]
     if not np.isfinite(lv).all():
         bad.append("levspread finite")
     R1.gate(dict(gate="G-self", status="PASS" if not bad else "FAIL", bad=bad,
-                 summary="member construction = e17b; distances by definition" if not bad else str(bad)))
+                 summary="member construction = e17b; distances by definition; O6 K=1 and two-mode; O7 context" if not bad else str(bad)))
 
 
 # ============================================================================ pool jobs
@@ -444,6 +543,11 @@ def prep_job(a):
         gam = (PS._full(lite, np.asarray(z["zgamma_raw"], np.float64)[idx])
                if (not ext and "zgamma_raw" in getattr(z, "files", z)) else None)
         store, smm, d0_bad, enc_bad, na = {}, {}, [], None, []
+        mixdiag, mix1_bad = [], None
+        fl = np.asarray(z["is_flag5sd"]).astype(bool)[idx] if (not ext and "is_flag5sd" in getattr(z, "files", z)) else None
+        bgm = (~np.asarray(z["is_ictal"]).astype(bool)[idx]) & (~np.asarray(z["is_buffer"]).astype(bool)[idx]) \
+            if (fl is not None and "is_buffer" in getattr(z, "files", z)) else None
+        flag_bg = (fl & bgm, (~fl) & bgm) if bgm is not None else None
         for tag in TAGS:
             rec, Z = PD.run_model(tag, adj, xn, f7)
             D0raw = d_maha(Z)
@@ -465,12 +569,22 @@ def prep_job(a):
                 Ds["self"] = conv(d_maha(encode(tag, adj, xn, f7, "self")), ext)
             if "enc_input" in need:
                 Ds["input"] = conv(d_maha(node_x(tag, adj, xn, f7)), ext)
+            if "enc_ctx3" in need:
+                Ds["ctx3"] = conv(d_maha(ctx3(Z, wf)), ext)
+            for mk, km in (("mixbic", "bic"), ("mix2", 2)):
+                if mk in need:
+                    Dm, inf = d_mix(Z, km, flags=flag_bg)
+                    Ds[mk] = conv(Dm, ext)
+                    mixdiag += [dict(r, case=case, seed=tag, variant=mk) for r in inf]
+            if check_enc and tag == TAGS[0] and ({"mixbic", "mix2"} & need):
+                d1, _ = d_mix(Z, 1)
+                mix1_bad = float(np.abs(d1 - D0raw).max())
             if check_enc and tag == TAGS[0]:
                 enc_bad = float(np.abs(encode(tag, adj, xn, f7, "own") - Z).max())
             recf = PS._full(lite, rec.astype(np.float64))
             for vid in variants:
                 v = VARIANTS[vid]
-                key = v["enc"] if v["enc"] in ("self", "input") else v["dist"]
+                key = v["enc"] if v["enc"] in ("self", "input", "ctx3") else v["dist"]
                 if key not in Ds or ("gamma" in v["extra"] and gam is None):
                     na.append(vid)
                     continue
@@ -479,12 +593,22 @@ def prep_job(a):
                 store[f"{vid}|{tag}|x"], store[f"{vid}|{tag}|m"] = x, m
                 if want_smm and tag == "clean_seed42":
                     smm[vid] = PS.smoothed(lite, m, v["smooth"])
+        if "O7" in variants:                 # O7 premise: lag-1 autocorrelation of the scalar within files (ok windows)
+            for tag in TAGS:
+                for vid in ("V0", "O7"):
+                    k = f"{vid}|{tag}|x"
+                    if k in store:
+                        x = np.asarray(store[k], np.float64)
+                        same = (fidx[1:] == fidx[:-1]) & ok[1:] & ok[:-1]
+                        a_, b_ = x[:-1][same], x[1:][same]
+                        mixdiag.append(dict(case=case, seed=tag, variant=vid, lag1=float(np.corrcoef(a_, b_)[0, 1])
+                                            if len(a_) > 2 else np.nan))
         d = SCR / "xm"
         d.mkdir(parents=True, exist_ok=True)
         np.savez(d / f".{case}.npz", **store)
         (d / f".{case}.npz").replace(d / f"{case}.npz")
         return _job_meta(t, case=case, src=src, job="prep", smm=smm, d0_bad=d0_bad, enc_maxabs=enc_bad,
-                         na=sorted(set(na)), hours=float(len(ok) * PS.WIN / 3600))
+                         na=sorted(set(na)), hours=float(len(ok) * PS.WIN / 3600), mixdiag=mixdiag, mix1=mix1_bad)
     except SystemExit as e:
         return dict(case=case, src=src, job="prep", error=f"STOP: {e}")
     except Exception:                    # noqa: BLE001
@@ -582,6 +706,13 @@ def variant_pass(cases_src, workers, ks=None, check_enc=(), label="full"):
                  summary=f"V0 distances = stored r10 distances in {len(prep)} cases x {len(TAGS)} seeds" if not d0_bad
                  else str(d0_bad)))
     enc = {r["case"]: r["enc_maxabs"] for r in prep if r["enc_maxabs"] is not None}
+    mix1 = {r["case"]: r["mix1"] for r in prep if r.get("mix1") is not None}
+    if check_enc and {"mixbic", "mix2"} & {VARIANTS[v]["dist"] for v in variants}:
+        R1.gate(dict(gate=f"G-mix1[{label}]", status="PASS" if mix1 and max(mix1.values()) == 0.0 else "FAIL",
+                     max_abs=mix1, summary=f"mixture distance with K = 1 = the V5 distance: max |dD| {mix1}"))
+    md = [r for x in prep for r in x.get("mixdiag", [])]
+    if md:
+        pd.DataFrame(md).to_csv(R1.out_dir() / "mix_diag.csv", index=False)
     if check_enc:
         R1.gate(dict(gate=f"G-enc[{label}]", status="PASS" if enc and max(enc.values()) == 0.0 else "FAIL", max_abs=enc,
                      summary=f"8a encoder with the window graph = run_model: max |dZ| {enc}"))

@@ -4,11 +4,12 @@
   EUR_9A    src/eur_9a.py (V5 with label-free z-score statistics; raw EDF verified against PhysioNet; smoke first)
   EUR_DIAG  src/eur_diag.py (diagnostics D1 shifted grids and EV event properties on V5; raw EDF verified)
   EUR_ABL8B src/eur_abl.py with EUR_VARIANTS=V0,8b and EUR_TAG=abl8b (ablation 8b, no encoder; chat D32-F, 20/11)
+  EUR_OPT   src/eur_abl.py with EUR_VARIANTS=V0,O6a,O6b,O7 and EUR_TAG=opt (optimisations O6 / O7; chat D32-F, 20/11)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -293,6 +294,37 @@ Code: `github.com/Nhanvas/Thesis` ref `{ref}`; every module's sha256 is asserted
     return name, cells
 
 
+def build_opt(ref):
+    """EUR_ABL's notebook with EUR_VARIANTS=V0,O6a,O6b,O7 and the output folder opt."""
+    name, cells = build_abl(ref)
+    name = "EUR_OPT"
+    cells[0] = md(f"""
+# {name} — optimisations O6 and O7 on the V5 model (Track F, chat D32-F)
+
+**Design:** `results/eureka_d32f/DESIGN_O6_O7.md` (approved by the author 20/11/2026 14:14). Inference only, the four
+V5 checkpoints. **O6a / O6b:** each channel's normal latent modelled per patient as a mixture of Gaussian components
+(K by BIC 1–4 / K = 2), score = the smallest Mahalanobis distance to a component. **O7:** the latent averaged over the
+previous, own and next window before V5's distance. V0 recomputed in the same run; k recalibrated per variant; the rest
+is V5's code. Selection on the development patients by the R214 rule written in the design. **Runs a SMOKE first**
+(chb01, chb03, chb24; gates incl. G-mix1) and STOPs before the full run if anything differs from the V5 record.
+**Accelerator:** None (CPU). **Internet:** ON (pip, git clone). **Inputs (Add Input):** `v9-x3-fold1`, `v9-x3-fold3`,
+`thesis-r2-external-features`. **Output:** `/kaggle/working/eureka/opt` (→ `results/eureka_d32f/opt`). **Runtime:** ≈ 1–1.5 h
+(computed; the smoke writes `projection.json`). Code: `github.com/Nhanvas/Thesis` ref `{ref}`; module sha256 asserted below.
+**Nothing printed here is a research result.** Do not edit; *Save Version → Save & Run All (Commit)*.
+""")
+    src = "".join(cells[2]["source"]).replace('os.environ.update(THESIS_REPO=REPO,',
+                                               'os.environ.update(EUR_VARIANTS="V0,O6a,O6b,O7", EUR_TAG="opt", THESIS_REPO=REPO,', 1)
+    assert "EUR_VARIANTS" in src
+    cells[2] = code(src)
+    src = "".join(cells[1]["source"]).replace('NOTEBOOK, REPO_REF = "EUR_ABL"', f'NOTEBOOK, REPO_REF = "{name}"', 1)
+    assert name in src
+    cells[1] = code(src)
+    src = "".join(cells[4]["source"]).replace('OUT = os.path.join(WORK, "eureka", "abl")', 'OUT = os.path.join(WORK, "eureka", "opt")', 1)
+    assert '"opt"' in src
+    cells[4] = code(src)
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -304,7 +336,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -316,3 +348,5 @@ if __name__ == "__main__":
         print("built", write(*build_diag(a.ref)), sha_of(FILES_DIAG))
     if a.only == "EUR_ABL8B":                     # built only on request (the other notebooks are records of runs)
         print("built", write(*build_abl8b(a.ref)), SHA)
+    if a.only == "EUR_OPT":
+        print("built", write(*build_opt(a.ref)), SHA)

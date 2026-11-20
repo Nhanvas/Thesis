@@ -25,11 +25,20 @@ r2_core.ext_job (chb24 + Siena, x1 convention, label-free statistics).
 
 Gates (STOP unless noted): G-mod (closed modules from the pinned repository), mode (versions vs R0's run_meta: exact /
 tolerance), R0.1 inventory (every raw file sha256 = PhysioNet, r2_core.inventory), G-ref (the R0 reference datasets
-found, one copy each), G-conv per case (slice-mode statistics vs R0's: max |d mean| / SD and max relative d SD
-<= 1e-3; counts reported), G-lab per case (labels, buffer, signal-loss flags, file index, file lists = the R0 dataset
+found, one copy each), G-conv per case (slice-mode statistics vs R0's: max |d mean| / SD and max relative d SD,
+reported for every case; STOP only above 1e-2 -- author 21/11 01:28, option A: the convention of whole-file filtering is
+accepted with its size reported), G-lab per case (labels, buffer, signal-loss flags, file index, file lists = the R0 dataset
 exactly), G-asr (every file of V9-X6's universe in this part: the 92-seizure rows and the high-amplitude window shares =
-results/v9_x6 within 1e-3 absolute; windows in only one set counted), G-ident (smoke: mode off -> the R0 .npz
-bit for bit in mode exact), G-done (every case of the part written). RP6 = V9-X6's Measure 1 on every file (same
+results/v9_x6 within 1e-3 absolute; windows in only one set counted; a file beyond 1e-3 is recomputed with the earlier
+asrpy chunkings that V9-X6's header documents -- 300-s chunks, asrpy's default mem_splits 3 for files <= 2 h -- and passes
+only if one of them reproduces the record within 1e-9: asrpy's asr_process restarts its update grid in every chunk, so
+its output depends on mem_splits; diagnosed 21/11, chat D35-F), G-ident (smoke: mode off -> the R0 .npz
+bit for bit in mode exact), G-done (every case of the part written), G-worker-sha (every ASR subprocess and feature
+job ran this fa15_asr.py: the sha16 each reports = the main process's). Pre-gates, before any long work (a FAIL skips the
+run, archives and STOPs): **G-conv-pad** (one CHB-MIT and one external case per notebook: the record's statistics with
+30-s padding = whole-file slices within 1e-9 relative -> the G-conv difference is the 3-s padding only, the slices are
+aligned) and **G-asr-pre** (named files, e.g. chb06_01, recomputed with the chunking the V9-X6 record used = the record
+within 1e-9). RP6 = V9-X6's Measure 1 on every file (same
 functions; thresholds = R0's 5-SD thresholds, as V9-X6).
 
 Outputs: WORK/fa15/<tag>/ (gates.json, cases.csv, files.csv, conv.csv, seizures.csv, highamp_windows.csv,
@@ -37,7 +46,8 @@ background_windows.csv, g_asr.json, run_meta.json, SUMMARY.md, logs/; smoke: pro
 datasets WORK/fa15-asr-chbmit-features-<tag>/ ({case}.npz, {case}_stats.json) and
 WORK/fa15-asr-external-features-<tag>/ ({case}_lf.npz). Never committed: .npz, caches.
   python src/fa15_asr.py --clean SPEC.json             (one file, one process: what the prefetch shells out to)
-  python src/fa15_asr.py --run --tag T --chb a,b --ext c,d [--asr-only file,...] [--smoke]
+  python src/fa15_asr.py --run --tag T --chb a,b --ext c,d [--asr-only file,...] [--conv-pad a,c]
+                         [--asr-pre case:file:chunk_s,...] [--smoke]
 Test (synthetic data, build container only): src/fa15_synthetic_test.py.
 """
 import argparse
@@ -83,9 +93,10 @@ TEST = bool(os.environ.get("FA15_TEST"))
 CUTOFF = 20
 WS = P.WIN_SAMPLES
 N_CH = 18
-TOL = dict(conv_rel=1e-3, asr_abs=1e-3)
-if TEST and os.environ.get("FA15_TEST_CONV_TOL"):     # synthetic test only (white-noise world: see the test's docstring)
-    TOL["conv_rel"] = float(os.environ["FA15_TEST_CONV_TOL"])
+TOL = dict(conv_rel=1e-2, asr_abs=1e-3, conv_pad=1e-9, asr_explain=1e-9)   # conv_rel: STOP bound (author 21/11, option A)
+PAD_LONG_S = 30                                     # G-conv-pad: the record's padding raised from 3 s to 30 s
+EXPLAIN_CHUNKS = (300.0, 1e12)                      # V9-X6's earlier chunkings: 300-s chunks; 1e12 -> asrpy's default 3
+EXPLAIN_DEFAULT_MAX_H = 2.0                         # mem_splits 3 OOM'd on a 4-h file (V9-X6 header): short files only
 SESSION_STOP_H = float(os.environ.get("FA15_SESSION_STOP_H", 11.0))
 MIN_FREE_MEM_GB = float(os.environ.get("FA15_MIN_FREE_MEM_GB", 4.5))      # V9-X6's MIN_AVAILABLE_GB
 DISK_MARGIN_GB = float(os.environ.get("FA15_DISK_MARGIN_GB", 4.0))
@@ -234,11 +245,14 @@ def _w_filter_file(path):
                                 .reshape(N_CH, n, WS).transpose(1, 0, 2)).astype(np.float32), n
 
 
+SHIFT = int(os.environ.get("FA15_TEST_SLICE_SHIFT", 0)) if TEST else 0   # synthetic test only: a planted misalignment
+
+
 def _w_filter_window(raw, start, end):
     if W["mode"] == "off":
         return _ORIG["filter_window"](raw, start, end)
     X = cleaned(raw.filenames[0], "chb", 60.0)
-    return np.asarray(X[:, start:end], dtype=np.float64)
+    return np.asarray(X[:, start + SHIFT:end + SHIFT], dtype=np.float64)
 
 
 def _w_load_18(path, kind):
@@ -263,7 +277,7 @@ def _w_window_padded(data, i, notch):
         return _ORIG["window_padded"](data, i, notch)
     path, kind = W["reg"][_fp(data)]
     X = cleaned(path, kind, notch)
-    return np.asarray(X[:, i * WS:(i + 1) * WS], dtype=np.float64)
+    return np.asarray(X[:, i * WS + SHIFT:(i + 1) * WS + SHIFT], dtype=np.float64)
 
 
 def install(mode):
@@ -337,22 +351,30 @@ def clean_cli(spec_path):
     X = whole_filtered(data, spec["notch"])
     del data
     t1 = time.time()
+    if spec.get("chunk_s"):                                  # diagnostic: an earlier V9-X6 chunking (G-asr-pre, G-asr)
+        V6.MEM_SPLIT_CHUNK_S = float(spec["chunk_s"])
+    mem_splits = max(3, int(np.ceil(n_total / (V6.MEM_SPLIT_CHUNK_S * P.FS))))       # = V6.run_asr's own formula
     if os.environ.get("FA15_TEST_ASR_IDENTITY"):             # synthetic test of the plumbing only
         Xc = X.copy()
     else:
         guard_block_covariance()
         Xc = V6.run_asr(X, CUTOFF)
     t2 = time.time()
+    sha = os.environ.get("FA15_TEST_WORKER_SHA") if TEST and os.environ.get("FA15_TEST_WORKER_SHA") else CODE_SHA
     payload = dict(path=spec["path"], key=spec["key"], n_total=int(n_total), hours=n_total / P.FS / 3600,
                    load_filter_s=round(t1 - t0, 2), asr_s=round(t2 - t1, 2), bc_trim=len(BC_TRIM),
+                   chunk_s=float(V6.MEM_SPLIT_CHUNK_S), mem_splits=mem_splits, code_sha=sha,
                    power_removed_total=float(1 - np.mean(Xc ** 2) / max(np.mean(X ** 2), 1e-300)))
     m = spec.get("measure")
     if m:
         payload["measure"] = measure1(X, Xc, n_total, [tuple(s) for s in m["seizures"]], np.asarray(m["thr"], float),
                                       m["subject"], m["file"])
-    tmp = CACHE / f".{spec['key']}.npy.part.npy"
-    np.save(tmp, Xc.astype(np.float32))
-    tmp.replace(CACHE / f"{spec['key']}.npy")
+    if spec.get("nocache"):                                  # diagnostic: an empty marker instead of the signal
+        (CACHE / f"{spec['key']}.npy").write_bytes(b"")
+    else:
+        tmp = CACHE / f".{spec['key']}.npy.part.npy"
+        np.save(tmp, Xc.astype(np.float32))
+        tmp.replace(CACHE / f"{spec['key']}.npy")
     payload["peak_rss_mb"] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
     payload["total_s"] = round(time.time() - t0, 2)
     (CACHE / f"{spec['key']}.json").write_text(json.dumps(payload, default=_np))
@@ -470,7 +492,7 @@ def feature_job(spec):
     STATE["tag"] = tag
     t0 = time.time()
     logs = out_dir() / "logs"
-    res = dict(case=case, set=set_, status="done")
+    res = dict(case=case, set=set_, status="done", code_sha=CODE_SHA)
     try:
         # --- G-conv: statistics with whole-file slices, no ASR, vs R0
         install("slice")
@@ -578,41 +600,177 @@ def v9_record():
     return sz[sz.cutoff == CUTOFF], hi[hi.cutoff == CUTOFF], bg[bg.cutoff == CUTOFF]
 
 
-def gate_asr(sz, hi, bg):
+def _measure_frames(m, s0, f0):
+    """one file's Measure 1 payload -> (seizure rows, high-amplitude rows, background rows) in V9-X6's format."""
+    h = m["highamp"]
+    hi = [dict(subject=s0, file=f0, cutoff=CUTOFF, win_idx=w, share=a, contrast_before=b, contrast_after=c)
+          for w, a, b, c in zip(h["win_idx"], h["share"], h["contrast_before"], h["contrast_after"])]
+    bg = [dict(subject=s0, file=f0, cutoff=CUTOFF, share=a) for a in m["background"]["share"]]
+    return pd.DataFrame(m["seizures"]), pd.DataFrame(hi), pd.DataFrame(bg)
+
+
+def compare_file(sz, hi, bg, s, f, rec):
+    """max |difference| per quantity between this run's Measure 1 rows of one file and the V9-X6 record's."""
+    rsz, rhi, rbg = rec
+    worst, only = {}, 0
+    a = sz[(sz.subject == s) & (sz.file == f)].set_index("seizure_idx") if len(sz) else pd.DataFrame()
+    b = rsz[(rsz.subject == s) & (rsz.file == f)].set_index("seizure_idx")
+    for col in ("share_seizure", "share_preictal60", "contrast_before", "contrast_after"):
+        dd = np.nanmax(np.abs(a[col].to_numpy(float) - b[col].reindex(a.index).to_numpy(float))) if len(a) else np.inf
+        worst[col] = float(dd) if np.isfinite(dd) else np.inf
+    ha = hi[(hi.subject == s) & (hi.file == f)].set_index("win_idx") if len(hi) else pd.DataFrame(columns=["share"])
+    hb = rhi[(rhi.subject == s) & (rhi.file == f)].set_index("win_idx")
+    com = ha.index.intersection(hb.index)
+    only = len(ha.index.symmetric_difference(hb.index))
+    worst["highamp_share"] = float(np.nanmax(np.abs(ha.share[com].to_numpy(float) - hb.share[com].to_numpy(float)))) \
+        if len(com) else 0.0
+    ga = np.sort(bg[(bg.subject == s) & (bg.file == f)].share.to_numpy(float)) if len(bg) else np.zeros(0)
+    gb = np.sort(rbg[(rbg.subject == s) & (rbg.file == f)].share.to_numpy(float))
+    worst["background_share_sorted"] = float(np.nanmax(np.abs(ga - gb))) if len(ga) == len(gb) and len(ga) else \
+        (0.0 if len(ga) == len(gb) else np.inf)
+    rows_ok = len(a) == len(b)
+    return worst, only, rows_ok, len(a), len(ha), len(hb), len(ga), len(gb)
+
+
+def recompute(specs, chunk_s, K):
+    """ASR + Measure 1 of the given files with another chunking, in subprocesses (no cache kept); {(subject, file):
+    frames}. Keys are suffixed so that the main caches are never touched."""
+    out = {}
+
+    def one(sp):
+        sp = dict(sp, key=f"{sp['key']}_c{int(min(chunk_s, 1e6))}", chunk_s=chunk_s, nocache=True)
+        while mem_available_gb() < MIN_FREE_MEM_GB:
+            time.sleep(5)
+        r = run_clean(sp)
+        (CACHE / f"{sp['key']}.npy").unlink(missing_ok=True)
+        m = sp["measure"]
+        return (m["subject"], m["file"]), _measure_frames(r["measure"], m["subject"], m["file"]), r
+    with cf.ThreadPoolExecutor(max(1, K)) as ex:
+        for key, frames, r in ex.map(one, specs):
+            out[key] = dict(frames=frames, mem_splits=r["mem_splits"], code_sha=r["code_sha"], asr_s=r["asr_s"])
+    return out
+
+
+def gate_asr(sz, hi, bg, specs_by_file=None, K=1):
     """every file of V9-X6's universe processed here: seizure rows and high-amplitude window shares = the record within
-    1e-3 absolute; background shares compared as sorted lists per file. n/a if this part holds none of those files."""
-    rsz, rhi, rbg = v9_record()
+    1e-3 absolute; background shares compared as sorted lists per file. A file beyond 1e-3 is recomputed with V9-X6's
+    earlier chunkings (EXPLAIN_CHUNKS; the default 3 only for files <= EXPLAIN_DEFAULT_MAX_H) and is explained when one
+    reproduces the record within 1e-9 (author 21/11 01:28). n/a if this part holds none of those files."""
+    rec = v9_record()
+    rsz = rec[0]
     files = sorted(set(zip(rsz.subject, rsz.file)) & set(zip(sz.subject, sz.file))) if len(sz) else []
     if not files:
-        rec = dict(gate="G-asr", status="n/a", summary="no file of V9-X6's universe in this part")
-        jdump(out_dir() / "g_asr.json", rec)
-        return rec
-    worst, n_rows, only, detail = {}, 0, 0, []
+        r = dict(gate="G-asr", status="n/a", summary="no file of V9-X6's universe in this part")
+        jdump(out_dir() / "g_asr.json", r)
+        return r
+    worst_all, n_rows, only_all, detail, beyond = {}, 0, 0, [], []
     for s, f in files:
-        a = sz[(sz.subject == s) & (sz.file == f)].set_index("seizure_idx")
-        b = rsz[(rsz.subject == s) & (rsz.file == f)].set_index("seizure_idx")
-        for col in ("share_seizure", "share_preictal60", "contrast_before", "contrast_after"):
-            dd = np.nanmax(np.abs(a[col].to_numpy(float) - b[col].reindex(a.index).to_numpy(float))) if len(a) else 0.0
-            worst[col] = max(worst.get(col, 0.0), float(dd) if np.isfinite(dd) else np.inf)
-        n_rows += len(a)
-        ha = hi[(hi.subject == s) & (hi.file == f)].set_index("win_idx")
-        hb = rhi[(rhi.subject == s) & (rhi.file == f)].set_index("win_idx")
-        com = ha.index.intersection(hb.index)
-        only += len(ha.index.symmetric_difference(hb.index))
-        if len(com):
-            worst["highamp_share"] = max(worst.get("highamp_share", 0.0),
-                                         float(np.nanmax(np.abs(ha.share[com].to_numpy() - hb.share[com].to_numpy()))))
-        ga, gb = np.sort(bg[(bg.subject == s) & (bg.file == f)].share.to_numpy()), np.sort(rbg[(rbg.subject == s) & (rbg.file == f)].share.to_numpy())
-        if len(ga) == len(gb) and len(ga):
-            worst["background_share_sorted"] = max(worst.get("background_share_sorted", 0.0), float(np.nanmax(np.abs(ga - gb))))
-        detail.append(dict(subject=s, file=f, seizures=len(a), highamp_here=len(ha), highamp_record=len(hb),
-                           background_here=len(ga), background_record=len(gb)))
-    ok = all(v <= TOL["asr_abs"] for v in worst.values()) and n_rows == len(rsz.merge(pd.DataFrame(files, columns=["subject", "file"])))
-    rec = dict(gate="G-asr", status="PASS" if ok else "FAIL", files=len(files), seizure_rows=n_rows, max_abs=worst,
-               highamp_windows_in_one_set_only=only, tol=TOL["asr_abs"], detail=detail,
-               summary=f"{len(files)} V9-X6 files, {n_rows} seizures; max |diff| {worst}; windows in one set only {only}")
-    jdump(out_dir() / "g_asr.json", rec)
-    return rec
+        worst, only, rows_ok, na, nha, nhb, nga, ngb = compare_file(sz, hi, bg, s, f, rec)
+        for k, v in worst.items():
+            worst_all[k] = max(worst_all.get(k, 0.0), v)
+        n_rows += na
+        only_all += only
+        mx = max(worst.values())
+        cls = "exact" if mx <= TOL["asr_explain"] and rows_ok else ("within_tol" if mx <= TOL["asr_abs"] and rows_ok
+                                                                     else "beyond")
+        detail.append(dict(subject=s, file=f, seizures=na, highamp_here=nha, highamp_record=nhb, background_here=nga,
+                           background_record=ngb, max_abs=mx, cls=cls, explained_by=None))
+        if cls == "beyond":
+            beyond.append((s, f))
+    sha_bad = []
+    for chunk in EXPLAIN_CHUNKS:
+        todo = []
+        for s, f in beyond:
+            d = next(x for x in detail if (x["subject"], x["file"]) == (s, f))
+            sp = (specs_by_file or {}).get((s, f))
+            if d["explained_by"] is None and sp is not None and (chunk < 1e6 or sp["hours"] <= EXPLAIN_DEFAULT_MAX_H):
+                todo.append(sp)
+        if not todo:
+            continue
+        res = recompute(todo, chunk, K)
+        for (s, f), r in res.items():
+            d = next(x for x in detail if (x["subject"], x["file"]) == (s, f))
+            w, only, rows_ok, *_ = compare_file(*r["frames"], s, f, rec)
+            d.setdefault("tried", []).append(dict(chunk_s=chunk, mem_splits=r["mem_splits"], max_abs=max(w.values()),
+                                                  asr_s=r["asr_s"]))
+            if r["code_sha"] != CODE_SHA:
+                sha_bad.append((s, f, r["code_sha"]))
+            if max(w.values()) <= TOL["asr_explain"] and rows_ok and only == 0:
+                d["explained_by"] = dict(chunk_s=chunk, mem_splits=r["mem_splits"])
+                d["cls"] = "explained"
+    unexplained = [(d["subject"], d["file"]) for d in detail if d["cls"] == "beyond"]
+    counts = {c: sum(d["cls"] == c for d in detail) for c in ("exact", "within_tol", "explained", "beyond")}
+    ok = not unexplained and not sha_bad and n_rows == len(rsz.merge(pd.DataFrame(files, columns=["subject", "file"])))
+    r = dict(gate="G-asr", status="PASS" if ok else "FAIL", files=len(files), seizure_rows=n_rows, max_abs=worst_all,
+             highamp_windows_in_one_set_only=only_all, tol=TOL["asr_abs"], tol_explain=TOL["asr_explain"],
+             classes=counts, unexplained=unexplained, worker_sha_bad=sha_bad, detail=detail,
+             summary=f"{len(files)} V9-X6 files, {n_rows} seizures; classes {counts}; unexplained {unexplained}; "
+                     f"max |diff| at 60-s chunks {max(worst_all.values()):.2e}")
+    jdump(out_dir() / "g_asr.json", r)
+    return r
+
+
+def gate_asr_pre(items, plans_all, K):
+    """G-asr-pre: each named file recomputed with the chunking the V9-X6 record used = the record within 1e-9."""
+    rec = v9_record()
+    det, ok = [], True
+    by_chunk = {}
+    for case, fname, chunk in items:
+        sp = next((s for s in plans_all if s["case"] == case and Path(s["path"]).name == fname), None)
+        if sp is None:
+            det.append(dict(case=case, file=fname, status="FAIL", error="file not in this part's plan"))
+            ok = False
+            continue
+        by_chunk.setdefault(chunk, []).append(sp)
+    for chunk, sps in by_chunk.items():
+        for (s, f), r in recompute(sps, chunk, K).items():
+            w, only, rows_ok, *_ = compare_file(*r["frames"], s, f, rec)
+            good = max(w.values()) <= TOL["asr_explain"] and rows_ok and only == 0 and r["code_sha"] == CODE_SHA
+            ok &= good
+            det.append(dict(case=s, file=f, chunk_s=chunk, mem_splits=r["mem_splits"], max_abs=w, highamp_only=only,
+                            code_sha=r["code_sha"], asr_s=r["asr_s"], status="PASS" if good else "FAIL"))
+    return dict(gate="G-asr-pre", status="PASS" if ok and det else "FAIL", tol=TOL["asr_explain"], files=det,
+                summary=f"{len(det)} file(s) with the record's chunking vs results/v9_x6: "
+                        f"{[(d['file'], d.get('mem_splits'), d['status']) for d in det]}")
+
+
+def _stats_pair(case, set_, complete):
+    """(mean, sd) of the record's statistics function for one case in the current wrapper mode (V; CHB thesis = every
+    10th non-ictal non-buffer window, external = every 10th window)."""
+    if set_ == "chb":
+        smap = P.parse_summary(R0.summary_path(complete, case))
+        return P.compute_subject_stats(case, Path(complete) / "chbmit", smap)
+    files, meta = X1.subject_files(str(complete), case)
+    return X1.labelfree_stats(files, meta["kind"], meta["notch"])
+
+
+def gate_conv_pad(cases, complete):
+    """G-conv-pad: the record's statistics with the padding raised to 30 s (mode off) = whole-file slices (mode slice)
+    within 1e-9 relative, per case; also the 3-s record value (= G-conv) for scale."""
+    det, ok = [], True
+    pad0 = P.FILTER_PAD
+    for case, set_ in cases:
+        t = time.time()
+        try:
+            install("off")
+            P.FILTER_PAD = PAD_LONG_S * P.FS
+            mu30, sd30 = _stats_pair(case, set_, complete)
+            P.FILTER_PAD = pad0
+            mu3, sd3 = _stats_pair(case, set_, complete)
+            install("slice")
+            mus, sds = _stats_pair(case, set_, complete)
+        finally:
+            P.FILTER_PAD = pad0
+            install("off")
+        d30 = max(float(np.max(np.abs(mus - mu30) / sd30)), float(np.max(np.abs(sds - sd30) / sd30)))
+        d3 = max(float(np.max(np.abs(mus - mu3) / sd3)), float(np.max(np.abs(sds - sd3) / sd3)))
+        good = d30 <= TOL["conv_pad"]
+        ok &= good
+        det.append(dict(case=case, set=set_, rel_pad30_vs_slice=d30, rel_pad3_vs_slice=d3, seconds=round(time.time() - t, 1),
+                        status="PASS" if good else "FAIL"))
+    return dict(gate="G-conv-pad", status="PASS" if ok and det else "FAIL", tol=TOL["conv_pad"], cases=det,
+                summary="; ".join(f"{d['case']}: 30 s {d['rel_pad30_vs_slice']:.1e}, 3 s {d['rel_pad3_vs_slice']:.1e}"
+                                  for d in det))
 
 
 # ============================================================================ orchestration
@@ -669,13 +827,14 @@ def plan_case(case, set_, complete, refs):
     return specs
 
 
-def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local", asr_workers=None, feat_workers=1):
+def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local", asr_workers=None, feat_workers=1,
+        conv_pad=(), asr_pre=()):
     STATE["tag"] = tag
     t_run = time.time()
     v = versions()
     meta = dict(notebook=notebook, tag=tag, repo_commit=commit, code_sha=CODE_SHA, v9_x6_sha=V6_SHA, versions=v,
                 cpu_count=os.cpu_count(), platform=platform.platform(), smoke=smoke, chb=list(chb), ext=list(ext),
-                asr_only=list(asr_only), started=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()), test=TEST)
+                asr_only=list(asr_only), conv_pad=list(conv_pad), asr_pre=[list(x) for x in asr_pre], started=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()), test=TEST)
     jdump(out_dir() / "run_meta.json", meta)
     gate(dict(gate="G-mod", status="PASS", summary=f"closed modules from {REPO / 'src'}; fa15_asr {CODE_SHA}, "
                                                    f"v9_x6_asr {V6_SHA}"))
@@ -720,12 +879,30 @@ def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local
         f"{sum(s['hours'] for p in plans for s in p[2]):.1f} h; ASR-only files {len(extra)}; ASR processes {K}, "
         f"feature processes {feat_workers}; free disk {shutil.disk_usage(SCRATCH.parent if SCRATCH.parent.exists() else '/').free / 1e9:.1f} GB")
     file_rows, case_rows = [], []
-    t = time.time()
     SCRATCH.mkdir(parents=True, exist_ok=True)
+    specs_by_file = {(s["measure"]["subject"], s["measure"]["file"]): s for p_ in plans for s in p_[2]}
+    specs_by_file.update({(s["measure"]["subject"], s["measure"]["file"]): s for s in extra})
+    # ---- pre-gates (author 21/11 01:28): before any long work; a FAIL skips the run, archives and STOPs
+    pre_fail = False
+    if conv_pad:
+        t = time.time()
+        g = gate_conv_pad([(c, "chb" if c in chb else "ext") for c in conv_pad], complete)
+        gate(g, stop=False)
+        pre_fail |= g["status"] != "PASS"
+        STATE["phases"]["g_conv_pad"] = round(time.time() - t, 1)
+    if asr_pre and not pre_fail:
+        t = time.time()
+        g = gate_asr_pre(asr_pre, [s for p_ in plans for s in p_[2]] + extra, K)
+        gate(g, stop=False)
+        pre_fail |= g["status"] != "PASS"
+        STATE["phases"]["g_asr_pre"] = round(time.time() - t, 1)
+    t = time.time()
     asr_ex = cf.ThreadPoolExecutor(K)
     feat_ex = cf.ProcessPoolExecutor(feat_workers, mp_context=mp.get_context("spawn"), initializer=_init,
                                      initargs=({k: os.environ[k] for k in os.environ if k.startswith(("FA15_", "R2_", "THESIS_", "OMP_", "OPENBLAS_", "MKL_"))},))
-    pending = list(plans)
+    pending = [] if pre_fail else list(plans)
+    if pre_fail:
+        extra = []
     asr_futs, feat_futs, case_files = {}, {}, {}
 
     def submit_asr(spec):
@@ -776,8 +953,8 @@ def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local
                     row = dict(case=s["case"], file=Path(s["path"]).name, hours=r["hours"], asr_s=r["asr_s"],
                                load_filter_s=r["load_filter_s"], wall_s=r["wall_s"], total_s=r["total_s"],
                                peak_rss_mb=r["peak_rss_mb"], power_removed_total=r["power_removed_total"],
-                               bc_trim=r.get("bc_trim", 0),
-                               asr_only=c == "__extra__")
+                               bc_trim=r.get("bc_trim", 0), mem_splits=r.get("mem_splits"),
+                               code_sha=r.get("code_sha"), asr_only=c == "__extra__")
                     file_rows.append(row)
                     jdump(out_dir() / "measure" / f"{s['case']}__{row['file']}.json", r.get("measure") or {})
                     if c == "__extra__":
@@ -822,17 +999,17 @@ def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local
         m = json.loads(p.read_text())
         if not m:
             continue
-        sz += m["seizures"]
         s0, f0 = p.stem.split("__")
-        h = m["highamp"]
-        hi += [dict(subject=s0, file=f0, cutoff=CUTOFF, win_idx=w, share=a, contrast_before=b, contrast_after=c)
-               for w, a, b, c in zip(h["win_idx"], h["share"], h["contrast_before"], h["contrast_after"])]
-        bg += [dict(subject=s0, file=f0, cutoff=CUTOFF, share=a) for a in m["background"]["share"]]
-    sz, hi, bg = pd.DataFrame(sz), pd.DataFrame(hi), pd.DataFrame(bg)
+        a_, b_, c_ = _measure_frames(m, s0, f0)
+        sz.append(a_), hi.append(b_), bg.append(c_)
+    cat = lambda L: pd.concat(L, ignore_index=True) if L else pd.DataFrame()  # noqa: E731
+    sz, hi, bg = cat(sz), cat(hi), cat(bg)
     sz.to_csv(out_dir() / "seizures.csv", index=False)
     hi.to_csv(out_dir() / "highamp_windows.csv", index=False)
     bg.to_csv(out_dir() / "background_windows.csv", index=False)
-    if stop_reason:
+    if pre_fail:
+        gate(dict(gate="G-done", status="FAIL", summary="skipped: a pre-gate failed"), stop=False)
+    elif stop_reason:
         gate(dict(gate="G-done", status="FAIL", summary=stop_reason[:1500]), stop=False)
     else:
         conv_bad = [r["case"] for r in case_rows if r.get("conv", {}).get("status") != "PASS"]
@@ -845,12 +1022,20 @@ def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local
         gate(dict(gate="G-lab", status="PASS" if not lab_bad else "FAIL", failed=lab_bad,
                   summary=f"labels / buffer / signal loss / file index / files = R0 in {len(case_rows) - len(lab_bad)} "
                           f"of {len(case_rows)} cases"), stop=False)
-        gate(gate_asr(sz, hi, bg), stop=False)
+        t = time.time()
+        gate(gate_asr(sz, hi, bg, specs_by_file, K), stop=False)
+        STATE["phases"]["g_asr"] = round(time.time() - t, 1)
         done = {r["case"] for r in case_rows if r["status"] == "done"}
         want = set(chb) | set(ext)
         gate(dict(gate="G-done", status="PASS" if done == want else "FAIL", missing=sorted(want - done),
                   summary=f"{len(done)} of {len(want)} cases written"), stop=False)
-    if smoke and not stop_reason:
+        shas = {("asr", x["file"]): x.get("code_sha") for x in file_rows} | {("feat", r["case"]): r.get("code_sha")
+                                                                              for r in case_rows}
+        bad = sorted(f"{k[0]}:{k[1]}={v}" for k, v in shas.items() if v != CODE_SHA)
+        gate(dict(gate="G-worker-sha", status="PASS" if shas and not bad else "FAIL", expected=CODE_SHA,
+                  jobs=len(shas), differ=bad, summary=f"{len(shas) - len(bad)} of {len(shas)} jobs ran fa15_asr "
+                                                        f"{CODE_SHA}; differ {bad[:5]}"), stop=False)
+    if smoke and not stop_reason and not pre_fail:
         ident = []
         for c in [x for x in chb][:1] + [x for x in ext if x.startswith("PN")][:1]:
             ident.append(ident_job(dict(case=c, set="chb" if c in chb else "ext", complete=str(complete), tag=tag,
@@ -947,6 +1132,8 @@ def main():
     ap.add_argument("--ext", default="")
     ap.add_argument("--asr-only", default="")
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--conv-pad", default="")
+    ap.add_argument("--asr-pre", default="")
     ap.add_argument("--asr-workers", type=int, default=None)
     ap.add_argument("--notebook", default="local")
     ap.add_argument("--commit", default="local")
@@ -956,7 +1143,9 @@ def main():
         return 0
     if a.run:
         sp = lambda s: [x for x in s.split(",") if x]  # noqa: E731
-        failed = run(a.tag, sp(a.chb), sp(a.ext), sp(a.asr_only), a.smoke, a.notebook, a.commit, a.asr_workers)
+        pre = [(x.split(":")[0], x.split(":")[1], float(x.split(":")[2])) for x in sp(a.asr_pre)]
+        failed = run(a.tag, sp(a.chb), sp(a.ext), sp(a.asr_only), a.smoke, a.notebook, a.commit, a.asr_workers,
+                     conv_pad=sp(a.conv_pad), asr_pre=pre)
         print("FAILED GATES:", failed if failed else "none")
         return 1 if failed else 0
     ap.print_help()

@@ -11,17 +11,23 @@ src/r2_rb1c_notebook_test.py. In a SEPARATE process, with the record code only:
     PN05 -> input/thesis-r2-chbmit-features, input/thesis-r2-external-features (+ R0 run_meta with these versions);
   - the "V9-X6 record" for chb01_01 and chb24_01 by V9-X6's own path (v9_x6_asr.whole_file_filtered + run_asr + its
     Measure 1 functions; thresholds = the references' 5-SD thresholds) -> repo/results/v9_x6/*.csv.
-G-conv runs here at a test tolerance of 0.01 (FA15_TEST_CONV_TOL): on this world the record's 3-s padded per-window
-filtering differs from whole-file filtering by ~0.75 % of window RMS (diagnosed 15/11: the difference vanishes with
->= 10 s padding), which moves the statistics by up to 2.5e-3 SD; the real size is measured by the smoke at the design's
-1e-3 (a FAIL there goes to the author, plan §14 row 40).
+G-conv: on this world the record's 3-s padded per-window filtering differs from whole-file filtering by ~0.75 % of
+window RMS, which moves the statistics by up to 2.5e-3 SD -- reported, below the STOP bound 1e-2 (author 21/11 01:28).
+Rev 21/11 (chat D35-F): the V9-X6 record of chb01_01 is built with 300-s chunks (asrpy mem_splits 3 on this 5-min file),
+as V9-X6's early files were, so the run's 60-s chunks differ beyond 1e-3 there and G-asr must explain it by the 300-s
+recomputation; chb24_01 is built with 60-s chunks (exact). Pre-gates G-conv-pad (chb11, PN05) and G-asr-pre (chb01_01,
+300 s) run in the smoke and in a data notebook built by fa15_make_notebooks.build_data. Notebooks are written to the
+test root, never into the repository.
 Checks: FA15_SMOKE runs to the end; every gate PASS (mode exact, R0.1 with two files from PhysioNet, G-ref, G-conv, G-lab,
 G-asr, G-done, G-ident); the chb12 referential files are skipped by design; the datasets hold every case, their labels =
 the references and their features differ from them (ASR acted); the chb01 statistics changed (planted stretch cleaned);
 the ASR-only file was measured and its cache removed; projection.json and split.json written; the Measure 1 tables
-hold the V9-X6 columns. Failure paths (each STOPs at the end of the notebook with the results archived): a V9-X6 record
-value + 0.01 -> G-asr FAIL; an R0 reference SD x 1.01 -> G-conv FAIL; one R0 buffer flag flipped -> G-lab and G-ident
-FAIL; an ASR subprocess failing on one file -> G-done FAIL.
+hold the V9-X6 columns; G-asr classes (chb01_01 explained by 300-s chunks, chb24_01 exact); G-conv-pad (30 s <= 1e-9,
+3 s visibly larger); G-worker-sha. Failure paths (each STOPs at the end of the notebook with the results archived): a
+V9-X6 record value of chb24_01 + 0.01 -> G-asr FAIL (unexplained by any chunking); an R0 reference SD x 1.05 -> G-conv
+FAIL (above 1e-2); one R0 buffer flag flipped -> G-lab and G-ident FAIL; an ASR subprocess failing on one file -> G-done
+FAIL; slices shifted by one sample -> G-conv-pad FAIL and the run skipped; a chb01_01 record value + 1e-6 -> G-asr-pre
+FAIL and the run skipped; a worker reporting another code sha -> G-worker-sha FAIL.
 Not covered: the real files' size, Kaggle's speed, memory and disk (the smoke measures them); the memory / disk guards
 (they only wait).
   python src/fa15_synthetic_test.py [--root DIR]
@@ -46,7 +52,8 @@ import r2_rb1c_notebook_test as NBT  # noqa: E402
 import fa15_make_notebooks as MK  # noqa: E402
 
 RES = []
-CASES = [["chb01", "chb11"], ["chb24", "PN05"], ["chb12:chb12_06.edf"]]
+CASES = [["chb01", "chb11"], ["chb24", "PN05"], ["chb12:chb12_06.edf"], ["chb11", "PN05"],
+         [["chb01", "chb01_01.edf", 300.0]]]
 
 REFB = r'''
 import json, os, sys, numpy as np, pandas as pd, platform
@@ -83,6 +90,7 @@ for case, f, thr in (("chb01", "chb01_01.edf", np.asarray(json.loads((dc / "chb0
                      ("chb24", "chb24_01.edf", 5.0 * np.asarray(json.loads(str(np.load(de / "chb24_lf.npz", allow_pickle=True)["meta"]))["labelfree_std_uV"]) * 1e-6)):
     path = root / "chbmit" / case / f
     X, n_total = V6.whole_file_filtered(path)
+    V6.MEM_SPLIT_CHUNK_S = 300.0 if f == "chb01_01.edf" else 60.0      # chb01_01: an early V9-X6 chunking
     Xc = V6.run_asr(X, 20)
     smap = P.parse_summary(root / "chbmit" / case / f"{case}-summary.txt")
     seizures = smap[f]
@@ -121,7 +129,7 @@ def env(root, tag, extra=None):
              FA15_TEST_WORK=str(root / f"work_{tag}"), FA15_TEST_SCRATCH=str(root / f"scratch_{tag}"),
              FA15_TEST_CASES=json.dumps(CASES), FA15_DISK_MARGIN_GB="0.1", FA15_MIN_FREE_MEM_GB="0.5",
              FA15_TEST_HOURS=json.dumps({"chb01": 30.0, "chb04": 156.0, "chb24": 21.0, "PN00": 3.2, "PN05": 2.0}),
-             FA15_TEST_FAIL_FILE="", FA15_TEST_CONV_TOL="0.01")
+             FA15_TEST_FAIL_FILE="")
     e.update(extra or {})
     return e
 
@@ -178,6 +186,7 @@ def main():
     (root / "refb.py").write_text(REFB)
     subprocess.check_call([sys.executable, str(root / "refb.py"), str(repo), str(root)], cwd=str(root))
     shutil.copytree(ROOT / "results" / "x1_external", repo / "results" / "x1_external", dirs_exist_ok=True)
+    MK.OUTDIR = root / "nb"                       # never into the repository
     MK.build("FA15_SMOKE", "WORKTREE", "smoke", MK.SMOKE["chb"], MK.SMOKE["ext"], MK.SMOKE["asr_only"], True, "test")
     nbp = MK.OUTDIR / "FA15_SMOKE.ipynb"
 
@@ -186,7 +195,8 @@ def main():
     work = root / "work_ok"
     G = gates(work)
     check("FA15_SMOKE: every cell ran, no STOP", err is None, str(err)[:400])
-    want = ["G-mod", "mode", "R0.1-inventory", "G-ref", "G-conv", "G-lab", "G-asr", "G-done", "G-ident"]
+    want = ["G-mod", "mode", "R0.1-inventory", "G-ref", "G-conv-pad", "G-asr-pre", "G-conv", "G-lab", "G-asr", "G-done",
+            "G-worker-sha", "G-ident"]
     check("every gate PASS (incl. mode exact and G-ident)", all(G.get(g, {}).get("status") == "PASS" for g in want)
           and G["mode"].get("mode") == "exact", str({g: G.get(g, {}).get("status") for g in want}))
     inv = pd.read_csv(work / "fa15" / "smoke" / "inventory.csv")
@@ -227,8 +237,20 @@ def main():
     check("asrpy block_covariance guard acted on chb12_06 only (its calibration length = 2 mod 100) and the file completed",
           dict(zip(fr.file, fr.bc_trim)) == {f: int(f == "chb12_06.edf") for f in fr.file}, str(dict(zip(fr.file, fr.bc_trim))))
     ga = json.loads((work / "fa15" / "smoke" / "g_asr.json").read_text())
-    check("G-asr: both V9-X6 files reproduced (seizure rows and window shares)", ga["files"] == 2 and
-          max(ga["max_abs"].values()) <= 1e-6, str(ga["max_abs"]))
+    cls = {d["file"]: (d["cls"], (d.get("explained_by") or {}).get("mem_splits")) for d in ga["detail"]}
+    check("G-asr: chb01_01 beyond 1e-3 at 60-s chunks and explained by the 300-s recomputation; chb24_01 exact",
+          ga["files"] == 2 and cls == {"chb01_01.edf": ("explained", 3), "chb24_01.edf": ("exact", None)}
+          and ga["max_abs"]["share_preictal60"] > 1e-3, f"{cls} {ga['max_abs']}")
+    gp = G["G-conv-pad"]["cases"]
+    check("G-conv-pad: 30-s padding = slices (<= 1e-9) in both conventions; 3-s padding visibly different (> 1e-5)",
+          len(gp) == 2 and all(d["rel_pad30_vs_slice"] <= 1e-9 and d["rel_pad3_vs_slice"] > 1e-5 for d in gp),
+          str([(d["case"], d["rel_pad30_vs_slice"], d["rel_pad3_vs_slice"]) for d in gp]))
+    gpre = G["G-asr-pre"]["files"]
+    check("G-asr-pre: chb01_01 with 300-s chunks (mem_splits 3) = the record within 1e-9",
+          len(gpre) == 1 and gpre[0]["mem_splits"] == 3 and max(gpre[0]["max_abs"].values()) <= 1e-9, str(gpre))
+    check("G-worker-sha: every ASR subprocess and feature job reported this fa15_asr.py",
+          G["G-worker-sha"]["jobs"] == len(fr) + 4 and not G["G-worker-sha"]["differ"], G["G-worker-sha"]["summary"])
+    check("no diagnostic marker or cache left in the scratch cache", not any((root / "scratch_ok" / "asr_cache").glob("*.npy")))
     pj = work / "fa15" / "smoke"
     split = json.loads((pj / "split.json").read_text()) if (pj / "split.json").exists() else {}
     check("projection.json and split.json written; every test case in one part",
@@ -238,11 +260,10 @@ def main():
     check("results archive written", zp.exists() and "smoke/SUMMARY.md" in zipfile.ZipFile(zp).namelist())
 
     # ---- failure paths
-    def neg(tag, mutate, restore, want_fail):
+    def neg(tag, mutate, restore, want_fail, extra=None):
         mutate()
         try:
-            ns, err = run_nb(nbp, env(root, tag, extra=None if tag != "asrfail" else
-                                              dict(FA15_TEST_FAIL_FILE="chb11_02.edf")))
+            ns, err = run_nb(nbp, env(root, tag, extra=extra))
         finally:
             restore()
         G = gates(root / f"work_{tag}")
@@ -256,7 +277,7 @@ def main():
 
     def m1():
         d = pd.read_csv(rec)
-        d.loc[0, "share_seizure"] += 0.01
+        d.loc[d.file == "chb24_01.edf", "share_seizure"] += 0.01
         d.to_csv(rec, index=False)
     neg("asrrec", m1, lambda: rec.write_bytes(keep), ["G-asr"])
 
@@ -280,7 +301,33 @@ def main():
         if not str(zp_).endswith(".npz"):
             pass
     neg("lab", m3, lambda: zp_.write_bytes(keep3), ["G-lab", "G-ident"])
-    neg("asrfail", lambda: None, lambda: None, ["G-done"])
+    neg("asrfail", lambda: None, lambda: None, ["G-done"], dict(FA15_TEST_FAIL_FILE="chb11_02.edf"))
+    neg("pad", lambda: None, lambda: None, ["G-conv-pad", "G-done"], dict(FA15_TEST_SLICE_SHIFT="1"))
+    check("pad: the run was skipped after the pre-gate (no case written)",
+          not (root / "work_pad" / "fa15-asr-chbmit-features-smoke").exists()
+          and gates(root / "work_pad").get("G-done", {}).get("summary", "").startswith("skipped"))
+
+    def m4():
+        d = pd.read_csv(rec)
+        d.loc[d.file == "chb01_01.edf", "share_preictal60"] += 1e-6
+        d.to_csv(rec, index=False)
+    neg("asrpre", m4, lambda: rec.write_bytes(keep), ["G-asr-pre", "G-done"])
+    neg("sha", lambda: None, lambda: None, ["G-worker-sha"],
+        dict(FA15_TEST_WORKER_SHA="deadbeefdeadbeef", FA15_TEST_CASES=json.dumps(CASES[:3])))
+
+    # ---- a data notebook built by the builder's data path (not smoke: no G-ident, no projection)
+    MK.build_data("WORKTREE")
+    nbd = MK.OUTDIR / "FA15_DATA_B.ipynb"
+    src = "".join(json.loads(nbd.read_text())["cells"][2]["source"])
+    check("builder: FA15_DATA_B carries G-conv-pad [chb08, PN16] and G-asr-pre chb06_01 at 300 s; FA15_DATA_A PN00",
+          '["chb08", "PN16"]' in src and '"chb06_01.edf", 300.0' in src and
+          '"PN00"]' in "".join(json.loads((MK.OUTDIR / "FA15_DATA_A.ipynb").read_text())["cells"][2]["source"]))
+    ns, err = run_nb(nbd, env(root, "data", extra=dict(FA15_TEST_CASES=json.dumps(CASES))))
+    Gd = gates(root / "work_data", "b")
+    check("data notebook (tag b) runs to the end; every gate PASS; no G-ident / projection (not smoke)",
+          err is None and all(Gd.get(g, {}).get("status") == "PASS" for g in want if g != "G-ident")
+          and "G-ident" not in Gd and not (root / "work_data" / "fa15" / "b" / "split.json").exists(),
+          f"{err} {[(g, Gd.get(g, {}).get('status')) for g in want]}")
 
     n_ok = sum(r[1] for r in RES)
     print(f"\n{n_ok}/{len(RES)} checks PASS in {time.time() - t0:.0f} s")

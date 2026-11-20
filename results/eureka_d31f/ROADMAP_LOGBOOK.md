@@ -32,12 +32,12 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 | limit | evidence in V5 | experiments |
 |---|---|---|
 | **L1** false alarms from the patient's own high-amplitude non-seizure activity (precision ≈ 0.1) | Sections 4.3.1, 4.3.3; Figure 18 | EV, O1, O3 |
-| **L2** missed seizures that are low in amplitude and short (chb06, chb13, chb16) | Sections 4.3.1, 4.3.2 | D1, EV, O1, O5, C2 |
+| **L2** missed seizures that are low in amplitude and short (chb06, chb13, chb16) | Sections 4.3.1, 4.3.2 | D1, EV, O1, O5, PC2 |
 | **L3** offsets not improved by the localizer | Table 10, Section 4.2 | E (7a, 7b), O2 |
-| **L4** the graph adds no detection value (MLP-AE and K-means better) | Sections 3.4, 4.3.5 | E (8a), O3, C4 |
+| **L4** the graph adds no detection value (MLP-AE and K-means better) | Sections 3.4, 4.3.5 | E (8a), O3, PC4 |
 | **L5** CHB-MIT z-score statistics use labels | Sections 2.1.3, 3.6 | E9A |
 | **L6** the per-patient budget is test-informed and its gain is chb15 only | Sections 2.7.2, 4.1 | E (6a) |
-| **L7** small paediatric training data; no artifact labels | Section 4.5 | C3 (after 11/12, CNCL) |
+| **L7** small paediatric training data; no artifact labels | Section 4.5 | PC3 (after 11/12, CNCL) |
 
 ## 2 · Roadmap
 
@@ -49,6 +49,8 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 | **EUR_9A** | E | V5 with label-free z-score statistics, 4 seeds, k recalibrated | Kaggle account 2, 4–5 h (computed) | paired difference with V0, no threshold | approved 19/11 20:35 |
 | **D1** | D | can a finer time grid bring short seizures within the budget? (best of the +1, +2 and +3 s shifts = upper bound of a 2 s hop) | laptop, 20–40 min | ≥ 3 more short seizures (test8 + chb24 + Siena, 4-seed mean) within their patient's budget → O5 may run | approved 19/11 20:35 |
 | **EV** (extends D2) | D | which properties of a flagged event tell a seizure from the patient's own non-seizure activity? Event level, measured relative to the patient's own background: **rhythm** (autocorrelation peak at 0.1–1 s, spectral-peak share), **evolution** (change of dominant frequency and amplitude within the event), **waveform** (line length, sharpness, Hjorth), **field** (number and contiguity of involved channels, single-channel dominance), **artifact signatures** (high-frequency share, frontopolar dominance, clipping, step jumps), duration | laptop, raw EDF of the V5 events and missed seizures; development for the decision, test descriptive; 30–60 min | a feature enters O1 only if its event AUROC (detected seizure vs false alarm, development) has a patient-cluster bootstrap lower bound ≥ 0.80 and points the same way in ≥ 10 of 15 patients | proposed (D2 was approved; EV adds the other feature groups) |
+
+*Status 20/11 09:30:* EUR_ABL **done** (Kaggle account 1, measured 0.868 h; no R214 candidate); EUR_9A **done** (account 2, measured 3.2 h); D1 and EV run in one Kaggle notebook `EUR_DIAG` (moved from the laptop, logbook 19/11 22:20): first run stopped at G-s0, corrected, **rerun 20/11**.
 
 ### Phase B — optimisations, selected on development (20/11 evening → 22/11)
 
@@ -62,23 +64,26 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 
 ### Phase C — not before the freeze (Q&A 11/12 or later; the author decides)
 
+*Items renamed PC1–PC6 on 20/11 (their earlier names C1–C6 collided with Track C's chats C1 report and C2 slides).*
+
 | ID | limit | experiment | cost | note |
 |---|---|---|---|---|
-| C1 | L2, L4 | retraining 10a / 10b (without the 7 absolute features / without gamma powers) | about 4.6 h per variant, 1 account each | can start after 22/11 for the Q&A |
-| C2 | L2 | **rhythm and waveform features in the node input** (V5 Section 4.5) — only if EV shows a separating feature | feature rebuild + 4 trainings, about 10 h | after EV |
-| C3 | L1, L7 | **artifact detector trained on an annotated artifact corpus** (TUH Artifact Corpus), marked time returned to the budget | needs data access (registration, not checked) and a training pipeline; days | after 11/12 (CNCL) |
-| C4 | L4 | GAE retrained on a time-stable graph per patient (plan §14 row 37) | 4 trainings per partition | after 11/12 |
-| C5 | — | F-A1.5 (ASR in the preprocessing, retrained) | 2 data notebooks + 1 training, about 18 h | after 11/12 |
-| C6 | L1, L2 | 11a / 11b (wPLI only / AEC only) | graph rebuild + training, about 10 h | after 11/12 |
+| PC1 | L2, L4 | retraining 10a / 10b (without the 7 absolute features / without gamma powers) | about 4.6 h per variant, 1 account each | can start after 22/11 for the Q&A |
+| PC2 | L2 | **rhythm and waveform features in the node input** (V5 Section 4.5) — only if EV shows a separating feature | feature rebuild + 4 trainings, about 10 h | after EV |
+| PC3 | L1, L7 | **artifact detector trained on an annotated artifact corpus** (TUH Artifact Corpus), marked time returned to the budget | needs data access (registration, not checked) and a training pipeline; days | after 11/12 (CNCL) |
+| PC4 | L4 | GAE retrained on a time-stable graph per patient (plan §14 row 37) | 4 trainings per partition | after 11/12 |
+| PC5 | — | F-A1.5 (ASR in the preprocessing, retrained) | 2 data notebooks + 1 training, about 18 h | after 11/12 |
+| PC6 | L1, L2 | 11a / 11b (wPLI only / AEC only) | graph rebuild + training, about 10 h | after 11/12 |
 
 ## 3 · Schedule and accounts
 
 | day | Kaggle account 1 | account 2 | account 3 | account 4 | laptop (Claude Code) | this chat |
 |---|---|---|---|---|---|---|
 | 19/11 night | — | — | — | — | — | code, synthetic tests, aggregates, smoke prompt for `EUR_ABL` / `EUR_9A` / D1 / EV |
-| 20/11 | `EUR_ABL` | `EUR_9A` | `EUR_OPT` (O3 K-means) | spare (rerun after a STOP) | smoke → D1 → EV | read the smoke; design O1 from EV |
+| 19/11 21:20 → 20/11 08:00 (ran) | `EUR_ABL` (0.87 h), then `EUR_DIAG` (stopped at G-s0) | `EUR_9A` (3.2 h) | — | — | — | code, tests, readings of EUR_ABL and EUR_9A |
+| 20/11 (from 08:46) | `EUR_DIAG` rerun | free | `EUR_OPT` (O3) once designed and approved (D32-F) | spare | — | project update; then chat D32-F: read EUR_DIAG, design O1 / O2 / O3 |
 | 21/11 | O-arms if needed | — | — | — | O1 features | read all; O1 / O2 / O3 / O4 selection on development; combination check |
-| 22/11 | — | — | — | (C1 may start, for the Q&A) | — | the chosen arm scored once on test / chb24 / Siena; T2 table; hand-off to C1 / C2 before the freeze |
+| 22/11 | — | — | — | (PC1 may start, for the Q&A) | — | the chosen arm scored once on test / chb24 / Siena; hand-off to Track C's chats C1 (report) and C2 (slides) before the freeze |
 
 ## 4 · Logbook
 
@@ -96,3 +101,4 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 | 20/11 08:30 | `EUR_9A` output pushed (`01a1f8c`), measured 3.2 h (projection 2.63 h). Every gate PASS (G-raw 664 EDF, G-stats0 exact, G-feat0, R1.0, G-k, PROJ, G-struct 23/23, G-worker). Aggregate A0 / A1 PASS, `9a/aggregate/T9A.md`. k label-free 4.0978 (record 4.0677). Own operating point after the localizer: development 0.838 vs 0.832 (+0.006 [0.000, +0.015]), FP/day 22.7 vs 23.2; **test 0.536 vs 0.567 (−0.032 [−0.055, −0.009]; 34.0 vs 36.25 of 76 seizures), F1 0.175 vs 0.180 (−0.005 [−0.021, +0.010]), FP/day 27.9 vs 28.7**; the numerical rebuild difference alone (committed `cf_krec`, 21 cases) is −0.008 [−0.018, 0.000] on test. Test drop from chb03, chb06, chb14, chb16 (two of them partly rebuild) |
 | 20/11 08:30 | `EUR_DIAG` stopped at G-s0 (output `eedc1db`): every other gate PASS (G-raw 727 EDF, R1.0, GE, G-k, G-ev 92/92), but the shift-0 rebuild differed from the stored smoothed scalar by up to 0.033 (tolerance 0.02). Pattern: > 0 only in the six CHB-MIT cases with short seizures (chb02, 06, 12, 14, 16, 21), ≤ 5e-5 in the external cases, whose features were built on Kaggle with the same library stack. Hypothesis: the documented rebuild difference of the CHB-MIT features (R0 G-feat: 0.03–0.05 % of adjacency entries differ in every case), not the scoring path (exact on synthetic data and on stored inputs). G-s0 was redefined to test this directly (stored inputs through the path = stored scalar; bit-identical rebuilt features = stored scalar; the rest reported with the number of differing windows and decisions); D1 compares shifts with the rebuilt shift 0. Outputs are now written before the gates. The tolerance was set without accounting for R0's documented difference — my error |
 | 20/11 09:10 | The stricter G-s0 found a second, smaller cause on synthetic data: new windows were scored with `einsum` while the stored distances come from `LedoitWolf.mahalanobis`; the last-digit differences reorder near-ties, which moves a percentile by 1/n (≈ 1e-5 on real data: the external cases' 5e-5). Fixed: new windows are scored with the patient's fitted LedoitWolf objects. Synthetic test ALL PASS with the path exact (0.0) and every decision equal. The CHB-MIT 0.03 cannot come from this (1e-5 scale); the rerun tells whether it is the feature rebuild |
+| 20/11 09:30 | Project update before chat D32-F (author 08:38 / 08:46): audit in `TRACK_F_HANDBACK.md` Part 25; `TRACKS_PROGRESS.md` row "Hand-off to C (Euréka)"; plan §0, §0a, §14.14; Phase C items renamed PC1–PC6 |

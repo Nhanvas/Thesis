@@ -1,0 +1,10 @@
+  chb23/chb23_06.edf: 1871 windows, flagged 425 (48s)
+  chb23/chb23_07.edf: 640 windows, flagged 410 (64s)
+  chb23/chb23_08.edf: 2585 windows, flagged 48 (132s)
+  chb23/chb23_09.edf: 3606 windows, flagged 465 (234s)
+  chb23/chb23_10.edf: 3600 windows, flagged 2257 (334s)
+  chb23/chb23_16.edf: 3600 windows, flagged 2064 (437s)
+  chb23/chb23_17.edf: 3146 windows, flagged 1749 (554s)
+  chb23/chb23_19.edf: 3600 windows, flagged 1162 (662s)
+  chb23/chb23_20.edf: 1252 windows, flagged 337 (692s)
+chb23: 23900 windows, ictal 109, flagged 8917, skipped files [], saved chb23.npz, 692s

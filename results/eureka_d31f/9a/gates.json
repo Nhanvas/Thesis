@@ -1,0 +1,139 @@
+[
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 664,
+  "from_physionet": 1,
+  "failed_checks": [],
+  "cases_missing": [],
+  "earlier_hours": 953.6,
+  "summary": "664 EDF verified by sha256 against PhysioNet (1 downloaded); checks ['committed data/summaries = PhysioNet summaries', 'CHB-MIT files skipped by design (missing common channel)', 'CHB-MIT chb01-23: every EDF listed in its summary']"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 23,
+  "bad": [],
+  "pinned": 23,
+  "summary": "23 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-stats0",
+  "status": "PASS",
+  "case": "chb08",
+  "ch_mean_uV_max_rel": 0.0,
+  "ch_std_uV_max_rel": 0.0,
+  "summary": "chb08: record statistics recomputed = committed stats.json (max relative 0.0e+00; tolerance 1e-06)"
+ },
+ {
+  "gate": "G-feat0",
+  "status": "PASS",
+  "case": "chb08",
+  "files": 2,
+  "exact_on_all_windows": true,
+  "f7_max_abs": 4.76837158203125e-07,
+  "bp5_max_abs": 2.384185791015625e-07,
+  "adj_frac_differing": 0.00040123456790123454,
+  "status_chain_windows": "PASS",
+  "status_all_windows": "PASS",
+  "summary": "chb08 first 2 files with the committed statistics = earlier .npz (r2_core.compare_features, scope chain)"
+ },
+ {
+  "gate": "G-worker[smoke]",
+  "status": "PASS",
+  "jobs": 2,
+  "differ": [],
+  "summary": "2 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-k",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 128,
+  "error_pairs": 296,
+  "rows_look6": 64,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ],
+  "summary": "e23 128 rows + 296 error pairs, look #6 64 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed estimate (smoke rates x hours, LPT on workers; r13 + rescore = 1.2 x measured R1.0)",
+  "elapsed_h": 0.301,
+  "build_h": 2.118,
+  "r10_measured_h": 0.177,
+  "r13_h": 0.212,
+  "workers": 4,
+  "stats_s_per_h": 12.017,
+  "feat_s_per_h": 18.35,
+  "smoke_s": 254.4,
+  "smoke_case_h": 20.006,
+  "feat0_h": 2.0,
+  "projected_total_h": 2.63,
+  "summary": "projected total 2.63 h (limit 10.5 h)"
+ },
+ {
+  "gate": "G-struct",
+  "status": "PASS",
+  "cases": 23,
+  "failed": [],
+  "summary": "23 label-free builds: file list, windows, file_idx, is_ictal, is_buffer, is_signal_loss = earlier .npz; 0 differ"
+ },
+ {
+  "gate": "G-worker[build]",
+  "status": "PASS",
+  "jobs": 46,
+  "differ": [],
+  "summary": "46 jobs ran the parent's modules"
+ }
+]

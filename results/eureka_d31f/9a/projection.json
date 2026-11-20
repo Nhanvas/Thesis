@@ -1,0 +1,14 @@
+{
+ "note": "computed estimate (smoke rates x hours, LPT on workers; r13 + rescore = 1.2 x measured R1.0)",
+ "elapsed_h": 0.301,
+ "build_h": 2.118,
+ "r10_measured_h": 0.177,
+ "r13_h": 0.212,
+ "workers": 4,
+ "stats_s_per_h": 12.017,
+ "feat_s_per_h": 18.35,
+ "smoke_s": 254.4,
+ "smoke_case_h": 20.006,
+ "feat0_h": 2.0,
+ "projected_total_h": 2.63
+}

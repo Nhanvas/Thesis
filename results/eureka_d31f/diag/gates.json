@@ -1,0 +1,191 @@
+[
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 727,
+  "failed_checks": [],
+  "from_physionet": 1,
+  "summary": "727 EDF verified by sha256 against PhysioNet"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 38,
+  "bad": [],
+  "pinned": 38,
+  "summary": "38 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-k",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 128,
+  "error_pairs": 296,
+  "rows_look6": 64,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ],
+  "summary": "e23 128 rows + 296 error pairs, look #6 64 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 240,
+  "exact_rows": 148,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 2,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 24.0,
+    "median_abs_ref": 24.0
+   },
+   "det_off": {
+    "median_abs": 16.0,
+    "median_abs_ref": 16.0
+   },
+   "cpd_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "cpd_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 8.0
+   },
+   "pairs": 348,
+   "pairs_ref": 343
+  },
+  "cases": [
+   "chb24",
+   "PN00",
+   "PN01",
+   "PN03",
+   "PN05",
+   "PN06",
+   "PN07",
+   "PN09",
+   "PN10",
+   "PN11",
+   "PN12",
+   "PN13",
+   "PN14",
+   "PN16",
+   "PN17"
+  ],
+  "summary": "240 rows, 148 exact, max |dtp| 1, max |dfp| 2 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "G-ev",
+  "status": "PASS",
+  "rows": 92,
+  "differ": [],
+  "external_rows": 60,
+  "x1_rows": "ext_x1_rows.csv",
+  "summary": "V5 events (L2f, cpd) reproduce the r10 rows for 92 CHB-MIT case-seeds; 0 differ (external: same functions on the r10 distances, GE-gated)"
+ },
+ {
+  "gate": "G-s0",
+  "status": "FAIL",
+  "max_abs": 0.032606837606837635,
+  "tol": 0.02,
+  "per_case": {
+   "chb07": 0.0,
+   "chb09": 0.0,
+   "chb06": 0.031437728937729004,
+   "chb01": 0.0,
+   "chb10": 0.0,
+   "chb15": 0.0,
+   "chb04": 0.0,
+   "chb05": 0.0,
+   "chb03": 0.0,
+   "chb18": 0.0,
+   "chb02": 0.026462711490595314,
+   "chb13": 0.0,
+   "chb22": 0.0,
+   "chb21": 0.02782063813446911,
+   "chb23": 0.0,
+   "chb20": 0.0,
+   "chb11": 0.0,
+   "chb19": 0.0,
+   "chb17": 0.0,
+   "chb14": 0.032606837606837635,
+   "chb24": 1.8261504747929536e-05,
+   "chb08": 0.0,
+   "chb12": 0.012183068328319668,
+   "chb16": 0.021853801169590625,
+   "PN03": 0.0,
+   "PN14": 1.6292836582887382e-05,
+   "PN10": 5.350136725723598e-05,
+   "PN07": 0.0,
+   "PN06": 0.0,
+   "PN01": 0.0,
+   "PN09": 0.0,
+   "PN13": 0.0,
+   "PN12": 0.0,
+   "PN05": 0.0,
+   "PN17": 0.0,
+   "PN16": 0.0,
+   "PN00": 0.0,
+   "PN11": 0.0
+  },
+  "summary": "shift-0 windows rebuilt from the raw EDF reproduce the stored smoothed scalar (max |difference| 0.0326, tolerance 0.02)"
+ }
+]

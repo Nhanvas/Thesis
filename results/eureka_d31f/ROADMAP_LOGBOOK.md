@@ -72,6 +72,8 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 
 *Items renamed PC1–PC6 on 20/11 (their earlier names C1–C6 collided with Track C's chats C1 report and C2 slides).*
 
+*Status 21/11 00:45 (D33-F):* **PC1 read** (`results/eureka_d32f/pc1/`; no arm meets R214; the absolute amplitude features carry most of the detection, the gamma powers do not; retraining varies by seed); the remaining items run in three parallel chats — **D34-F** PC7 (seed variance) → PC8 (decomposition of the absolute features) → PC6, **D35-F** PC5, **D36-F** F5a (plan §8.1) — for the Q&A of 11/12 (board R222). The status line below is history.
+
 *Status 20/11 23:10 (D32-F):* **PC1 run** (three notebooks, every gate PASS; read in chat D33-F before the freeze); **PC2 not run** — its condition ("only if EV shows a separating feature") is not met; **PC6** optional before 11/12, the author decides; **PC3, PC4, PC5** after 11/12, re-planned with CNCL. The project keeps this status in the row "Roadmap" of `TRACKS_PROGRESS.md` (R221).
 
 | ID | limit | experiment | cost | note |
@@ -82,6 +84,8 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 | PC4 | L4 | GAE retrained on a time-stable graph per patient (plan §14 row 37) | 4 trainings per partition | after 11/12 |
 | PC5 | — | F-A1.5 (ASR in the preprocessing, retrained) | 2 data notebooks + 1 training, about 18 h | after 11/12 |
 | PC6 | L1, L2 | 11a / 11b (wPLI only / AEC only) | graph rebuild + training, about 10 h | after 11/12 |
+| PC7 | — (reliability) | seed variance of the training recipe: R0 retrained with more seeds; detection vs validation loss (from the PC1 reading) | ≈ 2.9 h per notebook of 4 seeds (R0 measured 2.86 h) | chat D34-F, first |
+| PC8 | L2 | decomposition of the 7 absolute features: without the log band powers / without line length + kurtosis / the absolute features only (from the PC1 reading) | 3 arms × ≈ 4.6 h | chat D34-F, after PC7 |
 
 ## 3 · Schedule and accounts
 
@@ -123,3 +127,5 @@ detailed designs are in `STEP1_DESIGN.md` and later design files. The full text 
 | 20/11 16:35 | **PC1 designed and built (D32-F; approved by the author 16:17).** Design `results/eureka_d32f/DESIGN_PC1.md` (written before any run): three arms retrained with the thesis recipe on the record training windows (200 epochs, seeds 42 / 1 / 2 / 3) — **R0** full node input (same-platform control), **10a** without the 7 absolute features (input 23, target 5; 3,285 parameters), **10b** without the relative and absolute gamma powers (input 28, target 10; 3,770) — then V5's chain (k recalibrated). Readings fixed: feature effect = arm − R0 (development primary, paired patient bootstrap); replacement only by R214 on arm − V0 (aggregate unchanged). Hypotheses H10a (lower sensitivity and fewer FP/day) and H10b (≈ 0). Gates G-pc1const, G-pc1vec (arm loop with every column = `f1_core.train`, difference 0), window counts = V5's, M0 (V0 rows identical across the three runs). Code: `src/eur_abl.py` (ARMS, `train_masked`, `train_arm_job`, `pc1_prepare`), `src/eur_pc1_merge.py`, notebooks `EUR_PC1_R0 / _10a / _10b` (training modules pinned too); synthetic test `src/eur_pc1_synthetic_test.py` (two defects found by this test before delivery and fixed: the arm table first reused the name of the budget-arm table `ARMS` — renamed `PC1_ARMS`; the merge compared V0 rows in pool order — now as sorted row sets). Cost ≈ 4.5–5 h per notebook (3.9 h measured for 4 parallel trainings in R1), three accounts in parallel |
 | 20/11 22:30 | **PC1 runs complete, not read.** Three notebooks (clone `0bc3248`), outputs `cbf4316` / `e2013ac` / `fb68f30` (`results/eureka_d32f/pc1_r0/`, `pc1_10a/`, `pc1_10b/`), measured 2.86 / 4.55 / 4.80 h, 23 gates PASS in each, 4 seeds per arm trained. Project updated before chat D33-F (author 22:30); D33-F merges and reads PC1 against `DESIGN_PC1.md` before the freeze |
 | 20/11 23:10 | Project update R220–R221 (author 23:05): thesis closed → Track A = CNCL; board prompts reduced to chats not yet opened; Track F roadmap row in `TRACKS_PROGRESS.md`; Phase C status line added above |
+| 21/11 00:10 | **PC1 read (D33-F).** Merge M0 / A0 / A1 PASS, 69 / 69 run gates PASS, no R214 candidate; 10a − R0 development sensitivity −0.277 [−0.393, −0.163] with +26.2 FP/day (fragmentation, diagnosed: `pc1/diag/DIAG_PC1.md`), 10b − R0 +0.012 [−0.006, +0.033], R0 − V0 −0.042 [−0.074, −0.013] (mostly seed 2); hand-off item (6); plan §12 21/11 00:10 |
+| 21/11 00:45 | Remaining experiments in three parallel chats (author 00:44, board R222): D34-F PC7 → PC8 → PC6, D35-F PC5, D36-F F5a; after 11/12 the rest of the row "Roadmap" |

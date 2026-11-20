@@ -1,0 +1,5 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+O6a,3.8948552036753705,"latent mixture normal model, K by BIC (1-4), smallest component Mahalanobis"
+O6b,4.201536622145801,"latent mixture normal model, K = 2, smallest component Mahalanobis"
+O7,6.942126249904726,"latent averaged over 3 windows (previous, own, next valid window of the file)"

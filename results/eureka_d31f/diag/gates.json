@@ -143,49 +143,389 @@
  },
  {
   "gate": "G-s0",
-  "status": "FAIL",
-  "max_abs": 0.032606837606837635,
-  "tol": 0.02,
+  "status": "PASS",
+  "path_max_abs": 0.0,
+  "max_dx_where_features_equal": 0.0,
+  "windows": 2340,
+  "adj_differs": 268,
+  "feat_differs": 268,
+  "max_dx_where_features_differ": 0.16303418803418795,
+  "smoothed_max_abs": 0.032606837606837635,
+  "decisions_differing": 0,
+  "decisions": 100,
   "per_case": {
-   "chb07": 0.0,
-   "chb09": 0.0,
-   "chb06": 0.031437728937729004,
-   "chb01": 0.0,
-   "chb10": 0.0,
-   "chb15": 0.0,
-   "chb04": 0.0,
-   "chb05": 0.0,
-   "chb03": 0.0,
-   "chb18": 0.0,
-   "chb02": 0.026462711490595314,
-   "chb13": 0.0,
-   "chb22": 0.0,
-   "chb21": 0.02782063813446911,
-   "chb23": 0.0,
-   "chb20": 0.0,
-   "chb11": 0.0,
-   "chb19": 0.0,
-   "chb17": 0.0,
-   "chb14": 0.032606837606837635,
-   "chb24": 1.8261504747929536e-05,
-   "chb08": 0.0,
-   "chb12": 0.012183068328319668,
-   "chb16": 0.021853801169590625,
-   "PN03": 0.0,
-   "PN14": 1.6292836582887382e-05,
-   "PN10": 5.350136725723598e-05,
-   "PN07": 0.0,
-   "PN06": 0.0,
-   "PN01": 0.0,
-   "PN09": 0.0,
-   "PN13": 0.0,
-   "PN12": 0.0,
-   "PN05": 0.0,
-   "PN17": 0.0,
-   "PN16": 0.0,
-   "PN00": 0.0,
-   "PN11": 0.0
+   "chb07": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb09": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb06": {
+    "smoothed": 0.031437728937729004,
+    "path": 0.0,
+    "windows": 672,
+    "adj_differs": 92,
+    "feat_differs": 92,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.1280427905427906
+   },
+   "chb01": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb10": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb15": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb04": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb05": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb03": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb18": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb02": {
+    "smoothed": 0.026462711490595314,
+    "path": 0.0,
+    "windows": 92,
+    "adj_differs": 16,
+    "feat_differs": 16,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.13231355745297585
+   },
+   "chb13": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb21": {
+    "smoothed": 0.02782063813446911,
+    "path": 0.0,
+    "windows": 96,
+    "adj_differs": 16,
+    "feat_differs": 16,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.13910319067234522
+   },
+   "chb22": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb11": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb19": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb23": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb20": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb17": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb14": {
+    "smoothed": 0.032606837606837635,
+    "path": 0.0,
+    "windows": 96,
+    "adj_differs": 4,
+    "feat_differs": 4,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.16303418803418795
+   },
+   "chb24": {
+    "smoothed": 2.220446049250313e-16,
+    "path": 0.0,
+    "windows": 96,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb12": {
+    "smoothed": 0.012183068328319668,
+    "path": 0.0,
+    "windows": 96,
+    "adj_differs": 8,
+    "feat_differs": 8,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.060915341641598564
+   },
+   "chb08": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN03": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "chb16": {
+    "smoothed": 0.021853801169590625,
+    "path": 0.0,
+    "windows": 912,
+    "adj_differs": 132,
+    "feat_differs": 132,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.10926900584795324
+   },
+   "PN14": {
+    "smoothed": 2.220446049250313e-16,
+    "path": 0.0,
+    "windows": 96,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN01": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN10": {
+    "smoothed": 2.220446049250313e-16,
+    "path": 0.0,
+    "windows": 184,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN06": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN09": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN12": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN07": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN13": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN00": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN17": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN05": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN16": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   },
+   "PN11": {
+    "smoothed": 0.0,
+    "path": 0.0,
+    "windows": 0,
+    "adj_differs": 0,
+    "feat_differs": 0,
+    "max_dx_equal_feat": 0.0,
+    "max_dx_diff_feat": 0.0
+   }
   },
-  "summary": "shift-0 windows rebuilt from the raw EDF reproduce the stored smoothed scalar (max |difference| 0.0326, tolerance 0.02)"
+  "summary": "stored inputs through this path = stored scalar (max 0.0e+00); windows whose rebuilt features equal the stored ones give the stored scalar (max 0.0e+00); 268 of 2340 shift-0 windows have rebuilt features that differ (adjacency 268); smoothed max |difference| 0.0326; within-budget decision differs for 0 of 100 seizure-seeds"
+ },
+ {
+  "gate": "G-extstats",
+  "status": "PASS",
+  "per_case": {
+   "chb24": 2.0534204325652823e-16,
+   "PN03": 2.087665702540491e-16,
+   "PN14": 2.0853748703740762e-16,
+   "PN01": 1.9133925860505147e-16,
+   "PN10": 2.0206492524173955e-16,
+   "PN06": 1.9493818400172825e-16,
+   "PN09": 2.030337896496586e-16,
+   "PN12": 2.101338766125987e-16,
+   "PN07": 2.06163241819822e-16,
+   "PN13": 2.0808168992872037e-16,
+   "PN00": 1.9152124498523733e-16,
+   "PN17": 2.0848210624830388e-16,
+   "PN05": 1.8899212898967263e-16,
+   "PN16": 1.9429398960826705e-16,
+   "PN11": 2.0496185604541523e-16
+  },
+  "summary": "label-free statistics recomputed for 15 external cases = those R0.4 used (.npz meta; max relative 2.1e-16)"
+ },
+ {
+  "gate": "G-worker",
+  "status": "PASS",
+  "jobs": 38,
+  "differ": [],
+  "summary": "38 jobs ran the parent's modules"
  }
 ]

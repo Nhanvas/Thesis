@@ -1,0 +1,137 @@
+set,feature,comparison,auroc,oriented_auroc,direction,events_seizure,events_fa,ci_lo,ci_hi,patients_same_direction,patients_with_both,rule_met,events_missed
+development,acf_peak_med,seizure vs false alarm,0.5521477412947543,0.5521477412947543,higher in seizures,250.0,2571.0,0.4801653744254422,0.6210449686926012,8.0,15.0,False,
+development,spec_peak_share_med,seizure vs false alarm,0.509563874863288,0.509563874863288,higher in seizures,250.0,2571.0,0.35055506250352547,0.6652386488257606,9.0,15.0,False,
+development,line_length_med,seizure vs false alarm,0.5828748156894973,0.5828748156894973,higher in seizures,250.0,2571.0,0.49687004639802146,0.6596244681834937,10.0,15.0,False,
+development,hjorth_mob_med,seizure vs false alarm,0.5171914431477616,0.5171914431477616,higher in seizures,250.0,2571.0,0.38641156983338865,0.6453311319665352,4.0,15.0,False,
+development,hjorth_comp_med,seizure vs false alarm,0.48213244498898084,0.5178675550110192,lower in seizures,250.0,2571.0,0.37392775935404626,0.6617364885083515,5.0,15.0,False,
+development,crest_med,seizure vs false alarm,0.3886356915758745,0.6113643084241255,lower in seizures,250.0,2571.0,0.5167607269383165,0.7184007486695697,12.0,15.0,False,
+development,n_involved_med,seizure vs false alarm,0.6711869474573298,0.6711869474573298,higher in seizures,250.0,2571.0,0.545693994246761,0.7879558939990648,14.0,15.0,False,
+development,dominance_med,seizure vs false alarm,0.4488278666325053,0.5511721333674947,lower in seizures,250.0,2571.0,0.45064962761845273,0.6511117920655888,11.0,15.0,False,
+development,contiguity_med,seizure vs false alarm,0.6149095096403132,0.6149095096403132,higher in seizures,250.0,2571.0,0.5105987656790391,0.7181754295363505,12.0,15.0,False,
+development,hf_share_med,seizure vs false alarm,0.48404740911083366,0.5159525908891663,lower in seizures,250.0,2571.0,0.38764724933224853,0.6400097517804801,12.0,15.0,False,
+development,frontopolar_med,seizure vs false alarm,0.5187552572494261,0.5187552572494261,higher in seizures,250.0,2571.0,0.42051244248255354,0.6255855884172048,11.0,15.0,False,
+development,flat_frac_med,seizure vs false alarm,0.3629178786021413,0.6370821213978587,lower in seizures,250.0,2571.0,0.5432392419833377,0.7220702796232834,14.0,15.0,False,
+development,step_med,seizure vs false alarm,0.45106040256472124,0.5489395974352788,lower in seizures,250.0,2571.0,0.45846261434169333,0.6470820502406676,11.0,15.0,False,
+development,line_length_max,seizure vs false alarm,0.6346022483664372,0.6346022483664372,higher in seizures,250.0,2571.0,0.5483540001311766,0.72092238437915,10.0,15.0,False,
+development,evo_dfreq,seizure vs false alarm,0.7009999772472761,0.7009999772472761,higher in seizures,250.0,2571.0,0.6362516451715762,0.774898458600966,15.0,15.0,False,
+development,evo_amp,seizure vs false alarm,0.3979811165239744,0.6020188834760256,lower in seizures,250.0,2571.0,0.497947414763634,0.6945164181916007,10.0,15.0,False,
+development,duration,seizure vs false alarm,0.7781384002774547,0.7781384002774547,higher in seizures,250.0,2571.0,0.7147716875815822,0.8461422106924461,14.0,15.0,False,
+development,acf_peak_med,missed vs false alarm (descriptive),0.3158874012417293,,,,,,,,,,125.0
+development,spec_peak_share_med,missed vs false alarm (descriptive),0.27699890264987787,,,,,,,,,,125.0
+development,line_length_med,missed vs false alarm (descriptive),0.3166239655119223,,,,,,,,,,125.0
+development,hjorth_mob_med,missed vs false alarm (descriptive),0.4573263622813773,,,,,,,,,,125.0
+development,hjorth_comp_med,missed vs false alarm (descriptive),0.4411375693452376,,,,,,,,,,125.0
+development,crest_med,missed vs false alarm (descriptive),0.4042240830329734,,,,,,,,,,125.0
+development,n_involved_med,missed vs false alarm (descriptive),0.4372205130519792,,,,,,,,,,125.0
+development,dominance_med,missed vs false alarm (descriptive),0.38096200400844166,,,,,,,,,,125.0
+development,contiguity_med,missed vs false alarm (descriptive),0.565456054557807,,,,,,,,,,125.0
+development,hf_share_med,missed vs false alarm (descriptive),0.35272932598621465,,,,,,,,,,125.0
+development,frontopolar_med,missed vs false alarm (descriptive),0.31559631520373477,,,,,,,,,,125.0
+development,flat_frac_med,missed vs false alarm (descriptive),0.40596750114958857,,,,,,,,,,125.0
+development,step_med,missed vs false alarm (descriptive),0.35764740750568297,,,,,,,,,,125.0
+development,line_length_max,missed vs false alarm (descriptive),0.3013755326948109,,,,,,,,,,125.0
+development,evo_dfreq,missed vs false alarm (descriptive),0.6695748755753853,,,,,,,,,,125.0
+development,evo_amp,missed vs false alarm (descriptive),0.6401210362381671,,,,,,,,,,125.0
+development,duration,missed vs false alarm (descriptive),0.5243429926672373,,,,,,,,,,125.0
+test,acf_peak_med,seizure vs false alarm,0.6056884081868784,0.6056884081868784,higher in seizures,146.0,1323.0,,,,,,
+test,spec_peak_share_med,seizure vs false alarm,0.5588468375191864,0.5588468375191864,higher in seizures,146.0,1323.0,,,,,,
+test,line_length_med,seizure vs false alarm,0.578162779394552,0.578162779394552,higher in seizures,146.0,1323.0,,,,,,
+test,hjorth_mob_med,seizure vs false alarm,0.477685046502149,0.5223149534978511,lower in seizures,146.0,1323.0,,,,,,
+test,hjorth_comp_med,seizure vs false alarm,0.5006406044702548,0.5006406044702548,higher in seizures,146.0,1323.0,,,,,,
+test,crest_med,seizure vs false alarm,0.420190195374846,0.5798098046251541,lower in seizures,146.0,1323.0,,,,,,
+test,n_involved_med,seizure vs false alarm,0.5778516966081823,0.5778516966081823,higher in seizures,146.0,1323.0,,,,,,
+test,dominance_med,seizure vs false alarm,0.5549894537372899,0.5549894537372899,higher in seizures,146.0,1323.0,,,,,,
+test,contiguity_med,seizure vs false alarm,0.6308532048349748,0.6308532048349748,higher in seizures,146.0,1323.0,,,,,,
+test,hf_share_med,seizure vs false alarm,0.4846425330536084,0.5153574669463916,lower in seizures,146.0,1323.0,,,,,,
+test,frontopolar_med,seizure vs false alarm,0.43307754782838803,0.566922452171612,lower in seizures,146.0,1323.0,,,,,,
+test,flat_frac_med,seizure vs false alarm,0.3219838661223962,0.6780161338776038,lower in seizures,146.0,1323.0,,,,,,
+test,step_med,seizure vs false alarm,0.4480596460706866,0.5519403539293134,lower in seizures,146.0,1323.0,,,,,,
+test,line_length_max,seizure vs false alarm,0.6011948773701767,0.6011948773701767,higher in seizures,146.0,1323.0,,,,,,
+test,evo_dfreq,seizure vs false alarm,0.6283789374622014,0.6283789374622014,higher in seizures,146.0,1323.0,,,,,,
+test,evo_amp,seizure vs false alarm,0.3645126765024278,0.6354873234975722,lower in seizures,146.0,1323.0,,,,,,
+test,duration,seizure vs false alarm,0.646923940681092,0.646923940681092,higher in seizures,146.0,1323.0,,,,,,
+test,acf_peak_med,missed vs false alarm (descriptive),0.5235543656486633,,,,,,,,,,158.0
+test,spec_peak_share_med,missed vs false alarm (descriptive),0.43436999363477835,,,,,,,,,,158.0
+test,line_length_med,missed vs false alarm (descriptive),0.3691964070992465,,,,,,,,,,158.0
+test,hjorth_mob_med,missed vs false alarm (descriptive),0.39760903445267515,,,,,,,,,,158.0
+test,hjorth_comp_med,missed vs false alarm (descriptive),0.45725122003913304,,,,,,,,,,158.0
+test,crest_med,missed vs false alarm (descriptive),0.3017822237585574,,,,,,,,,,158.0
+test,n_involved_med,missed vs false alarm (descriptive),0.49875248641647635,,,,,,,,,,158.0
+test,dominance_med,missed vs false alarm (descriptive),0.3900019825433073,,,,,,,,,,158.0
+test,contiguity_med,missed vs false alarm (descriptive),0.39804782880658335,,,,,,,,,,158.0
+test,hf_share_med,missed vs false alarm (descriptive),0.379630784711632,,,,,,,,,,158.0
+test,frontopolar_med,missed vs false alarm (descriptive),0.4151831367420864,,,,,,,,,,158.0
+test,flat_frac_med,missed vs false alarm (descriptive),0.5177143642871462,,,,,,,,,,158.0
+test,step_med,missed vs false alarm (descriptive),0.22829784800872083,,,,,,,,,,158.0
+test,line_length_max,missed vs false alarm (descriptive),0.3450685157845576,,,,,,,,,,158.0
+test,evo_dfreq,missed vs false alarm (descriptive),0.6785596952563497,,,,,,,,,,158.0
+test,evo_amp,missed vs false alarm (descriptive),0.5737382921292976,,,,,,,,,,158.0
+test,duration,missed vs false alarm (descriptive),0.4310402017894383,,,,,,,,,,158.0
+chb24,acf_peak_med,seizure vs false alarm,0.8304156712852365,0.8304156712852365,higher in seizures,54.0,98.0,,,,,,
+chb24,spec_peak_share_med,seizure vs false alarm,0.7087338748208314,0.7087338748208314,higher in seizures,54.0,98.0,,,,,,
+chb24,line_length_med,seizure vs false alarm,0.4953463927376971,0.5046536072623029,lower in seizures,54.0,98.0,,,,,,
+chb24,hjorth_mob_med,seizure vs false alarm,0.28839703774486386,0.7116029622551361,lower in seizures,54.0,98.0,,,,,,
+chb24,hjorth_comp_med,seizure vs false alarm,0.6982274247491639,0.6982274247491639,higher in seizures,54.0,98.0,,,,,,
+chb24,crest_med,seizure vs false alarm,0.2384854276158624,0.7615145723841377,lower in seizures,54.0,98.0,,,,,,
+chb24,n_involved_med,seizure vs false alarm,0.7844266602962255,0.7844266602962255,higher in seizures,54.0,98.0,,,,,,
+chb24,dominance_med,seizure vs false alarm,0.33808170090778783,0.6619182990922121,lower in seizures,54.0,98.0,,,,,,
+chb24,contiguity_med,seizure vs false alarm,0.8902293358815099,0.8902293358815099,higher in seizures,54.0,98.0,,,,,,
+chb24,hf_share_med,seizure vs false alarm,0.28304347826086956,0.7169565217391305,lower in seizures,54.0,98.0,,,,,,
+chb24,frontopolar_med,seizure vs false alarm,0.6729956999522216,0.6729956999522216,higher in seizures,54.0,98.0,,,,,,
+chb24,flat_frac_med,seizure vs false alarm,0.5292821309125657,0.5292821309125657,higher in seizures,54.0,98.0,,,,,,
+chb24,step_med,seizure vs false alarm,0.6054443382704252,0.6054443382704252,higher in seizures,54.0,98.0,,,,,,
+chb24,line_length_max,seizure vs false alarm,0.3977090301003345,0.6022909698996655,lower in seizures,54.0,98.0,,,,,,
+chb24,evo_dfreq,seizure vs false alarm,0.6747061634018157,0.6747061634018157,higher in seizures,54.0,98.0,,,,,,
+chb24,evo_amp,seizure vs false alarm,0.3382130912565695,0.6617869087434305,lower in seizures,54.0,98.0,,,,,,
+chb24,duration,seizure vs false alarm,0.41264333492594363,0.5873566650740564,lower in seizures,54.0,98.0,,,,,,
+chb24,acf_peak_med,missed vs false alarm (descriptive),0.9279710144927537,,,,,,,,,,10.0
+chb24,spec_peak_share_med,missed vs false alarm (descriptive),0.8384782608695652,,,,,,,,,,10.0
+chb24,line_length_med,missed vs false alarm (descriptive),0.29384057971014493,,,,,,,,,,10.0
+chb24,hjorth_mob_med,missed vs false alarm (descriptive),0.22434782608695653,,,,,,,,,,10.0
+chb24,hjorth_comp_med,missed vs false alarm (descriptive),0.7956521739130435,,,,,,,,,,10.0
+chb24,crest_med,missed vs false alarm (descriptive),0.3021739130434783,,,,,,,,,,10.0
+chb24,n_involved_med,missed vs false alarm (descriptive),0.6796739130434784,,,,,,,,,,10.0
+chb24,dominance_med,missed vs false alarm (descriptive),0.1476086956521739,,,,,,,,,,10.0
+chb24,contiguity_med,missed vs false alarm (descriptive),0.662608695652174,,,,,,,,,,10.0
+chb24,hf_share_med,missed vs false alarm (descriptive),0.21934782608695652,,,,,,,,,,10.0
+chb24,frontopolar_med,missed vs false alarm (descriptive),0.7169565217391305,,,,,,,,,,10.0
+chb24,flat_frac_med,missed vs false alarm (descriptive),0.6394927536231884,,,,,,,,,,10.0
+chb24,step_med,missed vs false alarm (descriptive),0.9101449275362319,,,,,,,,,,10.0
+chb24,line_length_max,missed vs false alarm (descriptive),0.28246376811594204,,,,,,,,,,10.0
+chb24,evo_dfreq,missed vs false alarm (descriptive),0.5115579710144929,,,,,,,,,,10.0
+chb24,evo_amp,missed vs false alarm (descriptive),0.6376811594202898,,,,,,,,,,10.0
+chb24,duration,missed vs false alarm (descriptive),0.23021739130434782,,,,,,,,,,10.0
+siena,acf_peak_med,seizure vs false alarm,0.39319385993019196,0.606806140069808,lower in seizures,118.0,991.0,,,,,,
+siena,spec_peak_share_med,seizure vs false alarm,0.46838468780752207,0.5316153121924779,lower in seizures,118.0,991.0,,,,,,
+siena,line_length_med,seizure vs false alarm,0.5233437548499585,0.5233437548499585,higher in seizures,118.0,991.0,,,,,,
+siena,hjorth_mob_med,seizure vs false alarm,0.4022968304011989,0.5977031695988011,lower in seizures,118.0,991.0,,,,,,
+siena,hjorth_comp_med,seizure vs false alarm,0.5937580680987555,0.5937580680987555,higher in seizures,118.0,991.0,,,,,,
+siena,crest_med,seizure vs false alarm,0.30074757351751014,0.6992524264824899,lower in seizures,118.0,991.0,,,,,,
+siena,n_involved_med,seizure vs false alarm,0.5094387077224799,0.5094387077224799,higher in seizures,118.0,991.0,,,,,,
+siena,dominance_med,seizure vs false alarm,0.5232060996640149,0.5232060996640149,higher in seizures,118.0,991.0,,,,,,
+siena,contiguity_med,seizure vs false alarm,0.4953141108517074,0.5046858891482926,lower in seizures,118.0,991.0,,,,,,
+siena,hf_share_med,seizure vs false alarm,0.38569329243311756,0.6143067075668824,lower in seizures,118.0,991.0,,,,,,
+siena,frontopolar_med,seizure vs false alarm,0.5084885764754313,0.5084885764754313,higher in seizures,118.0,991.0,,,,,,
+siena,flat_frac_med,seizure vs false alarm,0.4874115599051979,0.5125884400948021,lower in seizures,118.0,991.0,,,,,,
+siena,step_med,seizure vs false alarm,0.3377092695956446,0.6622907304043554,lower in seizures,118.0,991.0,,,,,,
+siena,line_length_max,seizure vs false alarm,0.5463596080020938,0.5463596080020938,higher in seizures,118.0,991.0,,,,,,
+siena,evo_dfreq,seizure vs false alarm,0.6542910406804996,0.6542910406804996,higher in seizures,118.0,991.0,,,,,,
+siena,evo_amp,seizure vs false alarm,0.48328088674410985,0.5167191132558902,lower in seizures,118.0,991.0,,,,,,
+siena,duration,seizure vs false alarm,0.6784536335586726,0.6784536335586726,higher in seizures,118.0,991.0,,,,,,
+siena,acf_peak_med,missed vs false alarm (descriptive),0.3534518838287774,,,,,,,,,,70.0
+siena,spec_peak_share_med,missed vs false alarm (descriptive),0.48440148530552984,,,,,,,,,,70.0
+siena,line_length_med,missed vs false alarm (descriptive),0.31277501664815005,,,,,,,,,,70.0
+siena,hjorth_mob_med,missed vs false alarm (descriptive),0.3092898937401586,,,,,,,,,,70.0
+siena,hjorth_comp_med,missed vs false alarm (descriptive),0.60804303586909,,,,,,,,,,70.0
+siena,crest_med,missed vs false alarm (descriptive),0.2161206883816967,,,,,,,,,,70.0
+siena,n_involved_med,missed vs false alarm (descriptive),0.3596308400365893,,,,,,,,,,70.0
+siena,dominance_med,missed vs false alarm (descriptive),0.5791756462899624,,,,,,,,,,70.0
+siena,contiguity_med,missed vs false alarm (descriptive),0.34011559059417235,,,,,,,,,,70.0
+siena,hf_share_med,missed vs false alarm (descriptive),0.2426547681104711,,,,,,,,,,70.0
+siena,frontopolar_med,missed vs false alarm (descriptive),0.43516384315133727,,,,,,,,,,70.0
+siena,flat_frac_med,missed vs false alarm (descriptive),0.4874115599051979,,,,,,,,,,70.0
+siena,step_med,missed vs false alarm (descriptive),0.24784866763027177,,,,,,,,,,70.0
+siena,line_length_max,missed vs false alarm (descriptive),0.2998438450681455,,,,,,,,,,70.0
+siena,evo_dfreq,missed vs false alarm (descriptive),0.6873495182940293,,,,,,,,,,70.0
+siena,evo_amp,missed vs false alarm (descriptive),0.47252297031871293,,,,,,,,,,70.0
+siena,duration,missed vs false alarm (descriptive),0.5451311600112804,,,,,,,,,,70.0

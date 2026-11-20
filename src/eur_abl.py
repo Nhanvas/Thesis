@@ -11,7 +11,10 @@ module to come from this repository). A variant swaps ONE function; everything e
                 8b (added 20/11, chat D32-F, approved by the author 13:04): no encoder -- the distance is taken on the
                 30-value node input the encoder receives, built by node_x = the record construction;
                 O7 (D32-F 20/11, approved 14:14): the latent averaged with its previous and next valid window of the same
-                file before the distance)
+                file before the distance; R0 / 10a / 10b (D32-F 20/11, approved 16:17; design
+                results/eureka_d32f/DESIGN_PC1.md): GAEs RETRAINED in this run on the record training windows with the
+                thesis recipe (f1_core's tensor loop, gate G-pc1vec) -- R0 full node input (control), 10a without the 7
+                absolute features, 10b without the relative and absolute gamma powers -- then the V5 chain unchanged)
   distance      per-channel LedoitWolf Mahalanobis (x1_external.model_outputs); 1a diagonal, 1b Euclidean; 4a reference
                 fitted on the clean windows of the 12 training patients (leave the scored patient out); 4b / 4c per-file
                 baselines of 10 / 30 min (e16_recording_baseline.arm_distances arms a / c); O6a / O6b (D32-F 20/11,
@@ -83,7 +86,7 @@ if _OUT:
     raise SystemExit(f"STOP: record modules imported from outside {REPO / 'src'}: {_OUT}")
 log = R1.log
 
-TAGS, DEV, TEST, TRAIN = R1.TAGS, list(R1.DEV), list(R1.TEST), list(R1.TRAIN)
+TAGS, DEV, TEST, TRAIN, VAL = R1.TAGS, list(R1.DEV), list(R1.TEST), list(R1.TRAIN), list(R1.VAL)
 EXT = list(R1.EXT)
 K_RECORD = R1.K_RECORD
 SCR = R1.SCRATCH / "eur"
@@ -121,7 +124,17 @@ VARIANTS = {
     "O6a": _v(dist="mixbic", text="latent mixture normal model, K by BIC (1-4), smallest component Mahalanobis"),
     "O6b": _v(dist="mix2", text="latent mixture normal model, K = 2, smallest component Mahalanobis"),
     "O7": _v(enc="ctx3", text="latent averaged over 3 windows (previous, own, next valid window of the file)"),
+    "R0": _v(enc="armR0", text="GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"),
+    "10a": _v(enc="arm10a", text="GAE retrained without the 7 absolute features (node input 23, target 5)"),
+    "10b": _v(enc="arm10b", text="GAE retrained without the gamma powers, relative and absolute (input 28, target 10)"),
 }
+# PC1 arms: columns kept of the 30-value node input [adjacency 0-17 | relative band powers 18-22 (delta..gamma) |
+# 7 absolute features 23-29 (log band powers delta..gamma, log line length, kurtosis)] and of the 12-value
+# reconstruction target [relative band powers 0-4 | absolute features 5-11]
+PC1_ARMS = {"R0": (list(range(30)), list(range(12))),
+        "10a": (list(range(23)), list(range(5))),
+        "10b": ([i for i in range(30) if i not in (22, 27)], [i for i in range(12) if i not in (4, 9)])}
+PC1_EPOCHS = 200
 MIX_SAMPLE, MIX_KMAX, MIX_MIN, MIX_MIN_SHARE, MIX_SEED = 5000, 4, 64, 0.05, 42
 
 
@@ -233,17 +246,20 @@ def node_x(tag, adj, xn, f7):
     return X if X is not None else np.empty((0, 18, 30), np.float32)
 
 
-def encode(tag, adj, xn, f7, prop="own"):
+def encode(tag, adj, xn, f7, prop="own", ckpt_dir=None):
     """p2_dump_seeds23.run_model's construction; prop 'self' = empty propagation graph (GCN self loops only). The node
-    input keeps the window's own connectivity row in both cases (as F-A1.4's I-self)."""
+    input keeps the window's own connectivity row in both cases (as F-A1.4's I-self). ckpt_dir: a PC1 arm's retrained
+    checkpoints (their json holds the kept input columns)."""
     import torch
     from torch_geometric.data import Data, Batch
     from torch_geometric.utils import dense_to_sparse
     import gae_joint as G
     E8 = R1.E8
-    ck = PD.CKPT / f"gae_v2_{tag}.pt"
+    ck = (Path(ckpt_dir) if ckpt_dir else PD.CKPT) / f"gae_v2_{tag}.pt"
     meta = json.loads(ck.with_suffix(".json").read_text())
     X = node_x(tag, adj, xn, f7)
+    if "keep_in" in meta:
+        X = np.ascontiguousarray(X[:, :, meta["keep_in"]])
     model = G.GAEModel(in_dim=meta["in_dim"], bands=meta["out_x"])
     model.load_state_dict(torch.load(str(ck), map_location="cpu"), strict=True)
     model.eval()
@@ -569,6 +585,9 @@ def prep_job(a):
                 Ds["self"] = conv(d_maha(encode(tag, adj, xn, f7, "self")), ext)
             if "enc_input" in need:
                 Ds["input"] = conv(d_maha(node_x(tag, adj, xn, f7)), ext)
+            for a_ in PC1_ARMS:
+                if f"enc_arm{a_}" in need:
+                    Ds[f"arm{a_}"] = conv(d_maha(encode(tag, adj, xn, f7, ckpt_dir=arm_dir(a_))), ext)
             if "enc_ctx3" in need:
                 Ds["ctx3"] = conv(d_maha(ctx3(Z, wf)), ext)
             for mk, km in (("mixbic", "bic"), ("mix2", 2)):
@@ -584,7 +603,7 @@ def prep_job(a):
             recf = PS._full(lite, rec.astype(np.float64))
             for vid in variants:
                 v = VARIANTS[vid]
-                key = v["enc"] if v["enc"] in ("self", "input", "ctx3") else v["dist"]
+                key = v["enc"] if (v["enc"] in ("self", "input", "ctx3") or v["enc"].startswith("arm")) else v["dist"]
                 if key not in Ds or ("gamma" in v["extra"] and gam is None):
                     na.append(vid)
                     continue
@@ -753,6 +772,162 @@ def write_outputs(sc, label):
     pd.DataFrame([r for x in sc for r in x["curve"]]).to_csv(o / f"curve{label}.csv", index=False)
 
 
+# ============================================================================ PC1: retraining (D32-F)
+def arm_dir(arm):
+    return R1.WORK / "eureka" / os.environ.get("EUR_TAG", "abl") / "models" / arm
+
+
+def _pc1_meta():
+    """V5's checkpoint constants (equal for the 4 seeds; gate G-pc1const) and training-window counts."""
+    m = json.loads((REPO / "data" / "models_v2" / "gae_v2_clean_seed42.json").read_text())
+    return dict(add_mean=m["add_mean"], add_std=m["add_std"], clip=m["clip"]), m["n_train"], m.get("n_val")
+
+
+def _loss_m(model, A, X, T):
+    """f1_core._loss('gae') with the input / target widths of the arm."""
+    import torch
+    import gae_joint as G
+    B = A.shape[0]
+    b_, r_, c_ = A.nonzero(as_tuple=True)
+    ei = torch.stack([b_ * G.N_CH + r_, b_ * G.N_CH + c_])
+    z = model.encoder(X.reshape(B * G.N_CH, X.shape[2]), ei, A[b_, r_, c_])
+    zp = z.view(B, G.N_CH, G.LATENT_DIM)
+    Ah = torch.clamp(torch.bmm(zp, zp.transpose(1, 2)), 0.0, 1.0)
+    Xh = model.x_decoder(z).view(B, G.N_CH, T.shape[2])
+    return ((A - Ah) ** 2).mean(dim=(1, 2)) + G.LAMBDA * ((T - Xh) ** 2).mean(dim=(1, 2))
+
+
+def train_masked(cases, meta, seed, keep_in, keep_out, epochs, max_windows=None, tag=""):
+    """f1_core.train('gae') (the thesis recipe; window order of torch's DataLoader) on the kept columns. With every column
+    kept no indexing is done, so it is f1_core.train exactly (gate G-pc1vec)."""
+    import torch
+    import f1_core as F
+    import gae_joint as G
+    import model_cmp_core as C
+    t_load = time.time()
+    A, X, T = C._mlp_tensors(sorted(cases), meta, torch.device("cpu"), C.clean_mask, max_windows)
+    if not (len(keep_in) == F.IN_DIM and len(keep_out) == F.OUT_X):
+        X = X[:, :, torch.tensor(keep_in)].contiguous()
+        T = T[:, :, torch.tensor(keep_out)].contiguous()
+    n = len(A)
+    t_load = time.time() - t_load
+    torch.manual_seed(seed); np.random.seed(seed)
+    g = torch.Generator().manual_seed(seed)
+    model = G.GAEModel(in_dim=len(keep_in), bands=len(keep_out))
+    n_params = sum(q.numel() for q in model.parameters())
+    opt = torch.optim.Adam(model.parameters(), lr=F.LR)
+    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
+    rows, t0 = [], time.time()
+    for ep in range(epochs):
+        model.train()
+        tot = torch.zeros(())
+        torch.empty((), dtype=torch.int64).random_(generator=g)
+        perm = torch.randperm(n, generator=g)
+        torch.randperm(n, generator=g)
+        for i in range(0, n, F.BATCH):
+            ii = perm[i:i + F.BATCH]
+            opt.zero_grad()
+            loss = _loss_m(model, A[ii], X[ii], T[ii]).mean()
+            loss.backward(); opt.step()
+            tot += loss.detach() * len(ii)
+        sched.step()
+        rows.append(dict(epoch=ep + 1, train_loss=float(tot) / n, s=round(time.time() - t0, 1)))
+        if ep < 2 or (ep + 1) % 20 == 0 or ep == epochs - 1:
+            log(f"[pc1{tag}] epoch {ep+1}/{epochs} loss {rows[-1]['train_loss']:.6f} ({rows[-1]['s']}s)")
+    steps = epochs * ((n + F.BATCH - 1) // F.BATCH)
+    info = dict(n_train=int(n), epochs=epochs, seed=int(seed), n_params=int(n_params), first_loss=rows[0]["train_loss"],
+                last_loss=rows[-1]["train_loss"], fit_s=round(time.time() - t0, 1), load_s=round(t_load, 1),
+                ms_per_step=round((time.time() - t0) / steps * 1000, 3),
+                G2="PASS" if rows[-1]["train_loss"] < rows[0]["train_loss"] else "FAIL")
+    return model.eval(), info, rows
+
+
+def train_arm_job(a):
+    """one arm x one seed: train_masked on the 12 training patients' clean windows of the record data, V5's constants;
+    validation loss on the 3 validation patients; checkpoint + json (+ kept columns) and _DONE.json last."""
+    arm, tag, epochs = a
+    t0 = time.time()
+    try:
+        import resource
+        import torch
+        import model_cmp_core as C
+        out = arm_dir(arm)
+        done = out / f"gae_v2_{tag}_DONE.json"
+        if done.exists() and json.loads(done.read_text()).get("eur_abl_sha") == CODE_SHA:
+            return dict(case=f"{arm}/{tag}", s=0.0, reused=True)
+        R1.point_npz(TRAIN + VAL, "earlier")
+        meta, n_exp, n_val = _pc1_meta()
+        seed = int(tag.split("seed")[-1])
+        ki, ko = PC1_ARMS[arm]
+        model, info, rows = train_masked(TRAIN, meta, seed, ki, ko, epochs, tag=f" {arm} {tag}")
+        if info["n_train"] != sum(n_exp.values()):
+            raise SystemExit(f"training windows {info['n_train']} != V5's {sum(n_exp.values())}")
+        if info["G2"] != "PASS":
+            raise SystemExit("G2: last-epoch loss not below the first")
+        vl, nv = 0.0, {}
+        with torch.no_grad():
+            for s in VAL:
+                A, X, T = C._mlp_tensors([s], meta, torch.device("cpu"), C.clean_mask)
+                X = X[:, :, torch.tensor(ki)]; T = T[:, :, torch.tensor(ko)]
+                nv[s] = int(len(A))
+                for i in range(0, len(A), 512):
+                    vl += float(_loss_m(model, A[i:i + 512], X[i:i + 512], T[i:i + 512]).sum())
+        if n_val and nv != {s: int(n_val[s]) for s in VAL}:
+            raise SystemExit(f"validation windows {nv} != V5's {n_val}")
+        out.mkdir(parents=True, exist_ok=True)
+        torch.save({k: v.cpu() for k, v in model.state_dict().items()}, out / f"gae_v2_{tag}.pt")
+        m = dict(arm=arm, in_dim=len(ki), out_x=len(ko), keep_in=ki, keep_out=ko, clip=meta["clip"],
+                 add_mean=meta["add_mean"], add_std=meta["add_std"], n_val=nv, final_val=vl / max(1, sum(nv.values())),
+                 loop="eur_abl.train_masked (= f1_core.train with every column; gate G-pc1vec)", eur_abl_sha=CODE_SHA,
+                 torch=torch.__version__, threads=torch.get_num_threads(), **info)
+        (out / f"gae_v2_{tag}.json").write_text(json.dumps(m, indent=1))
+        pd.DataFrame(rows).assign(arm=arm, seed=seed).to_csv(out / f"training_log_{tag}.csv", index=False)
+        peak = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
+        done.write_text(json.dumps(dict(arm=arm, tag=tag, seconds=round(time.time() - t0), peak_rss_mb=peak,
+                                        eur_abl_sha=CODE_SHA, n_train=info["n_train"], n_params=info["n_params"],
+                                        ms_per_step=info["ms_per_step"]), indent=1))
+        return dict(case=f"{arm}/{tag}", s=round(time.time() - t0, 1))
+    except SystemExit as e:
+        return dict(case=f"{arm}/{tag}", s=round(time.time() - t0, 1), error=f"STOP: {e}")
+    except Exception:                    # noqa: BLE001
+        import traceback
+        return dict(case=f"{arm}/{tag}", s=round(time.time() - t0, 1), error=traceback.format_exc()[-3000:])
+
+
+def pc1_prepare(arms, workers):
+    """gates G-pc1const (V5's constants = the recipe's own constants on the record data) and G-pc1vec (train_masked
+    with every column = f1_core.train, 2,000 windows, 2 epochs, exactly; each arm runs 2 epochs), then the trainings
+    (arms x 4 seeds, in parallel)."""
+    import torch
+    import f1_core as F
+    t = time.time()
+    meta, _, _ = _pc1_meta()
+    mu, sd = R1.TGV2.norm_constants(R1.VIEWS / "earlier", "clean")
+    rel = 0.0
+    for got, key in ((mu, "add_mean"), (sd, "add_std")):
+        want = np.asarray(meta[key])
+        rel = max(rel, float(np.max(np.abs(got - want) / np.maximum(np.abs(want), 1e-12))))
+    R1.gate(dict(gate="G-pc1const", status="PASS" if rel <= R1.TOL["const_rel"] else "FAIL", max_rel=rel,
+                 summary=f"V5 constants = norm_constants on the record training windows (relative {rel:.1e})"))
+    R1.point_npz(TRAIN + VAL, "earlier")
+    ref, _, _ = F.train("gae", TRAIN[:1], meta, 42, torch.device("cpu"), epochs=2, max_windows=2000, tag=" G-pc1vec")
+    mine, info, _ = train_masked(TRAIN[:1], meta, 42, *PC1_ARMS["R0"], 2, max_windows=2000, tag=" G-pc1vec")
+    d = F._maxdiff(ref, mine)
+    smoke = {}
+    for a_ in arms:
+        _, inf, _ = train_masked(TRAIN[:1], meta, 42, *PC1_ARMS[a_], 2, max_windows=2000, tag=f" smoke {a_}")
+        smoke[a_] = dict(n_params=inf["n_params"], G2=inf["G2"], ms_per_step=inf["ms_per_step"])
+    ok = d == 0.0 and all(v["G2"] == "PASS" for v in smoke.values())
+    R1.gate(dict(gate="G-pc1vec", status="PASS" if ok else "FAIL", max_abs_diff=d, arms=smoke,
+                 summary=f"train_masked (every column) = f1_core.train: max |weight diff| {d:.1e}; arms 2 epochs {smoke}"))
+    R1.phase("pc1_gates", t)
+    t = time.time()
+    epochs = int(os.environ.get("EUR_PC1_EPOCHS", PC1_EPOCHS)) if os.environ.get("R2_TEST") else PC1_EPOCHS
+    res = _run(train_arm_job, [(a_, tg, epochs) for a_ in arms for tg in TAGS], workers, "pc1 training")
+    R1.phase("pc1_training", t)
+    R1._jdump(R1.WORK / "eureka" / os.environ.get("EUR_TAG", "abl") / "pc1_training.json", res)
+
+
 def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False):
     R1.OUT_ROOT = R1.WORK / "eureka"
     workers = int(workers or os.environ.get("EUR_WORKERS") or R1.n_workers())
@@ -765,6 +940,9 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     self_checks()
     src = build_views(DEV, TEST, EXT)
     gate_data(src)
+    arms = [VARIANTS[v]["enc"][3:] for v in sel if VARIANTS[v]["enc"].startswith("arm")]
+    if arms:
+        pc1_prepare(arms, workers)
     # ---- SMOKE (the small check before the full run): chb01 + chb03 (+ first external case), measured
     t = time.time()
     s_dev, s_test, s_ext = [DEV[0]], [TEST[0]], EXT[:1]

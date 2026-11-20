@@ -1,0 +1,109 @@
+set,comparison,variant,arm,stage,metric,reading,diff,ci_lo,ci_hi,subjects
+development,O6a - V0,O6a,own,cpd,sens,primary,0.0023519536019535898,-0.019365079365079394,0.02588329081632651,15
+development,O6a - V0,O6a,own,cpd,f1,primary,-0.016100916886143735,-0.03513899121629973,0.0018294140108938628,15
+development,O6a - V0,O6a,own,cpd,fa,primary,2.4561710603747375,-0.04629899170058178,5.511068514110049,15
+development,O6b - V0,O6b,own,cpd,sens,primary,-0.01941086691086692,-0.036836080586080594,-0.004807692307692309,15
+development,O6b - V0,O6b,own,cpd,f1,primary,-0.0033953843321603353,-0.017803608838563877,0.014629509866938005,15
+development,O6b - V0,O6b,own,cpd,fa,primary,0.15388887338542798,-1.3835138048460658,2.0033679349501483,15
+development,O7 - V0,O7,own,cpd,sens,primary,-0.006306471306471314,-0.07213782051282053,0.05309523809523809,15
+development,O7 - V0,O7,own,cpd,f1,primary,0.0515208989146913,0.02061307786041732,0.08525491618652353,15
+development,O7 - V0,O7,own,cpd,fa,primary,-6.904015734020252,-9.6277191903014,-3.8881984378054772,15
+development,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,sens,primary,0.009018620268620254,-0.020876913265306135,0.0433493947458791,15
+development,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,f1,primary,-0.0047149349963620715,-0.026625572024866928,0.018752533769652427,15
+development,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,fa,primary,0.9205580535871385,-0.6209785240056608,2.5414793242038125,15
+development,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,sens,primary,-0.012744200244200261,-0.04252354788069076,0.019551282051282013,15
+development,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,f1,primary,-0.001141164188052649,-0.016800874202835162,0.017688613685990416,15
+development,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,fa,primary,-0.4149486052897001,-1.5255028182255999,0.6266065957518276,15
+development,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,sens,primary,-0.05725885225885228,-0.15499603174603177,0.026588369963369943,15
+development,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,f1,primary,0.010054566060098217,-0.0677021482047106,0.07218188069106084,15
+development,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,fa,primary,-4.9912743456433155,-6.968508960892053,-2.7862724296619503,15
+development,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,sens,primary,-0.009999999999999993,-0.032142857142857126,0.0,15
+development,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,f1,primary,0.036508808208127484,0.012270430169589792,0.06111803773542247,15
+development,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,fa,primary,-3.9991398892524694,-7.028638754075282,-1.381149816020044,15
+development,7a: detector boundaries - localizer,V0,own,detector,sens,primary,0.009999999999999993,0.0,0.032142857142857126,15
+development,7a: detector boundaries - localizer,V0,own,detector,f1,primary,-0.0018844645587490028,-0.008954154626821174,0.0056589404998000385,15
+development,7a: detector boundaries - localizer,V0,own,detector,fa,primary,0.5079009027288245,0.3276046506419648,0.6971779991396991,15
+development,7b: hybrid - localizer,V0,own,hybrid,sens,primary,0.006666666666666665,0.0,0.021428571428571425,15
+development,7b: hybrid - localizer,V0,own,hybrid,f1,primary,-0.0006581929698124457,-0.007086221185457817,0.005166053939019049,15
+development,7b: hybrid - localizer,V0,own,hybrid,fa,primary,0.24281693942661342,0.06636127932999125,0.4364580995235711,15
+test,O6a - V0,O6a,own,cpd,sens,descriptive,-0.004650297619047627,-0.05100446428571429,0.02507440476190475,8
+test,O6a - V0,O6a,own,cpd,f1,descriptive,-0.017948436962435255,-0.03382174641030922,-0.002568361113049554,8
+test,O6a - V0,O6a,own,cpd,fa,descriptive,3.648898362708686,1.5601992927151311,6.275145552701034,8
+test,O6b - V0,O6b,own,cpd,sens,descriptive,-0.023697916666666666,-0.06796875,0.010416666666666671,8
+test,O6b - V0,O6b,own,cpd,f1,descriptive,-0.010830231021357106,-0.027109616545003278,0.003668741563202982,8
+test,O6b - V0,O6b,own,cpd,fa,descriptive,-0.18312753924473624,-0.9840444765536351,0.6906392795181038,8
+test,O7 - V0,O7,own,cpd,sens,descriptive,-0.04657738095238096,-0.12782738095238097,0.02738095238095238,8
+test,O7 - V0,O7,own,cpd,f1,descriptive,0.02763285610670662,-0.01759146487070703,0.07205059592684433,8
+test,O7 - V0,O7,own,cpd,fa,descriptive,-9.469210936098026,-12.69560662326228,-6.181445830555185,8
+test,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,sens,descriptive,0.018005952380952376,-0.036160714285714296,0.07790178571428572,8
+test,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,f1,descriptive,0.014156304330027234,-0.026603208124959407,0.061853647849292405,8
+test,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,fa,descriptive,3.3827274896682806,0.28391748840780906,6.7574951425442356,8
+test,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,sens,descriptive,-0.019791666666666666,-0.05625,0.010416666666666671,8
+test,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,f1,descriptive,-0.00735124892647022,-0.029934722841170266,0.011355347021955299,8
+test,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,fa,descriptive,0.16704736705474033,-1.1516169378948158,1.7967301651547722,8
+test,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,sens,descriptive,-0.07079613095238096,-0.13482979910714288,-0.006696428571428596,8
+test,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,f1,descriptive,0.003196416327273864,-0.03230870102215529,0.03459366171077784,8
+test,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,fa,descriptive,-6.606350181990287,-9.928233898193623,-3.2305480019297517,8
+test,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,sens,descriptive,-0.06953125,-0.20078125000000002,0.0,8
+test,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,f1,descriptive,-0.018986264818127523,-0.08626172167442792,0.024468311960842565,8
+test,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,fa,descriptive,-4.949623814127286,-11.719972897045047,-0.6359470686480231,8
+test,7a: detector boundaries - localizer,V0,own,detector,sens,descriptive,0.002604166666666668,0.0,0.007812500000000003,8
+test,7a: detector boundaries - localizer,V0,own,detector,f1,descriptive,-0.0029664808458147907,-0.006275598534707702,0.0006614889923994517,8
+test,7a: detector boundaries - localizer,V0,own,detector,fa,descriptive,0.8503116988095105,0.5639048446966557,1.249546922390364,8
+test,7b: hybrid - localizer,V0,own,hybrid,sens,descriptive,0.002604166666666668,0.0,0.007812500000000003,8
+test,7b: hybrid - localizer,V0,own,hybrid,f1,descriptive,0.0004618741799571769,-0.0018936488958276841,0.0034154414313596147,8
+test,7b: hybrid - localizer,V0,own,hybrid,fa,descriptive,0.10785646568405594,-0.3117074857889357,0.3689377594295956,8
+chb24,O6a - V0,O6a,own,cpd,sens,descriptive,0.03125,,,1
+chb24,O6a - V0,O6a,own,cpd,f1,descriptive,-0.004297665096213155,,,1
+chb24,O6a - V0,O6a,own,cpd,fa,descriptive,2.2704577705366056,,,1
+chb24,O6b - V0,O6b,own,cpd,sens,descriptive,0.0,,,1
+chb24,O6b - V0,O6b,own,cpd,f1,descriptive,-0.01078008892060528,,,1
+chb24,O6b - V0,O6b,own,cpd,fa,descriptive,1.4190361065853772,,,1
+chb24,O7 - V0,O7,own,cpd,sens,descriptive,-0.3125,,,1
+chb24,O7 - V0,O7,own,cpd,f1,descriptive,-0.09288515233637179,,,1
+chb24,O7 - V0,O7,own,cpd,fa,descriptive,-8.230409418195197,,,1
+chb24,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,sens,descriptive,0.078125,,,1
+chb24,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,f1,descriptive,0.0576798977312456,,,1
+chb24,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,fa,descriptive,-0.8514216639512284,,,1
+chb24,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,sens,descriptive,0.046875,,,1
+chb24,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,f1,descriptive,0.03555545981733399,,,1
+chb24,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,fa,descriptive,-0.5676144426341505,,,1
+chb24,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,sens,descriptive,-0.203125,,,1
+chb24,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,f1,descriptive,-0.1364284878632081,,,1
+chb24,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,fa,descriptive,0.0,,,1
+chb24,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,sens,descriptive,-0.21875,,,1
+chb24,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,f1,descriptive,0.019192401509474766,,,1
+chb24,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,fa,descriptive,-13.622746623219637,,,1
+chb24,7a: detector boundaries - localizer,V0,own,detector,sens,descriptive,0.0,,,1
+chb24,7a: detector boundaries - localizer,V0,own,detector,f1,descriptive,-0.017784370801612104,,,1
+chb24,7a: detector boundaries - localizer,V0,own,detector,fa,descriptive,2.2704577705366056,,,1
+chb24,7b: hybrid - localizer,V0,own,hybrid,sens,descriptive,0.0,,,1
+chb24,7b: hybrid - localizer,V0,own,hybrid,f1,descriptive,-0.004547042754589892,,,1
+chb24,7b: hybrid - localizer,V0,own,hybrid,fa,descriptive,0.5676144426341487,,,1
+siena,O6a - V0,O6a,own,cpd,sens,descriptive,-0.05892857142857143,-0.14642857142857144,0.03750000000000001,14
+siena,O6a - V0,O6a,own,cpd,f1,descriptive,-4.745553228744014e-05,-0.05210506392146279,0.05528263921137392,14
+siena,O6a - V0,O6a,own,cpd,fa,descriptive,-7.259710402977504,-13.399181077349462,-0.9464765522572408,14
+siena,O6b - V0,O6b,own,cpd,sens,descriptive,-0.03333333333333334,-0.11250000000000002,0.054166666666666655,14
+siena,O6b - V0,O6b,own,cpd,f1,descriptive,-0.0013140819093738487,-0.03502517063510302,0.03621944601772942,14
+siena,O6b - V0,O6b,own,cpd,fa,descriptive,-3.8786794918086955,-9.472993397257417,1.2322754258970494,14
+siena,O7 - V0,O7,own,cpd,sens,descriptive,-0.012499999999999995,-0.15892857142857145,0.11607142857142858,14
+siena,O7 - V0,O7,own,cpd,f1,descriptive,0.08353733769670835,0.01297879305154125,0.14853236367800435,14
+siena,O7 - V0,O7,own,cpd,fa,descriptive,-18.730065019081998,-26.6493793405911,-11.780654779365014,14
+siena,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,sens,descriptive,0.08720238095238095,0.0023809523809523803,0.18303571428571427,14
+siena,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,f1,descriptive,0.029112780548590227,-0.004238947422262651,0.06603616568968781,14
+siena,O6a - V0 (fixed 0.5 %),O6a,fixed,cpd,fa,descriptive,3.3117119446188275,0.5321956069814628,6.375360028768315,14
+siena,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,sens,descriptive,0.052976190476190475,-0.005357142857142854,0.1375,14
+siena,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,f1,descriptive,0.019160579765470618,-0.01334809420071307,0.059596361261396724,14
+siena,O6b - V0 (fixed 0.5 %),O6b,fixed,cpd,fa,descriptive,0.28649965238481473,-1.0279769508600114,1.5035471173019157,14
+siena,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,sens,descriptive,0.12321428571428572,0.015773809523809523,0.2681547619047619,14
+siena,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,f1,descriptive,0.08910085646934218,0.03500701495008511,0.1536383921911714,14
+siena,O7 - V0 (fixed 0.5 %),O7,fixed,cpd,fa,descriptive,-3.373046916010466,-6.399667451430504,-0.37084426406847454,14
+siena,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,sens,descriptive,-0.22678571428571428,-0.36013392857142856,-0.10476190476190475,14
+siena,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,f1,descriptive,-0.0018207039524008514,-0.08132698446146448,0.09107538260449609,14
+siena,6a: fixed 0.5 % - per-patient budget,V0,fixed,cpd,fa,descriptive,-20.527011287508333,-29.312138061623738,-11.699856925118523,14
+siena,7a: detector boundaries - localizer,V0,own,detector,sens,descriptive,-0.014880952380952384,-0.05952380952380953,0.020833333333333332,14
+siena,7a: detector boundaries - localizer,V0,own,detector,f1,descriptive,-0.003630360506856101,-0.01404659101767597,0.008345628035512871,14
+siena,7a: detector boundaries - localizer,V0,own,detector,fa,descriptive,1.9395503981499735,0.723556852460277,3.2751885067710433,14
+siena,7b: hybrid - localizer,V0,own,hybrid,sens,descriptive,0.0,0.0,0.0,14
+siena,7b: hybrid - localizer,V0,own,hybrid,f1,descriptive,0.0019670708942568157,-0.0021317417592728186,0.007796768633170031,14
+siena,7b: hybrid - localizer,V0,own,hybrid,fa,descriptive,0.09849961387128303,-0.8889347484276544,0.8619034385261858,14

@@ -7,11 +7,14 @@
   EUR_OPT   src/eur_abl.py with EUR_VARIANTS=V0,O6a,O6b,O7 and EUR_TAG=opt (optimisations O6 / O7; chat D32-F, 20/11)
   EUR_PC1_R0, EUR_PC1_10a, EUR_PC1_10b  src/eur_abl.py with EUR_VARIANTS=V0,<arm>, EUR_TAG=pc1_<arm>: the arm's GAE
             retrained (4 seeds) then scored (retraining ablations PC1; chat D32-F, 20/11)
+  EUR_PC7_A, EUR_PC7_B  src/eur_abl.py with EUR_VARIANTS=V0,R0,R0s, EUR_TAG=pc7_<part>: R0 retrained with 8 new seeds
+            (A: 4-11, B: 12-19) + PC1's seeds 42/1/2/3 reused from results/eureka_d32f/pc1_r0, then scored (seed variance
+            PC7; chat D34-F, 21/11; design results/eureka_d34f/DESIGN_PC7.md)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -368,6 +371,46 @@ ref `{ref}`; module sha256 asserted below. **Nothing printed here is a research 
     return name, cells
 
 
+PC7_SEEDS = {"A": list(range(4, 12)), "B": list(range(12, 20))}
+PC7_REUSE, PC7_REF = [42, 1, 2, 3], "results/eureka_d32f/pc1_r0"
+
+
+def build_pc7(ref, part):
+    """EUR_ABL's notebook for PC7: V0 + R0 (8 new seeds trained, PC1's 4 reused) + R0s (per-seed k)."""
+    name, cells = build_abl(ref)
+    name = f"EUR_PC7_{part}"
+    seeds = PC7_REUSE + PC7_SEEDS[part]
+    cells[0] = md(f"""
+# {name} — seed variance of the training recipe PC7, part {part} (Track F, chat D34-F)
+
+**Design:** `results/eureka_d34f/DESIGN_PC7.md` (approved by the author 21/11/2026 01:26). The GAE retrained with the
+thesis recipe exactly as PC1's control R0 (12 training patients' clean windows, V5's constants, 200 epochs) with **8 new
+seeds {PC7_SEEDS[part][0]}–{PC7_SEEDS[part][-1]}**, 4 in parallel, in two chunks (the second only if the session guard
+allows); PC1's R0 checkpoints of seeds 42 / 1 / 2 / 3 are copied from `{PC7_REF}` and scored again (gates G-pc7reuse,
+G-pc7k, G-pc7r0). Recorded first: G-pc7plat (library versions = PC1) and G-pc7rep (1 epoch of seed 42 = PC1's log).
+Then the V5 chain on V0, R0 (k of seed 42) and R0s (k per seed), with the usual SMOKE and record gates.
+**Accelerator:** None (CPU). **Internet:** ON. **Inputs (Add Input):** `v9-x3-fold1`, `v9-x3-fold3`,
+`thesis-r2-external-features`. **Output:** `/kaggle/working/eureka/pc7_{part}` (→ `results/eureka_d34f/pc7_{part}`; checkpoints
+≈ 20 KB each). **Runtime:** ≈ 5.5–9.4 h (computed from PC1's measured 8,700–14,860 s per chunk of 4 trainings + scoring).
+Code: `github.com/Nhanvas/Thesis` ref `{ref}`; module sha256 asserted below. **Nothing printed here is a research result.**
+Do not edit; *Save Version → Save & Run All (Commit)*.
+""")
+    env = (f'os.environ.update(EUR_VARIANTS="V0,R0,R0s", EUR_TAG="pc7_{part}", EUR_ARM_SEEDS="{",".join(map(str, seeds))}", '
+           f'EUR_ARM_REUSE="{",".join(map(str, PC7_REUSE))}", EUR_PC7_REF="{PC7_REF}", R2_T0=str(T_NB), THESIS_REPO=REPO,')
+    src = "".join(cells[2]["source"]).replace('os.environ.update(THESIS_REPO=REPO,', env, 1)
+    src = src.replace(f"WANT = {json.dumps(SHA)}", f"WANT = {json.dumps(sha_of(FILES_PC1))}", 1)
+    assert "EUR_ARM_SEEDS" in src and "train_gae_v2.py" in src
+    cells[2] = code(src)
+    src = "".join(cells[1]["source"]).replace('NOTEBOOK, REPO_REF = "EUR_ABL"', f'NOTEBOOK, REPO_REF = "{name}"', 1)
+    assert name in src
+    cells[1] = code(src)
+    src = "".join(cells[4]["source"]).replace('OUT = os.path.join(WORK, "eureka", "abl")', f'OUT = os.path.join(WORK, "eureka", "pc7_{part}")', 1)
+    src = src.replace('for f in ("gates.json",', 'for f in ("pc1_training.json", "reused_checkpoints.csv", "gates.json",', 1)
+    assert f"pc7_{part}" in src
+    cells[4] = code(src)
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -379,7 +422,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -396,3 +439,6 @@ if __name__ == "__main__":
     if a.only == "EUR_PC1":
         for arm in ("R0", "10a", "10b"):
             print("built", write(*build_pc1(a.ref, arm)), sha_of(FILES_PC1))
+    if a.only == "EUR_PC7":
+        for part in ("A", "B"):
+            print("built", write(*build_pc7(a.ref, part)), sha_of(FILES_PC1))

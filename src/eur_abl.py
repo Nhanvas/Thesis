@@ -47,8 +47,19 @@ Gates (STOP unless PASS):
 Variant selection (added 20/11, D32-F): EUR_VARIANTS="V0,8b" runs only those variants (V0 is always included: the
 record gates and the paired differences need it); EUR_TAG names the output folder (default abl). The 4a reference
 pass runs only when a 4a-type variant is selected.
+Arm seeds (added 21/11, chat D34-F, PC7; design results/eureka_d34f/DESIGN_PC7.md, approved 01:26): the retrained arms
+(R0 / 10a / 10b) use the seeds of EUR_ARM_SEEDS (comma list; default = the four V0 seeds, so PC1 runs unchanged); V0 keeps
+the four V5 seeds. EUR_ARM_REUSE lists arm seeds whose checkpoints are copied from the committed run EUR_PC7_REF
+(<ref>/models/<arm>/) instead of trained (gate G-pc7reuse); with EUR_PC7_REF set the run also records G-pc7plat (library
+versions = the reference run) and G-pc7rep (seed 42, 1 epoch: epoch-1 loss = the reference log exactly) -- both without
+stopping -- and stops unless R0's k = the reference k (G-pc7k) and the reused seeds' R0 rows = the reference rows
+(G-pc7r0). Trainings run in chunks of `workers`; a further chunk starts only if elapsed + the last chunk's duration +
+PC7_RESERVE_S <= PC7_GUARD_H (gate G-guard lists the seeds trained). Variant R0s = R0's latents with k recalibrated on
+each seed's own development scores (kmode "seed"; every other variant: k of seed 42). An arm's node input uses the
+constants of its own checkpoint json (= V5's, gate G-pc1const).
 Outputs: WORK/eureka/<tag>/ (run_meta.json, gates.json, data_sha256.csv, r10/, per_subject.csv, errors.csv, curve.csv,
-k.csv, jobs.csv, projection.json, SUMMARY.md). The reading is done by src/eur_abl_aggregate.py (committed first).
+k.csv, jobs.csv, projection.json, SUMMARY.md). The reading is done by src/eur_abl_aggregate.py (committed first); PC7 by
+src/eur_pc7_read.py.
   python src/eur_abl.py [--workers N]
 Test mode (synthetic world, build container only): R2_TEST=1 (see src/eur_abl_synthetic_test.py).
 """
@@ -98,8 +109,9 @@ TEST_MODE = bool(os.environ.get("R2_TEST"))
 WIDTH = 451                                               # +-15 min running window (e17b_latent_family.member)
 
 
-def _v(dist="maha", enc="own", members=MEMBERS, drift="level", extra=(), smooth=5, text=""):
-    return dict(dist=dist, enc=enc, members=tuple(members), drift=drift, extra=tuple(extra), smooth=smooth, text=text)
+def _v(dist="maha", enc="own", members=MEMBERS, drift="level", extra=(), smooth=5, text="", kmode="s42"):
+    return dict(dist=dist, enc=enc, members=tuple(members), drift=drift, extra=tuple(extra), smooth=smooth, text=text,
+                kmode=kmode)
 
 
 VARIANTS = {
@@ -127,7 +139,31 @@ VARIANTS = {
     "R0": _v(enc="armR0", text="GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"),
     "10a": _v(enc="arm10a", text="GAE retrained without the 7 absolute features (node input 23, target 5)"),
     "10b": _v(enc="arm10b", text="GAE retrained without the gamma powers, relative and absolute (input 28, target 10)"),
+    "R0s": _v(enc="armR0", kmode="seed", text="R0 with k recalibrated on each seed's own development scores (PC7, Q6)"),
 }
+PC7_GUARD_H, PC7_RESERVE_S = 11.3, 4500.0
+REUSE_FILES = ("gae_v2_{t}.pt", "gae_v2_{t}.json", "gae_v2_{t}_DONE.json", "training_log_{t}.csv")
+
+
+def arm_tags():
+    """arm seeds (EUR_ARM_SEEDS; default = the four V0 seeds). Test mode: EUR_TEST_ARM_SEEDS overrides."""
+    s = (os.environ.get("EUR_TEST_ARM_SEEDS") if os.environ.get("R2_TEST") else None) or os.environ.get("EUR_ARM_SEEDS", "")
+    seeds = [int(x) for x in s.split(",") if x.strip()]
+    return [f"clean_seed{x}" for x in seeds] if seeds else list(TAGS)
+
+
+def reuse_tags():
+    s = (os.environ.get("EUR_TEST_ARM_REUSE") if os.environ.get("R2_TEST") else None) or os.environ.get("EUR_ARM_REUSE", "")
+    return [f"clean_seed{int(x)}" for x in s.split(",") if x.strip()]
+
+
+def pc7_ref():
+    r = os.environ.get("EUR_PC7_REF", "")
+    return (REPO / r) if r else None
+
+
+def seeds_of(vid):
+    return arm_tags() if VARIANTS[vid]["enc"].startswith("arm") else list(TAGS)
 # PC1 arms: columns kept of the 30-value node input [adjacency 0-17 | relative band powers 18-22 (delta..gamma) |
 # 7 absolute features 23-29 (log band powers delta..gamma, log line length, kurtosis)] and of the 12-value
 # reconstruction target [relative band powers 0-4 | absolute features 5-11]
@@ -224,14 +260,15 @@ def model_inputs(z):
     return idx, adj, xn, f7
 
 
-def node_x(tag, adj, xn, f7):
+def node_x(tag, adj, xn, f7, meta=None):
     """the node input the encoder receives (n x 18 x 30, float32): normalised adjacency row 18 + relative band powers 5
     + the 7 clipped absolute features with the checkpoint's constants -- p2_dump_seeds23.run_model's construction, line
     for line (torch ops). encode() builds its graphs from this array, so gate G-enc (encode with the window graph =
-    run_model, exactly) also proves that this is the record's input."""
+    run_model, exactly) also proves that this is the record's input. meta: a retrained arm's checkpoint json (its
+    add_mean / add_std / clip = V5's, gate G-pc1const); default the V5 checkpoint of the tag."""
     import torch
-    ck = PD.CKPT / f"gae_v2_{tag}.pt"
-    meta = json.loads(ck.with_suffix(".json").read_text())
+    if meta is None or "add_mean" not in meta:
+        meta = json.loads((PD.CKPT / f"gae_v2_{tag}.json").read_text())
     mu, sd, clip = np.array(meta["add_mean"]), np.array(meta["add_std"]), meta["clip"]
     fa = ((np.clip((f7 - mu) / sd, -clip, clip) + clip) / (2 * clip)).astype(np.float32)
     n = len(adj)
@@ -257,7 +294,7 @@ def encode(tag, adj, xn, f7, prop="own", ckpt_dir=None):
     E8 = R1.E8
     ck = (Path(ckpt_dir) if ckpt_dir else PD.CKPT) / f"gae_v2_{tag}.pt"
     meta = json.loads(ck.with_suffix(".json").read_text())
-    X = node_x(tag, adj, xn, f7)
+    X = node_x(tag, adj, xn, f7, meta if ckpt_dir else None)
     if "keep_in" in meta:
         X = np.ascontiguousarray(X[:, :, meta["keep_in"]])
     model = G.GAEModel(in_dim=meta["in_dim"], bands=meta["out_x"])
@@ -585,9 +622,6 @@ def prep_job(a):
                 Ds["self"] = conv(d_maha(encode(tag, adj, xn, f7, "self")), ext)
             if "enc_input" in need:
                 Ds["input"] = conv(d_maha(node_x(tag, adj, xn, f7)), ext)
-            for a_ in PC1_ARMS:
-                if f"enc_arm{a_}" in need:
-                    Ds[f"arm{a_}"] = conv(d_maha(encode(tag, adj, xn, f7, ckpt_dir=arm_dir(a_))), ext)
             if "enc_ctx3" in need:
                 Ds["ctx3"] = conv(d_maha(ctx3(Z, wf)), ext)
             for mk, km in (("mixbic", "bic"), ("mix2", 2)):
@@ -603,7 +637,9 @@ def prep_job(a):
             recf = PS._full(lite, rec.astype(np.float64))
             for vid in variants:
                 v = VARIANTS[vid]
-                key = v["enc"] if (v["enc"] in ("self", "input", "ctx3") or v["enc"].startswith("arm")) else v["dist"]
+                if v["enc"].startswith("arm"):              # retrained arms: own seeds, below
+                    continue
+                key = v["enc"] if v["enc"] in ("self", "input", "ctx3") else v["dist"]
                 if key not in Ds or ("gamma" in v["extra"] and gam is None):
                     na.append(vid)
                     continue
@@ -612,6 +648,26 @@ def prep_job(a):
                 store[f"{vid}|{tag}|x"], store[f"{vid}|{tag}|m"] = x, m
                 if want_smm and tag == "clean_seed42":
                     smm[vid] = PS.smoothed(lite, m, v["smooth"])
+        arm_vids = [v for v in variants if VARIANTS[v]["enc"].startswith("arm")]
+        smm_t = {}
+        for tag in (arm_tags() if arm_vids else []):  # retrained arms: the arm seeds (EUR_ARM_SEEDS), not V0's four
+            Ds = {}
+            for enc in sorted({VARIANTS[v]["enc"] for v in arm_vids}):
+                if (arm_dir(enc[3:]) / f"gae_v2_{tag}.pt").exists():      # absent: a chunk skipped by the guard
+                    Ds[enc] = conv(d_maha(encode(tag, adj, xn, f7, ckpt_dir=arm_dir(enc[3:]))), ext)
+            for vid in arm_vids:
+                v = VARIANTS[vid]
+                if v["enc"] not in Ds:
+                    na.append(f"{vid}|{tag}")
+                    continue
+                x, m = scalar_and_m(lite, member_series(Ds[v["enc"]], wf, v["members"], v["drift"]), [])
+                store[f"{vid}|{tag}|x"], store[f"{vid}|{tag}|m"] = x, m
+                if want_smm:
+                    sm = PS.smoothed(lite, m, v["smooth"])
+                    if v["kmode"] == "seed":
+                        smm_t.setdefault(vid, {})[tag] = sm
+                    elif tag == "clean_seed42":
+                        smm[vid] = sm
         if "O7" in variants:                 # O7 premise: lag-1 autocorrelation of the scalar within files (ok windows)
             for tag in TAGS:
                 for vid in ("V0", "O7"):
@@ -626,7 +682,7 @@ def prep_job(a):
         d.mkdir(parents=True, exist_ok=True)
         np.savez(d / f".{case}.npz", **store)
         (d / f".{case}.npz").replace(d / f"{case}.npz")
-        return _job_meta(t, case=case, src=src, job="prep", smm=smm, d0_bad=d0_bad, enc_maxabs=enc_bad,
+        return _job_meta(t, case=case, src=src, job="prep", smm=smm, smm_t=smm_t, d0_bad=d0_bad, enc_maxabs=enc_bad,
                          na=sorted(set(na)), hours=float(len(ok) * PS.WIN / 3600), mixdiag=mixdiag, mix1=mix1_bad)
     except SystemExit as e:
         return dict(case=case, src=src, job="prep", error=f"STOP: {e}")
@@ -643,17 +699,18 @@ def score_job(a):
         ctx, _ = R1.ctx_from_store(case, src, "r10")
         xm = np.load(SCR / "xm" / f"{case}.npz")
         rows, errs, curve, x0_bad, eng_bad = [], [], [], [], []
-        for tag in TAGS:
-            for vid in variants:
+        for vid in variants:
+            for tag in seeds_of(vid):
                 if f"{vid}|{tag}|x" not in xm.files:
                     continue
                 v = VARIANTS[vid]
                 x, m = xm[f"{vid}|{tag}|x"], xm[f"{vid}|{tag}|m"]
-                q = P3L.q_of(PS.smoothed(ctx, m, v["smooth"]), ks[vid])
+                kv = ks[vid][tag] if isinstance(ks[vid], dict) else ks[vid]
+                q = P3L.q_of(PS.smoothed(ctx, m, v["smooth"]), kv)
                 r_, e_ = [], []
                 for arm, (fl, cp) in ARMS.items():
                     run_budget_s(ctx, case, tag, x, q, fl, cp, arm, r_, e_, v["smooth"])
-                rows += [dict(r, variant=vid, set=set_name, q_raw=q, k=ks[vid]) for r in r_]
+                rows += [dict(r, variant=vid, set=set_name, q_raw=q, k=kv) for r in r_]
                 errs += [dict(e, variant=vid, set=set_name) for e in e_]
                 sm = PS.smoothed(ctx, x, v["smooth"])
                 for top in CURVE_TOPS:
@@ -738,13 +795,28 @@ def variant_pass(cases_src, workers, ks=None, check_enc=(), label="full"):
     if ks is None:
         ks = {}
         for vid in variants:
+            if VARIANTS[vid]["kmode"] == "seed":              # R0s: one k per seed, on that seed's own scores
+                ks[vid] = {}
+                for tag in seeds_of(vid):
+                    sm = [r["smm_t"][vid][tag] for r in prep if r["case"] in DEV and tag in r.get("smm_t", {}).get(vid, {})]
+                    if len(sm) == len(DEV):
+                        ks[vid][tag] = float(P3L.calibrate(sm))
+                continue
             sm = [r["smm"][vid] for r in prep if r["case"] in DEV and vid in r["smm"]]
             ks[vid] = float(P3L.calibrate(sm)) if len(sm) == len(DEV) else float("nan")
         rel = abs(ks["V0"] - K_RECORD) / abs(K_RECORD)
         R1.gate(dict(gate="G-kv0", status="PASS" if rel <= R1.TOL["k_rel"] else "FAIL", k=ks["V0"], k_record=K_RECORD,
                      rel=rel, summary=f"V0 k {ks['V0']:.9f} vs record {K_RECORD:.9f} (relative {rel:.1e})"))
-    pd.DataFrame([dict(variant=v, k=k, text=VARIANTS[v]["text"]) for v, k in ks.items()]).to_csv(
-        R1.out_dir() / "k.csv", index=False)
+    krows = []
+    for v, k in ks.items():
+        if isinstance(k, dict):
+            krows += [dict(variant=v, k=kk, text=VARIANTS[v]["text"], seed=t) for t, kk in k.items()]
+        else:
+            krows.append(dict(variant=v, k=k, text=VARIANTS[v]["text"]))
+    kd = pd.DataFrame(krows)
+    if "seed" in kd and kd["seed"].isna().all():
+        kd = kd.drop(columns="seed")
+    kd.to_csv(R1.out_dir() / "k.csv", index=False)
     t = time.time()
     specs = sorted([(c, s, ks, set_of(c, s), variants) for c, s in cases_src], key=lambda a: -_size(a[0], a[1]))
     sc = _run(score_job, specs, workers, f"score[{label}]")
@@ -921,11 +993,118 @@ def pc1_prepare(arms, workers):
     R1.gate(dict(gate="G-pc1vec", status="PASS" if ok else "FAIL", max_abs_diff=d, arms=smoke,
                  summary=f"train_masked (every column) = f1_core.train: max |weight diff| {d:.1e}; arms 2 epochs {smoke}"))
     R1.phase("pc1_gates", t)
+    reused = pc7_reuse(arms) if reuse_tags() else []
+    if pc7_ref() is not None:
+        pc7_platform_checks(meta)
     t = time.time()
     epochs = int(os.environ.get("EUR_PC1_EPOCHS", PC1_EPOCHS)) if os.environ.get("R2_TEST") else PC1_EPOCHS
-    res = _run(train_arm_job, [(a_, tg, epochs) for a_ in arms for tg in TAGS], workers, "pc1 training")
+    specs = [(a_, tg, epochs) for a_ in arms for tg in arm_tags() if (a_, tg) not in reused]
+    res = train_chunks(specs, workers)
     R1.phase("pc1_training", t)
     R1._jdump(R1.WORK / "eureka" / os.environ.get("EUR_TAG", "abl") / "pc1_training.json", res)
+
+
+def train_chunks(specs, workers):
+    """trainings in chunks of `workers` (4 in parallel on Kaggle); a further chunk starts only if the time so far + the
+    last chunk's duration + PC7_RESERVE_S stays within PC7_GUARD_H (gate G-guard records it). Without EUR_PC7_REF every
+    chunk runs (PC1 behaviour: one pool over all specs)."""
+    if pc7_ref() is None:
+        return _run(train_arm_job, specs, workers, "pc1 training")
+    guard_h = float(os.environ.get("EUR_TEST_GUARD_H", PC7_GUARD_H)) if os.environ.get("R2_TEST") else PC7_GUARD_H
+    res, skipped, chunks = [], [], []
+    for i in range(0, len(specs), max(1, workers)):
+        ch = specs[i:i + max(1, workers)]
+        el = time.time() - R1.T0
+        if chunks and el + chunks[-1]["s"] + PC7_RESERVE_S > guard_h * 3600:
+            skipped += [f"{a}/{t}" for a, t, _ in specs[i:]]
+            break
+        t = time.time()
+        res += _run(train_arm_job, ch, workers, "pc1 training")
+        chunks.append(dict(seeds=[f"{a}/{tg}" for a, tg, _ in ch], s=round(time.time() - t, 1),
+                           elapsed_h=round((time.time() - R1.T0) / 3600, 3)))
+    R1.gate(dict(gate="G-guard", status="PASS", chunks=chunks, skipped=skipped, guard_h=guard_h, reserve_s=PC7_RESERVE_S,
+                 summary=f"{sum(len(c['seeds']) for c in chunks)} trained in {len(chunks)} chunk(s); skipped {skipped}"))
+    return res
+
+
+def pc7_reuse(arms):
+    """copies the committed checkpoints of the reused seeds from EUR_PC7_REF/models/<arm>/ into this run (G-pc7reuse)."""
+    import shutil
+    ref, rows, bad, done = pc7_ref(), [], [], []
+    ep_want = int(os.environ.get("EUR_PC1_EPOCHS", PC1_EPOCHS)) if os.environ.get("R2_TEST") else PC1_EPOCHS
+    for a_ in arms:
+        out = arm_dir(a_)
+        out.mkdir(parents=True, exist_ok=True)
+        for tg in reuse_tags():
+            src = ref / "models" / a_
+            for f in REUSE_FILES:
+                p = src / f.format(t=tg)
+                if not p.exists():
+                    bad.append(f"missing {p}")
+                    continue
+                shutil.copyfile(p, out / p.name)
+                rows.append(dict(arm=a_, seed=tg, file=p.name, sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
+            js = out / f"gae_v2_{tg}.json"
+            if js.exists():
+                m = json.loads(js.read_text())
+                ki, ko = PC1_ARMS[a_]
+                if not (m.get("keep_in") == ki and m.get("keep_out") == ko and m.get("epochs") == ep_want
+                        and m.get("G2") == "PASS"):
+                    bad.append(f"{a_}/{tg}: json columns / epochs / G2 differ")
+            done.append((a_, tg))
+    pd.DataFrame(rows).to_csv(R1.out_dir() / "reused_checkpoints.csv", index=False)
+    R1.gate(dict(gate="G-pc7reuse", status="PASS" if not bad else "FAIL", bad=bad, reused=[f"{a}/{t}" for a, t in done],
+                 summary=f"{len(done)} checkpoints copied from {ref.relative_to(REPO)}; sha256 in reused_checkpoints.csv"
+                 if not bad else str(bad)))
+    return done
+
+
+def note(rec):
+    """a recorded check that does not stop the run (G-pc7plat, G-pc7rep): status PASS or DIFF."""
+    STATE["gates"].append(rec)
+    R1._jdump(R1.out_dir() / "gates.json", STATE["gates"])
+    log(f"{rec['gate']}: {rec['status']} ({rec.get('summary')})")
+
+
+def pc7_platform_checks(meta):
+    """G-pc7plat (library versions = the reference run) and G-pc7rep (R0 seed 42 retrained for 1 epoch on the full
+    training data: epoch-1 loss = the reference training log exactly). Recorded, no stop (pooling rule of the design)."""
+    ref = pc7_ref()
+    want = json.loads((ref / "run_meta.json").read_text()).get("versions", {})
+    got = json.loads((R1.out_dir() / "run_meta.json").read_text()).get("versions", {})
+    keys = ("python", "numpy", "scipy", "sklearn", "pandas", "torch", "torch_geometric")
+    diff = {k: (got.get(k), want.get(k)) for k in keys if got.get(k) != want.get(k)}
+    note(dict(gate="G-pc7plat", status="PASS" if not diff else "DIFF", diff=diff, stops=False,
+              summary="library versions = the reference run" if not diff else f"differ: {diff}"))
+    log_f = ref / "models" / "R0" / "training_log_clean_seed42.csv"
+    want_l = float(pd.read_csv(log_f, float_precision="round_trip").query("epoch == 1").train_loss.iloc[0])  # exact digits
+    _, info, rows = train_masked(TRAIN, meta, 42, *PC1_ARMS["R0"], 1, tag=" G-pc7rep")
+    got_l = float(rows[0]["train_loss"])
+    note(dict(gate="G-pc7rep", status="PASS" if got_l == want_l else "DIFF", got=repr(got_l), want=repr(want_l),
+              stops=False, s=info["fit_s"], summary=f"epoch-1 loss {got_l!r} vs reference {want_l!r}"))
+
+
+def pc7_final_gates(ks):
+    """G-pc7k (R0's k = the reference k) and G-pc7r0 (the reused seeds' R0 rows = the reference rows), after the run."""
+    ref = pc7_ref()
+    kr = pd.read_csv(ref / "k.csv")
+    want = float(kr[kr.variant == "R0"].k.iloc[0])
+    rel = abs(ks["R0"] - want) / abs(want)
+    R1.gate(dict(gate="G-pc7k", status="PASS" if rel <= R1.TOL["k_rel"] else "FAIL", k=ks["R0"], k_ref=want, rel=rel,
+                 summary=f"R0 k {ks['R0']:.9f} vs reference {want:.9f} (relative {rel:.1e})"))
+    bad = {}
+    seeds = set(reuse_tags())
+    for f in ("per_subject.csv", "errors.csv"):
+        a = pd.read_csv(R1.out_dir() / f)
+        b = pd.read_csv(ref / f)
+        a = a[(a.variant == "R0") & a.seed.isin(seeds)]
+        b = b[(b.variant == "R0") & b.seed.isin(seeds)]
+        ca = a.sort_values(list(a.columns), kind="mergesort").reset_index(drop=True)
+        cb = b[list(a.columns)].sort_values(list(a.columns), kind="mergesort").reset_index(drop=True)
+        if len(a) == 0 or not ca.equals(cb):
+            bad[f] = dict(rows=len(a), ref_rows=len(b))
+    R1.gate(dict(gate="G-pc7r0", status="PASS" if not bad else "FAIL", bad=bad,
+                 summary=f"R0 rows of {sorted(seeds)} = the reference rows (per_subject, errors)" if not bad else str(bad)))
 
 
 def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False):
@@ -935,12 +1114,13 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     sel = selected()
     need_ref = any(VARIANTS[v]["dist"] == "ref" for v in sel)
     meta = R1.run_meta(tag, notebook, repo_commit)
-    meta.update(eur_abl_sha=CODE_SHA, code_shas=code_shas(), variants={v: VARIANTS[v] for v in sel}, workers=workers)
+    meta.update(eur_abl_sha=CODE_SHA, code_shas=code_shas(), variants={v: VARIANTS[v] for v in sel}, workers=workers,
+                arm_seeds=arm_tags(), arm_reuse=reuse_tags(), pc7_ref=os.environ.get("EUR_PC7_REF", ""))
     R1._jdump(R1.out_dir() / "run_meta.json", meta)
     self_checks()
     src = build_views(DEV, TEST, EXT)
     gate_data(src)
-    arms = [VARIANTS[v]["enc"][3:] for v in sel if VARIANTS[v]["enc"].startswith("arm")]
+    arms = list(dict.fromkeys(VARIANTS[v]["enc"][3:] for v in sel if VARIANTS[v]["enc"].startswith("arm")))  # R0s = R0
     if arms:
         pc1_prepare(arms, workers)
     # ---- SMOKE (the small check before the full run): chb01 + chb03 (+ first external case), measured
@@ -983,6 +1163,8 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     cs = [(c, "earlier") for c in DEV + TEST] + [(c, "ext") for c in EXT]
     prep, sc, ks, na, jobs = variant_pass(cs, workers, check_enc={DEV[0], TEST[0], EXT[0]} if EXT else {DEV[0], TEST[0]})
     write_outputs(sc, "")
+    if pc7_ref() is not None:
+        pc7_final_gates(ks)
     jobs.to_csv(R1.out_dir() / "jobs.csv", index=False)
     R1._jdump(R1.out_dir() / "not_available.json", na)
     R1.finish_meta(dict(ks=ks))

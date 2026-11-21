@@ -126,3 +126,53 @@ small numerical perturbations).
   machine recorded); the T1 script reads chb01_01 "record state" and chb24_01 "same" on the synthetic record, writes
   only to its own folder and resumes. Observed on the synthetic world (not evidence about real EEG): chb24_01 moved by
   5.7e-3 under the 2⁻⁴⁰ perturbation.
+
+## 7 · Training and reading (author 21/11 19:13, option A; written before any training output)
+
+**Seen before this design.** T1 (`results/fa15/diag_laptop/`, laptop, V9-X6's own code, 713 s): the 10 differing files
+equal the record exactly on the laptop (max 0.0) and differ from Kaggle; the 2 controls equal both → **the G-asr
+differences are the platform** (laptop vs Kaggle arithmetic; the laptop reproduces the record even with numpy 2.4.4 /
+scipy 1.17.1). T2 (`results/fa15/perturb/`, 1.382 h, 70 / 70 files, every gate PASS): a relative input change of
+9.1e-13 changes ASR's Measure 1 beyond 1e-9 in **12 of 70 files** (up to 0.34 in a window share); 10 of the 11 files
+that differ from the record are among them; Kaggle P0 = the data run's Measure 1 in 58 / 58 files. B1 / B2 (3.756 h /
+4.159 h; 10 + 9 cases; G-conv PASS, worst 2.86e-3; G-lab, G-done, G-worker-sha PASS; G-asr B2: chb06_01, chb18_31 differ —
+platform (T1) and perturbation-sensitive (T2)). The ASR data of all 38 cases exist and are internally consistent; B1,
+B2 and T2 ran on Intel Xeon 2.20 GHz without AVX-512.
+
+**Arms (one factor: ASR in the preprocessing).** Both = the path-2 recipe (r2_r1.train_job unchanged, 200 epochs, 3,964
+parameters), k per seed (p3_levers.calibrate on each seed's own model, 15 development cases), p3c_freeze.run_budget for
+the 4 budget arms × 3 stages on every set. **Control** = R0's data: seeds 42, 1, 2, 3, 4 committed
+(`results/r2/r1_system/rp`) + seeds 5, 6, 7 (notebook `FA15_RUN_CTRL`). **ASR** = the ASR datasets
+(`nhn2mm/fa15-asr-features-a`, `nhn2mm/fa15-asr-features-b1`, `norncreades/fa15-asr-features-b2`): seeds 42, 1, 2, 3
+(`FA15_RUN_ASR_A`) and 4, 5, 6, 7 (`FA15_RUN_ASR_B`). 8 seeds per arm: PC7's minimal detectable development
+sensitivity difference ≈ 0.03 with 8 seeds per arm (≈ 0.04–0.05 with 4; handback Part 28.2). The ASR arm's 5-SD flags
+and z-score statistics are those of the cleaned signal (approved 15/11); its expected training-window counts are counted
+from the ASR files.
+
+**Gates** (`src/fa15_run.py` docstring): G-mod (r2_r1 76cbe51f, r2_rp 5281446e = the control's code), mode, G-data,
+**G-repro** (the control's committed seed-4 checkpoint rescored by this path with its k = its committed rp2 rows), ctrl
+G-const-new, asr G-asr-data / G-asr-counts, G-vec, training, RUN-complete, G-worker-sha; machine in `run_meta`.
+
+**Reading** (`src/fa15_aggregate.py`, committed before the runs; gate A0 already PASS on the real record, 240 / 240
+per-seed rows): per-patient means after the localizer; sets development, test, chb24, Siena; held-out (0.5 %) and final
+(per-patient budget); sensitivity, F1, FP/day, precision; control and ASR mean ± SD over seeds; **ASR − control with a
+two-level bootstrap** (patients as units, chb01 + chb21 one unit; seeds resampled within each arm; B = 10,000) — the
+patient bootstrap of seed means alone omits training variation (PC7); chb24 seeds only; per-seed and per-patient tables;
+onset / offset median |error| (descriptive); training-window counts of both arms. No threshold, every set reported, no
+primary set (no selection is made from this result; R214 does not apply — a project verification, R204).
+
+**Not separated (information, plan §14):** the effect of the stricter 5-SD flag (fewer clean training windows) from
+the signal change itself — an extra arm (ASR features with R0's training mask, 8 seeds) would separate them.
+**Machine types:** recorded; PC7 found no difference between Kaggle's two types (permutation p 0.098).
+
+**Code and test (21/11 evening):** `src/fa15_run.py` (sha16 `effcdf70588ae6b1`), `src/fa15_aggregate.py`
+(`8933129c1c826ed7`), `src/fa15_make_notebooks.py` (`--train`), `src/fa15_run_synthetic_test.py`: **15 / 15 checks PASS**
+(6,820 s, build container) on the synthetic R1 / RP world (the real R1_RUN and RP_RUN notebooks, 3 epochs, as the
+control record; fake ASR datasets with perturbed features and ~10 % of the 5-SD flags flipped, split over three inputs):
+the three notebooks run with every gate PASS in mode exact (G-repro every row exact; the ASR runs read only the ASR
+inputs, train on the ASR counts — 3,352 vs R0's 3,696 windows — and score differently from the control); the aggregate
+A0 / A1 / A2 PASS and writes every table (chb24 seeds-only bootstrap); A0 on the real record 240 / 240; negative paths
+G-repro, G-asr-data, G-worker-sha, A1, A2 STOP; resume imports only the notebook's own previous seeds (a control output
+attached to FA15_RUN_ASR_B is not imported). The test's `--reuse` / `--only-resume` options were added after that run;
+`--only-resume` was run on the same world: 2 / 2 PASS (1,364 s). G-mod passes in the test by its switch (the synthetic
+repository's shas differ); its comparison is checked on Kaggle by the notebook's own sha asserts.

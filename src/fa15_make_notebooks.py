@@ -10,6 +10,8 @@ plan §12 15/11 12:40):
   --bsplit COMMIT notebooks/fa15/FA15_DATA_B1.ipynb, _B2.ipynb: part b of split.json re-split in two by hours (LPT;
                   FA15_DATA_A measured 10.5 h for 561 h of EEG), no pre-gates (author 21/11 13:30, chat D35-F)
   --perturb COMMIT notebooks/fa15/FA15_PERTURB.ipynb: diagnostic T2 (src/fa15_perturb.py), the 70 V9-X6 files
+  --train COMMIT  notebooks/fa15/FA15_RUN_CTRL.ipynb, FA15_RUN_ASR_A.ipynb, FA15_RUN_ASR_B.ipynb: training and scoring
+                  (src/fa15_run.py; design results/fa15/DESIGN_D35F.md §7, author 21/11 19:13)
 Each clones github.com/Nhanvas/Thesis at the pinned COMMIT (40-hex, never a tag) and checks the sha256 of fa15_asr.py.
 Inputs: the raw dataset (bonesclarke26/combined-siena-scalp-and-chb-mit-eeg-datasets), thesis-r2-chbmit-features
 (nhn2mm), thesis-r2-external-features (norncreades). Internet ON (pip, git, PhysioNet SHA256SUMS). CPU.
@@ -201,14 +203,107 @@ print("failed gates:", FAILED or "none")
           run_cell=run_cell, does="diagnostic T2 (src/fa15_perturb.py): the 70 V9-X6 files twice, as is and x (1 + 2^-40); ")
 
 
+TRAIN_NB = {
+    "ctrl": ("FA15_RUN_CTRL", "control: seeds 5, 6, 7 of the path-2 recipe on R0's data",
+             ["thesis-r2-chbmit-features (nhn2mm)", "thesis-r2-external-features (norncreades)"]),
+    "asr_a": ("FA15_RUN_ASR_A", "ASR arm: seeds 42, 1, 2, 3 of the path-2 recipe on the ASR data",
+              ["thesis-r2-chbmit-features (nhn2mm)", "thesis-r2-external-features (norncreades)",
+               "fa15-asr-features-a (nhn2mm)", "fa15-asr-features-b1 (nhn2mm)", "fa15-asr-features-b2 (norncreades)"]),
+    "asr_b": ("FA15_RUN_ASR_B", "ASR arm: seeds 4, 5, 6, 7 of the path-2 recipe on the ASR data",
+              ["thesis-r2-chbmit-features (nhn2mm)", "thesis-r2-external-features (norncreades)",
+               "fa15-asr-features-a (nhn2mm)", "fa15-asr-features-b1 (nhn2mm)", "fa15-asr-features-b2 (norncreades)"]),
+}
+R_SHAS = {"r2_core.py": "902d15ad4feb3e8a", "r2_r1.py": "76cbe51ff0180d4a", "r2_rp.py": "5281446e6168312e"}
+PKGS_RUN = '"mne==1.12.1", "torch_geometric==2.7.0", "ruptures==1.1.10", "timescoring==0.0.7"'
+
+
+def build_train(commit):
+    """the three training notebooks (fa15_run.run(arm)); the repository is imported from the clone with sha checks."""
+    sha = sha_at(commit, "src/fa15_run.py")
+    for arm, (name, does, inputs) in TRAIN_NB.items():
+        cells = [md(f"""
+# {name} — F-A1.5 / PC5 training and scoring (project verification, board R204)
+
+**Design:** `results/fa15/DESIGN_D35F.md` §7 (author 21/11 19:13, option A). **Does:** {does}; gates G-mod, mode, G-data,
+G-repro (the control's seed 4 rescored = its committed rows){", G-const-new" if arm == "ctrl" else ", G-asr-data, G-asr-counts"},
+G-vec, training (r2_r1.train_job unchanged, 200 epochs, one worker per seed), k per seed, scoring of every set (4 budget arms
+x 3 stages), RUN-complete, G-worker-sha. **Accelerator:** None (CPU). **Internet:** ON.
+**Inputs:** {", ".join(f"`{x}`" for x in inputs)}.
+**Runtime:** ≈ 4.5–8.5 h (computed: R1_RUN measured 4.64 h for 4 seeds; EUR_PC7_B 8.39 h on the slower machine type).
+Code: `github.com/Nhanvas/Thesis` at `{commit[:7]}`; `src/fa15_run.py` sha256 `{sha}` (checked). A STOP is recorded; the END
+cell archives the results, then raises `STOPPED: ...`. Do not edit; *Save Version → Save & Run All (Commit)*.
+"""), code(f"""
+# SETUP: packages + repository at the pinned commit (read only), sha checks
+import os, sys, subprocess, time, json, hashlib, shutil
+T_NB = time.time()
+os.environ["R2_T0"] = str(T_NB)
+NOTEBOOK, REPO_COMMIT, ARM = "{name}", "{commit}", "{arm}"
+TEST = bool(os.environ.get("R2_TEST_REPO"))                      # synthetic test in the build container only
+WORK = os.environ.get("R2_TEST_WORK", "/kaggle/working")
+INPUT = os.environ.get("R2_TEST_INPUT", "/kaggle/input")
+SCRATCH = os.environ.get("R2_TEST_SCRATCH", "/tmp/r2")
+for v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ[v] = "1"
+if TEST:
+    REPO = os.environ["R2_TEST_REPO"]
+else:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", {PKGS_RUN}])
+    REPO = "/tmp/Thesis"
+    if not os.path.exists(REPO + "/src/fa15_run.py"):
+        r = subprocess.run(f"git init -q {{REPO}} && cd {{REPO}} && git remote add origin https://github.com/Nhanvas/Thesis.git "
+                           f"&& git fetch -q --depth 1 origin {{REPO_COMMIT}} && git checkout -q FETCH_HEAD", shell=True)
+        if r.returncode != 0:
+            subprocess.check_call(f"rm -rf {{REPO}} && git clone -q https://github.com/Nhanvas/Thesis.git {{REPO}} "
+                                  f"&& cd {{REPO}} && git checkout -q {{REPO_COMMIT}}", shell=True)
+    head = subprocess.check_output(["git", "-C", REPO, "rev-parse", "HEAD"]).decode().strip()
+    assert head == REPO_COMMIT, f"wrong commit {{head}}"
+for f, want in {json.dumps(dict(R_SHAS, **{"fa15_run.py": sha}))}.items():
+    got = hashlib.sha256(open(f"{{REPO}}/src/{{f}}", "rb").read()).hexdigest()[:16]
+    assert TEST or got == want, f"{{f}} sha {{got}} != {{want}}"
+os.environ.update(THESIS_REPO=REPO, R2_WORK=WORK, R2_INPUT=INPUT, R2_SCRATCH=SCRATCH)
+for p in ("src", "src/dataprep", "src/retrain", "src/phaseB", "src/phaseC"):
+    sys.path.insert(0, REPO + "/" + p)
+import torch
+torch.set_num_threads(1)
+print("repository", REPO, "CPU cores", os.cpu_count(), f"({{time.time()-T_NB:.0f}}s)")
+"""), code("""
+# RUN: gates, training, k per seed, scoring (fa15_run.run); a STOP is kept and reported at the end
+import fa15_run as FR
+R1 = FR.R1
+EPOCHS = int(os.environ.get("R2_TEST_EPOCHS", 200)) if TEST else 200        # the recipe: 200 (test mode only fewer)
+STOP = None
+try:
+    FR.run(ARM, notebook=NOTEBOOK, commit=REPO_COMMIT, epochs=EPOCHS)
+except SystemExit as e:
+    STOP = str(e)
+print("stop:", STOP or "none")
+"""), code("""
+# END: SUMMARY.md, measured runtime, archive of the output folder (small files and the checkpoints)
+print(FR.summary_md())
+meta = R1.finish_meta(dict(stop=STOP))
+print(f"MEASURED notebook runtime: {meta['runtime_h']} h | phases (s): {meta['phases_s']}")
+OUT = R1.out_dir()
+ZIP = shutil.make_archive(os.path.join(WORK, f"{OUT.name}_results"), "zip", root_dir=str(OUT.parent), base_dir=OUT.name)
+print("results archive:", ZIP, f"{os.path.getsize(ZIP) / 1e6:.1f} MB")
+if STOP:
+    raise RuntimeError(f"STOPPED: {STOP[:1500]} (results archived)")
+""")]
+        nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+                                           "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
+        OUTDIR.mkdir(parents=True, exist_ok=True)
+        (OUTDIR / f"{name}.ipynb").write_text(json.dumps(nb, indent=1))
+        print("written", OUTDIR / f"{name}.ipynb", "fa15_run sha", sha)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke")
     ap.add_argument("--data")
     ap.add_argument("--bsplit")
     ap.add_argument("--perturb")
+    ap.add_argument("--train")
     a = ap.parse_args()
-    for c in (a.smoke, a.data, a.bsplit, a.perturb):
+    for c in (a.smoke, a.data, a.bsplit, a.perturb, a.train):
         if c and c != "WORKTREE" and not re.fullmatch(r"[0-9a-f]{40}", c):
             raise SystemExit("pin a 40-hex commit hash (never a tag)")
     if a.smoke:
@@ -221,6 +316,8 @@ def main():
         build_bsplit(a.bsplit)
     if a.perturb:
         build_perturb(a.perturb)
+    if a.train:
+        build_train(a.train)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,65 @@
+{
+ "m_gates": "PASS",
+ "m0": "PASS",
+ "m1": "PASS",
+ "m2": "PASS",
+ "info": {
+  "pc7_A": {
+   "G-pc7rep": "PASS",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  },
+  "pc7_B": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  }
+ },
+ "reused": [
+  "clean_seed1",
+  "clean_seed2",
+  "clean_seed3",
+  "clean_seed42"
+ ],
+ "trained": {
+  "pc7_A": [
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed8",
+   "clean_seed9",
+   "clean_seed10",
+   "clean_seed11"
+  ],
+  "pc7_B": [
+   "clean_seed12",
+   "clean_seed13",
+   "clean_seed14",
+   "clean_seed15",
+   "clean_seed16",
+   "clean_seed17",
+   "clean_seed18",
+   "clean_seed19"
+  ]
+ },
+ "pooled": false,
+ "primary_seeds": [
+  "clean_seed4",
+  "clean_seed5",
+  "clean_seed6",
+  "clean_seed7",
+  "clean_seed8",
+  "clean_seed9",
+  "clean_seed10",
+  "clean_seed11",
+  "clean_seed12",
+  "clean_seed13",
+  "clean_seed14",
+  "clean_seed15",
+  "clean_seed16",
+  "clean_seed17",
+  "clean_seed18",
+  "clean_seed19"
+ ]
+}

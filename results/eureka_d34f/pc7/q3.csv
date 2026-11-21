@@ -1,0 +1,19 @@
+metric,n_per_arm,method,mdd95,mdd80
+sens,4,empirical (disjoint seed groups x patient bootstrap),0.047921913496969296,
+sens,8,empirical (disjoint seed groups x patient bootstrap),0.033569334960546704,
+sens,4,variance components,0.039546276829781554,0.05649468118540221
+sens,8,variance components,0.027963440517018982,0.03994777216716997
+sens,12,variance components,0.02283205357312184,0.032617219390174056
+sens,20,variance components,0.01768563264968329,0.025265189499547553
+f1,4,empirical (disjoint seed groups x patient bootstrap),0.01912902150165486,
+f1,8,empirical (disjoint seed groups x patient bootstrap),0.014399110810026408,
+f1,4,variance components,0.01647069942119551,0.02352957060170787
+f1,8,variance components,0.01164654325161269,0.01663791893087527
+f1,12,variance components,0.009509362744568641,0.013584803920812344
+f1,20,variance components,0.007365920708551921,0.010522743869359885
+fa,4,empirical (disjoint seed groups x patient bootstrap),1.4064287580742842,
+fa,8,empirical (disjoint seed groups x patient bootstrap),1.0227291281244026,
+fa,4,variance components,1.037557318058828,1.4822247400840398
+fa,8,variance components,0.7336638154691247,1.0480911649558926
+fa,12,variance components,0.5990339968809305,0.8557628526870436
+fa,20,variance components,0.4640097387463819,0.6628710553519741

@@ -1,0 +1,13 @@
+subject,file,role,kaggle_run,max_vs_record,highamp_only_record,equal_record,max_vs_kaggle,highamp_only_kaggle,equal_kaggle,reading
+chb03,chb03_01.edf,differs,a,0.0,0,True,0.002833624204134244,0,False,platform
+chb03,chb03_02.edf,differs,a,0.0,0,True,0.0732049837693608,0,False,platform
+chb15,chb15_10.edf,differs,a,0.0,0,True,0.02632577704940431,0,False,platform
+chb15,chb15_20.edf,differs,a,0.0,0,True,0.1292523758515125,0,False,platform
+chb15,chb15_62.edf,differs,a,0.0,0,True,0.34219220535820516,0,False,platform
+chb16,chb16_11.edf,differs,a,0.0,0,True,0.00201944442756552,0,False,platform
+chb16,chb16_16.edf,differs,a,0.0,0,True,0.07137294872011735,0,False,platform
+chb16,chb16_18.edf,differs,a,0.0,0,True,0.016830272244557354,0,False,platform
+chb24,chb24_14.edf,differs,a,0.0,0,True,0.14329858659475148,0,False,platform
+chb06,chb06_01.edf,differs,smoke,0.0,0,True,0.0038673787443492813,0,False,platform
+chb03,chb03_03.edf,control,a,0.0,0,True,9.814371537686384e-14,0,True,same
+chb16,chb16_17.edf,control,a,0.0,0,True,1.609823385706477e-13,0,True,same

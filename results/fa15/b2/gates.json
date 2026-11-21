@@ -1,0 +1,345 @@
+[
+ {
+  "gate": "G-mod",
+  "status": "PASS",
+  "summary": "closed modules from /tmp/Thesis/src; fa15_asr f9a548e45cfed9a6, v9_x6_asr 9cb96ecdc50b45e7"
+ },
+ {
+  "gate": "mode",
+  "status": "PASS",
+  "mode": "exact",
+  "versions": {
+   "python": "3.13.18",
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "pandas": "2.3.3",
+   "mne": "1.12.1",
+   "asrpy": "0.0.8"
+  },
+  "differing": {
+   "chb": {},
+   "ext": {}
+  },
+  "summary": "exact (versions vs R0's run_meta); asrpy 0.0.8"
+ },
+ {
+  "gate": "R0.1-inventory",
+  "status": "PASS",
+  "files": 159,
+  "from_physionet": 0,
+  "summary": "159 files sha256 = PhysioNet (0 downloaded)"
+ },
+ {
+  "gate": "G-ref",
+  "status": "PASS",
+  "missing": [],
+  "differ_from_pin": [],
+  "pinned_checked": 15,
+  "files": {
+   "chb07.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb07.npz",
+    "sha256": "014c6a6cf030e91210fe99135e669c182ae68bb2eefaa7c8fccb983ac83ab513"
+   },
+   "chb07_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb07_stats.json",
+    "sha256": "0be8d590467f4ff89da7e8bfaa662a989e3a53b2540207bd1e0ba4ccb0e724be"
+   },
+   "chb06.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06.npz",
+    "sha256": "eb45bb3e88038acc87c0623de35380574da75a39ef6a11a800dd656563152d71"
+   },
+   "chb06_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06_stats.json",
+    "sha256": "603f679ff80a6c70ab6fb01c68f6c7c3919b327a0b802720ed00b86e4390f151"
+   },
+   "chb18.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb18.npz",
+    "sha256": "2f3388943ed97f21065b2db7fb6050ea5b6cab562a7ebcd53b7f58cae2f17da4"
+   },
+   "chb18_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb18_stats.json",
+    "sha256": "1c845d4a34f56b1337a1da5b66a777567c9ad1449cfa5ce625a568b796177a1e"
+   },
+   "chb21.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb21.npz",
+    "sha256": "051c1a773ad3e589323648d7f38abdd0c9ddfb02561a7912b0070c735f57d334"
+   },
+   "chb21_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb21_stats.json",
+    "sha256": "0ffc64f128ab3643c3dce290481c5af79474032b847fc0f80df67a910ca2c893"
+   },
+   "chb23.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb23.npz",
+    "sha256": "ddd7591c4118cdc56b501428b9ec1a4b1e907748f819804f75db5c7efd57384f"
+   },
+   "chb23_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb23_stats.json",
+    "sha256": "0c726cad148256aab613c8d503f34a5bc4c71f6e765fc0bf6843473e0e803f5b"
+   },
+   "chb12.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb12.npz",
+    "sha256": "4c84ca3fa1ee42a4fe47d2331765e6dcb181b625dfe0cbb99f4f5d501cc36ef3"
+   },
+   "chb12_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb12_stats.json",
+    "sha256": "90fc63ea4144a4933daba296ef7f443a51068a733572ea354f3733d7cb7982de"
+   },
+   "PN10_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN10_lf.npz",
+    "sha256": "b7a31f6b7a1603be5830697f925a194ee905ba2056ff2ce1863b4e1a37785f1e"
+   },
+   "PN09_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN09_lf.npz",
+    "sha256": "255ef4593b50afda80841a6a3a2281302d315e9aef21b82238bd3d694064f409"
+   },
+   "PN16_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN16_lf.npz",
+    "sha256": "6f59ad088a27d7f24d682e3a0ca7f76566178a35bc1fa32356df0f35da191358"
+   }
+  },
+  "summary": "15 R0 reference files; 15 checked against the pin; missing []; differ []"
+ },
+ {
+  "gate": "G-conv",
+  "status": "PASS",
+  "failed": [],
+  "tol": 0.01,
+  "worst": 0.0006662883916446776,
+  "summary": "9 cases; worst relative difference 6.66e-04; beyond 0.01: []"
+ },
+ {
+  "gate": "G-lab",
+  "status": "PASS",
+  "failed": [],
+  "summary": "labels / buffer / signal loss / file index / files = R0 in 9 of 9 cases"
+ },
+ {
+  "gate": "G-asr",
+  "status": "FAIL",
+  "files": 13,
+  "seizure_rows": 16,
+  "max_abs": {
+   "share_seizure": 0.015468625171088712,
+   "share_preictal60": 0.017324008153529413,
+   "contrast_before": 5.1514348342607263e-14,
+   "contrast_after": 0.03243537107154726,
+   "highamp_share": 0.10114034818775908,
+   "background_share_sorted": 0.21327485499597426
+  },
+  "highamp_windows_in_one_set_only": 0,
+  "tol": 0.001,
+  "tol_explain": 1e-09,
+  "classes": {
+   "exact": 11,
+   "within_tol": 0,
+   "explained": 0,
+   "beyond": 2
+  },
+  "unexplained": [
+   [
+    "chb06",
+    "chb06_01.edf"
+   ],
+   [
+    "chb18",
+    "chb18_31.edf"
+   ]
+  ],
+  "worker_sha_bad": [],
+  "detail": [
+   {
+    "subject": "chb06",
+    "file": "chb06_01.edf",
+    "seizures": 3,
+    "highamp_here": 252,
+    "highamp_record": 252,
+    "background_here": 179,
+    "background_record": 179,
+    "max_abs": 0.0038673787443492813,
+    "cls": "beyond",
+    "explained_by": null,
+    "tried": [
+     {
+      "chunk_s": 300.0,
+      "mem_splits": 49,
+      "max_abs": 0.027100333517087134,
+      "asr_s": 169.7
+     }
+    ]
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_04.edf",
+    "seizures": 2,
+    "highamp_here": 50,
+    "highamp_record": 50,
+    "background_here": 31,
+    "background_record": 31,
+    "max_abs": 5.440092820663267e-14,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_09.edf",
+    "seizures": 1,
+    "highamp_here": 1466,
+    "highamp_record": 1466,
+    "background_here": 1659,
+    "background_record": 1659,
+    "max_abs": 2.279842981067759e-13,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_10.edf",
+    "seizures": 1,
+    "highamp_here": 1690,
+    "highamp_record": 1690,
+    "background_here": 1018,
+    "background_record": 1018,
+    "max_abs": 1.1360357099476914e-13,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_13.edf",
+    "seizures": 1,
+    "highamp_here": 97,
+    "highamp_record": 97,
+    "background_here": 29,
+    "background_record": 29,
+    "max_abs": 7.854827899222983e-15,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_18.edf",
+    "seizures": 1,
+    "highamp_here": 1088,
+    "highamp_record": 1088,
+    "background_here": 861,
+    "background_record": 861,
+    "max_abs": 1.2218004385999848e-13,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb06",
+    "file": "chb06_24.edf",
+    "seizures": 1,
+    "highamp_here": 1175,
+    "highamp_record": 1175,
+    "background_here": 1171,
+    "background_record": 1171,
+    "max_abs": 1.0774714453987144e-13,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_29.edf",
+    "seizures": 1,
+    "highamp_here": 21,
+    "highamp_record": 21,
+    "background_here": 848,
+    "background_record": 848,
+    "max_abs": 6.020184351029911e-14,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_30.edf",
+    "seizures": 1,
+    "highamp_here": 12,
+    "highamp_record": 12,
+    "background_here": 123,
+    "background_record": 123,
+    "max_abs": 8.7360674250192e-15,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_31.edf",
+    "seizures": 1,
+    "highamp_here": 337,
+    "highamp_record": 337,
+    "background_here": 184,
+    "background_record": 184,
+    "max_abs": 0.21327485499597426,
+    "cls": "beyond",
+    "explained_by": null,
+    "tried": [
+     {
+      "chunk_s": 300.0,
+      "mem_splits": 8,
+      "max_abs": 0.2124588288135782,
+      "asr_s": 29.78
+     },
+     {
+      "chunk_s": 1000000000000.0,
+      "mem_splits": 3,
+      "max_abs": 0.21327485499597426,
+      "asr_s": 31.76
+     }
+    ]
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_32.edf",
+    "seizures": 1,
+    "highamp_here": 362,
+    "highamp_record": 362,
+    "background_here": 115,
+    "background_record": 115,
+    "max_abs": 6.23945339839338e-14,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_35.edf",
+    "seizures": 1,
+    "highamp_here": 252,
+    "highamp_record": 252,
+    "background_here": 297,
+    "background_record": 297,
+    "max_abs": 2.0250467969162855e-13,
+    "cls": "exact",
+    "explained_by": null
+   },
+   {
+    "subject": "chb18",
+    "file": "chb18_36.edf",
+    "seizures": 1,
+    "highamp_here": 35,
+    "highamp_record": 35,
+    "background_here": 80,
+    "background_record": 80,
+    "max_abs": 4.490852134608758e-14,
+    "cls": "exact",
+    "explained_by": null
+   }
+  ],
+  "summary": "13 V9-X6 files, 16 seizures; classes {'exact': 11, 'within_tol': 0, 'explained': 0, 'beyond': 2}; unexplained [('chb06', 'chb06_01.edf'), ('chb18', 'chb18_31.edf')]; max |diff| at 60-s chunks 2.13e-01"
+ },
+ {
+  "gate": "G-done",
+  "status": "PASS",
+  "missing": [],
+  "summary": "9 of 9 cases written"
+ },
+ {
+  "gate": "G-worker-sha",
+  "status": "PASS",
+  "expected": "f9a548e45cfed9a6",
+  "jobs": 156,
+  "differ": [],
+  "summary": "156 of 156 jobs ran fa15_asr f9a548e45cfed9a6; differ []"
+ }
+]

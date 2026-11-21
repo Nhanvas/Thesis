@@ -1,0 +1,49 @@
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+/tmp/Thesis/src/dataprep/preprocessing.py:138: RuntimeWarning: Scaling factor is not defined in following channels:
+--0, --1, --2, --3
+  raw = mne.io.read_raw_edf(str(edf_path), preload=False, verbose=False)
+  chb18/chb18_01.edf: 902 windows, flagged 615 (20s)
+  chb18/chb18_02.edf: 900 windows, flagged 462 (39s)
+  chb18/chb18_03.edf: 900 windows, flagged 437 (64s)
+  chb18/chb18_04.edf: 900 windows, flagged 654 (85s)
+  chb18/chb18_05.edf: 900 windows, flagged 561 (104s)
+  chb18/chb18_06.edf: 900 windows, flagged 311 (123s)
+  chb18/chb18_07.edf: 900 windows, flagged 374 (142s)
+  chb18/chb18_08.edf: 900 windows, flagged 428 (161s)
+  chb18/chb18_09.edf: 900 windows, flagged 673 (181s)
+  chb18/chb18_10.edf: 900 windows, flagged 168 (202s)
+  chb18/chb18_11.edf: 900 windows, flagged 399 (225s)
+  chb18/chb18_12.edf: 900 windows, flagged 540 (243s)
+  chb18/chb18_13.edf: 900 windows, flagged 292 (266s)
+  chb18/chb18_14.edf: 900 windows, flagged 312 (294s)
+  chb18/chb18_15.edf: 900 windows, flagged 362 (318s)
+  chb18/chb18_16.edf: 900 windows, flagged 425 (351s)
+  chb18/chb18_17.edf: 900 windows, flagged 712 (377s)
+  chb18/chb18_18.edf: 900 windows, flagged 514 (405s)
+  chb18/chb18_19.edf: 900 windows, flagged 652 (429s)
+  chb18/chb18_20.edf: 900 windows, flagged 646 (454s)
+  chb18/chb18_21.edf: 900 windows, flagged 859 (479s)
+  chb18/chb18_22.edf: 900 windows, flagged 688 (504s)
+  chb18/chb18_23.edf: 900 windows, flagged 514 (528s)
+  chb18/chb18_24.edf: 900 windows, flagged 543 (553s)
+  chb18/chb18_25.edf: 900 windows, flagged 500 (579s)
+  chb18/chb18_26.edf: 900 windows, flagged 823 (604s)
+  chb18/chb18_27.edf: 900 windows, flagged 294 (625s)
+  chb18/chb18_28.edf: 900 windows, flagged 389 (649s)
+  chb18/chb18_29.edf: 900 windows, flagged 135 (671s)
+  chb18/chb18_30.edf: 900 windows, flagged 34 (696s)
+  chb18/chb18_31.edf: 568 windows, flagged 351 (711s)
+  chb18/chb18_32.edf: 900 windows, flagged 387 (735s)
+  chb18/chb18_33.edf: 900 windows, flagged 288 (759s)
+  chb18/chb18_34.edf: 900 windows, flagged 404 (778s)
+  chb18/chb18_35.edf: 900 windows, flagged 412 (804s)
+  chb18/chb18_36.edf: 900 windows, flagged 102 (831s)
+chb18: 32070 windows, ictal 83, flagged 16260, skipped files [], saved chb18.npz, 831s

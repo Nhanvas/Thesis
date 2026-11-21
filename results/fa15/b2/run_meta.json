@@ -1,0 +1,51 @@
+{
+ "notebook": "FA15_DATA_B2",
+ "tag": "b2",
+ "repo_commit": "9682471a483ed33282a700f2c4ae98ff5fd6e3c9",
+ "code_sha": "f9a548e45cfed9a6",
+ "v9_x6_sha": "9cb96ecdc50b45e7",
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "pandas": "2.3.3",
+  "mne": "1.12.1",
+  "asrpy": "0.0.8"
+ },
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "machine": {
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+  "avx512f": false,
+  "blas": "scipy-openblas 0.3.27"
+ },
+ "smoke": false,
+ "chb": [
+  "chb07",
+  "chb06",
+  "chb18",
+  "chb21",
+  "chb23",
+  "chb12"
+ ],
+ "ext": [
+  "PN10",
+  "PN09",
+  "PN16"
+ ],
+ "asr_only": [],
+ "conv_pad": [],
+ "asr_pre": [],
+ "started": "2026-11-21 07:12:05 UTC",
+ "test": false,
+ "finished": "2026-11-21 11:20:39 UTC",
+ "runtime_h": 4.159,
+ "phases_s": {
+  "inventory": 47.0,
+  "asr_and_features": 14519.8,
+  "g_asr": 240.5
+ },
+ "stop_reason": null,
+ "peak_rss_self_mb": 4501.2,
+ "disk_free_gb_end": 2698.7
+}

@@ -162,6 +162,25 @@ def sha256_file(p):
     return h.hexdigest()
 
 
+def machine_info():
+    """CPU model, AVX-512 presence and numpy's BLAS: Kaggle assigns machine types whose arithmetic differs under the same
+    library versions (chat D34-F, handback Part 28.3) -- recorded in every run_meta from 21/11 (chat D35-F)."""
+    info = dict(cpu_model=None, avx512f=None, blas=None)
+    try:
+        txt = Path("/proc/cpuinfo").read_text()
+        info["cpu_model"] = next((l.split(":", 1)[1].strip() for l in txt.splitlines() if l.startswith("model name")), None)
+        flags = next((l for l in txt.splitlines() if l.startswith("flags")), "")
+        info["avx512f"] = " avx512f" in flags
+    except OSError:
+        info["cpu_model"] = platform.processor() or os.environ.get("PROCESSOR_IDENTIFIER")
+    try:
+        b = np.show_config(mode="dicts")["Build Dependencies"]["blas"]
+        info["blas"] = f"{b.get('name')} {b.get('version')}"
+    except Exception:                    # noqa: BLE001
+        pass
+    return info
+
+
 def mem_available_gb():
     try:
         for line in open("/proc/meminfo"):
@@ -350,6 +369,8 @@ def clean_cli(spec_path):
     n_total = data.shape[1]
     X = whole_filtered(data, spec["notch"])
     del data
+    if spec.get("perturb"):                                  # T2 (chat D35-F): relative last-bit perturbation of the input
+        X = X * (1.0 + float(spec["perturb"]))
     t1 = time.time()
     if spec.get("chunk_s"):                                  # diagnostic: an earlier V9-X6 chunking (G-asr-pre, G-asr)
         V6.MEM_SPLIT_CHUNK_S = float(spec["chunk_s"])
@@ -364,6 +385,7 @@ def clean_cli(spec_path):
     payload = dict(path=spec["path"], key=spec["key"], n_total=int(n_total), hours=n_total / P.FS / 3600,
                    load_filter_s=round(t1 - t0, 2), asr_s=round(t2 - t1, 2), bc_trim=len(BC_TRIM),
                    chunk_s=float(V6.MEM_SPLIT_CHUNK_S), mem_splits=mem_splits, code_sha=sha,
+                   perturb=float(spec.get("perturb") or 0.0),
                    power_removed_total=float(1 - np.mean(Xc ** 2) / max(np.mean(X ** 2), 1e-300)))
     m = spec.get("measure")
     if m:
@@ -606,7 +628,8 @@ def _measure_frames(m, s0, f0):
     hi = [dict(subject=s0, file=f0, cutoff=CUTOFF, win_idx=w, share=a, contrast_before=b, contrast_after=c)
           for w, a, b, c in zip(h["win_idx"], h["share"], h["contrast_before"], h["contrast_after"])]
     bg = [dict(subject=s0, file=f0, cutoff=CUTOFF, share=a) for a in m["background"]["share"]]
-    return pd.DataFrame(m["seizures"]), pd.DataFrame(hi), pd.DataFrame(bg)
+    hc = ["subject", "file", "cutoff", "win_idx", "share", "contrast_before", "contrast_after"]
+    return pd.DataFrame(m["seizures"]), pd.DataFrame(hi, columns=hc), pd.DataFrame(bg, columns=hc[:3] + ["share"])
 
 
 def compare_file(sz, hi, bg, s, f, rec):
@@ -632,13 +655,15 @@ def compare_file(sz, hi, bg, s, f, rec):
     return worst, only, rows_ok, len(a), len(ha), len(hb), len(ga), len(gb)
 
 
-def recompute(specs, chunk_s, K):
-    """ASR + Measure 1 of the given files with another chunking, in subprocesses (no cache kept); {(subject, file):
-    frames}. Keys are suffixed so that the main caches are never touched."""
+def recompute(specs, chunk_s, K, perturb=0.0):
+    """ASR + Measure 1 of the given files with a given chunking (and optionally a relative input perturbation), in
+    subprocesses (no cache kept); {(subject, file): frames}. Keys are suffixed so that the main caches are never
+    touched."""
     out = {}
 
     def one(sp):
-        sp = dict(sp, key=f"{sp['key']}_c{int(min(chunk_s, 1e6))}", chunk_s=chunk_s, nocache=True)
+        sp = dict(sp, key=f"{sp['key']}_c{int(min(chunk_s, 1e6))}{'_p' if perturb else ''}", chunk_s=chunk_s,
+                  nocache=True, perturb=perturb)
         while mem_available_gb() < MIN_FREE_MEM_GB:
             time.sleep(5)
         r = run_clean(sp)
@@ -647,7 +672,9 @@ def recompute(specs, chunk_s, K):
         return (m["subject"], m["file"]), _measure_frames(r["measure"], m["subject"], m["file"]), r
     with cf.ThreadPoolExecutor(max(1, K)) as ex:
         for key, frames, r in ex.map(one, specs):
-            out[key] = dict(frames=frames, mem_splits=r["mem_splits"], code_sha=r["code_sha"], asr_s=r["asr_s"])
+            out[key] = dict(frames=frames, mem_splits=r["mem_splits"], code_sha=r["code_sha"], asr_s=r["asr_s"],
+                            perturb=r.get("perturb", 0.0), power_removed_total=r["power_removed_total"],
+                            hours=r["hours"])
     return out
 
 
@@ -833,7 +860,8 @@ def run(tag, chb, ext, asr_only=(), smoke=False, notebook="local", commit="local
     t_run = time.time()
     v = versions()
     meta = dict(notebook=notebook, tag=tag, repo_commit=commit, code_sha=CODE_SHA, v9_x6_sha=V6_SHA, versions=v,
-                cpu_count=os.cpu_count(), platform=platform.platform(), smoke=smoke, chb=list(chb), ext=list(ext),
+                cpu_count=os.cpu_count(), platform=platform.platform(), machine=machine_info(), smoke=smoke,
+                chb=list(chb), ext=list(ext),
                 asr_only=list(asr_only), conv_pad=list(conv_pad), asr_pre=[list(x) for x in asr_pre], started=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()), test=TEST)
     jdump(out_dir() / "run_meta.json", meta)
     gate(dict(gate="G-mod", status="PASS", summary=f"closed modules from {REPO / 'src'}; fa15_asr {CODE_SHA}, "

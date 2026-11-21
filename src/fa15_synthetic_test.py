@@ -329,6 +329,69 @@ def main():
           and "G-ident" not in Gd and not (root / "work_data" / "fa15" / "b" / "split.json").exists(),
           f"{err} {[(g, Gd.get(g, {}).get('status')) for g in want]}")
 
+    # ---- rev 21/11 13:30 (chat D35-F): B1 / B2 builder, T2 notebook (FA15_PERTURB), T1 laptop script
+    MK.build_bsplit("WORKTREE")
+    bcases = []
+    for x in ("B1", "B2"):
+        c = "".join(json.loads((MK.OUTDIR / f"FA15_DATA_{x}.ipynb").read_text())["cells"][2]["source"])
+        line = next(l for l in c.splitlines() if l.startswith("CHB, EXT, ASR_ONLY"))
+        lists = json.loads("[" + line.split("=", 1)[1].strip() + "]")
+        bcases += lists[0] + lists[1]
+        check(f"builder: FA15_DATA_{x} without pre-gates", "CONV_PAD, ASR_PRE = [], []" in c)
+    split_b = json.loads((ROOT / "results" / "fa15" / "smoke" / "split.json").read_text())["b"]["cases"]
+    check("builder: B1 + B2 hold exactly the cases of part b, once each", sorted(bcases) == sorted(split_b),
+          f"{len(bcases)} vs {len(split_b)}")
+    MK.build_perturb("WORKTREE")
+    nbp2 = MK.OUTDIR / "FA15_PERTURB.ipynb"
+    ns, err = run_nb(nbp2, env(root, "pert", extra=dict(FA15_TEST_PERTURB_FILES=json.dumps(
+        [["chb01", "chb01_01.edf"], ["chb24", "chb24_01.edf"]]))))
+    Gp = gates(root / "work_pert", "perturb")
+    pc = root / "work_pert" / "fa15" / "perturb" / "perturb.csv"
+    d = pd.read_csv(pc) if pc.exists() else pd.DataFrame()
+    check("T2 notebook runs to the end; G-mod, mode, R0.1, G-ref, G-done, G-worker-sha PASS",
+          err is None and all(Gp.get(g, {}).get("status") == "PASS" for g in
+                              ("G-mod", "mode", "R0.1-inventory", "G-ref", "G-done", "G-worker-sha")),
+          f"{err} {[(g, v.get('status')) for g, v in Gp.items()]}")
+    ok_rec = len(d) == 2 and bool(d.set_index("file").loc["chb01_01.edf", "differs_from_record"]) and \
+        not bool(d.set_index("file").loc["chb24_01.edf", "differs_from_record"])
+    check("T2: both arms on both files; chb01_01 differs from its 300-s record, chb24_01 equals its record",
+          ok_rec, d[["file", "max_pert", "max_vs_record", "moves_under_perturbation"]].to_string() if len(d) else "")
+    rm = json.loads((root / "work_pert" / "fa15" / "perturb" / "run_meta.json").read_text())
+    check("T2 run_meta records the machine (CPU model, AVX-512, BLAS) and eps 2^-40",
+          rm.get("machine", {}).get("cpu_model") is not None and abs(rm["eps"] - 2 ** -40) < 1e-30, str(rm.get("machine")))
+    # T1: the laptop script from the world repository, with the fa15 smoke's Measure 1 as "Kaggle"
+    repo_ = root / "repo"
+    km = repo_ / "results" / "fa15" / "smoke" / "measure"
+    km.mkdir(parents=True, exist_ok=True)
+    for f_ in ("chb01__chb01_01.edf.json", "chb24__chb24_01.edf.json"):
+        shutil.copyfile(work / "fa15" / "smoke" / "measure" / f_, km / f_)
+    rc_ = root / "input" / "thesis-r2-chbmit-features" / "thesis-r2-chbmit-features"
+    re2 = root / "input" / "thesis-r2-external-features" / "thesis-r2-external-features"
+    thr = {"chb01": (np.asarray(json.loads((rc_ / "chb01_stats.json").read_text())["artifact_thresh_uV"]) * 1e-6).tolist(),
+           "chb24": (5.0 * np.asarray(json.loads(str(np.load(re2 / "chb24_lf.npz", allow_pickle=True)["meta"]))
+                                       ["labelfree_std_uV"]) * 1e-6).tolist()}
+    out1 = root / "diag_laptop"
+    e1 = {k: v for k, v in os.environ.items() if not k.startswith(("FA15_", "R2_"))}
+    e1.update(FA15_DIAG_TEST="1", FA15_DIAG_DATASET=str(root / "chbmit"), FA15_DIAG_OUT=str(out1),
+              FA15_DIAG_THR=json.dumps(thr), FA15_DIAG_TARGETS=json.dumps([["chb01", "chb01_01.edf"],
+                                                                          ["chb24", "chb24_01.edf"]]),
+              PYTHONUTF8="1")
+    r1 = subprocess.run([sys.executable, str(repo_ / "src" / "fa15_diag_laptop.py"), "--run"], env=e1,
+                        capture_output=True, text=True)
+    cp = out1 / "compare.csv"
+    c1 = pd.read_csv(cp).set_index("file") if cp.exists() else pd.DataFrame()
+    check("T1 script: chb01_01 (record made with 300-s chunks) reads 'record state' (= Kaggle 60 s, != record); "
+          "chb24_01 reads 'same'; parts written to its own folder, env.json written",
+          r1.returncode == 0 and len(c1) == 2 and c1.loc["chb01_01.edf", "reading"] == "record state"
+          and c1.loc["chb24_01.edf", "reading"] == "same" and len(list((out1 / "parts").glob("*.json"))) == 2
+          and (out1 / "env.json").exists() and not (repo_ / "results" / "v9_x6" / "_parts").exists(),
+          (c1[["max_vs_record", "max_vs_kaggle", "reading"]].to_string() if len(c1) else "") + r1.stderr[-600:])
+    r2 = subprocess.run([sys.executable, str(repo_ / "src" / "fa15_diag_laptop.py"), "--run"], env=e1,
+                        capture_output=True, text=True)
+    check("T1 script resumes: a second run skips both files and gives the same table",
+          r2.returncode == 0 and r2.stdout.count("part exists, skipped") == 2
+          and pd.read_csv(cp).equals(c1.reset_index()[pd.read_csv(cp).columns]), r2.stdout[-300:])
+
     n_ok = sum(r[1] for r in RES)
     print(f"\n{n_ok}/{len(RES)} checks PASS in {time.time() - t0:.0f} s")
     print("ALL PASS" if n_ok == len(RES) else "FAILURES: " + "; ".join(r[0] for r in RES if not r[1]))

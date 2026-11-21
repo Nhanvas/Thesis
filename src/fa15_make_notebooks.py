@@ -7,6 +7,9 @@ plan §12 15/11 12:40):
   --data COMMIT   notebooks/fa15/FA15_DATA_<x>.ipynb, one per part of results/fa15/smoke/split.json at COMMIT, each with
                   the pre-gates of 21/11 (author 01:28): G-conv-pad on the shortest CHB-MIT case and one external case
                   of the part (PN00, the smoke's largest G-conv, where present; else the shortest); G-asr-pre on chb06_01 with 300-s chunks in the part that holds chb06
+  --bsplit COMMIT notebooks/fa15/FA15_DATA_B1.ipynb, _B2.ipynb: part b of split.json re-split in two by hours (LPT;
+                  FA15_DATA_A measured 10.5 h for 561 h of EEG), no pre-gates (author 21/11 13:30, chat D35-F)
+  --perturb COMMIT notebooks/fa15/FA15_PERTURB.ipynb: diagnostic T2 (src/fa15_perturb.py), the 70 V9-X6 files
 Each clones github.com/Nhanvas/Thesis at the pinned COMMIT (40-hex, never a tag) and checks the sha256 of fa15_asr.py.
 Inputs: the raw dataset (bonesclarke26/combined-siena-scalp-and-chb-mit-eeg-datasets), thesis-r2-chbmit-features
 (nhn2mm), thesis-r2-external-features (norncreades). Internet ON (pip, git, PhysioNet SHA256SUMS). CPU.
@@ -55,13 +58,14 @@ def sha_at(commit, rel):
     return hashlib.sha256(subprocess.check_output(["git", "-C", str(ROOT), "show", f"{commit}:{rel}"])).hexdigest()[:16]
 
 
-def build(name, commit, tag, chb, ext, asr_only, smoke, runtime, conv_pad=(), asr_pre=()):
+def build(name, commit, tag, chb, ext, asr_only, smoke, runtime, conv_pad=(), asr_pre=(), run_cell=None, does=None):
     sha = sha_at(commit, "src/fa15_asr.py")
+    sha_p = sha_at(commit, "src/fa15_perturb.py") if run_cell else None
     cells = [
         md(f"""
 # {name} — F-A1.5, project verification (not part of the report; board R204)
 
-**Plan:** `docs/FUTURE_RESEARCH_PLAN.md` §12 15/11 12:40. **Does:** ASR exactly as V9-X6 (asrpy 0.0.8, cutoff 20, per-file
+**Plan:** `docs/FUTURE_RESEARCH_PLAN.md` §12 15/11 12:40; `results/fa15/DESIGN_D35F.md`. **Does:** {does or ''}ASR exactly as V9-X6 (asrpy 0.0.8, cutoff 20, per-file
 calibration, one process per file) on the pipeline-filtered signal, then the record's statistics and features on the
 cleaned signal; pre-gates {', '.join(x for x, y in (('G-conv-pad ' + str(list(conv_pad)), conv_pad),
                                                     ('G-asr-pre ' + str([a[1] for a in asr_pre]), asr_pre)) if y) or '—'};
@@ -101,12 +105,15 @@ else:
     assert head == REPO_COMMIT, f"wrong commit {{head}}"
 sha = hashlib.sha256(open(REPO + "/src/fa15_asr.py", "rb").read()).hexdigest()[:16]
 assert TEST or sha == "{sha}", f"fa15_asr.py sha {{sha}} != {sha}"
+if {bool(sha_p)}:
+    shp = hashlib.sha256(open(REPO + "/src/fa15_perturb.py", "rb").read()).hexdigest()[:16]
+    assert TEST or shp == "{sha_p}", f"fa15_perturb.py sha {{shp}} != {sha_p}"
 os.environ.update(THESIS_REPO=REPO, FA15_WORK=WORK, FA15_SCRATCH=SCRATCH, R2_WORK=WORK, R2_INPUT=INPUT,
                   R2_SCRATCH=SCRATCH + "/r2")
 sys.path.insert(0, REPO + "/src")
 print("repository", REPO, "CPU cores", os.cpu_count(), f"({{time.time()-T_NB:.0f}}s)")
 """),
-        code(f"""
+        code(run_cell) if run_cell else code(f"""
 # RUN: inventory (every raw file sha256 = PhysioNet), ASR per file (one process each), statistics + features per case
 # (record code), gates; results in WORK/fa15/{tag}/, datasets in WORK/fa15-asr-*-features-{tag}/
 import fa15_asr as F
@@ -163,12 +170,45 @@ def build_data(commit):
               f"pre-gates ≈ 0.1 h + G-asr recomputations ≤ 0.5 h (computed)", conv_pad=pad, asr_pre=pre)
 
 
+def build_bsplit(commit):
+    """FA15_DATA_B1 / _B2: the cases of part b re-split in two by hours (LPT), no pre-gates."""
+    rel = "results/fa15/smoke/split.json"
+    split = json.loads((ROOT / rel).read_text() if commit == "WORKTREE" else
+                       subprocess.check_output(["git", "-C", str(ROOT), "show", f"{commit}:{rel}"]))
+    hrs = case_hours(commit)
+    bins = [[], []]
+    for c in sorted(split["b"]["cases"], key=lambda c: -hrs[c]):
+        bins[min((0, 1), key=lambda i: sum(hrs[x] for x in bins[i]))].append(c)
+    rate = 10.545 / 561.0                                   # FA15_DATA_A: measured h per hour of EEG
+    for i, cases in enumerate(bins, 1):
+        chb = [c for c in cases if c.startswith("chb") and c != "chb24"]
+        ext = [c for c in cases if c == "chb24" or c.startswith("PN")]
+        h = sum(hrs[c] for c in cases)
+        build(f"FA15_DATA_B{i}", commit, f"b{i}", chb, ext, [], False,
+              f"≈ {h * rate:.1f} h (computed from FA15_DATA_A's measured 10.5 h for 561 h of EEG; {h:.1f} h of EEG)")
+
+
+def build_perturb(commit):
+    run_cell = """
+# RUN: diagnostic T2 -- ASR on the 70 V9-X6 files twice (as is; x (1 + 2^-40)), Measure 1, comparisons, gates
+import fa15_perturb as FP
+TAG = "perturb"
+FAILED = FP.run(notebook=NOTEBOOK, commit=REPO_COMMIT)
+print("failed gates:", FAILED or "none")
+"""
+    build("FA15_PERTURB", commit, "perturb", [], [], [], False,
+          "≈ 2 h (computed: 88.5 h of EEG, two ASR passes, 4 processes, FA15_DATA_A's measured 146 s per hour of EEG per process)",
+          run_cell=run_cell, does="diagnostic T2 (src/fa15_perturb.py): the 70 V9-X6 files twice, as is and x (1 + 2^-40); ")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke")
     ap.add_argument("--data")
+    ap.add_argument("--bsplit")
+    ap.add_argument("--perturb")
     a = ap.parse_args()
-    for c in (a.smoke, a.data):
+    for c in (a.smoke, a.data, a.bsplit, a.perturb):
         if c and c != "WORKTREE" and not re.fullmatch(r"[0-9a-f]{40}", c):
             raise SystemExit("pin a 40-hex commit hash (never a tag)")
     if a.smoke:
@@ -177,6 +217,10 @@ def main():
               "on 3 processes, up to 3 × on Kaggle, + features ≈ 0.3 h)")
     if a.data:
         build_data(a.data)
+    if a.bsplit:
+        build_bsplit(a.bsplit)
+    if a.perturb:
+        build_perturb(a.perturb)
 
 if __name__ == "__main__":
     main()

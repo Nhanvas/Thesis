@@ -1,0 +1,66 @@
+{
+ "notebook": "FA15_DATA_B",
+ "tag": "b",
+ "repo_commit": "d1e06d297274f6ca87f0d4058c49a38a880ce4db",
+ "code_sha": "0f9843dcfa3162a7",
+ "v9_x6_sha": "9cb96ecdc50b45e7",
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "pandas": "2.3.3",
+  "mne": "1.12.1",
+  "asrpy": "0.0.8"
+ },
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "smoke": false,
+ "chb": [
+  "chb09",
+  "chb07",
+  "chb06",
+  "chb01",
+  "chb05",
+  "chb18",
+  "chb11",
+  "chb21",
+  "chb20",
+  "chb23",
+  "chb12",
+  "chb08"
+ ],
+ "ext": [
+  "PN03",
+  "PN10",
+  "PN06",
+  "PN07",
+  "PN09",
+  "PN17",
+  "PN16"
+ ],
+ "asr_only": [],
+ "conv_pad": [
+  "chb08",
+  "PN16"
+ ],
+ "asr_pre": [
+  [
+   "chb06",
+   "chb06_01.edf",
+   300.0
+  ]
+ ],
+ "started": "2026-11-21 01:32:30 UTC",
+ "test": false,
+ "finished": "2026-11-21 01:49:17 UTC",
+ "runtime_h": 0.297,
+ "phases_s": {
+  "inventory": 91.5,
+  "g_conv_pad": 462.0,
+  "g_asr_pre": 196.8,
+  "asr_and_features": 0.0
+ },
+ "stop_reason": null,
+ "peak_rss_self_mb": 11165.2,
+ "disk_free_gb_end": 2698.8
+}

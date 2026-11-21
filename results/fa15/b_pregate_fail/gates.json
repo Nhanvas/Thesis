@@ -1,0 +1,221 @@
+[
+ {
+  "gate": "G-mod",
+  "status": "PASS",
+  "summary": "closed modules from /tmp/Thesis/src; fa15_asr 0f9843dcfa3162a7, v9_x6_asr 9cb96ecdc50b45e7"
+ },
+ {
+  "gate": "mode",
+  "status": "PASS",
+  "mode": "exact",
+  "versions": {
+   "python": "3.13.18",
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "pandas": "2.3.3",
+   "mne": "1.12.1",
+   "asrpy": "0.0.8"
+  },
+  "differing": {
+   "chb": {},
+   "ext": {}
+  },
+  "summary": "exact (versions vs R0's run_meta); asrpy 0.0.8"
+ },
+ {
+  "gate": "R0.1-inventory",
+  "status": "PASS",
+  "files": 363,
+  "from_physionet": 0,
+  "summary": "363 files sha256 = PhysioNet (0 downloaded)"
+ },
+ {
+  "gate": "G-ref",
+  "status": "PASS",
+  "missing": [],
+  "differ_from_pin": [],
+  "pinned_checked": 31,
+  "files": {
+   "chb09.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb09.npz",
+    "sha256": "c1ef166081552c4e635b3dae88c2a9454f6c54aa5c196c4de3f685edd8794ccd"
+   },
+   "chb09_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb09_stats.json",
+    "sha256": "7977acbe0152923da809424de70cc4975fe67bc8e1b1d9f8aa948662018f5587"
+   },
+   "chb07.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb07.npz",
+    "sha256": "014c6a6cf030e91210fe99135e669c182ae68bb2eefaa7c8fccb983ac83ab513"
+   },
+   "chb07_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb07_stats.json",
+    "sha256": "0be8d590467f4ff89da7e8bfaa662a989e3a53b2540207bd1e0ba4ccb0e724be"
+   },
+   "chb06.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06.npz",
+    "sha256": "eb45bb3e88038acc87c0623de35380574da75a39ef6a11a800dd656563152d71"
+   },
+   "chb06_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb06_stats.json",
+    "sha256": "603f679ff80a6c70ab6fb01c68f6c7c3919b327a0b802720ed00b86e4390f151"
+   },
+   "chb01.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb01.npz",
+    "sha256": "60867ec3296f664d804fd9eaec9ff665c55f9b47d31a7e504e91bff49003ad12"
+   },
+   "chb01_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb01_stats.json",
+    "sha256": "c01496cd982c35decd367e4d2ba7b5acb31b0343df706ffa66b49a3d3f7287a5"
+   },
+   "chb05.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb05.npz",
+    "sha256": "621759ecab3ce59dc0e11d1d428c10dcf465d75b645439b29c89647e28b13966"
+   },
+   "chb05_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb05_stats.json",
+    "sha256": "111796f21c0907ccf1e942eca208def6434c5b3f10f7447c7380178ba399784a"
+   },
+   "chb18.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb18.npz",
+    "sha256": "2f3388943ed97f21065b2db7fb6050ea5b6cab562a7ebcd53b7f58cae2f17da4"
+   },
+   "chb18_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb18_stats.json",
+    "sha256": "1c845d4a34f56b1337a1da5b66a777567c9ad1449cfa5ce625a568b796177a1e"
+   },
+   "chb11.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb11.npz",
+    "sha256": "c84f709395280d14fcb91ce17dea32da312b0cf7808d19f835313504beea2ae5"
+   },
+   "chb11_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb11_stats.json",
+    "sha256": "2141738f2d1b567aae52fe72d356414e64b07470a0a12560a942967402d742a8"
+   },
+   "chb21.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb21.npz",
+    "sha256": "051c1a773ad3e589323648d7f38abdd0c9ddfb02561a7912b0070c735f57d334"
+   },
+   "chb21_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb21_stats.json",
+    "sha256": "0ffc64f128ab3643c3dce290481c5af79474032b847fc0f80df67a910ca2c893"
+   },
+   "chb20.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb20.npz",
+    "sha256": "534671ea279e9be63b5b58bafb56135e5f60fcf651c3d4555179f059101f735e"
+   },
+   "chb20_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb20_stats.json",
+    "sha256": "971f25c387cb86b089c7bfbb24e23744c57dbbae1c8a6c2e28999e4b9d13986a"
+   },
+   "chb23.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb23.npz",
+    "sha256": "ddd7591c4118cdc56b501428b9ec1a4b1e907748f819804f75db5c7efd57384f"
+   },
+   "chb23_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb23_stats.json",
+    "sha256": "0c726cad148256aab613c8d503f34a5bc4c71f6e765fc0bf6843473e0e803f5b"
+   },
+   "chb12.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb12.npz",
+    "sha256": "4c84ca3fa1ee42a4fe47d2331765e6dcb181b625dfe0cbb99f4f5d501cc36ef3"
+   },
+   "chb12_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb12_stats.json",
+    "sha256": "90fc63ea4144a4933daba296ef7f443a51068a733572ea354f3733d7cb7982de"
+   },
+   "chb08.npz": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb08.npz",
+    "sha256": "9d1d309e7d4b1746fd9aaaf75a23569155413fc06216014ce0824a19c85b1e06"
+   },
+   "chb08_stats.json": {
+    "path": "/kaggle/input/datasets/nhn2mm/thesis-r2-chbmit-features/thesis-r2-chbmit-features/chb08_stats.json",
+    "sha256": "a5b310d87293dabbd710b3520d72e6a74f8b045ca80e7c824f8f260f551415c1"
+   },
+   "PN03_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN03_lf.npz",
+    "sha256": "994e4c9c72e58a168560b81ba595ae4774cf093fe6c0a589832a759bae37abee"
+   },
+   "PN10_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN10_lf.npz",
+    "sha256": "b7a31f6b7a1603be5830697f925a194ee905ba2056ff2ce1863b4e1a37785f1e"
+   },
+   "PN06_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN06_lf.npz",
+    "sha256": "47e5592a453e3ed66fccd3aee7c61e329ba0a5db990fddfcfa76c6e775bdf49e"
+   },
+   "PN07_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN07_lf.npz",
+    "sha256": "d025aa56e8b8e5540acde7f61283c8107976c65077d6c65bf554ccd4dced067f"
+   },
+   "PN09_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN09_lf.npz",
+    "sha256": "255ef4593b50afda80841a6a3a2281302d315e9aef21b82238bd3d694064f409"
+   },
+   "PN17_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN17_lf.npz",
+    "sha256": "20983112b9afdba8b74da96a70f3146e6ddddccb8eab12cf3446b2e80762049d"
+   },
+   "PN16_lf.npz": {
+    "path": "/kaggle/input/datasets/norncreades/thesis-r2-external-features/thesis-r2-external-features/PN16_lf.npz",
+    "sha256": "6f59ad088a27d7f24d682e3a0ca7f76566178a35bc1fa32356df0f35da191358"
+   }
+  },
+  "summary": "31 R0 reference files; 31 checked against the pin; missing []; differ []"
+ },
+ {
+  "gate": "G-conv-pad",
+  "status": "PASS",
+  "tol": 1e-09,
+  "cases": [
+   {
+    "case": "chb08",
+    "set": "chb",
+    "rel_pad30_vs_slice": 0.0,
+    "rel_pad3_vs_slice": 0.00016234754002653062,
+    "seconds": 393.1,
+    "status": "PASS"
+   },
+   {
+    "case": "PN16",
+    "set": "ext",
+    "rel_pad30_vs_slice": 8.999001927376706e-14,
+    "rel_pad3_vs_slice": 0.00041344690790509094,
+    "seconds": 68.9,
+    "status": "PASS"
+   }
+  ],
+  "summary": "chb08: 30 s 0.0e+00, 3 s 1.6e-04; PN16: 30 s 9.0e-14, 3 s 4.1e-04"
+ },
+ {
+  "gate": "G-asr-pre",
+  "status": "FAIL",
+  "tol": 1e-09,
+  "files": [
+   {
+    "case": "chb06",
+    "file": "chb06_01.edf",
+    "chunk_s": 300.0,
+    "mem_splits": 49,
+    "max_abs": {
+     "share_seizure": 0.0,
+     "share_preictal60": 0.0057791905145008204,
+     "contrast_before": 3.885780586188048e-15,
+     "contrast_after": 0.0030752425565470087,
+     "highamp_share": 0.027100333517087134,
+     "background_share_sorted": 0.0
+    },
+    "highamp_only": 0,
+    "code_sha": "0f9843dcfa3162a7",
+    "asr_s": 169.16,
+    "status": "FAIL"
+   }
+  ],
+  "summary": "1 file(s) with the record's chunking vs results/v9_x6: [('chb06_01.edf', 49, 'FAIL')]"
+ },
+ {
+  "gate": "G-done",
+  "status": "FAIL",
+  "summary": "skipped: a pre-gate failed"
+ }
+]

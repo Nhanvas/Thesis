@@ -1,0 +1,8 @@
+{
+ "smoke_s": 107.4,
+ "smoke_eeg_h": 99.85,
+ "all_eeg_h": 1115.9,
+ "workers": 4,
+ "note": "computed: smoke seconds x (all hours / smoke hours) / workers",
+ "projected_h": 0.08
+}

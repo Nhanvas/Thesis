@@ -1,0 +1,4 @@
+case,job,s,peak_rss_mb,hours,pairs,series_rows
+chb01,extract,4.9,663.6,40.55111111111111,56,1165
+chb24,extract,4.1,633.1,21.295555555555556,94,2247
+chb03,extract,6.1,656.5,38.00111111111111,54,1156

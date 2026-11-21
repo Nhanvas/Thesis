@@ -1,0 +1,53 @@
+{
+ "case": "chb04",
+ "set": "chb",
+ "status": "done",
+ "code_sha": "0f9843dcfa3162a7",
+ "conv": {
+  "mean_over_sd": 4.517088458986668e-05,
+  "sd_rel": 0.00014618896313029655,
+  "counts": {
+   "n_interictal": [
+    94450,
+    94438
+   ],
+   "n_ictal": [
+    99,
+    99
+   ],
+   "n_rejected": [
+    40395,
+    40407
+   ]
+  },
+  "seconds": 1777.7,
+  "status": "PASS"
+ },
+ "stats": {
+  "n_interictal": 54289,
+  "n_ictal": 99,
+  "n_rejected": 80556
+ },
+ "flag5sd": [
+  80556,
+  40393
+ ],
+ "clean": [
+  54287,
+  94450
+ ],
+ "lab": {
+  "status": "PASS",
+  "equal": {
+   "is_ictal": true,
+   "is_buffer": true,
+   "is_signal_loss": true,
+   "file_idx": true,
+   "files": true
+  }
+ },
+ "build_s": 13240.1,
+ "fallback_asr": 0,
+ "seconds": 15019.2,
+ "peak_rss_mb": 11577.6
+}

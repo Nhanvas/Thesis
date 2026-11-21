@@ -1,0 +1,26 @@
+{
+ "case": "chb24",
+ "set": "ext",
+ "status": "done",
+ "code_sha": "0f9843dcfa3162a7",
+ "conv": {
+  "mean_over_sd": 0.00029116920286417335,
+  "sd_rel": 0.00019582467616592882,
+  "counts": {},
+  "seconds": 55.7,
+  "status": "PASS"
+ },
+ "lab": {
+  "status": "PASS",
+  "equal": {
+   "is_ictal": true,
+   "is_signal_loss": true,
+   "file_idx": true,
+   "files": true
+  }
+ },
+ "build_s": 308.7,
+ "fallback_asr": 0,
+ "seconds": 364.7,
+ "peak_rss_mb": 11577.6
+}

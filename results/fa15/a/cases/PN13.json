@@ -1,0 +1,26 @@
+{
+ "case": "PN13",
+ "set": "ext",
+ "status": "done",
+ "code_sha": "0f9843dcfa3162a7",
+ "conv": {
+  "mean_over_sd": 0.0002053940855448504,
+  "sd_rel": 0.0003722017620589247,
+  "counts": {},
+  "seconds": 70.3,
+  "status": "PASS"
+ },
+ "lab": {
+  "status": "PASS",
+  "equal": {
+   "is_ictal": true,
+   "is_signal_loss": true,
+   "file_idx": true,
+   "files": true
+  }
+ },
+ "build_s": 178.3,
+ "fallback_asr": 0,
+ "seconds": 248.8,
+ "peak_rss_mb": 12150.7
+}

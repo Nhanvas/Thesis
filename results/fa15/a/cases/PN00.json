@@ -1,0 +1,26 @@
+{
+ "case": "PN00",
+ "set": "ext",
+ "status": "done",
+ "code_sha": "0f9843dcfa3162a7",
+ "conv": {
+  "mean_over_sd": 0.0003495143063089891,
+  "sd_rel": 0.0013181424368976023,
+  "counts": {},
+  "seconds": 24.7,
+  "status": "PASS"
+ },
+ "lab": {
+  "status": "PASS",
+  "equal": {
+   "is_ictal": true,
+   "is_signal_loss": true,
+   "file_idx": true,
+   "files": true
+  }
+ },
+ "build_s": 83.6,
+ "fallback_asr": 0,
+ "seconds": 108.4,
+ "peak_rss_mb": 12150.7
+}

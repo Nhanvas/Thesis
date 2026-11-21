@@ -1,0 +1,875 @@
+{
+ "gate": "G-asr",
+ "status": "FAIL",
+ "files": 57,
+ "seizure_rows": 76,
+ "max_abs": {
+  "share_seizure": 0.017339998196911344,
+  "share_preictal60": 0.0067396600054723255,
+  "contrast_before": 5.5067062021407764e-14,
+  "contrast_after": 0.023789294137832373,
+  "highamp_share": 0.3421922053582051,
+  "background_share_sorted": 0.12925237585151256
+ },
+ "highamp_windows_in_one_set_only": 0,
+ "tol": 0.001,
+ "tol_explain": 1e-09,
+ "classes": {
+  "exact": 48,
+  "within_tol": 0,
+  "explained": 0,
+  "beyond": 9
+ },
+ "unexplained": [
+  [
+   "chb03",
+   "chb03_01.edf"
+  ],
+  [
+   "chb03",
+   "chb03_02.edf"
+  ],
+  [
+   "chb15",
+   "chb15_10.edf"
+  ],
+  [
+   "chb15",
+   "chb15_20.edf"
+  ],
+  [
+   "chb15",
+   "chb15_62.edf"
+  ],
+  [
+   "chb16",
+   "chb16_11.edf"
+  ],
+  [
+   "chb16",
+   "chb16_16.edf"
+  ],
+  [
+   "chb16",
+   "chb16_18.edf"
+  ],
+  [
+   "chb24",
+   "chb24_14.edf"
+  ]
+ ],
+ "worker_sha_bad": [],
+ "detail": [
+  {
+   "subject": "chb03",
+   "file": "chb03_01.edf",
+   "seizures": 1,
+   "highamp_here": 32,
+   "highamp_record": 32,
+   "background_here": 58,
+   "background_record": 58,
+   "max_abs": 0.0028336242041341886,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.03316862015099731,
+     "asr_s": 92.3
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.03316862015099731,
+     "asr_s": 93.45
+    }
+   ]
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_02.edf",
+   "seizures": 1,
+   "highamp_here": 42,
+   "highamp_record": 42,
+   "background_here": 140,
+   "background_record": 140,
+   "max_abs": 0.0732049837693608,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.06922388421112025,
+     "asr_s": 94.79
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.06870332630452541,
+     "asr_s": 105.79
+    }
+   ]
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_03.edf",
+   "seizures": 1,
+   "highamp_here": 79,
+   "highamp_record": 79,
+   "background_here": 29,
+   "background_record": 29,
+   "max_abs": 9.814371537686384e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_04.edf",
+   "seizures": 1,
+   "highamp_here": 123,
+   "highamp_record": 123,
+   "background_here": 417,
+   "background_record": 417,
+   "max_abs": 6.317169010117141e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_34.edf",
+   "seizures": 1,
+   "highamp_here": 141,
+   "highamp_record": 141,
+   "background_here": 354,
+   "background_record": 354,
+   "max_abs": 1.7474910407599964e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_35.edf",
+   "seizures": 1,
+   "highamp_here": 260,
+   "highamp_record": 260,
+   "background_here": 388,
+   "background_record": 388,
+   "max_abs": 4.340972026284362e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb03",
+   "file": "chb03_36.edf",
+   "seizures": 1,
+   "highamp_here": 142,
+   "highamp_record": 142,
+   "background_here": 289,
+   "background_record": 289,
+   "max_abs": 1.1163292512605949e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_19.edf",
+   "seizures": 1,
+   "highamp_here": 458,
+   "highamp_record": 458,
+   "background_here": 61,
+   "background_record": 61,
+   "max_abs": 9.747758156208874e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_21.edf",
+   "seizures": 1,
+   "highamp_here": 196,
+   "highamp_record": 196,
+   "background_here": 37,
+   "background_record": 37,
+   "max_abs": 5.240252676230739e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_40.edf",
+   "seizures": 2,
+   "highamp_here": 14,
+   "highamp_record": 14,
+   "background_here": 21,
+   "background_record": 21,
+   "max_abs": 2.4868995751603507e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_55.edf",
+   "seizures": 2,
+   "highamp_here": 108,
+   "highamp_record": 108,
+   "background_here": 6,
+   "background_record": 6,
+   "max_abs": 1.503241975342462e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_58.edf",
+   "seizures": 1,
+   "highamp_here": 118,
+   "highamp_record": 118,
+   "background_here": 500,
+   "background_record": 500,
+   "max_abs": 1.2512213487525514e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_59.edf",
+   "seizures": 1,
+   "highamp_here": 225,
+   "highamp_record": 225,
+   "background_here": 609,
+   "background_record": 609,
+   "max_abs": 5.856426454897701e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_60.edf",
+   "seizures": 1,
+   "highamp_here": 33,
+   "highamp_record": 33,
+   "background_here": 126,
+   "background_record": 126,
+   "max_abs": 5.007105841059456e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb13",
+   "file": "chb13_62.edf",
+   "seizures": 3,
+   "highamp_here": 44,
+   "highamp_record": 44,
+   "background_here": 168,
+   "background_record": 168,
+   "max_abs": 3.7192471324942744e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_03.edf",
+   "seizures": 1,
+   "highamp_here": 299,
+   "highamp_record": 299,
+   "background_here": 197,
+   "background_record": 197,
+   "max_abs": 9.575673587391975e-15,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_04.edf",
+   "seizures": 2,
+   "highamp_here": 149,
+   "highamp_record": 149,
+   "background_here": 194,
+   "background_record": 194,
+   "max_abs": 1.454392162258955e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_06.edf",
+   "seizures": 1,
+   "highamp_here": 261,
+   "highamp_record": 261,
+   "background_here": 216,
+   "background_record": 216,
+   "max_abs": 2.195466031196247e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_11.edf",
+   "seizures": 1,
+   "highamp_here": 134,
+   "highamp_record": 134,
+   "background_here": 325,
+   "background_record": 325,
+   "max_abs": 2.6201263381153694e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_17.edf",
+   "seizures": 1,
+   "highamp_here": 244,
+   "highamp_record": 244,
+   "background_here": 565,
+   "background_record": 565,
+   "max_abs": 1.1773915176149785e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_18.edf",
+   "seizures": 1,
+   "highamp_here": 102,
+   "highamp_record": 102,
+   "background_here": 157,
+   "background_record": 157,
+   "max_abs": 1.687538997430238e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb14",
+   "file": "chb14_27.edf",
+   "seizures": 1,
+   "highamp_here": 265,
+   "highamp_record": 265,
+   "background_here": 443,
+   "background_record": 443,
+   "max_abs": 5.340172748447003e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_06.edf",
+   "seizures": 1,
+   "highamp_here": 13,
+   "highamp_record": 13,
+   "background_here": 55,
+   "background_record": 55,
+   "max_abs": 5.6066262743570405e-15,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_10.edf",
+   "seizures": 1,
+   "highamp_here": 24,
+   "highamp_record": 24,
+   "background_here": 246,
+   "background_record": 246,
+   "max_abs": 0.02632577704940431,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.02632577704940431,
+     "asr_s": 68.49
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.02632577704940431,
+     "asr_s": 86.4
+    }
+   ]
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_15.edf",
+   "seizures": 1,
+   "highamp_here": 226,
+   "highamp_record": 226,
+   "background_here": 171,
+   "background_record": 171,
+   "max_abs": 3.982925100842749e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_17.edf",
+   "seizures": 1,
+   "highamp_here": 72,
+   "highamp_record": 72,
+   "background_here": 409,
+   "background_record": 409,
+   "max_abs": 2.5979218776228663e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_20.edf",
+   "seizures": 1,
+   "highamp_here": 122,
+   "highamp_record": 122,
+   "background_here": 29,
+   "background_record": 29,
+   "max_abs": 0.12925237585151256,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.13226063751947786,
+     "asr_s": 67.82
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.1184518707920729,
+     "asr_s": 75.44
+    }
+   ]
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_22.edf",
+   "seizures": 1,
+   "highamp_here": 128,
+   "highamp_record": 128,
+   "background_here": 62,
+   "background_record": 62,
+   "max_abs": 2.5979218776228663e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_28.edf",
+   "seizures": 1,
+   "highamp_here": 136,
+   "highamp_record": 136,
+   "background_here": 83,
+   "background_record": 83,
+   "max_abs": 4.4027281820291364e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_31.edf",
+   "seizures": 1,
+   "highamp_here": 14,
+   "highamp_record": 14,
+   "background_here": 423,
+   "background_record": 423,
+   "max_abs": 2.453592884421596e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_40.edf",
+   "seizures": 3,
+   "highamp_here": 136,
+   "highamp_record": 136,
+   "background_here": 72,
+   "background_record": 72,
+   "max_abs": 7.316369732279782e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_46.edf",
+   "seizures": 1,
+   "highamp_here": 544,
+   "highamp_record": 544,
+   "background_here": 286,
+   "background_record": 286,
+   "max_abs": 4.773959005888173e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_49.edf",
+   "seizures": 1,
+   "highamp_here": 263,
+   "highamp_record": 263,
+   "background_here": 14,
+   "background_record": 14,
+   "max_abs": 2.0095036745715333e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_52.edf",
+   "seizures": 1,
+   "highamp_here": 102,
+   "highamp_record": 102,
+   "background_here": 92,
+   "background_record": 92,
+   "max_abs": 6.689093723366568e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_54.edf",
+   "seizures": 5,
+   "highamp_here": 35,
+   "highamp_record": 35,
+   "background_here": 30,
+   "background_record": 30,
+   "max_abs": 1.4432899320127035e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb15",
+   "file": "chb15_62.edf",
+   "seizures": 1,
+   "highamp_here": 28,
+   "highamp_record": 28,
+   "background_here": 159,
+   "background_record": 159,
+   "max_abs": 0.3421922053582051,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.3421922053582051,
+     "asr_s": 63.36
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.3421922053582051,
+     "asr_s": 64.03
+    }
+   ]
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_10.edf",
+   "seizures": 1,
+   "highamp_here": 438,
+   "highamp_record": 438,
+   "background_here": 134,
+   "background_record": 134,
+   "max_abs": 6.838973831690964e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_11.edf",
+   "seizures": 1,
+   "highamp_here": 240,
+   "highamp_record": 240,
+   "background_here": 40,
+   "background_record": 40,
+   "max_abs": 0.00201944442756552,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.11722285302618607,
+     "asr_s": 82.92
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.12218638894693383,
+     "asr_s": 98.55
+    }
+   ]
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_14.edf",
+   "seizures": 1,
+   "highamp_here": 128,
+   "highamp_record": 128,
+   "background_here": 335,
+   "background_record": 335,
+   "max_abs": 3.019806626980426e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_16.edf",
+   "seizures": 1,
+   "highamp_here": 266,
+   "highamp_record": 266,
+   "background_here": 37,
+   "background_record": 37,
+   "max_abs": 0.07137294872011735,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.27079265243018924,
+     "asr_s": 113.71
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.27454615497744317,
+     "asr_s": 89.7
+    }
+   ]
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_17.edf",
+   "seizures": 4,
+   "highamp_here": 42,
+   "highamp_record": 42,
+   "background_here": 14,
+   "background_record": 14,
+   "max_abs": 1.609823385706477e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb16",
+   "file": "chb16_18.edf",
+   "seizures": 2,
+   "highamp_here": 98,
+   "highamp_record": 98,
+   "background_here": 58,
+   "background_record": 58,
+   "max_abs": 0.0168302722445573,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.09632991046079131,
+     "asr_s": 107.0
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.09632991046079131,
+     "asr_s": 95.06
+    }
+   ]
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17a_03.edf",
+   "seizures": 1,
+   "highamp_here": 320,
+   "highamp_record": 320,
+   "background_here": 250,
+   "background_record": 250,
+   "max_abs": 8.448797217397441e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17a_04.edf",
+   "seizures": 1,
+   "highamp_here": 189,
+   "highamp_record": 189,
+   "background_here": 567,
+   "background_record": 567,
+   "max_abs": 7.083222897108499e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb17",
+   "file": "chb17b_63.edf",
+   "seizures": 1,
+   "highamp_here": 513,
+   "highamp_record": 513,
+   "background_here": 271,
+   "background_record": 271,
+   "max_abs": 4.9182879990894435e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_01.edf",
+   "seizures": 2,
+   "highamp_here": 105,
+   "highamp_record": 105,
+   "background_here": 15,
+   "background_record": 15,
+   "max_abs": 1.4832579608992091e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_03.edf",
+   "seizures": 2,
+   "highamp_here": 51,
+   "highamp_record": 51,
+   "background_here": 6,
+   "background_record": 6,
+   "max_abs": 5.46451772720502e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_04.edf",
+   "seizures": 3,
+   "highamp_here": 259,
+   "highamp_record": 259,
+   "background_here": 13,
+   "background_record": 13,
+   "max_abs": 2.2248869413488137e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_06.edf",
+   "seizures": 1,
+   "highamp_here": 42,
+   "highamp_record": 42,
+   "background_here": 265,
+   "background_record": 265,
+   "max_abs": 9.9253938401489e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_07.edf",
+   "seizures": 1,
+   "highamp_here": 0,
+   "highamp_record": 0,
+   "background_here": 9,
+   "background_record": 9,
+   "max_abs": 1.7275070263167436e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_09.edf",
+   "seizures": 1,
+   "highamp_here": 63,
+   "highamp_record": 63,
+   "background_here": 373,
+   "background_record": 373,
+   "max_abs": 3.397282455352979e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_11.edf",
+   "seizures": 1,
+   "highamp_here": 53,
+   "highamp_record": 53,
+   "background_here": 828,
+   "background_record": 828,
+   "max_abs": 4.4075854077618715e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_13.edf",
+   "seizures": 1,
+   "highamp_here": 96,
+   "highamp_record": 96,
+   "background_here": 726,
+   "background_record": 726,
+   "max_abs": 2.05613304160579e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_14.edf",
+   "seizures": 1,
+   "highamp_here": 18,
+   "highamp_record": 18,
+   "background_here": 466,
+   "background_record": 466,
+   "max_abs": 0.1432985865947515,
+   "cls": "beyond",
+   "explained_by": null,
+   "tried": [
+    {
+     "chunk_s": 300.0,
+     "mem_splits": 12,
+     "max_abs": 0.13018297465163056,
+     "asr_s": 84.36
+    },
+    {
+     "chunk_s": 1000000000000.0,
+     "mem_splits": 3,
+     "max_abs": 0.13018297465163056,
+     "asr_s": 60.32
+    }
+   ]
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_15.edf",
+   "seizures": 1,
+   "highamp_here": 60,
+   "highamp_record": 60,
+   "background_here": 828,
+   "background_record": 828,
+   "max_abs": 4.529709940470639e-14,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_17.edf",
+   "seizures": 1,
+   "highamp_here": 697,
+   "highamp_record": 697,
+   "background_here": 181,
+   "background_record": 181,
+   "max_abs": 1.0080825063596421e-13,
+   "cls": "exact",
+   "explained_by": null
+  },
+  {
+   "subject": "chb24",
+   "file": "chb24_21.edf",
+   "seizures": 1,
+   "highamp_here": 676,
+   "highamp_record": 676,
+   "background_here": 25,
+   "background_record": 25,
+   "max_abs": 4.5046855134955877e-11,
+   "cls": "exact",
+   "explained_by": null
+  }
+ ],
+ "summary": "57 V9-X6 files, 76 seizures; classes {'exact': 48, 'within_tol': 0, 'explained': 0, 'beyond': 9}; unexplained [('chb03', 'chb03_01.edf'), ('chb03', 'chb03_02.edf'), ('chb15', 'chb15_10.edf'), ('chb15', 'chb15_20.edf'), ('chb15', 'chb15_62.edf'), ('chb16', 'chb16_11.edf'), ('chb16', 'chb16_16.edf'), ('chb16', 'chb16_18.edf'), ('chb24', 'chb24_14.edf')]; max |diff| at 60-s chunks 3.42e-01"
+}

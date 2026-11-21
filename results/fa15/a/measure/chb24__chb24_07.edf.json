@@ -1,0 +1,36 @@
+{
+ "seizures": [
+  {
+   "subject": "chb24",
+   "file": "chb24_07.edf",
+   "cutoff": 20,
+   "seizure_idx": 0,
+   "onset_s": 38,
+   "offset_s": 60,
+   "duration_s": 22,
+   "share_seizure": 0.9206839345848778,
+   "share_preictal60": 0.0,
+   "contrast_before": 4.858142154839035,
+   "contrast_after": 2.198560732676499
+  }
+ ],
+ "highamp": {
+  "win_idx": [],
+  "share": [],
+  "contrast_before": [],
+  "contrast_after": []
+ },
+ "background": {
+  "share": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ]
+ }
+}

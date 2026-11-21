@@ -1,0 +1,58 @@
+{
+ "notebook": "F5A_CV",
+ "tag": "f5a_cv",
+ "repo_commit": "69bb08a328c993db56ccbbfe8339561b5003f9e3",
+ "r2_r2_sha": "542968bb851bc05c",
+ "f1_core_sha": "bf4bfd69d7669226",
+ "model_cmp_core_sha": "179b91278035b37a",
+ "r2_core_sha": "902d15ad4feb3e8a",
+ "started": "2026-11-21 06:28:37 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "ram_gb": 33.7,
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cpu",
+  "torch_geometric": "2.7.0",
+  "ruptures": "v1.1.10"
+ },
+ "epochs": 200,
+ "seed": 42,
+ "test_mode": false,
+ "r4_f5a_cv_sha": "559d460958a5b080",
+ "code_shas": {
+  "r4_f5a_cv": "559d460958a5b080",
+  "r2_r2": "542968bb851bc05c",
+  "f1_core": "bf4bfd69d7669226",
+  "model_cmp_core": "179b91278035b37a",
+  "p3_levers": "feb247d2d08c52ba",
+  "p2_scalars": "11feeaf3ba95ced4",
+  "e18": "e18c0ffe37f78e77"
+ },
+ "workers": 4,
+ "partitions": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+ "finished": "2026-11-21 06:55:29 UTC",
+ "runtime_h": 0.455,
+ "phases_s": {
+  "views": 3.4,
+  "gate_data": 15.6,
+  "gate_d0": 0.4,
+  "cv_full": 1475.9
+ },
+ "notes": [],
+ "peak_rss_self_mb": 654.1,
+ "pairs": 2561,
+ "jobs": 48
+}

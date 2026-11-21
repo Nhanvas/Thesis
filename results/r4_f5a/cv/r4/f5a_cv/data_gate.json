@@ -1,0 +1,8 @@
+{
+ "gate": "G-data",
+ "status": "PASS",
+ "pinned": "results/r2/r1_system/smoke/data_sha256.csv",
+ "files": 24,
+ "differ": [],
+ "summary": "24 new .npz, sha256 = pinned R1_SMOKE hashes"
+}

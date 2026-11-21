@@ -1,0 +1,10 @@
+{
+ "smoke_s": 108.2,
+ "job_s": {
+  "mlp": 54.0,
+  "gae": 103.6
+ },
+ "workers": 4,
+ "note": "computed: (gae job s + mlp job s) x 24 / workers x 1.15 (fold sizes differ)",
+ "projected_h": 0.3
+}

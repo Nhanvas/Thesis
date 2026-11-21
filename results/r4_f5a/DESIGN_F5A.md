@@ -140,3 +140,32 @@ largest late error; drawn on the laptop from the raw EDF with the deck's style.
   on a planted 60-s plateau with white noise). Changed to the pre-onset 5th–95th percentile band (probability 0.9 per
   window) and a null value computed with the same rule in the pre-onset background; H1 / H2 read return − null.
   Seen at the change: synthetic data only.
+
+## 10 · Part B — the CV models (approved by the author 21/11/2026 12:43; written before any Part B output)
+
+**Question.** Do the two V5 findings — the localizer places the offset late, at the end of the score's post-ictal
+elevation, and the offset error changes by no measurable amount — hold for both models and every patient partition,
+or are they specific to the GAE (message passing)?
+- **Models:** the 48 committed checkpoints, never retrained — GAE and MLP-AE × partitions 0–5 × 4 folds: partition 0 =
+  R2_A (`results/r2/r2_cv/a/jobs`), partitions 1–5 = R3 (`results/r2/r3_repcv/p1–p5/jobs`); complete data
+  `thesis-r2-chbmit-features`, 24 cases out of fold (≈ 185 seizures per partition). Arms own (the fold's k, as V5) and
+  fixed 0.5 %. The partitions play the role of V5's seeds; patient bootstrap, chb01 + chb21 one unit.
+- **Gates:** G-data, D0' (`r2_r2`); **G-k** (k recomputed = the job's committed `fit.json` k, relative 1e-6); **G-rows**
+  (`f1_core.evaluate_case` rows of both points × detector / localized — tp, fp, n_ref — and the seizure caught flags =
+  the committed `per_subject.csv` / `seizures.csv`, exactly); G-eng, G-seg, G-worker-sha as in Part A; smoke on fold 1
+  of partition 0 (GAE and MLP-AE) first. Aggregate gates A0, A1, A3 (A2 has no counterpart: the CV record holds no error
+  pairs; G-eng ties the extraction to the record rows instead).
+- **Extraction and analysis:** as Part A (`src/r4_f5a_cv.py`, `src/r4_f5a_cv_aggregate.py`, which imports the Part A
+  helpers unchanged): pairs, segments of x, model-free series once per case; V1, V2 (pooled and per partition), D3
+  (return − null, fall − rise, and the level of x in the 60 s after the offset relative to the pre-onset median, alone
+  and as a share of the seizure level), D4, D5.
+
+| # | explanation | supported if |
+|---|---|---|
+| HB1 | the behaviour is general (not message passing) | for both models: localizer signed offset > 0 in ≥ 5 of 6 partitions; localizer − detector \|offset\| interval contains 0 or lies above 0; the onset gain holds |
+| HB2 | an additional GAE-specific part | GAE − MLP-AE, paired by patient, in the localizer signed offset, return − null of x, or the level after the offset (absolute or relative to the seizure level): interval excluding 0 |
+| HB3 | V5's mechanism repeats | for both models: ρ(offset error, return time) > 0, fall − rise ≈ 0, and neither 3 change points nor margin 30 brings the offset nearer the annotation |
+
+Run `F5A_CV` (Kaggle CPU, Internet on, input `thesis-r2-chbmit-features`), outputs `results/r4_f5a/cv/`; runtime ≈ 0.4–0.6 h
+computed from R3's measured scoring times (GAE 137–163 s, MLP-AE 50–76 s per fold; 48 jobs on 4 workers). Synthetic test
+`src/r4_f5a_cv_synthetic_test.py`.

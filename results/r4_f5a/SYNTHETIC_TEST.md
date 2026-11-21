@@ -18,3 +18,17 @@ consecutive windows) returned 176 s on a planted 60-s plateau because a white-no
 of the time; changed to the 5th–95th percentile band plus a null value (DESIGN_F5A.md §9).
 Aggregate runtime (computed from the synthetic run: 60 s at B = 1,000 on 221 pairs): ≈ 30–60 min at B = 10,000 on the real
 ≈ 1,030 pairs (V0 own + fixed, every set), in the container.
+
+## Part B (`python src/r4_f5a_cv_synthetic_test.py`, 21/11/2026)
+
+**ALL PASS in 318 s** (measured; same container). World: `r2_r2_synthetic_test.build_world` + the 48 CV "checkpoints"
+(random GAE / MLP-AE, new-view fold constants) with rows written by `f1_core.run_fold` itself (no r4_f5a_cv code).
+
+| check | result |
+|---|---|
+| C1 notebook F5A_CV (2 workers) | every gate PASS: G-data, D0', G-k / G-rows / G-eng / G-seg / G-worker-sha (smoke and full), SMOKE; 48 jobs, 536 pairs |
+| C2 aggregate | A0, A1, A3 PASS; every table written (B = 200 in the test) |
+| NEG-ROWS | one committed per_subject row tp + 1 (partition 0, GAE fold 1) → STOP G-rows in the SMOKE |
+| NEG-K | one committed k × (1 + 1e-5) → STOP G-k in the SMOKE |
+| NEG-MOD | `f1_core.py` edited after the build → the notebook refuses to start |
+| NEG-A3 | a flat stored search window → aggregate STOP A3 |

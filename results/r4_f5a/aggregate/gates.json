@@ -1,0 +1,26 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "bad": []
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "bad": [],
+  "pairs": 1032,
+  "seizures": 232
+ },
+ {
+  "gate": "A2",
+  "status": "PASS",
+  "bad": [],
+  "groups": 273
+ },
+ {
+  "gate": "A3",
+  "status": "PASS",
+  "bad": [],
+  "pairs": 1032
+ }
+]

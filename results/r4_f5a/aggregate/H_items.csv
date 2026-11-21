@@ -1,0 +1,119 @@
+set,item,est,lo,hi
+development,return-null x,7.0,1.5,17.0
+development,fall-rise x,1.0,-0.5,9.0
+development,return x,8.5,5.0,22.0
+development,return-null x caught,8.0,2.5,28.0
+development,fall-rise x caught,2.0,0.0,14.0
+development,return x caught,10.0,8.0,32.0
+development,return-null m,8.0,3.0,18.0
+development,return m,8.5,5.0,24.5
+development,return-null ll,16.0,4.0,28.0
+development,fall-rise ll,0.0,-8.0,20.0
+development,return ll,16.0,8.0,28.0
+development,return-null d,8.0,4.0,20.0
+development,return d,14.0,4.0,24.0
+development,return-null pow,14.0,4.0,24.0
+development,return pow,20.0,8.0,32.0
+test,return-null x,3.0,0.0,7.5
+test,fall-rise x,0.5,-1.0,3.5
+test,return x,7.5,3.5,10.0
+test,return-null x caught,8.0,0.0,15.0
+test,fall-rise x caught,0.0,-2.0,5.0
+test,return x caught,10.5,8.0,16.0
+test,return-null m,2.0,0.0,8.0
+test,return m,7.0,3.0,11.0
+test,return-null ll,0.0,0.0,4.0
+test,fall-rise ll,0.0,0.0,20.0
+test,return ll,0.0,0.0,8.0
+test,return-null d,4.0,0.0,36.0
+test,return d,10.0,0.0,36.0
+test,return-null pow,2.0,0.0,40.0
+test,return pow,4.0,0.0,40.0
+chb24,return-null x,-1.0,,
+chb24,fall-rise x,0.0,,
+chb24,return x,2.0,,
+chb24,return-null x caught,-2.0,,
+chb24,fall-rise x caught,0.0,,
+chb24,return x caught,2.0,,
+chb24,return-null m,-1.0,,
+chb24,return m,2.0,,
+chb24,return-null ll,0.0,,
+chb24,fall-rise ll,8.0,,
+chb24,return ll,0.0,,
+chb24,return-null d,0.0,,
+chb24,return d,4.0,,
+chb24,return-null pow,0.0,,
+chb24,return pow,4.0,,
+Siena,return-null x,5.0,2.0,10.0
+Siena,fall-rise x,3.0,1.0,14.0
+Siena,return x,6.0,4.0,12.0
+Siena,return-null x caught,6.0,0.5,12.0
+Siena,fall-rise x caught,4.5,1.0,14.0
+Siena,return x caught,9.5,4.0,13.0
+Siena,return-null m,5.0,2.0,11.0
+Siena,return m,6.0,4.0,12.0
+Siena,return-null ll,12.0,0.0,36.0
+Siena,fall-rise ll,4.0,4.0,28.0
+Siena,return ll,12.0,0.0,38.0
+Siena,return-null d,16.0,4.0,38.0
+Siena,return d,16.0,8.0,48.0
+Siena,return-null pow,8.0,0.0,36.0
+Siena,return pow,10.0,0.0,42.0
+development,rho return x-mf_ll,0.3848859622622926,0.2072810883905933,0.5441366578004091
+development,rho return x-mf_d,0.0025428843305271486,-0.34120695380731514,0.29755808058579214
+test,rho return x-mf_ll,0.01708295184949653,-0.16995712690367673,0.29649397985485415
+test,rho return x-mf_d,0.08935101027758426,-0.1849066202952068,0.28762936975433073
+chb24,rho return x-mf_ll,0.27160988535869124,,
+chb24,rho return x-mf_d,-0.3080848388716714,,
+Siena,rho return x-mf_ll,0.38237869951953535,-0.0627892965344198,0.6971825938333802
+Siena,rho return x-mf_d,0.3680430113027403,-0.05428918459627851,0.6984493728393194
+development,signed offset,4.0,-4.0,24.0
+development,end-return,-8.0,-16.0,0.0
+development,nearer return,0.35319148936170214,0.19534559436671917,0.5164332146726512
+development,rho error-return,0.1869663005381947,-0.05043446240904929,0.39232019954220115
+development,rho error-fall,0.24061976641099175,-0.011148773599270691,0.4406665923108959
+development,edge,0.008368200836820083,0.0,0.0297029702970297
+test held-out,signed offset,16.0,4.0,36.0
+test held-out,end-return,0.0,-8.0,20.0
+test held-out,nearer return,0.5164835164835165,0.26153846153846155,0.6786153395784538
+test held-out,rho error-return,0.5995701551642988,0.009001147287204418,0.8257395543014433
+test held-out,rho error-fall,0.35534649571339977,-0.13847407671914994,0.6362408064762354
+test held-out,edge,0.04395604395604396,0.0,0.14084507042253522
+test final,signed offset,16.0,8.0,36.0
+test final,end-return,0.0,0.0,8.0
+test final,nearer return,0.5114503816793893,0.36432346723044395,0.6460176991150443
+test final,rho error-return,0.5028458571106829,0.127836434621408,0.7880461251759827
+test final,rho error-fall,0.09363939578589553,-0.24008949399450732,0.4473426755154954
+test final,edge,0.03816793893129771,0.006578947368421052,0.10843373493975904
+chb24,signed offset,0.0,,
+chb24,end-return,-4.0,,
+chb24,nearer return,0.022727272727272728,,
+chb24,rho error-return,-0.06163591347643124,,
+chb24,rho error-fall,0.15333270565691284,,
+chb24,edge,0.041666666666666664,,
+Siena,signed offset,16.0,4.0,88.0
+Siena,end-return,0.0,-8.0,68.0
+Siena,nearer return,0.41935483870967744,0.34042004825619654,0.5333333333333333
+Siena,rho error-return,0.4275613176198859,0.031124504159486064,0.7527588935327789
+Siena,rho error-fall,-0.06722362938792445,-0.3776352990454962,0.28204742184470044
+Siena,edge,0.010752688172043012,0.0,0.025
+development,k3 2nd-record |off|,20.0,0.0,40.0
+development,k3 3rd nearer return,0.6382978723404256,0.5496439247406365,0.7302904564315352
+development,m30-record signed,4.0,0.0,24.0
+test held-out,k3 2nd-record |off|,8.0,-16.0,28.0
+test held-out,k3 3rd nearer return,0.5054945054945055,0.35820434862723416,0.654320987654321
+test held-out,m30-record signed,16.0,-8.0,46.0
+test final,k3 2nd-record |off|,16.0,-8.0,28.0
+test final,k3 3rd nearer return,0.5877862595419847,0.4266666666666667,0.7080745341614907
+test final,m30-record signed,4.0,-4.0,28.0
+chb24,k3 2nd-record |off|,20.0,,
+chb24,k3 3rd nearer return,0.6818181818181818,,
+chb24,m30-record signed,0.0,,
+Siena,k3 2nd-record |off|,12.0,-68.0,40.0
+Siena,k3 3rd nearer return,0.5806451612903226,0.39080459770114945,0.7520661157024794
+Siena,m30-record signed,0.0,-16.0,44.0
+development,patient-weighted loc-det |off|,0.0,,
+test held-out,patient-weighted loc-det |off|,10.0,,
+test final,patient-weighted loc-det |off|,10.0,,
+chb24,patient-weighted loc-det |off|,-4.0,,
+Siena,patient-weighted loc-det |off|,0.0,,

@@ -1,0 +1,31 @@
+set,stratum,n,cpd_abs,det_abs,cpd_signed
+development,fallback,8,32.0,32.0,-6.0
+development,long,16,268.0,272.0,236.0
+development,merged,78,42.0,96.0,24.0
+development,multi,0,,,
+development,short,8,38.0,32.0,38.0
+development,vlong,4,492.0,316.0,-492.0
+test held-out,fallback,12,16.0,16.0,6.0
+test held-out,long,0,,,
+test held-out,merged,20,52.0,44.0,52.0
+test held-out,multi,0,,,
+test held-out,short,14,32.0,24.0,32.0
+test held-out,vlong,0,,,
+test final,fallback,15,24.0,24.0,4.0
+test final,long,0,,,
+test final,merged,40,54.0,44.0,52.0
+test final,multi,0,,,
+test final,short,14,32.0,24.0,32.0
+test final,vlong,0,,,
+chb24,fallback,6,14.0,14.0,-10.0
+chb24,long,0,,,
+chb24,merged,8,90.0,90.0,86.0
+chb24,multi,0,,,
+chb24,short,0,,,
+chb24,vlong,0,,,
+Siena,fallback,24,96.0,96.0,36.0
+Siena,long,1,248.0,240.0,248.0
+Siena,merged,52,132.0,132.0,132.0
+Siena,multi,0,,,
+Siena,short,7,292.0,256.0,292.0
+Siena,vlong,0,,,

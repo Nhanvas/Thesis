@@ -57,6 +57,11 @@ stopping -- and stops unless R0's k = the reference k (G-pc7k) and the reused se
 PC7_RESERVE_S <= PC7_GUARD_H (gate G-guard lists the seeds trained). Variant R0s = R0's latents with k recalibrated on
 each seed's own development scores (kmode "seed"; every other variant: k of seed 42). An arm's node input uses the
 constants of its own checkpoint json (= V5's, gate G-pc1const).
+PC8 (added 21/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8.md): arms P8a (without the 5 log band powers), P8b
+(without log line length + kurtosis), P8c (the 7 absolute features only), retrained like R0 / 10a / 10b. Seeds and reuse
+per arm: EUR_ARM_SEEDS_<ARM> / EUR_ARM_REUSE_<ARM> override EUR_ARM_SEEDS / EUR_ARM_REUSE for that arm (unset: PC1 / PC7
+behaviour unchanged). Gate G-pc8cols: the dropped columns by name = the design, seed 42 in every PC8 arm. run_meta records
+the CPU model (/proc/cpuinfo) and the seeds of every arm.
 Outputs: WORK/eureka/<tag>/ (run_meta.json, gates.json, data_sha256.csv, r10/, per_subject.csv, errors.csv, curve.csv,
 k.csv, jobs.csv, projection.json, SUMMARY.md). The reading is done by src/eur_abl_aggregate.py (committed first); PC7 by
 src/eur_pc7_read.py.
@@ -140,21 +145,35 @@ VARIANTS = {
     "10a": _v(enc="arm10a", text="GAE retrained without the 7 absolute features (node input 23, target 5)"),
     "10b": _v(enc="arm10b", text="GAE retrained without the gamma powers, relative and absolute (input 28, target 10)"),
     "R0s": _v(enc="armR0", kmode="seed", text="R0 with k recalibrated on each seed's own development scores (PC7, Q6)"),
+    "P8a": _v(enc="armP8a", text="GAE retrained without the 5 log band powers (input 25, target 7; PC8)"),
+    "P8b": _v(enc="armP8b", text="GAE retrained without log line length and kurtosis (input 28, target 10; PC8)"),
+    "P8c": _v(enc="armP8c", text="GAE retrained on the 7 absolute features only (input 7, target 7; PC8)"),
 }
 PC7_GUARD_H, PC7_RESERVE_S = 11.3, 4500.0
 REUSE_FILES = ("gae_v2_{t}.pt", "gae_v2_{t}.json", "gae_v2_{t}_DONE.json", "training_log_{t}.csv")
 
 
-def arm_tags():
-    """arm seeds (EUR_ARM_SEEDS; default = the four V0 seeds). Test mode: EUR_TEST_ARM_SEEDS overrides."""
-    s = (os.environ.get("EUR_TEST_ARM_SEEDS") if os.environ.get("R2_TEST") else None) or os.environ.get("EUR_ARM_SEEDS", "")
-    seeds = [int(x) for x in s.split(",") if x.strip()]
+def _env_list(name, arm):
+    """EUR_<name>_<ARM> (per arm; added 21/11, chat D37-F, PC8) else EUR_<name>; in test mode EUR_TEST_<name>[_<ARM>]
+    first. Unset per-arm variables leave PC1 / PC7 behaviour unchanged."""
+    test = bool(os.environ.get("R2_TEST"))
+    keys = ([f"EUR_TEST_{name}_{arm}"] if (test and arm) else []) + ([f"EUR_{name}_{arm}"] if arm else []) + \
+           ([f"EUR_TEST_{name}"] if test else []) + [f"EUR_{name}"]
+    for k in keys:
+        if os.environ.get(k, "").strip():
+            return os.environ[k]
+    return ""
+
+
+def arm_tags(arm=None):
+    """arm seeds (EUR_ARM_SEEDS_<ARM> or EUR_ARM_SEEDS; default = the four V0 seeds). Test mode: EUR_TEST_ARM_SEEDS[_<ARM>]
+    overrides."""
+    seeds = [int(x) for x in _env_list("ARM_SEEDS", arm).split(",") if x.strip()]
     return [f"clean_seed{x}" for x in seeds] if seeds else list(TAGS)
 
 
-def reuse_tags():
-    s = (os.environ.get("EUR_TEST_ARM_REUSE") if os.environ.get("R2_TEST") else None) or os.environ.get("EUR_ARM_REUSE", "")
-    return [f"clean_seed{int(x)}" for x in s.split(",") if x.strip()]
+def reuse_tags(arm=None):
+    return [f"clean_seed{int(x)}" for x in _env_list("ARM_REUSE", arm).split(",") if x.strip()]
 
 
 def pc7_ref():
@@ -163,13 +182,25 @@ def pc7_ref():
 
 
 def seeds_of(vid):
-    return arm_tags() if VARIANTS[vid]["enc"].startswith("arm") else list(TAGS)
+    enc = VARIANTS[vid]["enc"]
+    return arm_tags(enc[3:]) if enc.startswith("arm") else list(TAGS)
 # PC1 arms: columns kept of the 30-value node input [adjacency 0-17 | relative band powers 18-22 (delta..gamma) |
 # 7 absolute features 23-29 (log band powers delta..gamma, log line length, kurtosis)] and of the 12-value
 # reconstruction target [relative band powers 0-4 | absolute features 5-11]
+# PC8 arms (21/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8.md): P8a without the 5 log band powers (input 23-27,
+# target 5-9), P8b without log line length + kurtosis (input 28-29, target 10-11), P8c the 7 absolute features only.
 PC1_ARMS = {"R0": (list(range(30)), list(range(12))),
         "10a": (list(range(23)), list(range(5))),
-        "10b": ([i for i in range(30) if i not in (22, 27)], [i for i in range(12) if i not in (4, 9)])}
+        "10b": ([i for i in range(30) if i not in (22, 27)], [i for i in range(12) if i not in (4, 9)]),
+        "P8a": ([i for i in range(30) if i not in range(23, 28)], [i for i in range(12) if i not in range(5, 10)]),
+        "P8b": ([i for i in range(30) if i not in (28, 29)], [i for i in range(12) if i not in (10, 11)]),
+        "P8c": (list(range(23, 30)), list(range(5, 12)))}
+IN_NAMES = ([f"adj{c}" for c in range(18)] + [f"rel_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")] +
+            [f"logbp_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")] + ["log_linelen", "slog_kurtosis"])
+OUT_NAMES = IN_NAMES[18:]
+PC8_DROP = {"P8a": {f"logbp_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")},      # design §2, by name
+            "P8b": {"log_linelen", "slog_kurtosis"},
+            "P8c": set(IN_NAMES[:23])}
 PC1_EPOCHS = 200
 MIX_SAMPLE, MIX_KMAX, MIX_MIN, MIX_MIN_SHARE, MIX_SEED = 5000, 4, 64, 0.05, 42
 
@@ -650,13 +681,18 @@ def prep_job(a):
                     smm[vid] = PS.smoothed(lite, m, v["smooth"])
         arm_vids = [v for v in variants if VARIANTS[v]["enc"].startswith("arm")]
         smm_t = {}
-        for tag in (arm_tags() if arm_vids else []):  # retrained arms: the arm seeds (EUR_ARM_SEEDS), not V0's four
+        arm_seed_union = list(dict.fromkeys(t for v in arm_vids for t in seeds_of(v)))
+        for tag in arm_seed_union:  # retrained arms: each arm's own seeds (EUR_ARM_SEEDS[_<ARM>]), not V0's four
             Ds = {}
             for enc in sorted({VARIANTS[v]["enc"] for v in arm_vids}):
+                if tag not in arm_tags(enc[3:]):
+                    continue
                 if (arm_dir(enc[3:]) / f"gae_v2_{tag}.pt").exists():      # absent: a chunk skipped by the guard
                     Ds[enc] = conv(d_maha(encode(tag, adj, xn, f7, ckpt_dir=arm_dir(enc[3:]))), ext)
             for vid in arm_vids:
                 v = VARIANTS[vid]
+                if tag not in seeds_of(vid):
+                    continue
                 if v["enc"] not in Ds:
                     na.append(f"{vid}|{tag}")
                     continue
@@ -992,16 +1028,51 @@ def pc1_prepare(arms, workers):
     ok = d == 0.0 and all(v["G2"] == "PASS" for v in smoke.values())
     R1.gate(dict(gate="G-pc1vec", status="PASS" if ok else "FAIL", max_abs_diff=d, arms=smoke,
                  summary=f"train_masked (every column) = f1_core.train: max |weight diff| {d:.1e}; arms 2 epochs {smoke}"))
+    if any(a_ in PC8_DROP for a_ in arms):
+        pc8_columns(arms)
     R1.phase("pc1_gates", t)
-    reused = pc7_reuse(arms) if reuse_tags() else []
+    reused = pc7_reuse(arms) if any(reuse_tags(a_) for a_ in arms) else []
     if pc7_ref() is not None:
         pc7_platform_checks(meta)
     t = time.time()
     epochs = int(os.environ.get("EUR_PC1_EPOCHS", PC1_EPOCHS)) if os.environ.get("R2_TEST") else PC1_EPOCHS
-    specs = [(a_, tg, epochs) for a_ in arms for tg in arm_tags() if (a_, tg) not in reused]
+    specs = [(a_, tg, epochs) for a_ in arms for tg in arm_tags(a_) if (a_, tg) not in reused]
     res = train_chunks(specs, workers)
     R1.phase("pc1_training", t)
     R1._jdump(R1.WORK / "eureka" / os.environ.get("EUR_TAG", "abl") / "pc1_training.json", res)
+
+
+def pc8_columns(arms):
+    """G-pc8cols (PC8): each PC8 arm drops exactly the named columns of design §2 from the node input and the matching
+    ones from the reconstruction target; each arm runs with seed 42 among its seeds (k is calibrated on seed 42)."""
+    bad = {}
+    for a_ in arms:
+        if a_ not in PC8_DROP:
+            continue
+        ki, ko = PC1_ARMS[a_]
+        drop_in = {IN_NAMES[i] for i in range(30) if i not in ki}
+        drop_out = {OUT_NAMES[i] for i in range(12) if i not in ko}
+        want_out = PC8_DROP[a_] & set(OUT_NAMES)
+        if drop_in != PC8_DROP[a_] or drop_out != want_out or ki != sorted(ki) or ko != sorted(ko):
+            bad[a_] = dict(drop_in=sorted(drop_in), drop_out=sorted(drop_out))
+        if "clean_seed42" not in arm_tags(a_):
+            bad[f"{a_}/seeds"] = arm_tags(a_)
+    R1.gate(dict(gate="G-pc8cols", status="PASS" if not bad else "FAIL", bad=bad,
+                 arms={a_: dict(keep_in=[IN_NAMES[i] for i in PC1_ARMS[a_][0]], keep_out=[OUT_NAMES[i] for i in PC1_ARMS[a_][1]],
+                                seeds=arm_tags(a_)) for a_ in arms if a_ in PC8_DROP},
+                 summary="PC8 arms drop exactly the design's columns; seed 42 in every arm" if not bad else str(bad)))
+
+
+def cpu_model():
+    """the CPU model of the machine (first 'model name' of /proc/cpuinfo) and the distinct models; Track F standard from
+    PC8 (plan §0, board R224)."""
+    try:
+        names = [ln.split(":", 1)[1].strip() for ln in Path("/proc/cpuinfo").read_text().splitlines()
+                 if ln.lower().startswith("model name")]
+    except OSError:
+        names = []
+    return dict(cpu_model=names[0] if names else platform.processor() or "unknown", cpu_models=sorted(set(names)),
+                cpu_logical=len(names) or os.cpu_count())
 
 
 def train_chunks(specs, workers):
@@ -1033,9 +1104,11 @@ def pc7_reuse(arms):
     ref, rows, bad, done = pc7_ref(), [], [], []
     ep_want = int(os.environ.get("EUR_PC1_EPOCHS", PC1_EPOCHS)) if os.environ.get("R2_TEST") else PC1_EPOCHS
     for a_ in arms:
+        if not reuse_tags(a_):
+            continue
         out = arm_dir(a_)
         out.mkdir(parents=True, exist_ok=True)
-        for tg in reuse_tags():
+        for tg in reuse_tags(a_):
             src = ref / "models" / a_
             for f in REUSE_FILES:
                 p = src / f.format(t=tg)
@@ -1093,7 +1166,7 @@ def pc7_final_gates(ks):
     R1.gate(dict(gate="G-pc7k", status="PASS" if rel <= R1.TOL["k_rel"] else "FAIL", k=ks["R0"], k_ref=want, rel=rel,
                  summary=f"R0 k {ks['R0']:.9f} vs reference {want:.9f} (relative {rel:.1e})"))
     bad = {}
-    seeds = set(reuse_tags())
+    seeds = set(reuse_tags("R0"))
     for f in ("per_subject.csv", "errors.csv"):
         a = pd.read_csv(R1.out_dir() / f)
         b = pd.read_csv(ref / f)
@@ -1115,7 +1188,9 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     need_ref = any(VARIANTS[v]["dist"] == "ref" for v in sel)
     meta = R1.run_meta(tag, notebook, repo_commit)
     meta.update(eur_abl_sha=CODE_SHA, code_shas=code_shas(), variants={v: VARIANTS[v] for v in sel}, workers=workers,
-                arm_seeds=arm_tags(), arm_reuse=reuse_tags(), pc7_ref=os.environ.get("EUR_PC7_REF", ""))
+                arm_seeds=arm_tags(), arm_reuse=reuse_tags(), pc7_ref=os.environ.get("EUR_PC7_REF", ""),
+                arm_seeds_by_arm={a_: arm_tags(a_) for a_ in PC1_ARMS}, arm_reuse_by_arm={a_: reuse_tags(a_) for a_ in PC1_ARMS},
+                **cpu_model())
     R1._jdump(R1.out_dir() / "run_meta.json", meta)
     self_checks()
     src = build_views(DEV, TEST, EXT)

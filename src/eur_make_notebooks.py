@@ -10,11 +10,15 @@
   EUR_PC7_A, EUR_PC7_B  src/eur_abl.py with EUR_VARIANTS=V0,R0,R0s, EUR_TAG=pc7_<part>: R0 retrained with 8 new seeds
             (A: 4-11, B: 12-19) + PC1's seeds 42/1/2/3 reused from results/eureka_d32f/pc1_r0, then scored (seed variance
             PC7; chat D34-F, 21/11; design results/eureka_d34f/DESIGN_PC7.md)
+  EUR_PC8_a, EUR_PC8_b, EUR_PC8_c  src/eur_abl.py with EUR_VARIANTS=V0,R0,<arm>, EUR_TAG=pc8_<a|b|c>: the PC8 arm (P8a /
+            P8b / P8c) retrained with seeds 42, 1-7; PC1's R0 seed 42 reused from results/eureka_d32f/pc1_r0 for the gates
+            G-pc7rep / G-pc7k / G-pc7r0 (decomposition of the absolute features PC8; chat D37-F, 21/11; design
+            results/eureka_d37f/DESIGN_PC8.md)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -411,6 +415,50 @@ Do not edit; *Save Version → Save & Run All (Commit)*.
     return name, cells
 
 
+PC8_SEEDS, PC8_R0_REUSE, PC8_REF = [42, 1, 2, 3, 4, 5, 6, 7], [42], "results/eureka_d32f/pc1_r0"
+PC8_TEXT = {"P8a": "without the 5 log band powers (node input 25, reconstruction target 7)",
+            "P8b": "without log line length and kurtosis (node input 28, reconstruction target 10)",
+            "P8c": "the 7 absolute features only (node input 7, reconstruction target 7)"}
+
+
+def build_pc8(ref, arm):
+    """EUR_ABL's notebook for PC8: V0 + R0 (PC1's seed 42 reused, for the gates) + one PC8 arm (8 seeds trained)."""
+    name, cells = build_abl(ref)
+    part = arm[-1]
+    name = f"EUR_PC8_{part}"
+    cells[0] = md(f"""
+# {name} — decomposition of the absolute features PC8, arm {arm} (Track F, chat D37-F)
+
+**Design:** `results/eureka_d37f/DESIGN_PC8.md` (approved by the author 21/11/2026 12:42). Arm **{arm}**: the GAE
+retrained {PC8_TEXT[arm]} with the thesis recipe (12 training patients' clean windows, V5's constants, 200 epochs),
+**seeds {", ".join(map(str, PC8_SEEDS))}**, 4 in parallel, in two chunks (the second only if the session guard allows).
+PC1's R0 checkpoint of seed 42 is copied from `{PC8_REF}` and scored again (gates G-pc7reuse, G-pc7k, G-pc7r0: the chain
+on this machine = the chain that scored the R0 control of PC7). Recorded first: G-pc8cols (dropped columns by name),
+G-pc7plat (library versions = PC1) and G-pc7rep (1 epoch of R0 seed 42 = PC1's log; tells the machine's arithmetic).
+The CPU model is written to `run_meta.json`. Then the V5 chain on V0, R0 and {arm} (k of seed 42 per variant), with the
+usual SMOKE and record gates. **Accelerator:** None (CPU). **Internet:** ON. **Inputs (Add Input):** `v9-x3-fold1`,
+`v9-x3-fold3`, `thesis-r2-external-features`. **Output:** `/kaggle/working/eureka/pc8_{part}` (→
+`results/eureka_d37f/pc8_{part}`; checkpoints ≈ 20 KB each). **Runtime:** ≈ 5.5–8.2 h (computed from PC7's measured
+5.94 / 8.39 h; the machine type decides). Code: `github.com/Nhanvas/Thesis` ref `{ref}`; module sha256 asserted below.
+**Nothing printed here is a research result.** Do not edit; *Save Version → Save & Run All (Commit)*.
+""")
+    env = (f'os.environ.update(EUR_VARIANTS="V0,R0,{arm}", EUR_TAG="pc8_{part}", EUR_ARM_SEEDS="{",".join(map(str, PC8_SEEDS))}", '
+           f'EUR_ARM_SEEDS_R0="{",".join(map(str, PC8_R0_REUSE))}", EUR_ARM_REUSE_R0="{",".join(map(str, PC8_R0_REUSE))}", '
+           f'EUR_PC7_REF="{PC8_REF}", R2_T0=str(T_NB), THESIS_REPO=REPO,')
+    src = "".join(cells[2]["source"]).replace('os.environ.update(THESIS_REPO=REPO,', env, 1)
+    src = src.replace(f"WANT = {json.dumps(SHA)}", f"WANT = {json.dumps(sha_of(FILES_PC1))}", 1)
+    assert "EUR_ARM_SEEDS_R0" in src and "train_gae_v2.py" in src
+    cells[2] = code(src)
+    src = "".join(cells[1]["source"]).replace('NOTEBOOK, REPO_REF = "EUR_ABL"', f'NOTEBOOK, REPO_REF = "{name}"', 1)
+    assert name in src
+    cells[1] = code(src)
+    src = "".join(cells[4]["source"]).replace('OUT = os.path.join(WORK, "eureka", "abl")', f'OUT = os.path.join(WORK, "eureka", "pc8_{part}")', 1)
+    src = src.replace('for f in ("gates.json",', 'for f in ("pc1_training.json", "reused_checkpoints.csv", "gates.json",', 1)
+    assert f"pc8_{part}" in src
+    cells[4] = code(src)
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -422,7 +470,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -442,3 +490,6 @@ if __name__ == "__main__":
     if a.only == "EUR_PC7":
         for part in ("A", "B"):
             print("built", write(*build_pc7(a.ref, part)), sha_of(FILES_PC1))
+    if a.only == "EUR_PC8":
+        for arm in ("P8a", "P8b", "P8c"):
+            print("built", write(*build_pc8(a.ref, arm)), sha_of(FILES_PC1))

@@ -1,0 +1,144 @@
+{
+ "notebook": "EUR_PC7_B",
+ "tag": "pc7_B",
+ "repo_commit": "668ad14ac601b6e47ff7d9ea2a2f290c47149ab3",
+ "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28",
+ "r2_core_sha256": "902d15ad4feb3e8ab76a7a3d3e818c37269811c537cf2b33b23b5a3f7d1850fd",
+ "started": "2026-11-20 19:51:40 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "torch_threads": 1,
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cpu",
+  "torch_geometric": "2.7.0",
+  "ruptures": "v1.1.10",
+  "timescoring": "not importable: module 'timescoring' has no attribute '__version__'",
+  "mne": "1.13.2"
+ },
+ "input": "/kaggle/input",
+ "work": "/kaggle/working",
+ "scratch": "/tmp/r2",
+ "test_mode": false,
+ "eur_abl_sha": "fd5bd161a55b0c4e",
+ "code_shas": {
+  "eur_abl": "fd5bd161a55b0c4e",
+  "r2_r1": "76cbe51ff0180d4a",
+  "e16": "f170e1c59f5b0447",
+  "e17b": "3b4f034dca00eaf3",
+  "p3c_freeze": "dabe4139f6005fd2",
+  "p3_levers": "feb247d2d08c52ba",
+  "p2_scalars": "11feeaf3ba95ced4",
+  "e22": "669350bbfaaf0f4e",
+  "x1_external": "9962e3e7fe4ddc35",
+  "p2_dump_seeds23": "0bc887542989310f"
+ },
+ "variants": {
+  "V0": {
+   "dist": "maha",
+   "enc": "own",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "V5 system",
+   "kmode": "s42"
+  },
+  "R0": {
+   "dist": "maha",
+   "enc": "armR0",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",
+   "kmode": "s42"
+  },
+  "R0s": {
+   "dist": "maha",
+   "enc": "armR0",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "R0 with k recalibrated on each seed's own development scores (PC7, Q6)",
+   "kmode": "seed"
+  }
+ },
+ "workers": 4,
+ "arm_seeds": [
+  "clean_seed42",
+  "clean_seed1",
+  "clean_seed2",
+  "clean_seed3",
+  "clean_seed12",
+  "clean_seed13",
+  "clean_seed14",
+  "clean_seed15",
+  "clean_seed16",
+  "clean_seed17",
+  "clean_seed18",
+  "clean_seed19"
+ ],
+ "arm_reuse": [
+  "clean_seed42",
+  "clean_seed1",
+  "clean_seed2",
+  "clean_seed3"
+ ],
+ "pc7_ref": "results/eureka_d32f/pc1_r0",
+ "finished": "2026-11-21 04:14:01 UTC",
+ "runtime_h": 8.387,
+ "phases_s": {
+  "views": 8.6,
+  "pc1_gates": 2.8,
+  "pc1_training": 27079.1,
+  "D_r10": 525.3,
+  "score_r10": 229.5,
+  "prep_smoke": 179.0,
+  "score_smoke": 34.1,
+  "r10_full": 755.6,
+  "prep_full": 1625.4,
+  "score_full": 314.0
+ },
+ "notes": [],
+ "peak_rss_self_mb": 3289.5,
+ "peak_rss_children_mb": 3289.5,
+ "ks": {
+  "V0": 4.067744298524509,
+  "R0": 4.138745506303298,
+  "R0s": {
+   "clean_seed42": 4.138745506303298,
+   "clean_seed1": 4.137564162243672,
+   "clean_seed2": 3.1991625167307003,
+   "clean_seed3": 3.7846941891231074,
+   "clean_seed12": 3.8448402124570276,
+   "clean_seed13": 4.136435839391545,
+   "clean_seed14": 4.299545308977811,
+   "clean_seed15": 3.4185377394966396,
+   "clean_seed16": 4.139465950894795,
+   "clean_seed17": 4.190611152474467,
+   "clean_seed18": 3.9334719258722783,
+   "clean_seed19": 3.9920392596509275
+  }
+ }
+}

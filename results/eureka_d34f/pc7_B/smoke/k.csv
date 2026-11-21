@@ -1,0 +1,4 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+R0,4.067744298524509,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"
+R0s,4.067744298524509,"R0 with k recalibrated on each seed's own development scores (PC7, Q6)"

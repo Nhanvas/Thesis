@@ -1,0 +1,19 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "bad": []
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "bad": [],
+  "pairs": 2561
+ },
+ {
+  "gate": "A3",
+  "status": "PASS",
+  "bad": [],
+  "pairs": 2561
+ }
+]

@@ -14,11 +14,13 @@
             P8b / P8c) retrained with seeds 42, 1-7; PC1's R0 seed 42 reused from results/eureka_d32f/pc1_r0 for the gates
             G-pc7rep / G-pc7k / G-pc7r0 (decomposition of the absolute features PC8; chat D37-F, 21/11; design
             results/eureka_d37f/DESIGN_PC8.md)
+  EUR_PC6_DATA  src/eur_pc6_data.py (graphs of the edge-type ablation PC6: wPLI only / AEC only, rebuilt from the raw EDF
+            with the record builders; chat D37-F, 22/11; design results/eureka_d37f/DESIGN_PC6.md §3)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8|EUR_PC6_DATA]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -459,6 +461,70 @@ usual SMOKE and record gates. **Accelerator:** None (CPU). **Internet:** ON. **I
     return name, cells
 
 
+FILES_PC6D = ["eur_pc6_data.py"] + FILES_PC1 + ["dataprep/preprocessing.py", "dataprep/graph_construction.py",
+                                                "dataprep/feature_extraction.py", "continuous_eval.py",
+                                                "c1b_build_trainset.py", "evaluation_protocol.py"]
+
+
+def build_pc6_data(ref):
+    """EUR_DIAG's notebook frame for EUR_PC6_DATA (raw EDF in, graph files out)."""
+    name, cells = build_diag(ref)
+    name = "EUR_PC6_DATA"
+    cells[0] = md(f"""
+# {name} — graphs of the edge-type ablation PC6 (Track F, chat D37-F)
+
+**Design:** `results/eureka_d37f/DESIGN_PC6.md` §3 (approved by the author 22/11/2026 07:32). From the raw EDF (verified
+against PhysioNet in the session) the record builders rebuild every window of the 23 CHB-MIT cases (defense-time file
+set, committed record statistics) and of chb24 + Siena (label-free statistics, x1 convention) with one change: per window
+wPLI and AEC are computed once and three top-20 % graphs are kept — the record rule (checked against the record files,
+gate G-adj), **wPLI only (11a)** and **AEC only (11b)**. A SMOKE first (chb08, first 2 files = the record, G-feat0;
+projection, STOP if > 10.5 h). **Accelerator:** None (CPU). **Internet:** ON (pip, git clone, PhysioNet checksums).
+**Inputs (Add Input):** `combined-siena-scalp-and-chb-mit-eeg-datasets`, `v9-x3-fold1`, `v9-x3-fold3`,
+`thesis-r2-external-features`. **Output:** `/kaggle/working/eureka/pc6_data` — small files (→ `results/eureka_d37f/pc6_data`,
+committed) and `graphs/` (≈ 0.3–1.1 GB of `{{case}}_g11.npz`, NOT committed: create the Kaggle dataset
+`thesis-pc6-graphs` from this output). **Runtime:** ≈ 2.5–3.5 h (computed from EUR_9A's and R0_EXT's measured builds).
+Code: `github.com/Nhanvas/Thesis` ref `{ref}`; every module's sha256 is asserted below.
+**Nothing printed here is a research result.** Do not edit; *Save Version → Save & Run All (Commit)*.
+""")
+    src = "".join(cells[1]["source"]).replace('NOTEBOOK, REPO_REF = "EUR_DIAG"', f'NOTEBOOK, REPO_REF = "{name}"', 1)
+    src = src.replace('os.path.exists(REPO + "/src/eur_diag.py")', 'os.path.exists(REPO + "/src/eur_pc6_data.py")', 1)
+    assert name in src and "eur_pc6_data.py" in src
+    cells[1] = code(src)
+    src = "".join(cells[2]["source"]).replace(f"WANT = {json.dumps(sha_of(FILES_DIAG))}",
+                                              f"WANT = {json.dumps(sha_of(FILES_PC6D))}", 1)
+    src = src.replace("import eur_diag as M", "import eur_pc6_data as M", 1)
+    src = src.replace('assert M.__file__ == f"{REPO}/src/eur_diag.py", M.__file__',
+                      'assert M.__file__ == f"{REPO}/src/eur_pc6_data.py", M.__file__', 1)
+    src = src.replace('"| eur_diag", M.sha16(M.__file__), "| cases", len(M.DEV + M.TEST + M.EXT)',
+                      '"| eur_pc6_data", M.sha16(M.__file__), "| cases", len(M.CHB + M.EXT)', 1)
+    assert "eur_pc6_data" in src and "graph_construction.py" in src and "eur_diag" not in src
+    cells[2] = code(src)
+    cells[3] = code("""
+# RUN: G-raw, G-data, SMOKE (G-stack, G-feat0, PROJ), CHB-MIT pool, external cases, G-stack, G-struct, G-adj, G-edges,
+# G-worker, G-done
+ERR = None
+try:
+    M.main(NOTEBOOK, HEAD, workers=int(os.environ.get("EUR_WORKERS", "0")) or None)
+except SystemExit as e:
+    ERR = str(e)
+""")
+    cells[4] = code("""
+# END: gates, per-case table, outputs, measured runtime
+OUT = os.path.join(WORK, "eureka", "pc6_data")
+for f in ("gates.json", "projection.json", "run_meta.json"):
+    p = os.path.join(OUT, f)
+    if os.path.exists(p):
+        print("=====", f); print(open(p).read()[:6000])
+for root, _, fs in os.walk(OUT):
+    for f in sorted(fs):
+        p = os.path.join(root, f); print(os.path.relpath(p, WORK), os.path.getsize(p))
+print(f"MEASURED notebook runtime: {(time.time() - T_NB) / 3600:.3f} h")
+if ERR:
+    raise RuntimeError(f"STOPPED: {ERR}")
+""")
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -470,7 +536,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8", "EUR_PC6_DATA"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -493,3 +559,5 @@ if __name__ == "__main__":
     if a.only == "EUR_PC8":
         for arm in ("P8a", "P8b", "P8c"):
             print("built", write(*build_pc8(a.ref, arm)), sha_of(FILES_PC1))
+    if a.only == "EUR_PC6_DATA":
+        print("built", write(*build_pc6_data(a.ref)), sha_of(FILES_PC6D))

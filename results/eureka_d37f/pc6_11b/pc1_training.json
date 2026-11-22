@@ -1,0 +1,34 @@
+[
+ {
+  "case": "11b/clean_seed3",
+  "s": 13564.3
+ },
+ {
+  "case": "11b/clean_seed42",
+  "s": 13573.5
+ },
+ {
+  "case": "11b/clean_seed1",
+  "s": 13576.7
+ },
+ {
+  "case": "11b/clean_seed2",
+  "s": 13579.8
+ },
+ {
+  "case": "11b/clean_seed6",
+  "s": 14318.1
+ },
+ {
+  "case": "11b/clean_seed7",
+  "s": 14332.1
+ },
+ {
+  "case": "11b/clean_seed4",
+  "s": 14349.0
+ },
+ {
+  "case": "11b/clean_seed5",
+  "s": 14350.3
+ }
+]

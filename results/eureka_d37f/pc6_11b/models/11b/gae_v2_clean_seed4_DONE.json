@@ -1,0 +1,10 @@
+{
+ "arm": "11b",
+ "tag": "clean_seed4",
+ "seconds": 14349,
+ "peak_rss_mb": 3292.1,
+ "eur_abl_sha": "5881c89aff93983c",
+ "n_train": 270190,
+ "n_params": 3964,
+ "ms_per_step": 8.481
+}

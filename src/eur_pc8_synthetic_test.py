@@ -214,7 +214,8 @@ if __name__ == "__main__":
     p = subprocess.run(cmd + ["--out", str(rd)], capture_output=True, text=True)
     print(p.stdout[-2500:], p.stderr[-2000:])
     assert p.returncode == 0 and "M-gates / M0 / M1 / M2 PASS" in p.stdout and "M4 PASS" in p.stdout, "reader failed"
-    for f in ("per_subject.csv", "errors.csv", "k.csv", "seeds.csv", "r1.csv", "r2.csv", "events.csv", "machines.csv",
+    for f in ("per_subject.csv", "errors.csv", "k.csv", "seeds.csv", "r1.csv", "r1_machine.csv", "r2.csv", "events.csv",
+              "machines.csv",
               "gates.json", "T_PC8.md"):
         assert (rd / f).exists() and (rd / f).stat().st_size > 50, f
     gj = json.loads((rd / "gates.json").read_text())
@@ -230,7 +231,14 @@ if __name__ == "__main__":
     r1 = pd.read_csv(rd / "r1.csv")
     assert set(r1.arm) == {"10a", "P8a", "P8b", "P8c"} and set(r1.set) == {"development", "test", "chb24", "siena"}
     assert (r1[r1.set == "development"].ci_lo <= r1[r1.set == "development"]["diff"]).all()
-    print("R PASS: reader gates M0 / M1 / M2 / M4, every table; merged control rows = the control runs' rows")
+    # R1m: in one container every run has G-pc7rep PASS -> the matched control = the control runs' trained seeds
+    r1m = pd.read_csv(rd / "r1_machine.csv")
+    mm = gj["machine_matched"]
+    assert all(v["arm_rep"] == "PASS" and sorted(v["control_seeds"]) == sorted(f"clean_seed{s}" for s in (4, 5, 6, 7))
+               for v in mm.values()), mm
+    assert set(r1m.arm) == {"P8a", "P8b", "P8c"} and (r1m.r0_seeds == 4).all() and (r1m.reading == "secondary").all()
+    print("R PASS: reader gates M0 / M1 / M2 / M4, every table (incl. R1m machine-matched); merged control rows = the "
+          "control runs' rows")
 
     # ---- negative paths
     neg = r'''

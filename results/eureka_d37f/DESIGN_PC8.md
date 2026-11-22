@@ -146,3 +146,16 @@ No new feature, no change of the architecture or the chain; no seed ensemble; no
 the seven would be needed for a full decomposition; the two groups are the frequency-domain and the time-domain features
 of the seven, as the PC1 reading named them). The
 deliverables keep V5's numbers; the result serves the Q&A of 11/12.
+
+## 9 · Addendum (22/11 07:45, written after the runs and before any reading)
+
+The three runs finished with every gate PASS (outputs `e32902b`). All three trained on the same Kaggle machine type:
+CPU "Intel(R) Xeon(R) CPU @ 2.20GHz", G-pc7rep **DIFF** in each (the arithmetic of PC7's EUR_PC7_B machine), 8.7–9.6 ms
+per step; measured runtime 9.42–9.56 h (the computed 5.5–8.2 h of §5 was too low: training took 30,694–31,176 s
+against PC7_B's 27,079 s). The control holds 8 seeds of each machine type (pc7_A: G-pc7rep PASS; pc7_B: DIFF). So the
+arm − R0 difference of §4 mixes the arm effect with any machine effect of half of the control.
+
+**Added reading R1m (secondary):** arm − R0 with the control restricted to the control runs whose G-pc7rep status equals
+the arm run's — here pc7_B, seeds 12–19 (8 seeds) — same two-level bootstrap and wording (`r1_machine.csv`, section R1m
+of `T_PC8.md`). The primary reading R1 is unchanged. PC7's machine check found no difference between the two machine
+groups (development sensitivity −0.017, permutation p 0.378); R1m shows whether the arm reading depends on that.

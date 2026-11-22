@@ -25,8 +25,11 @@ Siena descriptive):
      metrics per seed
   R4 events at each budget (CPD stage; per-seed means): events, seizures found, false alarms, seconds per event, flagged
      time (as DIAG_PC1)
-Outputs (--out): per_subject.csv, errors.csv, k.csv, seeds.csv, r1.csv, r2.csv, events.csv, machines.csv, gates.json,
-T_PC8.md.
+  R1m (addendum of 22/11, written after the runs and BEFORE the reading; DESIGN_PC8.md §9): arm - R0 with the control
+     restricted to the control runs whose G-pc7rep status equals the arm run's (the same machine arithmetic); same
+     bootstrap; secondary
+Outputs (--out): per_subject.csv, errors.csv, k.csv, seeds.csv, r1.csv, r1_machine.csv, r2.csv, events.csv, machines.csv,
+gates.json, T_PC8.md.
   python src/eur_pc8_read.py --runs results/eureka_d37f/pc8_a results/eureka_d37f/pc8_b results/eureka_d37f/pc8_c \
       --control results/eureka_d34f/pc7_A results/eureka_d34f/pc7_B --ref results/eureka_d32f/pc1_r0 \
       --pc1 results/eureka_d32f/pc1 --pc7 results/eureka_d34f/pc7 --out results/eureka_d37f/pc8
@@ -267,6 +270,35 @@ def main():
     R1t.to_csv(out / "r1.csv", index=False)
     R2t.to_csv(out / "r2.csv", index=False)
 
+    # R1m: machine-matched control (addendum §9): control runs with the arm run's G-pc7rep status
+    rep_of = lambda r: {x["gate"]: x for x in r["gates"]}.get("G-pc7rep", {}).get("status")
+    r1m, matched = [], {}
+    for n, r in runs.items():
+        arm = arm_by_run[n]
+        cs = [t for c in controls for t in ctrl_seeds[c] if rep_of(controls[c]) == rep_of(r)
+              and t in controls[c]["meta"]["arm_seeds"] and t not in controls[c]["meta"].get("arm_reuse", [])]
+        matched[arm] = dict(arm_rep=rep_of(r), control_seeds=cs)
+        if len(cs) < 2:
+            continue
+        for st in SETS:
+            for met in METRICS:
+                mats = {"R0": RD.matrix(P_all, st, "R0", met, cs), arm: RD.matrix(P_all, st, arm, met, trained[arm])}
+                subj = [x for x in mats["R0"].index if x in mats[arm].index]
+                if not subj:
+                    continue
+                groups = {v: m.loc[subj].values for v, m in mats.items()}
+                if len(subj) >= 2:
+                    point, bs = two_level(groups, "R0", rng, B, subj)
+                    lo, hi = np.nanpercentile(bs[arm], 2.5), np.nanpercentile(bs[arm], 97.5)
+                else:
+                    point = {arm: float((groups[arm].mean(axis=1) - groups["R0"].mean(axis=1)).mean())}
+                    lo = hi = np.nan
+                r1m.append(dict(comparison=f"{arm} - R0 (control {rep_of(r)})", arm=arm, set=st, metric=met,
+                                patients=len(subj), arm_seeds=groups[arm].shape[1], r0_seeds=groups["R0"].shape[1],
+                                diff=point[arm], ci_lo=lo, ci_hi=hi, reading="secondary", wording=wording(met, lo, hi)))
+    R1m = pd.DataFrame(r1m)
+    R1m.to_csv(out / "r1_machine.csv", index=False)
+
     # M4: 10a - R0 on development = PC7's Q5 point estimates
     q5 = pd.read_csv(Path(a.pc7) / "q5.csv", float_precision="round_trip")
     for met in METRICS:
@@ -294,9 +326,9 @@ def main():
     EV.to_csv(out / "events.csv", index=False)
 
     gates = dict(m_gates="PASS", m0="PASS", m1="PASS", m2="PASS", m4="PASS", info=info, arms=arm_by_run, seeds=trained,
-                 r0_control=r0_seeds, k_r0=k_r0)
+                 r0_control=r0_seeds, k_r0=k_r0, machine_matched=matched)
     (out / "gates.json").write_text(json.dumps(gates, indent=1, default=str), encoding="utf-8")
-    (out / "T_PC8.md").write_text(report(ST, MA, R1t, R2t, EV, SV, gates), encoding="utf-8")
+    (out / "T_PC8.md").write_text(report(ST, MA, R1t, R2t, EV, SV, gates, R1m), encoding="utf-8")
     print((out / "T_PC8.md").read_text(encoding="utf-8")[:6000])
 
 
@@ -309,7 +341,7 @@ def _f(x, met, sign=False):
     return s
 
 
-def report(ST, MA, R1t, R2t, EV, SV, g):
+def report(ST, MA, R1t, R2t, EV, SV, g, R1m=None):
     L = ["# Table T_PC8 — decomposition of the 7 absolute features (retraining, Kaggle CPU)", "",
          "Design `results/eureka_d37f/DESIGN_PC8.md` (written before the run). Arms retrained with the thesis recipe, "
          f"8 seeds each; control R0 = PC7's primary seeds (N = {len(g['r0_control'])}; rows read, scored with the same chain and "
@@ -326,6 +358,13 @@ def report(ST, MA, R1t, R2t, EV, SV, g):
     for _, r in R1t.iterrows():
         L.append(f"| {r.comparison} ({TEXT[r.arm]}) | {r.set} | {r.metric} | {r.arm_seeds} | {_f(r['diff'], r.metric, True)} "
                  f"[{_f(r.ci_lo, r.metric, True)}, {_f(r.ci_hi, r.metric, True)}] | {r.reading} | {r.wording} |")
+    if R1m is not None and len(R1m):
+        L += ["", "## R1m — arm − R0 with the machine-matched control (secondary; addendum of 22/11, written before the reading)",
+              "", f"Control seeds per arm: {json.dumps(g.get('machine_matched', {}))}", "",
+              "| comparison | set | metric | arm / control seeds | Δ [95 %] | wording |", "|---|---|---|---|---|---|"]
+        for _, r in R1m.iterrows():
+            L.append(f"| {r.comparison} | {r.set} | {r.metric} | {r.arm_seeds} / {r.r0_seeds} | "
+                     f"{_f(r['diff'], r.metric, True)} [{_f(r.ci_lo, r.metric, True)}, {_f(r.ci_hi, r.metric, True)}] | {r.wording} |")
     L += ["", "## R2 — share of 10a's loss, development (descriptive; ratio of paired bootstrap draws)", "",
           "| arm | metric | share [95 %] |", "|---|---|---|"]
     for _, r in R2t.iterrows():

@@ -62,6 +62,10 @@ PC8 (added 21/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8.md): arms P8
 per arm: EUR_ARM_SEEDS_<ARM> / EUR_ARM_REUSE_<ARM> override EUR_ARM_SEEDS / EUR_ARM_REUSE for that arm (unset: PC1 / PC7
 behaviour unchanged). Gate G-pc8cols: the dropped columns by name = the design, seed 42 in every PC8 arm. run_meta records
 the CPU model (/proc/cpuinfo) and the seeds of every arm.
+PC6 (added 22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC6.md): arms 11a / 11b keep every column and replace the
+GRAPH by the wPLI-only / AEC-only graphs of EUR_PC6_DATA ({case}_g11.npz under the inputs, sha256 = the committed manifest,
+gate G-g11data): training on a view of the record .npz whose adj is the arm graph (gate G-pc6view: every other key equal to
+the record), inference with the arm graph for message passing and the node input's connectivity row (arm_adj).
 Outputs: WORK/eureka/<tag>/ (run_meta.json, gates.json, data_sha256.csv, r10/, per_subject.csv, errors.csv, curve.csv,
 k.csv, jobs.csv, projection.json, SUMMARY.md). The reading is done by src/eur_abl_aggregate.py (committed first); PC7 by
 src/eur_pc7_read.py.
@@ -148,6 +152,8 @@ VARIANTS = {
     "P8a": _v(enc="armP8a", text="GAE retrained without the 5 log band powers (input 25, target 7; PC8)"),
     "P8b": _v(enc="armP8b", text="GAE retrained without log line length and kurtosis (input 28, target 10; PC8)"),
     "P8c": _v(enc="armP8c", text="GAE retrained on the 7 absolute features only (input 7, target 7; PC8)"),
+    "11a": _v(enc="arm11a", text="GAE retrained on graphs of wPLI only (top 20 %; PC6)"),
+    "11b": _v(enc="arm11b", text="GAE retrained on graphs of AEC only (top 20 %; PC6)"),
 }
 PC7_GUARD_H, PC7_RESERVE_S = 11.3, 4500.0
 REUSE_FILES = ("gae_v2_{t}.pt", "gae_v2_{t}.json", "gae_v2_{t}_DONE.json", "training_log_{t}.csv")
@@ -194,7 +200,15 @@ PC1_ARMS = {"R0": (list(range(30)), list(range(12))),
         "10b": ([i for i in range(30) if i not in (22, 27)], [i for i in range(12) if i not in (4, 9)]),
         "P8a": ([i for i in range(30) if i not in range(23, 28)], [i for i in range(12) if i not in range(5, 10)]),
         "P8b": ([i for i in range(30) if i not in (28, 29)], [i for i in range(12) if i not in (10, 11)]),
-        "P8c": (list(range(23, 30)), list(range(5, 12)))}
+        "P8c": (list(range(23, 30)), list(range(5, 12))),
+        "11a": (list(range(30)), list(range(12))),
+        "11b": (list(range(30)), list(range(12)))}
+# PC6 arms (22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC6.md): every column kept, the GRAPH replaced -- at training
+# (a view of the record .npz whose adj is the arm graph) and at inference (the arm graph for message passing and the node
+# input's connectivity row) -- by the graphs of EUR_PC6_DATA (Kaggle dataset thesis-pc6-graphs, {case}_g11.npz)
+GRAPH_ARMS = {"11a": "adj_11a", "11b": "adj_11b"}
+PC6_MANIFEST = Path("results") / "eureka_d37f" / "pc6_data" / "manifest.csv"
+PC6_MAP = "pc6_graphs.json"
 IN_NAMES = ([f"adj{c}" for c in range(18)] + [f"rel_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")] +
             [f"logbp_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")] + ["log_linelen", "slog_kurtosis"])
 OUT_NAMES = IN_NAMES[18:]
@@ -688,7 +702,8 @@ def prep_job(a):
                 if tag not in arm_tags(enc[3:]):
                     continue
                 if (arm_dir(enc[3:]) / f"gae_v2_{tag}.pt").exists():      # absent: a chunk skipped by the guard
-                    Ds[enc] = conv(d_maha(encode(tag, adj, xn, f7, ckpt_dir=arm_dir(enc[3:]))), ext)
+                    a_in = arm_adj(case, enc[3:], idx, len(ok)) if enc[3:] in GRAPH_ARMS else adj
+                    Ds[enc] = conv(d_maha(encode(tag, a_in, xn, f7, ckpt_dir=arm_dir(enc[3:]))), ext)
             for vid in arm_vids:
                 v = VARIANTS[vid]
                 if tag not in seeds_of(vid):
@@ -963,7 +978,7 @@ def train_arm_job(a):
         done = out / f"gae_v2_{tag}_DONE.json"
         if done.exists() and json.loads(done.read_text()).get("eur_abl_sha") == CODE_SHA:
             return dict(case=f"{arm}/{tag}", s=0.0, reused=True)
-        R1.point_npz(TRAIN + VAL, "earlier")
+        R1.point_npz(TRAIN + VAL, f"g{arm}" if arm in GRAPH_ARMS else "earlier")
         meta, n_exp, n_val = _pc1_meta()
         seed = int(tag.split("seed")[-1])
         ki, ko = PC1_ARMS[arm]
@@ -985,6 +1000,7 @@ def train_arm_job(a):
         out.mkdir(parents=True, exist_ok=True)
         torch.save({k: v.cpu() for k, v in model.state_dict().items()}, out / f"gae_v2_{tag}.pt")
         m = dict(arm=arm, in_dim=len(ki), out_x=len(ko), keep_in=ki, keep_out=ko, clip=meta["clip"],
+                 graph=GRAPH_ARMS.get(arm, "record"),
                  add_mean=meta["add_mean"], add_std=meta["add_std"], n_val=nv, final_val=vl / max(1, sum(nv.values())),
                  loop="eur_abl.train_masked (= f1_core.train with every column; gate G-pc1vec)", eur_abl_sha=CODE_SHA,
                  torch=torch.__version__, threads=torch.get_num_threads(), **info)
@@ -1023,8 +1039,10 @@ def pc1_prepare(arms, workers):
     d = F._maxdiff(ref, mine)
     smoke = {}
     for a_ in arms:
+        R1.point_npz(TRAIN + VAL, f"g{a_}" if a_ in GRAPH_ARMS else "earlier")
         _, inf, _ = train_masked(TRAIN[:1], meta, 42, *PC1_ARMS[a_], 2, max_windows=2000, tag=f" smoke {a_}")
         smoke[a_] = dict(n_params=inf["n_params"], G2=inf["G2"], ms_per_step=inf["ms_per_step"])
+    R1.point_npz(TRAIN + VAL, "earlier")
     ok = d == 0.0 and all(v["G2"] == "PASS" for v in smoke.values())
     R1.gate(dict(gate="G-pc1vec", status="PASS" if ok else "FAIL", max_abs_diff=d, arms=smoke,
                  summary=f"train_masked (every column) = f1_core.train: max |weight diff| {d:.1e}; arms 2 epochs {smoke}"))
@@ -1061,6 +1079,76 @@ def pc8_columns(arms):
                  arms={a_: dict(keep_in=[IN_NAMES[i] for i in PC1_ARMS[a_][0]], keep_out=[OUT_NAMES[i] for i in PC1_ARMS[a_][1]],
                                 seeds=arm_tags(a_)) for a_ in arms if a_ in PC8_DROP},
                  summary="PC8 arms drop exactly the design's columns; seed 42 in every arm" if not bad else str(bad)))
+
+
+def arm_adj(case, arm, idx, n):
+    """the PC6 arm graph of one case on the windows idx (the non-signal-loss windows), with model_inputs' rule for
+    non-finite graphs; n = the record's window count (checked)."""
+    m = json.loads((SCR / PC6_MAP).read_text())
+    g = np.load(m[case], allow_pickle=True)[GRAPH_ARMS[arm]]
+    if len(g) != n:
+        raise SystemExit(f"{case}: {arm} graph has {len(g)} windows, the record {n}")
+    a_ = g[idx].astype(np.float32)
+    a_[~np.isfinite(a_).all(axis=(1, 2))] = 0.0
+    return a_
+
+
+def _eq(a, b):
+    """exact equality of two stored arrays; NaN = NaN for float arrays (f7 holds NaN on some signal-loss windows)."""
+    a, b = np.asarray(a), np.asarray(b)
+    if a.dtype != b.dtype or a.shape != b.shape:
+        return False
+    return bool(np.array_equal(a, b, equal_nan=a.dtype.kind in "fc"))
+
+
+def pc6_prepare(arms):
+    """G-g11data (every graph file found once under the inputs, sha256 = the committed manifest of EUR_PC6_DATA) and
+    G-pc6view (for every case the graph file has the record's window count; for the 15 development cases a view of the
+    record .npz with adj = the arm graph is written, every other key identical to the record, checked)."""
+    t = time.time()
+    man = pd.read_csv(REPO / PC6_MANIFEST)
+    cases = DEV + TEST + EXT
+    found, bad = {}, []
+    for c in cases:
+        hits = sorted(p for p in R1.INPUT.rglob(f"{c}_g11.npz"))
+        shas = {hashlib.sha256(p.read_bytes()).hexdigest() for p in hits}
+        want = man[man.case == c].sha256.tolist()
+        if not hits or len(shas) != 1 or not want or shas != {want[0]}:
+            bad.append(f"{c}: {len(hits)} file(s), sha {sorted(x[:12] for x in shas)} vs manifest {[w[:12] for w in want]}")
+            continue
+        found[c] = str(hits[0])
+    R1.gate(dict(gate="G-g11data", status="PASS" if not bad else "FAIL", files=len(found), bad=bad[:10],
+                 summary=f"{len(found)} graph files = the manifest {PC6_MANIFEST}" if not bad else str(bad[:5])))
+    SCR.mkdir(parents=True, exist_ok=True)
+    (SCR / PC6_MAP).write_text(json.dumps(found, indent=1))
+    vbad, rows = [], []
+    for c in cases:
+        src = "ext" if c in EXT else "earlier"
+        ref = np.load(R1.VIEWS / src / (f"{c}_lf.npz" if c in EXT else f"{c}.npz"), allow_pickle=True)
+        g = np.load(found[c], allow_pickle=True)
+        n = len(ref["adj"])
+        ok = all(len(g[GRAPH_ARMS[a_]]) == n and g[GRAPH_ARMS[a_]].shape == ref["adj"].shape for a_ in arms)
+        ok &= [str(x) for x in g["files"]] == [str(x) for x in ref["files"]]
+        if c in DEV and ok:
+            for a_ in arms:
+                d = R1.VIEWS / f"g{a_}"
+                d.mkdir(parents=True, exist_ok=True)
+                z = {k: ref[k] for k in ref.files}
+                z["adj"] = np.asarray(g[GRAPH_ARMS[a_]])
+                np.savez(d / f"{c}.npz", **z)
+                v = np.load(d / f"{c}.npz", allow_pickle=True)
+                same = all(_eq(v[k], ref[k]) for k in ref.files if k != "adj")
+                same &= (np.array_equal(np.asarray(v["adj"]), np.asarray(g[GRAPH_ARMS[a_]]))
+                         and v["adj"].dtype == g[GRAPH_ARMS[a_]].dtype)          # the arm graph as stored (float16)
+                ok &= same
+        rows.append(dict(case=c, n_windows=n, ok=bool(ok)))
+        if not ok:
+            vbad.append(c)
+    pd.DataFrame(rows).to_csv(R1.out_dir() / "pc6_views.csv", index=False)
+    R1.gate(dict(gate="G-pc6view", status="PASS" if not vbad else "FAIL", bad=vbad, arms=list(arms),
+                 summary=f"{len(cases)} cases: graph windows / files = the record; development views differ from the "
+                         f"record in adj only" if not vbad else str(vbad)))
+    R1.phase("pc6_prepare", t)
 
 
 def cpu_model():
@@ -1196,6 +1284,8 @@ def main(notebook="EUR_ABL", repo_commit="local", workers=None, smoke_only=False
     src = build_views(DEV, TEST, EXT)
     gate_data(src)
     arms = list(dict.fromkeys(VARIANTS[v]["enc"][3:] for v in sel if VARIANTS[v]["enc"].startswith("arm")))  # R0s = R0
+    if any(a_ in GRAPH_ARMS for a_ in arms):
+        pc6_prepare([a_ for a_ in arms if a_ in GRAPH_ARMS])
     if arms:
         pc1_prepare(arms, workers)
     # ---- SMOKE (the small check before the full run): chb01 + chb03 (+ first external case), measured

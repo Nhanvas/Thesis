@@ -1,0 +1,55 @@
+comparison,arm,set,metric,patients,arm_seeds,p8c_seeds,diff,ci_lo,ci_hi,reading,wording
+R0 - P8c,R0,unseen,sens,11,16,8,0.163183170995671,0.039770698051948036,0.31960261093073594,descriptive,gains
+P8d - P8c,P8d,unseen,sens,11,8,8,0.1498647186147186,0.05771036255411254,0.26434591450216444,primary,gains
+P8e - P8c,P8e,unseen,sens,11,8,8,0.04059794372294372,-0.029383793290043328,0.1383928571428571,primary,no measurable difference
+R0 - P8c,R0,unseen,f1,11,16,8,0.026796437188706283,-0.024942594111258563,0.0739383313553822,descriptive,no measurable difference
+P8d - P8c,P8d,unseen,f1,11,8,8,-0.0009738809784684454,-0.04633575095727428,0.04262832359689227,primary,no measurable difference
+P8e - P8c,P8e,unseen,f1,11,8,8,-0.010130241618173047,-0.03424650572997864,0.014548502612932975,primary,no measurable difference
+R0 - P8c,R0,unseen,fa,11,16,8,2.2779791835091148,-1.9098344728027208,6.451204534966405,descriptive,no measurable difference
+P8d - P8c,P8d,unseen,fa,11,8,8,9.526333623229597,3.9763495063814696,15.797945554842647,primary,more false alarms
+P8e - P8c,P8e,unseen,fa,11,8,8,1.0749704889105667,-3.4102395007567785,5.093977478670412,primary,no measurable difference
+R0 - P8c,R0,development,sens,15,16,8,-0.012584325396825398,-0.11395701376170127,0.08965906675170066,descriptive,no measurable difference
+P8d - P8c,P8d,development,sens,15,8,8,-0.04787469474969476,-0.15044394841269845,0.051122714710884296,secondary,no measurable difference
+P8e - P8c,P8e,development,sens,15,8,8,-0.09534035409035409,-0.19464422066903686,-0.0006366921768707653,secondary,loses
+R0 - P8c,R0,development,f1,15,16,8,-0.03065873229355491,-0.07239549777662418,0.014431445178034448,descriptive,no measurable difference
+P8d - P8c,P8d,development,f1,15,8,8,-0.03602895630825651,-0.07508375170005423,0.00019583091931270504,secondary,no measurable difference
+P8e - P8c,P8e,development,f1,15,8,8,-0.03761719139725918,-0.08679238889033168,0.006393759009029364,secondary,no measurable difference
+R0 - P8c,R0,development,fa,15,16,8,2.542017858001046,-1.4052352877101353,5.815620716265136,descriptive,no measurable difference
+P8d - P8c,P8d,development,fa,15,8,8,4.889546167809252,1.1982852242196458,8.427186333995119,secondary,more false alarms
+P8e - P8c,P8e,development,fa,15,8,8,0.7878682387273522,-2.0263984849233063,3.5843737438347305,secondary,no measurable difference
+R0 - P8c,R0,validation,sens,3,16,8,0.12916666666666668,0.0,0.375,descriptive,no measurable difference
+P8d - P8c,P8d,validation,sens,3,8,8,0.04166666666666665,0.0,0.15,descriptive,no measurable difference
+P8e - P8c,P8e,validation,sens,3,8,8,-0.016666666666666663,-0.09999999999999998,0.024999999999999984,descriptive,no measurable difference
+R0 - P8c,R0,validation,f1,3,16,8,0.05690543197630484,-0.04254665235238037,0.13033113132705823,descriptive,no measurable difference
+P8d - P8c,P8d,validation,f1,3,8,8,-0.00427546917487336,-0.06566578723131239,0.04828122869660825,descriptive,no measurable difference
+P8e - P8c,P8e,validation,f1,3,8,8,-0.01824895584643521,-0.06784384003992719,0.03664821779152025,descriptive,no measurable difference
+R0 - P8c,R0,validation,fa,3,16,8,-0.9135639850770682,-10.222034162528118,6.6659891156023034,descriptive,no measurable difference
+P8d - P8c,P8d,validation,fa,3,8,8,3.1762029971583914,-4.676472194667202,11.426698663803553,descriptive,no measurable difference
+P8e - P8c,P8e,validation,fa,3,8,8,2.636383509549263,-4.431821094307624,8.826909425176055,descriptive,no measurable difference
+R0 - P8c,R0,test,sens,8,16,8,0.1759393601190476,0.030969122023809553,0.380751720610119,descriptive,gains
+P8d - P8c,P8d,test,sens,8,8,8,0.1904389880952381,0.0748507254464286,0.324482421875,descriptive,gains
+P8e - P8c,P8e,test,sens,8,8,8,0.062072172619047614,-0.029242001488095273,0.18834402901785702,descriptive,no measurable difference
+R0 - P8c,R0,test,f1,8,16,8,0.015505564143356817,-0.04436651608529453,0.07060091528694021,descriptive,no measurable difference
+P8d - P8c,P8d,test,f1,8,8,8,0.00026421459518339435,-0.056644417500295745,0.05626245266395094,descriptive,no measurable difference
+P8e - P8c,P8e,test,f1,8,8,8,-0.007085723782574736,-0.03126946239153396,0.019481756260129032,descriptive,no measurable difference
+R0 - P8c,R0,test,fa,8,16,8,3.4748078717289337,-0.9203364103549272,7.995231085917325,descriptive,no measurable difference
+P8d - P8c,P8d,test,fa,8,8,8,11.907632608006297,5.69005048462951,19.589161927461628,descriptive,more false alarms
+P8e - P8c,P8e,test,fa,8,8,8,0.48944060617105545,-4.847145458998231,5.270508058585619,descriptive,no measurable difference
+R0 - P8c,R0,chb24,sens,1,16,8,-0.19921875,,,descriptive,descriptive (one patient)
+P8d - P8c,P8d,chb24,sens,1,8,8,-0.140625,,,descriptive,descriptive (one patient)
+P8e - P8c,P8e,chb24,sens,1,8,8,-0.0078125,,,descriptive,descriptive (one patient)
+R0 - P8c,R0,chb24,f1,1,16,8,0.14531879163811834,,,descriptive,descriptive (one patient)
+P8d - P8c,P8d,chb24,f1,1,8,8,0.17193161586149286,,,descriptive,descriptive (one patient)
+P8e - P8c,P8e,chb24,f1,1,8,8,0.030425713301931445,,,descriptive,descriptive (one patient)
+R0 - P8c,R0,chb24,fa,1,16,8,-43.42250486151259,,,descriptive,descriptive (one patient)
+P8d - P8c,P8d,chb24,fa,1,8,8,-42.712986808219895,,,descriptive,descriptive (one patient)
+P8e - P8c,P8e,chb24,fa,1,8,8,-9.649445524780575,,,descriptive,descriptive (one patient)
+R0 - P8c,R0,siena,sens,14,16,8,0.015476190476190485,-0.18021205357142855,0.22589471726190474,descriptive,no measurable difference
+P8d - P8c,P8d,siena,sens,14,8,8,-0.13020833333333331,-0.29553943452380954,0.017261904761904763,descriptive,no measurable difference
+P8e - P8c,P8e,siena,sens,14,8,8,-0.011904761904761894,-0.17083705357142853,0.1575892857142857,descriptive,no measurable difference
+R0 - P8c,R0,siena,f1,14,16,8,0.009398145456949336,-0.06174340911212865,0.08442132991643429,descriptive,no measurable difference
+P8d - P8c,P8d,siena,f1,14,8,8,-0.03786740373571375,-0.091462046014546,0.012901412668075313,descriptive,no measurable difference
+P8e - P8c,P8e,siena,f1,14,8,8,-0.03449260622909613,-0.10147773377718017,0.02439112769317895,descriptive,no measurable difference
+R0 - P8c,R0,siena,fa,14,16,8,-3.1956823175494935,-12.205945080541762,6.39933114690392,descriptive,no measurable difference
+P8d - P8c,P8d,siena,fa,14,8,8,-8.636363021489208,-16.78714332241675,-0.36290866201231525,descriptive,fewer false alarms
+P8e - P8c,P8e,siena,fa,14,8,8,3.396675344870153,-3.7164686762759,10.857194290167431,descriptive,no measurable difference

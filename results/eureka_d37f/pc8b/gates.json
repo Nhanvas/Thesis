@@ -1,0 +1,128 @@
+{
+ "m_gates": "PASS",
+ "m0": "PASS",
+ "m1": "PASS",
+ "m2": "PASS",
+ "m4": "PASS",
+ "m5": "PASS",
+ "m6": "PASS",
+ "m7": "PASS",
+ "info": {
+  "pc8_d": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  },
+  "pc8_e": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  },
+  "pc8_c": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  }
+ },
+ "arms": {
+  "pc8_d": "P8d",
+  "pc8_e": "P8e",
+  "pc8_c": "P8c"
+ },
+ "seeds": {
+  "P8d": [
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed42"
+  ],
+  "P8e": [
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed42"
+  ],
+  "P8c": [
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed42"
+  ]
+ },
+ "r0_control": [
+  "clean_seed4",
+  "clean_seed5",
+  "clean_seed6",
+  "clean_seed7",
+  "clean_seed8",
+  "clean_seed9",
+  "clean_seed10",
+  "clean_seed11",
+  "clean_seed12",
+  "clean_seed13",
+  "clean_seed14",
+  "clean_seed15",
+  "clean_seed16",
+  "clean_seed17",
+  "clean_seed18",
+  "clean_seed19"
+ ],
+ "k_r0": 4.138745506303298,
+ "unseen": {
+  "validation": [
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "test": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ]
+ },
+ "machine_matched": {
+  "P8d": {
+   "arm_rep": "DIFF",
+   "control_seeds": [
+    "clean_seed12",
+    "clean_seed13",
+    "clean_seed14",
+    "clean_seed15",
+    "clean_seed16",
+    "clean_seed17",
+    "clean_seed18",
+    "clean_seed19"
+   ]
+  },
+  "P8e": {
+   "arm_rep": "DIFF",
+   "control_seeds": [
+    "clean_seed12",
+    "clean_seed13",
+    "clean_seed14",
+    "clean_seed15",
+    "clean_seed16",
+    "clean_seed17",
+    "clean_seed18",
+    "clean_seed19"
+   ]
+  }
+ }
+}

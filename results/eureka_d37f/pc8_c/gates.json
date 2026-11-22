@@ -1,0 +1,450 @@
+[
+ {
+  "gate": "G-self",
+  "status": "PASS",
+  "bad": [],
+  "summary": "member construction = e17b; distances by definition; O6 K=1 and two-mode; O7 context"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 38,
+  "bad": [],
+  "pinned": 38,
+  "summary": "38 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-pc1const",
+  "status": "PASS",
+  "max_rel": 0.0,
+  "summary": "V5 constants = norm_constants on the record training windows (relative 0.0e+00)"
+ },
+ {
+  "gate": "G-pc1vec",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "arms": {
+   "R0": {
+    "n_params": 3964,
+    "G2": "PASS",
+    "ms_per_step": 5.228
+   },
+   "P8c": {
+    "n_params": 2327,
+    "G2": "PASS",
+    "ms_per_step": 5.03
+   }
+  },
+  "summary": "train_masked (every column) = f1_core.train: max |weight diff| 0.0e+00; arms 2 epochs {'R0': {'n_params': 3964, 'G2': 'PASS', 'ms_per_step': 5.228}, 'P8c': {'n_params': 2327, 'G2': 'PASS', 'ms_per_step': 5.03}}"
+ },
+ {
+  "gate": "G-pc8cols",
+  "status": "PASS",
+  "bad": {},
+  "arms": {
+   "P8c": {
+    "keep_in": [
+     "logbp_delta",
+     "logbp_theta",
+     "logbp_alpha",
+     "logbp_beta",
+     "logbp_gamma",
+     "log_linelen",
+     "slog_kurtosis"
+    ],
+    "keep_out": [
+     "logbp_delta",
+     "logbp_theta",
+     "logbp_alpha",
+     "logbp_beta",
+     "logbp_gamma",
+     "log_linelen",
+     "slog_kurtosis"
+    ],
+    "seeds": [
+     "clean_seed42",
+     "clean_seed1",
+     "clean_seed2",
+     "clean_seed3",
+     "clean_seed4",
+     "clean_seed5",
+     "clean_seed6",
+     "clean_seed7"
+    ]
+   }
+  },
+  "summary": "PC8 arms drop exactly the design's columns; seed 42 in every arm"
+ },
+ {
+  "gate": "G-pc7reuse",
+  "status": "PASS",
+  "bad": [],
+  "reused": [
+   "R0/clean_seed42"
+  ],
+  "summary": "1 checkpoints copied from results/eureka_d32f/pc1_r0; sha256 in reused_checkpoints.csv"
+ },
+ {
+  "gate": "G-pc7plat",
+  "status": "PASS",
+  "diff": {},
+  "stops": false,
+  "summary": "library versions = the reference run"
+ },
+ {
+  "gate": "G-pc7rep",
+  "status": "DIFF",
+  "got": "0.01795412451365243",
+  "want": "0.017963460391877014",
+  "stops": false,
+  "s": 44.7,
+  "summary": "epoch-1 loss 0.01795412451365243 vs reference 0.017963460391877014"
+ },
+ {
+  "gate": "G-guard",
+  "status": "PASS",
+  "chunks": [
+   {
+    "seeds": [
+     "P8c/clean_seed42",
+     "P8c/clean_seed1",
+     "P8c/clean_seed2",
+     "P8c/clean_seed3"
+    ],
+    "s": 14708.8,
+    "elapsed_h": 4.129
+   },
+   {
+    "seeds": [
+     "P8c/clean_seed4",
+     "P8c/clean_seed5",
+     "P8c/clean_seed6",
+     "P8c/clean_seed7"
+    ],
+    "s": 15984.9,
+    "elapsed_h": 8.569
+   }
+  ],
+  "skipped": [],
+  "guard_h": 11.3,
+  "reserve_s": 4500.0,
+  "summary": "8 trained in 2 chunk(s); skipped []"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 48,
+  "error_pairs": 112,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01"
+  ],
+  "summary": "p3c_freeze: 48 rows, 112 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 16,
+  "error_pairs": 55,
+  "rows_look6": 8,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03"
+  ],
+  "summary": "e23 16 rows + 55 error pairs, look #6 8 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 16,
+  "exact_rows": 10,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 1,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "det_off": {
+    "median_abs": 8.0,
+    "median_abs_ref": 8.0
+   },
+   "cpd_on": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "cpd_off": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "hyb_on": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "hyb_off": {
+    "median_abs": 4.0,
+    "median_abs_ref": 4.0
+   },
+   "pairs": 108,
+   "pairs_ref": 106
+  },
+  "cases": [
+   "chb24"
+  ],
+  "summary": "16 rows, 10 exact, max |dtp| 1, max |dfp| 1 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "G-D0[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 distances = stored r10 distances in 3 cases x 4 seeds"
+ },
+ {
+  "gate": "G-enc[smoke]",
+  "status": "PASS",
+  "max_abs": {
+   "chb24": 0.0,
+   "chb03": 0.0,
+   "chb01": 0.0
+  },
+  "summary": "8a encoder with the window graph = run_model: max |dZ| {'chb24': 0.0, 'chb03': 0.0, 'chb01': 0.0}"
+ },
+ {
+  "gate": "G-x0[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 scalar and budget signal = the record functions"
+ },
+ {
+  "gate": "G-eng[smoke]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "run_budget_s = p3c_freeze.run_budget for V0 (own = L2f, fixed = frozen)"
+ },
+ {
+  "gate": "G-worker[smoke]",
+  "status": "PASS",
+  "bad": [],
+  "want": {
+   "eur_abl": "428c16c0456333db",
+   "r2_r1": "76cbe51ff0180d4a",
+   "e16": "f170e1c59f5b0447",
+   "e17b": "3b4f034dca00eaf3",
+   "p3c_freeze": "dabe4139f6005fd2",
+   "p3_levers": "feb247d2d08c52ba",
+   "p2_scalars": "11feeaf3ba95ced4",
+   "e22": "669350bbfaaf0f4e",
+   "x1_external": "9962e3e7fe4ddc35",
+   "p2_dump_seeds23": "0bc887542989310f"
+  },
+  "summary": "6 jobs ran eur_abl 428c16c0456333db, r2_r1 76cbe51ff0180d4a"
+ },
+ {
+  "gate": "SMOKE",
+  "status": "PASS",
+  "smoke_s": 285.5,
+  "smoke_eeg_h": 99.85,
+  "all_eeg_h": 1115.9,
+  "workers": 4,
+  "note": "computed: smoke seconds x (all hours / smoke hours) / workers x 1.3 (training-patient pass 1)",
+  "projected_h": 0.29,
+  "not_available": {},
+  "summary": "smoke 286 s on 99.8 h of EEG; full run projected 0.29 h"
+ },
+ {
+  "gate": "G-k",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 128,
+  "error_pairs": 296,
+  "rows_look6": 64,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ],
+  "summary": "e23 128 rows + 296 error pairs, look #6 64 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 240,
+  "exact_rows": 148,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 2,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 24.0,
+    "median_abs_ref": 24.0
+   },
+   "det_off": {
+    "median_abs": 16.0,
+    "median_abs_ref": 16.0
+   },
+   "cpd_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "cpd_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 8.0
+   },
+   "pairs": 348,
+   "pairs_ref": 343
+  },
+  "cases": [
+   "chb24",
+   "PN00",
+   "PN01",
+   "PN03",
+   "PN05",
+   "PN06",
+   "PN07",
+   "PN09",
+   "PN10",
+   "PN11",
+   "PN12",
+   "PN13",
+   "PN14",
+   "PN16",
+   "PN17"
+  ],
+  "summary": "240 rows, 148 exact, max |dtp| 1, max |dfp| 2 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "G-D0[full]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 distances = stored r10 distances in 38 cases x 4 seeds"
+ },
+ {
+  "gate": "G-enc[full]",
+  "status": "PASS",
+  "max_abs": {
+   "chb01": 0.0,
+   "chb03": 0.0,
+   "chb24": 0.0
+  },
+  "summary": "8a encoder with the window graph = run_model: max |dZ| {'chb01': 0.0, 'chb03': 0.0, 'chb24': 0.0}"
+ },
+ {
+  "gate": "G-kv0",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "V0 k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "G-x0[full]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "V0 scalar and budget signal = the record functions"
+ },
+ {
+  "gate": "G-eng[full]",
+  "status": "PASS",
+  "bad": {},
+  "summary": "run_budget_s = p3c_freeze.run_budget for V0 (own = L2f, fixed = frozen)"
+ },
+ {
+  "gate": "G-worker[full]",
+  "status": "PASS",
+  "bad": [],
+  "want": {
+   "eur_abl": "428c16c0456333db",
+   "r2_r1": "76cbe51ff0180d4a",
+   "e16": "f170e1c59f5b0447",
+   "e17b": "3b4f034dca00eaf3",
+   "p3c_freeze": "dabe4139f6005fd2",
+   "p3_levers": "feb247d2d08c52ba",
+   "p2_scalars": "11feeaf3ba95ced4",
+   "e22": "669350bbfaaf0f4e",
+   "x1_external": "9962e3e7fe4ddc35",
+   "p2_dump_seeds23": "0bc887542989310f"
+  },
+  "summary": "76 jobs ran eur_abl 428c16c0456333db, r2_r1 76cbe51ff0180d4a"
+ },
+ {
+  "gate": "G-pc7k",
+  "status": "PASS",
+  "k": 4.138745506303298,
+  "k_ref": 4.138745506303298,
+  "rel": 0.0,
+  "summary": "R0 k 4.138745506 vs reference 4.138745506 (relative 0.0e+00)"
+ },
+ {
+  "gate": "G-pc7r0",
+  "status": "PASS",
+  "bad": {},
+  "summary": "R0 rows of ['clean_seed42'] = the reference rows (per_subject, errors)"
+ }
+]

@@ -1,0 +1,10 @@
+{
+ "arm": "P8b",
+ "tag": "clean_seed2",
+ "seconds": 14937,
+ "peak_rss_mb": 3282.1,
+ "eur_abl_sha": "428c16c0456333db",
+ "n_train": 270190,
+ "n_params": 3770,
+ "ms_per_step": 8.835
+}

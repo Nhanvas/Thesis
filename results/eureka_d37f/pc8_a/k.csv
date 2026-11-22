@@ -1,0 +1,4 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"
+P8a,3.0227737489453643,"GAE retrained without the 5 log band powers (input 25, target 7; PC8)"

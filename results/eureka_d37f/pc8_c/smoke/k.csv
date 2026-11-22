@@ -1,0 +1,4 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+R0,4.067744298524509,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"
+P8c,4.067744298524509,"GAE retrained on the 7 absolute features only (input 7, target 7; PC8)"

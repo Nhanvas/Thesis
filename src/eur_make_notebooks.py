@@ -18,11 +18,13 @@
             with the record builders; chat D37-F, 22/11; design results/eureka_d37f/DESIGN_PC6.md §3)
   EUR_PC6_11a, EUR_PC6_11b  src/eur_abl.py with EUR_VARIANTS=V0,R0,<arm>, EUR_TAG=pc6_<arm>: the GAE retrained on the graphs
             of one measure (seeds 42, 1-7; inputs + thesis-pc6-graphs); R0 seed 42 reused as in PC8 (design §4)
+  EUR_PC8_d, EUR_PC8_e  EUR_PC8's notebook for the PC8b arms P8d (without the relative band powers) / P8e (without the
+            connectivity row), EUR_TAG=pc8_<d|e> (chat D37-F, 22/11; design results/eureka_d37f/DESIGN_PC8B.md)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8|EUR_PC6_DATA|EUR_PC6]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8|EUR_PC6_DATA|EUR_PC6|EUR_PC8B]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -422,7 +424,11 @@ Do not edit; *Save Version → Save & Run All (Commit)*.
 PC8_SEEDS, PC8_R0_REUSE, PC8_REF = [42, 1, 2, 3, 4, 5, 6, 7], [42], "results/eureka_d32f/pc1_r0"
 PC8_TEXT = {"P8a": "without the 5 log band powers (node input 25, reconstruction target 7)",
             "P8b": "without log line length and kurtosis (node input 28, reconstruction target 10)",
-            "P8c": "the 7 absolute features only (node input 7, reconstruction target 7)"}
+            "P8c": "the 7 absolute features only (node input 7, reconstruction target 7)",
+            "P8d": "without the 5 relative band powers: connectivity row + the 7 absolute features (node input 25, "
+                   "reconstruction target 7)",
+            "P8e": "without the connectivity row: relative band powers + the 7 absolute features (node input 12, "
+                   "reconstruction target 12)"}
 
 
 def build_pc8(ref, arm):
@@ -565,6 +571,29 @@ asserted below. **Nothing printed here is a research result.** Do not edit; *Sav
     return name, cells
 
 
+def build_pc8b(ref, arm):
+    """EUR_PC8's notebook for one PC8b arm (P8d / P8e); only the description differs from EUR_PC8_a / _b / _c."""
+    name, cells = build_pc8(ref, arm)
+    part = arm[-1]
+    cells[0] = md(f"""
+# {name} — which input block keeps the detection on unseen patients, PC8b arm {arm} (Track F, chat D37-F)
+
+**Design:** `results/eureka_d37f/DESIGN_PC8B.md` (approved by the author 22/11/2026 13:22). Arm **{arm}**: the GAE
+retrained {PC8_TEXT[arm]} with the thesis recipe (12 training patients' clean windows, V5's constants, 200 epochs),
+**seeds {", ".join(map(str, PC8_SEEDS))}**, 4 in parallel, in two chunks (the second only if the session guard allows).
+PC1's R0 checkpoint of seed 42 is copied from `{PC8_REF}` and scored again (gates G-pc7reuse, G-pc7k, G-pc7r0). Recorded
+first: G-pc8cols (dropped columns by name), G-pc7plat (library versions = PC1) and G-pc7rep (1 epoch of R0 seed 42 =
+PC1's log; tells the machine's arithmetic). The CPU model is written to `run_meta.json`. Then the V5 chain on V0, R0 and
+{arm} (k of seed 42 per variant), with the usual SMOKE and record gates. **Accelerator:** None (CPU). **Internet:** ON.
+**Inputs (Add Input):** `v9-x3-fold1`, `v9-x3-fold3`, `thesis-r2-external-features`. **Output:**
+`/kaggle/working/eureka/pc8_{part}` (→ `results/eureka_d37f/pc8_{part}`). **Runtime:** ≈ 9.5–10 h (measured basis: PC8's
+9.42–9.56 h for the same notebook frame; the arms have no more columns than R0). Code: `github.com/Nhanvas/Thesis` ref
+`{ref}`; module sha256 asserted below. **Nothing printed here is a research result.** Do not edit;
+*Save Version → Save & Run All (Commit)*.
+""")
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -576,7 +605,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8", "EUR_PC6_DATA", "EUR_PC6"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8", "EUR_PC6_DATA", "EUR_PC6", "EUR_PC8B"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -604,3 +633,6 @@ if __name__ == "__main__":
     if a.only == "EUR_PC6":
         for arm in ("11a", "11b"):
             print("built", write(*build_pc6(a.ref, arm)), sha_of(FILES_PC1))
+    if a.only == "EUR_PC8B":
+        for arm in ("P8d", "P8e"):
+            print("built", write(*build_pc8b(a.ref, arm)), sha_of(FILES_PC1))

@@ -62,6 +62,9 @@ PC8 (added 21/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8.md): arms P8
 per arm: EUR_ARM_SEEDS_<ARM> / EUR_ARM_REUSE_<ARM> override EUR_ARM_SEEDS / EUR_ARM_REUSE for that arm (unset: PC1 / PC7
 behaviour unchanged). Gate G-pc8cols: the dropped columns by name = the design, seed 42 in every PC8 arm. run_meta records
 the CPU model (/proc/cpuinfo) and the seeds of every arm.
+PC8b (added 22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8B.md): arms P8d (connectivity row + the 7 absolute
+features: without the 5 relative band powers) and P8e (relative band powers + the 7 absolute features: without the
+connectivity row), retrained as the PC8 arms (gate G-pc8cols).
 PC6 (added 22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC6.md): arms 11a / 11b keep every column and replace the
 GRAPH by the wPLI-only / AEC-only graphs of EUR_PC6_DATA ({case}_g11.npz under the inputs, sha256 = the committed manifest,
 gate G-g11data): training on a view of the record .npz whose adj is the arm graph (gate G-pc6view: every other key equal to
@@ -152,6 +155,8 @@ VARIANTS = {
     "P8a": _v(enc="armP8a", text="GAE retrained without the 5 log band powers (input 25, target 7; PC8)"),
     "P8b": _v(enc="armP8b", text="GAE retrained without log line length and kurtosis (input 28, target 10; PC8)"),
     "P8c": _v(enc="armP8c", text="GAE retrained on the 7 absolute features only (input 7, target 7; PC8)"),
+    "P8d": _v(enc="armP8d", text="GAE retrained without the 5 relative band powers (input 25, target 7; PC8b)"),
+    "P8e": _v(enc="armP8e", text="GAE retrained without the connectivity row (input 12, target 12; PC8b)"),
     "11a": _v(enc="arm11a", text="GAE retrained on graphs of wPLI only (top 20 %; PC6)"),
     "11b": _v(enc="arm11b", text="GAE retrained on graphs of AEC only (top 20 %; PC6)"),
 }
@@ -195,12 +200,16 @@ def seeds_of(vid):
 # reconstruction target [relative band powers 0-4 | absolute features 5-11]
 # PC8 arms (21/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8.md): P8a without the 5 log band powers (input 23-27,
 # target 5-9), P8b without log line length + kurtosis (input 28-29, target 10-11), P8c the 7 absolute features only.
+# PC8b arms (22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC8B.md): P8d without the 5 relative band powers (input
+# 18-22, target 0-4), P8e without the connectivity row (input 0-17; target unchanged).
 PC1_ARMS = {"R0": (list(range(30)), list(range(12))),
         "10a": (list(range(23)), list(range(5))),
         "10b": ([i for i in range(30) if i not in (22, 27)], [i for i in range(12) if i not in (4, 9)]),
         "P8a": ([i for i in range(30) if i not in range(23, 28)], [i for i in range(12) if i not in range(5, 10)]),
         "P8b": ([i for i in range(30) if i not in (28, 29)], [i for i in range(12) if i not in (10, 11)]),
         "P8c": (list(range(23, 30)), list(range(5, 12))),
+        "P8d": ([i for i in range(30) if i not in range(18, 23)], list(range(5, 12))),
+        "P8e": (list(range(18, 30)), list(range(12))),
         "11a": (list(range(30)), list(range(12))),
         "11b": (list(range(30)), list(range(12)))}
 # PC6 arms (22/11, chat D37-F; design results/eureka_d37f/DESIGN_PC6.md): every column kept, the GRAPH replaced -- at training
@@ -214,7 +223,9 @@ IN_NAMES = ([f"adj{c}" for c in range(18)] + [f"rel_{b}" for b in ("delta", "the
 OUT_NAMES = IN_NAMES[18:]
 PC8_DROP = {"P8a": {f"logbp_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")},      # design §2, by name
             "P8b": {"log_linelen", "slog_kurtosis"},
-            "P8c": set(IN_NAMES[:23])}
+            "P8c": set(IN_NAMES[:23]),
+            "P8d": {f"rel_{b}" for b in ("delta", "theta", "alpha", "beta", "gamma")},             # PC8b design §2
+            "P8e": set(IN_NAMES[:18])}
 PC1_EPOCHS = 200
 MIX_SAMPLE, MIX_KMAX, MIX_MIN, MIX_MIN_SHARE, MIX_SEED = 5000, 4, 64, 0.05, 42
 

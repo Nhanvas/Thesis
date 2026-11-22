@@ -1,0 +1,37 @@
+comparison,arm,set,metric,patients,arm_seeds,r0_seeds,diff,ci_lo,ci_hi,reading,wording
+P8a - R0 (control DIFF),P8a,development,sens,15,8,8,-0.11103937728937728,-0.20472062653186274,-0.029910141941391962,secondary,loses
+P8a - R0 (control DIFF),P8a,development,f1,15,8,8,-0.09637304516589966,-0.14305591632596368,-0.06023232930698886,secondary,loses
+P8a - R0 (control DIFF),P8a,development,fa,15,8,8,12.93006009969552,9.293145003056008,17.520770551721586,secondary,more false alarms
+P8a - R0 (control DIFF),P8a,test,sens,8,8,8,-0.09607514880952382,-0.26211914062499997,0.03075474330357131,secondary,no measurable difference
+P8a - R0 (control DIFF),P8a,test,f1,8,8,8,-0.06441848280892593,-0.1002812557810716,-0.02835272596317783,secondary,loses
+P8a - R0 (control DIFF),P8a,test,fa,8,8,8,11.18676557344166,5.588418273305983,17.631055625841505,secondary,more false alarms
+P8a - R0 (control DIFF),P8a,chb24,sens,1,8,8,-0.2890625,,,secondary,descriptive (one patient)
+P8a - R0 (control DIFF),P8a,chb24,f1,1,8,8,-0.18994627819291665,,,secondary,descriptive (one patient)
+P8a - R0 (control DIFF),P8a,chb24,fa,1,8,8,5.959951647658588,,,secondary,descriptive (one patient)
+P8a - R0 (control DIFF),P8a,siena,sens,14,8,8,-0.11666666666666665,-0.23452380952380955,0.007440476190476192,secondary,no measurable difference
+P8a - R0 (control DIFF),P8a,siena,f1,14,8,8,-0.10070888589393953,-0.15208724784746766,-0.05240258996093151,secondary,loses
+P8a - R0 (control DIFF),P8a,siena,fa,14,8,8,17.94956651150636,12.751452162651232,23.298862807330615,secondary,more false alarms
+P8b - R0 (control DIFF),P8b,development,sens,15,8,8,0.027525183150183152,-0.028273809523809517,0.08368079347123468,secondary,no measurable difference
+P8b - R0 (control DIFF),P8b,development,f1,15,8,8,-0.09069610545299961,-0.14157889987681488,-0.04837448834607008,secondary,loses
+P8b - R0 (control DIFF),P8b,development,fa,15,8,8,23.62958871039679,18.41263183421619,29.519599231645685,secondary,more false alarms
+P8b - R0 (control DIFF),P8b,test,sens,8,8,8,0.06813616071428572,0.01004371279761905,0.14810453869047613,secondary,gains
+P8b - R0 (control DIFF),P8b,test,f1,8,8,8,-0.0494913140654716,-0.10514197401633592,-0.007041907782698823,secondary,loses
+P8b - R0 (control DIFF),P8b,test,fa,8,8,8,20.438061150408096,11.658173870666404,29.754818053345442,secondary,more false alarms
+P8b - R0 (control DIFF),P8b,chb24,sens,1,8,8,0.140625,,,secondary,descriptive (one patient)
+P8b - R0 (control DIFF),P8b,chb24,f1,1,8,8,-0.10589186777748605,,,secondary,descriptive (one patient)
+P8b - R0 (control DIFF),P8b,chb24,fa,1,8,8,27.529300467756343,,,secondary,descriptive (one patient)
+P8b - R0 (control DIFF),P8b,siena,sens,14,8,8,0.1244047619047619,0.022916666666666672,0.25148809523809523,secondary,gains
+P8b - R0 (control DIFF),P8b,siena,f1,14,8,8,-0.016721110623488793,-0.06327781370389249,0.038617310155416376,secondary,no measurable difference
+P8b - R0 (control DIFF),P8b,siena,fa,14,8,8,18.852563724801456,13.284462097453428,24.52409220895666,secondary,more false alarms
+P8c - R0 (control DIFF),P8c,development,sens,15,8,8,0.025587606837606837,-0.08091730442176873,0.13164249879639348,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,development,f1,15,8,8,0.03545446850899426,-0.012156385516464065,0.08041054342629739,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,development,fa,15,8,8,-2.72712862856739,-6.1689930816094565,1.1752639456504637,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,test,sens,8,8,8,-0.1630394345238095,-0.36172154017857144,-0.01601236979166671,secondary,loses
+P8c - R0 (control DIFF),P8c,test,f1,8,8,8,-0.011852873064779878,-0.0677122139001399,0.04888688674196071,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,test,fa,8,8,8,-3.482757112252468,-8.2333037751124,1.127176745964609,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,chb24,sens,1,8,8,0.21875,,,secondary,descriptive (one patient)
+P8c - R0 (control DIFF),P8c,chb24,f1,1,8,8,-0.14604723130079944,,,secondary,descriptive (one patient)
+P8c - R0 (control DIFF),P8c,chb24,fa,1,8,8,44.841540968097966,,,secondary,descriptive (one patient)
+P8c - R0 (control DIFF),P8c,siena,sens,14,8,8,-0.01904761904761906,-0.2262090773809524,0.17768229166666663,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,siena,f1,14,8,8,-0.015589739850965886,-0.09692639053802735,0.06023790816414917,secondary,no measurable difference
+P8c - R0 (control DIFF),P8c,siena,fa,14,8,8,4.884322126485171,-4.99209243447033,13.986310771108087,secondary,no measurable difference

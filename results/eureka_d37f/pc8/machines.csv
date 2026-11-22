@@ -1,0 +1,4 @@
+run,arm,cpu_model,cpu_models,g_pc7rep,g_pc7plat,ms_per_step_min,ms_per_step_max,runtime_h,skipped
+pc8_a,P8a,Intel(R) Xeon(R) CPU @ 2.20GHz,Intel(R) Xeon(R) CPU @ 2.20GHz,DIFF,PASS,8.741,9.403,9.44,[]
+pc8_b,P8b,Intel(R) Xeon(R) CPU @ 2.20GHz,Intel(R) Xeon(R) CPU @ 2.20GHz,DIFF,PASS,8.807,9.584,9.559,[]
+pc8_c,P8c,Intel(R) Xeon(R) CPU @ 2.20GHz,Intel(R) Xeon(R) CPU @ 2.20GHz,DIFF,PASS,8.656,9.441,9.42,[]

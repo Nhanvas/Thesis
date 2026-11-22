@@ -1,0 +1,10 @@
+variant,k,text,run
+V0,4.067744298524509,V5 system,pc8_a
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",pc8_a
+P8a,3.0227737489453643,"GAE retrained without the 5 log band powers (input 25, target 7; PC8)",pc8_a
+V0,4.067744298524509,V5 system,pc8_b
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",pc8_b
+P8b,2.9442248744410486,"GAE retrained without log line length and kurtosis (input 28, target 10; PC8)",pc8_b
+V0,4.067744298524509,V5 system,pc8_c
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",pc8_c
+P8c,6.521826384152563,"GAE retrained on the 7 absolute features only (input 7, target 7; PC8)",pc8_c

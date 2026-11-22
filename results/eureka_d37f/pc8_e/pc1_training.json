@@ -1,0 +1,34 @@
+[
+ {
+  "case": "P8e/clean_seed42",
+  "s": 13857.9
+ },
+ {
+  "case": "P8e/clean_seed3",
+  "s": 13867.9
+ },
+ {
+  "case": "P8e/clean_seed1",
+  "s": 13868.9
+ },
+ {
+  "case": "P8e/clean_seed2",
+  "s": 13902.6
+ },
+ {
+  "case": "P8e/clean_seed5",
+  "s": 14816.7
+ },
+ {
+  "case": "P8e/clean_seed7",
+  "s": 14837.9
+ },
+ {
+  "case": "P8e/clean_seed4",
+  "s": 14857.8
+ },
+ {
+  "case": "P8e/clean_seed6",
+  "s": 14872.4
+ }
+]

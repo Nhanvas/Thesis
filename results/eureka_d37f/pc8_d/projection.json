@@ -1,0 +1,9 @@
+{
+ "smoke_s": 272.0,
+ "smoke_eeg_h": 99.85,
+ "all_eeg_h": 1115.9,
+ "workers": 4,
+ "note": "computed: smoke seconds x (all hours / smoke hours) / workers x 1.3 (training-patient pass 1)",
+ "projected_h": 0.27,
+ "not_available": {}
+}

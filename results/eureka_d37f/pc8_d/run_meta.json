@@ -1,0 +1,236 @@
+{
+ "notebook": "EUR_PC8_d",
+ "tag": "pc8_d",
+ "repo_commit": "4a6976ea18c41cb5ede20ceabe610b45a7c35577",
+ "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28",
+ "r2_core_sha256": "902d15ad4feb3e8ab76a7a3d3e818c37269811c537cf2b33b23b5a3f7d1850fd",
+ "started": "2026-11-22 09:40:08 UTC",
+ "cpu_count": 4,
+ "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+ "torch_threads": 1,
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "sklearn": "1.6.1",
+  "pandas": "2.3.3",
+  "torch": "2.11.0+cpu",
+  "torch_geometric": "2.7.0",
+  "ruptures": "v1.1.10",
+  "timescoring": "not importable: module 'timescoring' has no attribute '__version__'",
+  "mne": "1.13.2"
+ },
+ "input": "/kaggle/input",
+ "work": "/kaggle/working",
+ "scratch": "/tmp/r2",
+ "test_mode": false,
+ "eur_abl_sha": "0fd303e9b2f3671f",
+ "code_shas": {
+  "eur_abl": "0fd303e9b2f3671f",
+  "r2_r1": "76cbe51ff0180d4a",
+  "e16": "f170e1c59f5b0447",
+  "e17b": "3b4f034dca00eaf3",
+  "p3c_freeze": "dabe4139f6005fd2",
+  "p3_levers": "feb247d2d08c52ba",
+  "p2_scalars": "11feeaf3ba95ced4",
+  "e22": "669350bbfaaf0f4e",
+  "x1_external": "9962e3e7fe4ddc35",
+  "p2_dump_seeds23": "0bc887542989310f"
+ },
+ "variants": {
+  "V0": {
+   "dist": "maha",
+   "enc": "own",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "V5 system",
+   "kmode": "s42"
+  },
+  "R0": {
+   "dist": "maha",
+   "enc": "armR0",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",
+   "kmode": "s42"
+  },
+  "P8d": {
+   "dist": "maha",
+   "enc": "armP8d",
+   "members": [
+    6,
+    9,
+    12,
+    "mean"
+   ],
+   "drift": "level",
+   "extra": [],
+   "smooth": 5,
+   "text": "GAE retrained without the 5 relative band powers (input 25, target 7; PC8b)",
+   "kmode": "s42"
+  }
+ },
+ "workers": 4,
+ "arm_seeds": [
+  "clean_seed42",
+  "clean_seed1",
+  "clean_seed2",
+  "clean_seed3",
+  "clean_seed4",
+  "clean_seed5",
+  "clean_seed6",
+  "clean_seed7"
+ ],
+ "arm_reuse": [],
+ "pc7_ref": "results/eureka_d32f/pc1_r0",
+ "arm_seeds_by_arm": {
+  "R0": [
+   "clean_seed42"
+  ],
+  "10a": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "10b": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "P8a": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "P8b": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "P8c": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "P8d": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "P8e": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "11a": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ],
+  "11b": [
+   "clean_seed42",
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7"
+  ]
+ },
+ "arm_reuse_by_arm": {
+  "R0": [
+   "clean_seed42"
+  ],
+  "10a": [],
+  "10b": [],
+  "P8a": [],
+  "P8b": [],
+  "P8c": [],
+  "P8d": [],
+  "P8e": [],
+  "11a": [],
+  "11b": []
+ },
+ "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+ "cpu_models": [
+  "Intel(R) Xeon(R) CPU @ 2.20GHz"
+ ],
+ "cpu_logical": 4,
+ "finished": "2026-11-22 18:13:59 UTC",
+ "runtime_h": 8.581,
+ "phases_s": {
+  "views": 7.0,
+  "pc1_gates": 3.9,
+  "pc1_training": 27862.8,
+  "D_r10": 602.6,
+  "score_r10": 243.7,
+  "prep_smoke": 154.2,
+  "score_smoke": 25.3,
+  "r10_full": 847.1,
+  "prep_full": 1515.6,
+  "score_full": 255.2
+ },
+ "notes": [],
+ "peak_rss_self_mb": 3290.0,
+ "peak_rss_children_mb": 3290.0,
+ "ks": {
+  "V0": 4.067744298524509,
+  "R0": 4.138745506303298,
+  "P8d": 3.7405073053411355
+ }
+}

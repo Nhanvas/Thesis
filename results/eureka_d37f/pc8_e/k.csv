@@ -1,0 +1,4 @@
+variant,k,text
+V0,4.067744298524509,V5 system
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b"
+P8e,5.2908058480015345,"GAE retrained without the connectivity row (input 12, target 12; PC8b)"

@@ -1,0 +1,11 @@
+device=cpu data=/tmp/r2/r1_views/new variant=clean seed=42
+f7 train mean: [-2.902, -3.745, -4.865, -6.288, -8.193, -2.129, 0.26] std: [0.832, 0.772, 0.916, 1.002, 1.48, 0.509, 0.454]
+Building TRAIN set ...
+  chb01: 2000 windows (clean)
+Building VAL set ...
+  chb10: 2000 windows (clean)
+  train 2000 / val 2000 windows, built in 1s
+parameters: 3964
+  epoch   1/2 train=0.058549 val=0.040959 (2s)
+  epoch   2/2 train=0.020239 val=0.037528 (3s)
+SAVED gae_v2_clean_seed42_SMOKE.pt | val ictal-vs-rest AUROC {} | 3s

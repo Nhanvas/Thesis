@@ -1,0 +1,26 @@
+{
+ "k": {
+  "clean_seed42": 2.8786777530639167,
+  "clean_seed1": 2.7997982302226267,
+  "clean_seed2": 2.8320106815676818,
+  "clean_seed3": 2.9227961006663703
+ },
+ "cases": [
+  "chb01",
+  "chb02",
+  "chb04",
+  "chb05",
+  "chb07",
+  "chb08",
+  "chb09",
+  "chb12",
+  "chb19",
+  "chb20",
+  "chb21",
+  "chb23",
+  "chb10",
+  "chb11",
+  "chb22"
+ ],
+ "rule": "p3_levers.calibrate on each seed's own model: median over the 15 development cases of q_i(k) = 0.005 (as rp2)"
+}

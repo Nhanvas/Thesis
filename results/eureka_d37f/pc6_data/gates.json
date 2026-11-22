@@ -1,0 +1,95 @@
+[
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 727,
+  "failed_checks": [],
+  "from_physionet": 1,
+  "summary": "727 EDF verified by sha256 against PhysioNet"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 38,
+  "bad": [],
+  "pinned": 38,
+  "summary": "38 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-stack[smoke]",
+  "status": "PASS",
+  "stack": [
+   1800,
+   3,
+   18,
+   18
+  ],
+  "summary": "builder returned [1800, 3, 18, 18]"
+ },
+ {
+  "gate": "G-feat0",
+  "status": "PASS",
+  "case": "chb08",
+  "files": 2,
+  "exact_on_all_windows": true,
+  "f7_max_abs": 4.76837158203125e-07,
+  "bp5_max_abs": 2.384185791015625e-07,
+  "adj_frac_differing": 0.00040123456790123454,
+  "status_chain_windows": "PASS",
+  "status_all_windows": "PASS",
+  "summary": "chb08 first 2 files rebuilt (combined graph) = the record .npz (r2_core.compare_features, scope chain)"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed: smoke rate (s per hour of EEG, one worker) x hours; CHB-MIT by LPT on the workers; external at rate / 3 (x1's 2-4 processes); plus the time already spent",
+  "rate_s_per_h": 18.0,
+  "chb_h": 1.26,
+  "ext_h": 0.27,
+  "elapsed_h": 0.091,
+  "workers": 4,
+  "projected_total_h": 1.62,
+  "summary": "projected total 1.62 h (limit 10.5 h)"
+ },
+ {
+  "gate": "G-stack",
+  "status": "PASS",
+  "bad": [],
+  "summary": "38 cases built with three graphs per window"
+ },
+ {
+  "gate": "G-struct",
+  "status": "PASS",
+  "failed": [],
+  "summary": "38 of 38 cases PASS"
+ },
+ {
+  "gate": "G-adj",
+  "status": "PASS",
+  "failed": [],
+  "adj_frac_differing_chain_max": 0.00046165671165671166,
+  "cases_exact": 15,
+  "summary": "38 of 38 cases PASS {'adj_frac_differing_chain_max': 0.00046165671165671166, 'cases_exact': 15}"
+ },
+ {
+  "gate": "G-edges",
+  "status": "PASS",
+  "failed": [],
+  "summary": "38 of 38 cases PASS"
+ },
+ {
+  "gate": "G-worker[pool]",
+  "status": "PASS",
+  "jobs": 24,
+  "differ": [],
+  "summary": "24 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-done",
+  "status": "PASS",
+  "missing": [],
+  "files": 38,
+  "bytes": 302366214,
+  "summary": "38 graph files, 302 MB"
+ }
+]

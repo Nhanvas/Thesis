@@ -1,0 +1,9 @@
+{
+ "note": "computed: smoke rate (s per hour of EEG, one worker) x hours; CHB-MIT by LPT on the workers; external at rate / 3 (x1's 2-4 processes); plus the time already spent",
+ "rate_s_per_h": 18.0,
+ "chb_h": 1.26,
+ "ext_h": 0.27,
+ "elapsed_h": 0.091,
+ "workers": 4,
+ "projected_total_h": 1.62
+}

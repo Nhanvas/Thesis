@@ -1,0 +1,166 @@
+[
+ {
+  "gate": "G-mod",
+  "status": "PASS",
+  "got": {
+   "r2_r1": "76cbe51ff0180d4a",
+   "r2_rp": "5281446e6168312e",
+   "fa15_run": "effcdf70588ae6b1"
+  },
+  "want": {
+   "r2_r1": "76cbe51ff0180d4a",
+   "r2_rp": "5281446e6168312e"
+  },
+  "summary": "r2_r1 76cbe51ff0180d4a, r2_rp 5281446e6168312e (control's code), fa15_run effcdf70588ae6b1"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files_hashed": 63,
+  "pinned_files": 63,
+  "pin": "results/r2/r1_system/smoke/data_sha256.csv",
+  "differ": [],
+  "summary": "63 files hashed = pinned R1_SMOKE hashes"
+ },
+ {
+  "gate": "G-const-new",
+  "status": "PASS",
+  "max_rel": 0.0,
+  "counts_differ": [],
+  "n_train": 270758,
+  "n_val": {
+   "chb10": 28530,
+   "chb11": 16067,
+   "chb22": 11473
+  },
+  "summary": "constants max relative difference 0.0e+00; n_train 270758"
+ },
+ {
+  "gate": "G-repro",
+  "status": "PASS",
+  "mode": "exact",
+  "rows": 456,
+  "exact_rows": 456,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_pairs": 532,
+  "error_groups_differ": 0,
+  "k": {
+   "clean_seed4": 4.009211994582241
+  },
+  "summary": "mode exact: control seed 4 rescored = rp2 (456 rows, 456 exact, 0 mismatches; 0 error groups differ)"
+ },
+ {
+  "gate": "G-vec",
+  "status": "PASS",
+  "max_abs_diff": 0.0,
+  "exact": true,
+  "case": "chb01",
+  "windows": 2000,
+  "reference_windows": 2000,
+  "epochs": 2,
+  "seed": 42,
+  "torch": "2.11.0+cpu",
+  "threads": 1,
+  "seconds": 3.7,
+  "summary": "train_gae_v2.py --smoke vs tensor loop: max |weight difference| 0.000e+00"
+ },
+ {
+  "gate": "R1.1-training",
+  "status": "PASS",
+  "epochs": 200,
+  "expected_n_train": {
+   "chb01": 15410,
+   "chb02": 17805,
+   "chb04": 94450,
+   "chb05": 18681,
+   "chb07": 28016,
+   "chb08": 7549,
+   "chb09": 36432,
+   "chb12": 7459,
+   "chb19": 12925,
+   "chb20": 11854,
+   "chb21": 11619,
+   "chb23": 8558
+  },
+  "expected_n_val": {
+   "chb10": 28530,
+   "chb11": 16067,
+   "chb22": 11473
+  },
+  "jobs": [
+   {
+    "seed": 5,
+    "status": "done",
+    "seconds": 12972,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 7.644,
+    "fit_s": 12937.0,
+    "load_s": 6.0,
+    "val_and_sanity_s": 27.9,
+    "peak_rss_mb": 3229.2,
+    "checkpoint_sha256": "ea41886b0883fa4f3ad8f3e7b3b33b695a4eb0f094c0647af551a965d2294097",
+    "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28"
+   },
+   {
+    "seed": 6,
+    "status": "done",
+    "seconds": 12889,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 7.593,
+    "fit_s": 12850.3,
+    "load_s": 8.1,
+    "val_and_sanity_s": 29.0,
+    "peak_rss_mb": 3228.7,
+    "checkpoint_sha256": "aa90d06ecf00fcc4a83fc7a9246f1b3fec4b4c056db99d6f5b72d4c161cf62ca",
+    "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28"
+   },
+   {
+    "seed": 7,
+    "status": "done",
+    "seconds": 12827,
+    "epochs": 200,
+    "n_train": 270758,
+    "ms_per_step": 7.547,
+    "fit_s": 12772.6,
+    "load_s": 7.5,
+    "val_and_sanity_s": 45.3,
+    "peak_rss_mb": 3229.4,
+    "checkpoint_sha256": "1e61d7fa2e176f0b7443eb5ac7a63999218d950d80afd650c5e941931656769c",
+    "r2_r1_sha256": "76cbe51ff0180d4ae8ae14d75fec90e41a526ad9fe7625ff8e67787043183b28"
+   }
+  ],
+  "trained_now": [
+   7,
+   6,
+   5
+  ],
+  "summary": "seeds [5, 6, 7]: n_train 270758, 3,964 parameters, G2 PASS"
+ },
+ {
+  "gate": "RUN-complete",
+  "status": "PASS",
+  "rows": 1368,
+  "expected": 1368,
+  "k": {
+   "clean_seed5": 4.26799599116981,
+   "clean_seed6": 4.1994114667657065,
+   "clean_seed7": 4.169034492126537
+  },
+  "summary": "1368 rows (expected 1368); k per seed {'clean_seed5': 4.26799599116981, 'clean_seed6': 4.1994114667657065, 'clean_seed7': 4.169034492126537}"
+ },
+ {
+  "gate": "G-worker-sha",
+  "status": "PASS",
+  "main": {
+   "r2_r1": "76cbe51ff0180d4a",
+   "r2_rp": "5281446e6168312e",
+   "fa15_run": "effcdf70588ae6b1"
+  },
+  "workers": 4,
+  "differ": [],
+  "summary": "4 of 4 workers imported r2_r1 76cbe51ff0180d4a, r2_rp 5281446e6168312e, fa15_run effcdf70588ae6b1"
+ }
+]

@@ -1,0 +1,13 @@
+comparison,arm,set,metric,patients,arm_seeds,ref_seeds,diff,ci_lo,ci_hi,reading,wording
+11a - 11b,11a,development,sens,15,8,8,-0.055758547008547,-0.12357342819940477,-0.0022301396520146813,descriptive,loses
+11a - 11b,11a,development,f1,15,8,8,-0.09867537089103391,-0.15772689341219484,-0.04574030964997594,descriptive,loses
+11a - 11b,11a,development,fa,15,8,8,16.086571698359414,8.625848483642926,23.320941582823135,descriptive,more false alarms
+11a - 11b,11a,test,sens,8,8,8,-0.0975074404761905,-0.29388532366071435,0.0747786458333334,descriptive,no measurable difference
+11a - 11b,11a,test,f1,8,8,8,-0.040610173476142,-0.09342442270785607,0.008911233558779723,descriptive,no measurable difference
+11a - 11b,11a,test,fa,8,8,8,9.568997561174292,4.134309453697179,15.581015072739794,descriptive,more false alarms
+11a - 11b,11a,chb24,sens,1,8,8,-0.328125,,,descriptive,descriptive (one patient)
+11a - 11b,11a,chb24,f1,1,8,8,-0.22251812677997707,,,descriptive,descriptive (one patient)
+11a - 11b,11a,chb24,fa,1,8,8,12.487517737951332,,,descriptive,descriptive (one patient)
+11a - 11b,11a,siena,sens,14,8,8,-0.006696428571428571,-0.1369122023809524,0.12039062499999995,descriptive,no measurable difference
+11a - 11b,11a,siena,f1,14,8,8,-0.05370929045420333,-0.11522629197742588,-0.004761842289774145,descriptive,loses
+11a - 11b,11a,siena,fa,14,8,8,12.288122004089539,4.743970988187588,20.32639998309288,descriptive,more false alarms

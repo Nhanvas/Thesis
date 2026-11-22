@@ -1,0 +1,25 @@
+comparison,arm,set,metric,patients,arm_seeds,ref_seeds,diff,ci_lo,ci_hi,reading,wording
+11a - R0 (control DIFF),11a,development,sens,15,8,8,-0.07317536630036629,-0.14711533748114633,-0.009919299450549458,secondary,loses
+11a - R0 (control DIFF),11a,development,f1,15,8,8,-0.10710999272359681,-0.16601522100157443,-0.06074893644078032,secondary,loses
+11a - R0 (control DIFF),11a,development,fa,15,8,8,17.844565001504648,12.955164795620417,23.69509182138986,secondary,more false alarms
+11a - R0 (control DIFF),11a,test,sens,8,8,8,-0.13138020833333333,-0.2810686383928572,0.009121093749999894,secondary,no measurable difference
+11a - R0 (control DIFF),11a,test,f1,8,8,8,-0.06891336735466035,-0.11493159727213556,-0.02509751858671127,secondary,loses
+11a - R0 (control DIFF),11a,test,fa,8,8,8,12.65387597101872,8.391312493698896,17.326726753713263,secondary,more false alarms
+11a - R0 (control DIFF),11a,chb24,sens,1,8,8,-0.171875,,,secondary,descriptive (one patient)
+11a - R0 (control DIFF),11a,chb24,f1,1,8,8,-0.17002910028077167,,,secondary,descriptive (one patient)
+11a - R0 (control DIFF),11a,chb24,fa,1,8,8,14.899879119146476,,,secondary,descriptive (one patient)
+11a - R0 (control DIFF),11a,siena,sens,14,8,8,-0.05491071428571428,-0.1775297619047619,0.08244047619047616,secondary,no measurable difference
+11a - R0 (control DIFF),11a,siena,f1,14,8,8,-0.0902323176734156,-0.14089253277512948,-0.045692691611222414,secondary,loses
+11a - R0 (control DIFF),11a,siena,fa,14,8,8,17.868859437923533,10.569397858967037,25.83725481854227,secondary,more false alarms
+11b - R0 (control DIFF),11b,development,sens,15,8,8,-0.017416819291819294,-0.07533829365079363,0.03980695643642073,secondary,no measurable difference
+11b - R0 (control DIFF),11b,development,f1,15,8,8,-0.008434621832562926,-0.03842258385026242,0.02288234305621287,secondary,no measurable difference
+11b - R0 (control DIFF),11b,development,fa,15,8,8,1.75799330314523,-1.1526667275317184,5.375503603687422,secondary,no measurable difference
+11b - R0 (control DIFF),11b,test,sens,8,8,8,-0.03387276785714285,-0.17081519717261903,0.09699032738095233,secondary,no measurable difference
+11b - R0 (control DIFF),11b,test,f1,8,8,8,-0.028303193878518335,-0.06504837992803275,0.007255971688035749,secondary,no measurable difference
+11b - R0 (control DIFF),11b,test,fa,8,8,8,3.0848784098444284,-0.3426477075921777,6.707085640701228,secondary,no measurable difference
+11b - R0 (control DIFF),11b,chb24,sens,1,8,8,0.15625,,,secondary,descriptive (one patient)
+11b - R0 (control DIFF),11b,chb24,f1,1,8,8,0.05248902649920539,,,secondary,descriptive (one patient)
+11b - R0 (control DIFF),11b,chb24,fa,1,8,8,2.4123613811951437,,,secondary,descriptive (one patient)
+11b - R0 (control DIFF),11b,siena,sens,14,8,8,-0.0482142857142857,-0.17410714285714285,0.08854538690476185,secondary,no measurable difference
+11b - R0 (control DIFF),11b,siena,f1,14,8,8,-0.036523027219212266,-0.07949982898852812,0.0029879894941951127,secondary,no measurable difference
+11b - R0 (control DIFF),11b,siena,fa,14,8,8,5.580737433833989,1.79364492300337,9.58762747502809,secondary,more false alarms

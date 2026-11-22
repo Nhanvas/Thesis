@@ -1,0 +1,92 @@
+{
+ "m_gates": "PASS",
+ "m0": "PASS",
+ "m1": "PASS",
+ "m2": "PASS",
+ "m4": "PASS",
+ "info": {
+  "pc6_11a": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  },
+  "pc6_11b": {
+   "G-pc7rep": "DIFF",
+   "G-pc7plat": "PASS",
+   "skipped": []
+  }
+ },
+ "arms": {
+  "pc6_11a": "11a",
+  "pc6_11b": "11b"
+ },
+ "seeds": {
+  "11a": [
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed42"
+  ],
+  "11b": [
+   "clean_seed1",
+   "clean_seed2",
+   "clean_seed3",
+   "clean_seed4",
+   "clean_seed5",
+   "clean_seed6",
+   "clean_seed7",
+   "clean_seed42"
+  ]
+ },
+ "r0_control": [
+  "clean_seed4",
+  "clean_seed5",
+  "clean_seed6",
+  "clean_seed7",
+  "clean_seed8",
+  "clean_seed9",
+  "clean_seed10",
+  "clean_seed11",
+  "clean_seed12",
+  "clean_seed13",
+  "clean_seed14",
+  "clean_seed15",
+  "clean_seed16",
+  "clean_seed17",
+  "clean_seed18",
+  "clean_seed19"
+ ],
+ "k_r0": 4.138745506303298,
+ "machine_matched": {
+  "11a": {
+   "arm_rep": "DIFF",
+   "control_seeds": [
+    "clean_seed12",
+    "clean_seed13",
+    "clean_seed14",
+    "clean_seed15",
+    "clean_seed16",
+    "clean_seed17",
+    "clean_seed18",
+    "clean_seed19"
+   ]
+  },
+  "11b": {
+   "arm_rep": "DIFF",
+   "control_seeds": [
+    "clean_seed12",
+    "clean_seed13",
+    "clean_seed14",
+    "clean_seed15",
+    "clean_seed16",
+    "clean_seed17",
+    "clean_seed18",
+    "clean_seed19"
+   ]
+  }
+ }
+}

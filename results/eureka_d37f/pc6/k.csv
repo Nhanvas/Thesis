@@ -1,0 +1,7 @@
+variant,k,text,run
+V0,4.067744298524509,V5 system,pc6_11a
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",pc6_11a
+11a,2.7051319065980515,GAE retrained on graphs of wPLI only (top 20 %; PC6),pc6_11a
+V0,4.067744298524509,V5 system,pc6_11b
+R0,4.138745506303298,"GAE retrained here (CPU, thesis recipe), full node input: control of 10a / 10b",pc6_11b
+11b,4.466151033058775,GAE retrained on graphs of AEC only (top 20 %; PC6),pc6_11b

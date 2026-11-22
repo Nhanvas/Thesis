@@ -1,0 +1,3 @@
+run,arm,cpu_model,g_pc7rep,ms_per_step_min,ms_per_step_max,runtime_h,skipped
+pc6_11a,11a,Intel(R) Xeon(R) CPU @ 2.20GHz,DIFF,8.152,8.618,8.751,[]
+pc6_11b,11b,Intel(R) Xeon(R) CPU @ 2.20GHz,DIFF,8.023,8.485,8.592,[]

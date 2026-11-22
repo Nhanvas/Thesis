@@ -1,0 +1,28 @@
+[
+ {
+  "gate": "A0",
+  "status": "PASS",
+  "rows": 240,
+  "ref_rows": 240,
+  "differ": 0,
+  "summary": "240 of 240 per-seed rows of the record reproduced; 0 values differ"
+ },
+ {
+  "gate": "A1",
+  "status": "PASS",
+  "runs": [
+   "/home/claude/Thesis/results/fa15/fa15_ctrl",
+   "/home/claude/Thesis/results/fa15/fa15_asr_a",
+   "/home/claude/Thesis/results/fa15/fa15_asr_b"
+  ],
+  "bad": {},
+  "summary": "3 runs; gates not PASS: {}"
+ },
+ {
+  "gate": "A2",
+  "status": "PASS",
+  "bad": [],
+  "cases": 38,
+  "summary": "38 cases; control seeds [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(42)], asr seeds [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(42)]; problems []"
+ }
+]

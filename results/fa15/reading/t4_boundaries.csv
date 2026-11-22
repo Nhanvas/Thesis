@@ -1,0 +1,9 @@
+arm,set,pairs,med_abs_det_on,med_abs_det_off,med_abs_cpd_on,med_abs_cpd_off,med_abs_hyb_on,med_abs_hyb_off
+control,development,495,16.0,24.0,8.0,16.0,8.0,12.0
+control,test,282,30.0,20.0,16.0,28.0,16.0,16.0
+control,chb24,108,12.0,8.0,4.0,4.0,4.0,4.0
+control,siena,238,36.0,28.0,20.0,28.0,20.0,20.0
+asr,development,456,16.0,28.0,8.0,24.0,8.0,20.0
+asr,test,256,28.0,12.0,16.0,12.0,16.0,12.0
+asr,chb24,94,8.0,8.0,4.0,4.0,4.0,4.0
+asr,siena,241,28.0,32.0,16.0,16.0,20.0,20.0

@@ -1,0 +1,3 @@
+run,n_train_asr,n_train_r0,val_asr,val_r0
+fa15_asr_a,219055,270758,53539,56070
+fa15_asr_b,219055,270758,53539,56070

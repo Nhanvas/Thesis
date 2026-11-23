@@ -110,6 +110,7 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   - (b) The 4-s feature window and the alarm budget set the ceiling, whatever the model family (hypothesis in
     `results/model_cmp/ANALYSIS.md` §4 item 4).
   - (c) Seizure type or localisation (focal, extratemporal), which CHB-MIT does not annotate.
+- *V1 (23/11, F2-02; descriptive).* At 5 % of windows flagged (11.3 % of the recording reviewed) 9 test seizures stay missed by all four seeds: 12–36 s, amplitude ratio median 1.11 (chb06 3, chb13 2, chb15 2, chb16 2); at 10 % flagged 2 remain. On Siena the 6 missed at 5 % are 32–72 s, amplitude ratio 0.76–1.73 — the duration part does not repeat there (`results/m2_v1/reading/missed.csv`, `missed_summary.csv` @ `d7dd159` (csv)).
 - *Status.* hypothesis. *M2.* V1 (c) lists the seizures still missed at 5 % / 10 % review; T1 tests by seizure type.
 
 **FM-02 — The patient's own high-amplitude non-seizure activity outranks the missed seizures.**
@@ -127,6 +128,7 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   median e of short test seizures is 0.369–0.539 for 1–15 windows (`results/oracle_gate_bound/summary.md`).
 - *Still open.* Whether a label-free signal (artifact class, event context) can lower the background's rank without
   the oracle.
+- *V1 (23/11, F2-02).* The seizures this activity outranks are found only at large review shares: test sensitivity 0.858 [0.752, 0.959] at 11.3 % reviewed and 0.952 [0.906, 0.992] at 25.6 % (`results/m2_v1/reading/curve.csv` @ `d7dd159` (csv)).
 - *Status.* measured. *M2.* N1 (premise check), V1.
 
 **FM-03 — Seizures shorter than 20 s almost never reach the threshold; the time grid is not the cause.**
@@ -154,6 +156,7 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   (`results/eureka_d32f/opt/aggregate/T2.md` @ `efdf2eb`, row O7; an ablation, not adopted).
 - *Still open.* How many seizures a reader sees for a given share of the recording reviewed (the clinically relevant
   quantity), and whether a reader accepts this load.
+- *V1 (23/11, F2-02).* Seizures found against the share reviewed, test: 0.567 at 2.1 % (V5's point), 0.768 at 6.3 % with 129 FP/day, 0.858 at 11.3 % with 188 FP/day; chance 0.290 / 0.426 at the same shares (`results/m2_v1/reading/curve.csv` @ `d7dd159` (csv)). The reader load in minutes is not measured (H1).
 - *Status.* measured. *M2.* V1, H1.
 
 **FM-05 — False alarms are concentrated in windows the patient's 5-SD amplitude flag marks.**
@@ -532,6 +535,7 @@ Track F chat; "hold" means it waits; "reject" means it is closed with its reason
   EMU setting: are software packages ready for implementation?*, Seizure 96, 13–17, DOI 10.1016/j.seizure.2022.01.009.
   Review-time reference: Koren et al. (2018), Front Neurol 9, 454, DOI 10.3389/fneur.2018.00454.
 - *Smallest experiment.* V1 (inference only on the V5 checkpoints).
+- *Result (V1, 23/11, F2-02; descriptive).* Partly supports the hypothesis: test 0.768 [0.602, 0.934] at 6.3 % reviewed and 0.858 [0.752, 0.959] at 11.3 %, Siena 0.859 at 5.9 %, at four to seven times V5's false alarms; V5 − chance +0.478 / +0.432 on test (intervals exclude 0). The missed seizures of FM-01 are mostly found by 25 % reviewed (test 0.952) (`results/m2_v1/reading/curve.csv`, `missed.csv` @ `d7dd159` (csv); `T_V1.md`).
 - *Decision.* ______
 
 **RQ-08 — Which offset does an expert accept: the annotation or the score's return to background?**

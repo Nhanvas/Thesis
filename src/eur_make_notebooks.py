@@ -20,11 +20,13 @@
             of one measure (seeds 42, 1-7; inputs + thesis-pc6-graphs); R0 seed 42 reused as in PC8 (design §4)
   EUR_PC8_d, EUR_PC8_e  EUR_PC8's notebook for the PC8b arms P8d (without the relative band powers) / P8e (without the
             connectivity row), EUR_TAG=pc8_<d|e> (chat D37-F, 22/11; design results/eureka_d37f/DESIGN_PC8B.md)
+  EUR_V1    src/eur_v1.py (milestone M2, item V1: seizures found against the share of the recording reviewed; V5
+            checkpoints, inference only; chat F2-02, 23/11; design results/m2_v1/DESIGN_V1.md)
 Notebook pin rule (plan §0, board R205): the notebook clones the repository (branch main by default, or --ref COMMIT)
 and imports every module FROM THE CLONE; before anything runs it asserts the sha256 of each module against the values
 baked in at build time (the local files), so a run can only execute the reviewed code; pool workers import the same
 files and report their sha256 (gate G-worker). Rebuild the notebook after any change to a listed file.
-  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8|EUR_PC6_DATA|EUR_PC6|EUR_PC8B]  -> notebooks/eureka/*.ipynb
+  python src/eur_make_notebooks.py [--ref main|<40-hex commit>] [--only EUR_ABL|EUR_9A|EUR_DIAG|EUR_ABL8B|EUR_OPT|EUR_PC1|EUR_PC7|EUR_PC8|EUR_PC6_DATA|EUR_PC6|EUR_PC8B|EUR_V1]  -> notebooks/eureka/*.ipynb
 Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK / EUR_TEST_SCRATCH."""
 import argparse
 import hashlib
@@ -43,6 +45,7 @@ FILES_9A = ["eur_9a.py"] + FILES + ["dataprep/preprocessing.py", "continuous_eva
 FILES_DIAG = ["eur_diag.py"] + FILES + ["dataprep/preprocessing.py", "continuous_eval.py", "c1b_build_trainset.py",
                                         "evaluation_protocol.py"]
 FILES_PC1 = FILES + ["f1_core.py", "model_cmp_core.py", "retrain/gae_joint.py", "retrain/train_gae_v2.py"]   # + training
+FILES_V1 = ["eur_v1.py"] + FILES + ["szcore_eval.py"]                                   # M2 V1 (chat F2-02)
 sha_of = lambda names: {n: hashlib.sha256((ROOT / "src" / n).read_bytes()).hexdigest()[:16] for n in names}
 SHA = sha_of(FILES)
 PKGS = '"torch_geometric==2.7.0", "ruptures==1.1.10", "timescoring==0.0.7"'
@@ -594,6 +597,81 @@ PC1's log; tells the machine's arithmetic). The CPU model is written to `run_met
     return name, cells
 
 
+def build_v1(ref):
+    """EUR_V1 (milestone M2, item V1; chat F2-02, 23/11; design results/m2_v1/DESIGN_V1.md)."""
+    name = "EUR_V1"
+    sha = sha_of(FILES_V1)
+    cells = [md(f"""
+# {name} — seizures found against the share of the recording reviewed (Track F, milestone M2, item V1, chat F2-02)
+
+**Design:** `results/m2_v1/DESIGN_V1.md` (approved 23/11/2026 13:39). Inference only, the four committed V5 checkpoints:
+V5's own label-free point (= EUR_ABL's V0 rows, gate G-v5own), a budget sweep 0.1–20 % of windows (detector and change
+point stages; the committed curve rows reproduced, gate G-curve), a chance reference (scores circularly shifted within
+each file, 10 shifts), the top-N events per hour of EEG (V5's own events; peak-centred 120-s clips), and the seizures
+caught or missed at every budget. **Runs a SMOKE first** (chb01, chb03, chb24: every gate, measured) and STOPs before
+the full run if anything differs from the V5 record. **Accelerator:** None (CPU). **Internet:** ON (pip, git clone).
+**Inputs (Add Input):** `nhn2mm/v9-x3-fold1`, `nhannguyen26/v9-x3-fold3`, `norncreades/thesis-r2-external-features`.
+**Output:** `/kaggle/working/eureka/v1`
+(→ `results/m2_v1/run`). **Runtime:** ≈ 1–2 h (computed; the smoke writes `projection.json`).
+Code: `github.com/Nhanvas/Thesis` ref `{ref}`; every module's sha256 is asserted below.
+**Nothing printed here is a research result.** Do not edit; *Save Version → Save & Run All (Commit)*.
+"""), code(f"""
+# SETUP: packages + repository (read only)
+import os, sys, subprocess, time, json, hashlib
+T_NB = time.time()
+NOTEBOOK, REPO_REF = "{name}", "{ref}"
+TEST = bool(os.environ.get("EUR_TEST_REPO"))                     # synthetic test in the build container only
+WORK = os.environ.get("EUR_TEST_WORK", "/kaggle/working")
+INPUT = os.environ.get("EUR_TEST_INPUT", "/kaggle/input")
+SCRATCH = os.environ.get("EUR_TEST_SCRATCH", "/tmp/r2")
+if TEST:
+    REPO = os.environ["EUR_TEST_REPO"]; HEAD = "test"
+else:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", {PKGS}])
+    REPO = "/tmp/Thesis"
+    if not os.path.exists(REPO + "/src/eur_v1.py"):
+        subprocess.check_call(f"rm -rf {{REPO}} && git clone -q https://github.com/Nhanvas/Thesis.git {{REPO}} "
+                              f"&& cd {{REPO}} && git checkout -q {{REPO_REF}}", shell=True)
+    HEAD = subprocess.check_output(["git", "-C", REPO, "rev-parse", "HEAD"]).decode().strip()
+print("repository", REPO, HEAD, f"({{time.time()-T_NB:.0f}}s)")
+"""), code(f"""
+# START: sha256 of every module (the reviewed code only), environment, imports
+WANT = {json.dumps(sha)}
+sha = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()[:16]
+bad = {{n: sha(f"{{REPO}}/src/{{n}}") for n in WANT if sha(f"{{REPO}}/src/{{n}}") != WANT[n]}}
+assert not bad, f"modules differ from the reviewed code (rebuild the notebook or pin the right commit): {{bad}}"
+os.environ.update(THESIS_REPO=REPO, R2_WORK=WORK, R2_INPUT=INPUT, R2_SCRATCH=SCRATCH, OMP_NUM_THREADS="1",
+                  OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1")
+if TEST:
+    os.environ["R2_TEST"] = "1"
+sys.path[:0] = [REPO + "/src"]
+import eur_v1 as M
+assert M.__file__ == f"{{REPO}}/src/eur_v1.py", M.__file__
+print("CPU cores:", os.cpu_count(), "| eur_v1", M.CODE_SHA, "| grid", M.GRID)
+"""), code("""
+# RUN: G-self-v1, G-data, SMOKE (R1.0 rows, G-v5own, G-curve, projection), then the full run
+ERR = None
+try:
+    M.main(NOTEBOOK, HEAD, workers=int(os.environ.get("EUR_WORKERS", "0")) or None)
+except SystemExit as e:
+    ERR = str(e)
+"""), code("""
+# END: gates, projection, outputs, measured runtime
+OUT = os.path.join(WORK, "eureka", "v1")
+for f in ("gates.json", "smoke/gates.json", "projection.json", "k.csv", "run_meta.json"):
+    p = os.path.join(OUT, f)
+    if os.path.exists(p):
+        print("=====", f); print(open(p).read()[:4000])
+for root, _, fs in os.walk(OUT):
+    for f in sorted(fs):
+        p = os.path.join(root, f); print(os.path.relpath(p, WORK), os.path.getsize(p))
+print(f"MEASURED notebook runtime: {(time.time() - T_NB) / 3600:.3f} h")
+if ERR:
+    raise RuntimeError(f"STOPPED: {ERR}")
+""")]
+    return name, cells
+
+
 def write(name, cells):
     nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                                        "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
@@ -605,7 +683,7 @@ def write(name, cells):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="main", help="branch main (default) or a 40-hex commit")
-    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8", "EUR_PC6_DATA", "EUR_PC6", "EUR_PC8B"])
+    ap.add_argument("--only", choices=["EUR_ABL", "EUR_9A", "EUR_DIAG", "EUR_ABL8B", "EUR_OPT", "EUR_PC1", "EUR_PC7", "EUR_PC8", "EUR_PC6_DATA", "EUR_PC6", "EUR_PC8B", "EUR_V1"])
     a = ap.parse_args()
     if a.ref != "main" and not re.fullmatch(r"[0-9a-f]{40}", a.ref):
         ap.error("--ref takes main or a 40-hex commit hash, never a tag")
@@ -636,3 +714,5 @@ if __name__ == "__main__":
     if a.only == "EUR_PC8B":
         for arm in ("P8d", "P8e"):
             print("built", write(*build_pc8b(a.ref, arm)), sha_of(FILES_PC1))
+    if a.only == "EUR_V1":
+        print("built", write(*build_v1(a.ref)), sha_of(FILES_V1))

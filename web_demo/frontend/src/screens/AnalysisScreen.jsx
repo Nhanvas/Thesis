@@ -533,6 +533,13 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
           Viewed/Export, and (below) the file dropdown all packed together on the right. */}
       <div className="flex items-center gap-3 ml-auto shrink-0">
         <span className="font-mono text-sm truncate">{headerTitle}</span>
+        <span
+          className="bg-white/20 rounded-control px-2 py-0.5 text-xs shrink-0"
+          title={subject.engine || ''}
+        >
+          {fileMeta.mode === 'file' ? 'Engine: each file' : 'Engine: whole study'}
+          {fileMeta.private ? ' · private (elapsed time)' : ''}
+        </span>
         <button
           type="button"
           onClick={handlePrev}
@@ -619,6 +626,11 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
 
       <main className="p-6">
         {banner && <div className="mb-3 text-sm text-text bg-[#FFFBEB] border border-[#FDE68A] rounded-control px-3 py-2">{banner}</div>}
+        {fileMeta.notice && (
+          <div className="mb-3 text-sm text-text bg-[#FFFBEB] border border-[#FDE68A] rounded-control px-3 py-2">
+            {fileMeta.notice}
+          </div>
+        )}
         {error && <div className="mb-3 text-sm text-reject bg-reject-bg border border-reject rounded-control px-3 py-2">{error}</div>}
 
         <MiniTimeline
@@ -711,7 +723,7 @@ export default function AnalysisScreen({ username, onLoggedOut, subjectId, initi
                 active={preprocessedOn}
                 onClick={toggleFilter}
                 badge="pp"
-                label="Preprocessed (0.5-60 Hz + 60 Hz notch)"
+                label={`Preprocessed (0.5-60 Hz + ${fileMeta.mains_hz ?? 60} Hz notch)`}
               />
             </div>
           </div>

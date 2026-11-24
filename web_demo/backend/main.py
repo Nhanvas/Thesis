@@ -18,6 +18,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -81,15 +82,21 @@ def _require_auth(request: Request) -> str:
     return user
 
 
+def _actor(request: Request) -> str:
+    return _current_user(request) or ""
+
+
 @app.post("/api/login")
 def login(payload: LoginRequest, response: Response):
     if not (
         secrets.compare_digest(payload.username, ADMIN_USER)
         and secrets.compare_digest(payload.password, ADMIN_PASS)
     ):
+        db.audit("login_failed", actor=payload.username[:64])
         raise HTTPException(status_code=401, detail="Invalid username or password.")
     token = secrets.token_urlsafe(32)
     _sessions[token] = payload.username
+    db.audit("login", actor=payload.username)
     response.set_cookie(
         SESSION_COOKIE, token, httponly=True, samesite="lax", secure=False
     )
@@ -100,7 +107,9 @@ def login(payload: LoginRequest, response: Response):
 def logout(request: Request, response: Response):
     token = request.cookies.get(SESSION_COOKIE)
     if token is not None:
-        _sessions.pop(token, None)
+        user = _sessions.pop(token, None)
+        if user:
+            db.audit("logout", actor=user)
     response.delete_cookie(SESSION_COOKIE)
     return {"ok": True}
 
@@ -128,6 +137,7 @@ def delete_subject(subject_id: str, request: Request):
     the check costs nothing and removes the need to trust that invariant here."""
     _require_auth(request)
     db.delete_subject(subject_id)
+    db.audit("subject_deleted", actor=_actor(request), subject_id=subject_id)
 
     uploads_root = um.UPLOAD_DIR.resolve()
     subject_dir = (um.UPLOAD_DIR / subject_id).resolve()
@@ -164,6 +174,7 @@ def export_subject(subject_id: str, request: Request):
             detail="Export is only available once every file of the subject is Viewed.",
         )
     text = et.build_subject_export(subject_id, um.UPLOAD_DIR)
+    db.audit("export", actor=_actor(request), subject_id=subject_id)
     return Response(
         content=text,
         media_type="text/plain",
@@ -201,6 +212,7 @@ def get_file(file_id: int, request: Request):
     f = _file_detail(file_id)
     if f is None:
         raise HTTPException(status_code=404, detail="File not found.")
+    db.audit("file_opened", actor=_actor(request), subject_id=f["subject_id"], file_id=file_id)
     return f
 
 
@@ -222,6 +234,7 @@ def mark_file_viewed(file_id: int, request: Request):
     if db.get_file(file_id) is None:
         raise HTTPException(status_code=404, detail="File not found.")
     db.set_file_status(file_id, "Viewed")
+    db.audit("file_marked_viewed", actor=_actor(request), file_id=file_id)
     return _file_detail(file_id)
 
 
@@ -286,6 +299,8 @@ def create_event(file_id: int, payload: CreateEventRequest, request: Request):
     if offset <= onset:
         raise HTTPException(status_code=422, detail="Event must have a positive duration.")
     event_id = db.create_event(file_id, onset, offset)
+    db.audit("human_event_created", actor=_actor(request), file_id=file_id, event_id=event_id,
+             detail=f"{onset:.1f}-{offset:.1f} s")
     return db.get_event(event_id)
 
 
@@ -334,7 +349,15 @@ def update_event(event_id: int, payload: UpdateEventRequest, request: Request):
         if offset <= onset:
             raise HTTPException(status_code=422, detail="Event must have a positive duration.")
         db.update_event_times(event_id, onset, offset)
+        db.audit("human_event_edited", actor=_actor(request), file_id=event["file_id"], event_id=event_id,
+                 detail=f"{event['onset_sec']:.1f}-{event['offset_sec']:.1f} s -> {onset:.1f}-{offset:.1f} s")
     db.update_event(event_id, review_status=payload.review_status, comment=payload.comment)
+    if payload.review_status is not None and payload.review_status != event["review_status"]:
+        db.audit("review_decision", actor=_actor(request), file_id=event["file_id"], event_id=event_id,
+                 detail=f"{event['review_status']} -> {payload.review_status}")
+    if payload.comment is not None and payload.comment != event["comment"]:
+        db.audit("comment_changed", actor=_actor(request), file_id=event["file_id"], event_id=event_id,
+                 detail=f"{len(payload.comment)} characters")
     return db.get_event(event_id)
 
 
@@ -373,6 +396,9 @@ def put_event_attribution_status(event_id: int, payload: AttributionStatusReques
         if status not in ("Accept", "Reject"):
             raise HTTPException(status_code=422, detail="status must be Accept or Reject.")
     db.set_attribution_status(event_id, payload.statuses)
+    acc = sum(v == "Accept" for v in payload.statuses.values())
+    db.audit("channel_judgement_saved", actor=_actor(request), event_id=event_id,
+             detail=f"{acc} accepted, {len(payload.statuses) - acc} rejected")
     return {"ok": True}
 
 
@@ -387,6 +413,7 @@ def delete_event(event_id: int, request: Request):
     if event["source"] != "Human":
         raise HTTPException(status_code=422, detail="Only Human-added events can be deleted.")
     db.delete_event(event_id)
+    db.audit("human_event_deleted", actor=_actor(request), file_id=event["file_id"], event_id=event_id)
     return {"ok": True}
 
 
@@ -398,6 +425,10 @@ def delete_event(event_id: int, request: Request):
 class StartUploadRequest(BaseModel):
     project_id: str
     memo: str = ""
+    mode: str = "session"          # C5 Step 2: "session" (default) | "file"
+    mains: str | float = "auto"    # "auto" | 50 | 60
+    private: bool = False          # hospital data: neutral names, no header fields, elapsed time
+    interpolate: bool = False      # spherical-spline interpolation of bad electrodes (referential input)
 
 
 def _require_session(request: Request) -> um.UploadSession:
@@ -412,9 +443,13 @@ def _require_session(request: Request) -> um.UploadSession:
 def start_upload(payload: StartUploadRequest, request: Request):
     _require_auth(request)
     try:
-        session = um.start_session(payload.project_id.strip(), payload.memo)
+        session = um.start_session(payload.project_id.strip(), payload.memo, payload.mode, payload.mains,
+                                   payload.private, payload.interpolate)
     except um.UploadManagerError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.toast) from exc
+    db.audit("study_started", actor=_actor(request), subject_id=session.project_id,
+             detail=f"mode {session.mode}, mains {session.mains}, private {session.private}, "
+                    f"interpolate {session.interpolate}")
     return session.snapshot()
 
 
@@ -432,6 +467,8 @@ def discard_upload(request: Request):
     if session is not None and session.processing:
         raise HTTPException(status_code=409, detail="Cannot discard while Process is running.")
     um.discard_session()
+    if session is not None:
+        db.audit("study_discarded", actor=_actor(request), subject_id=session.project_id)
     return {"ok": True}
 
 
@@ -445,17 +482,21 @@ def acknowledge_upload(request: Request):
 @app.post("/api/uploads/current/files")
 async def upload_file(request: Request, file: UploadFile = File(...)):
     session = _require_session(request)
-    filename = Path(file.filename).name
+    filename = Path(file.filename or "").name
     if not filename.lower().endswith(".edf"):
         raise HTTPException(status_code=422, detail=um.REJECTED_FILE_MESSAGE)
     with session.lock:
-        if filename in session.files:
+        if not session.private and filename in session.files:
             raise HTTPException(status_code=409, detail=f"{filename} is already in this list.")
         if session.processing or session.done:
             raise HTTPException(status_code=409, detail="Cannot add files while Process is running.")
-    data = await file.read()
-    tmp_path = um.save_upload_to_tmp(data)
+    # C5 Step 2: streamed to disk in 1-MB chunks; a private session never keeps the original name (DESIGN C8, C9)
+    tmp_path, size, sha = await run_in_threadpool(um.save_upload_stream, file.file)
+    if session.private:
+        filename = um.neutral_name(session)
     um.add_file(session, filename, tmp_path)
+    db.audit("file_uploaded", actor=_actor(request), subject_id=session.project_id,
+             detail=f"{filename}, {size} bytes, sha256 {sha}")
     return session.snapshot()
 
 
@@ -463,6 +504,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 def remove_upload_file(filename: str, request: Request):
     session = _require_session(request)
     um.remove_file(session, filename)
+    db.audit("file_removed", actor=_actor(request), subject_id=session.project_id, detail=filename)
     return session.snapshot()
 
 
@@ -478,4 +520,17 @@ def process_upload(payload: ProcessRequest, request: Request):
         um.start_process(session, payload.project_id, payload.memo)
     except um.UploadManagerError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.toast) from exc
+    db.audit("process_started", actor=_actor(request), subject_id=session.project_id,
+             detail=f"{len(session.files)} files, mode {session.mode}")
     return session.snapshot()
+
+
+# ── Action log (C5 Step 2, DESIGN_STEP2.md C10) ─────────────────────────────────────────
+
+@app.get("/api/audit.csv")
+def audit_csv(request: Request):
+    """The append-only action log as CSV (UTF-8). Its export is itself logged."""
+    _require_auth(request)
+    db.audit("audit_exported", actor=_actor(request))
+    return Response(content=db.audit_csv(), media_type="text/csv",
+                    headers={"Content-Disposition": 'attachment; filename="szscan-action-log.csv"'})

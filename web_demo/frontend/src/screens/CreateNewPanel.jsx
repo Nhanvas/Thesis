@@ -22,6 +22,11 @@ import { addUploadFile, discardUpload, processUpload, removeUploadFile, startUpl
 export default function CreateNewPanel({ hidden, session, onSessionChange, onMinimize, onClose, onDone }) {
   const [projectId, setProjectId] = useState('')
   const [memo, setMemo] = useState('')
+  // C5 Step 2 (DESIGN_STEP2.md C2, C5, C7, C9): fixed for the whole study once its first file is added
+  const [mode, setMode] = useState('session')
+  const [mains, setMains] = useState('auto')
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [interpolate, setInterpolate] = useState(false)
   const [error, setError] = useState('') // full-panel takeover message (UI/A1b-style)
   const [dragActive, setDragActive] = useState(false)
   const [finishing, setFinishing] = useState(false)
@@ -53,7 +58,12 @@ export default function CreateNewPanel({ hidden, session, onSessionChange, onMin
       return null
     }
     try {
-      const started = await startUpload(trimmed, memo)
+      const started = await startUpload(trimmed, memo, {
+        mode,
+        mains: mains === 'auto' ? 'auto' : Number(mains),
+        private: isPrivate,
+        interpolate,
+      })
       onSessionChange(started)
       return started
     } catch (err) {
@@ -74,7 +84,7 @@ export default function CreateNewPanel({ hidden, session, onSessionChange, onMin
 
     for (const file of files) {
       try {
-        const updated = await addUploadFile(file)
+        const updated = await addUploadFile(file, Boolean(active.private))
         onSessionChange(updated)
       } catch (err) {
         if (err.status === 409) continue // duplicate filename or process already running — skip
@@ -216,9 +226,58 @@ export default function CreateNewPanel({ hidden, session, onSessionChange, onMin
             type="text"
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
-            placeholder="e.g. chb06"
+            placeholder="e.g. chb06 — never a patient's name"
             className="w-full border border-border rounded-control px-3 py-2 mb-4 text-sm"
           />
+
+          {/* C5 Step 2: engine mode, mains frequency, private recording, bad-electrode interpolation */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">Engine</label>
+              <select
+                value={session ? session.mode : mode}
+                onChange={(e) => setMode(e.target.value)}
+                disabled={Boolean(session)}
+                className="w-full border border-border rounded-control px-2 py-2 text-sm bg-surface disabled:opacity-60"
+              >
+                <option value="session">Whole study (default)</option>
+                <option value="file">Each file on its own</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">Mains</label>
+              <select
+                value={session ? String(session.mains) : mains}
+                onChange={(e) => setMains(e.target.value)}
+                disabled={Boolean(session)}
+                className="w-full border border-border rounded-control px-2 py-2 text-sm bg-surface disabled:opacity-60"
+              >
+                <option value="auto">Auto (from the signal)</option>
+                <option value="50">50 Hz</option>
+                <option value="60">60 Hz</option>
+              </select>
+            </div>
+          </div>
+          <label className="flex items-start gap-2 text-sm text-text mb-2">
+            <input
+              type="checkbox"
+              checked={session ? Boolean(session.private) : isPrivate}
+              onChange={(e) => setIsPrivate(e.target.checked)}
+              disabled={Boolean(session)}
+              className="mt-0.5"
+            />
+            <span>Private recording (hospital data): neutral file names, no header fields, elapsed time</span>
+          </label>
+          <label className="flex items-start gap-2 text-sm text-text mb-4">
+            <input
+              type="checkbox"
+              checked={session ? Boolean(session.interpolate) : interpolate}
+              onChange={(e) => setInterpolate(e.target.checked)}
+              disabled={Boolean(session)}
+              className="mt-0.5"
+            />
+            <span>Interpolate electrodes that look disconnected (referential recordings)</span>
+          </label>
 
           <label className="block text-sm font-medium text-text mb-1">Memo</label>
           <textarea
@@ -234,7 +293,10 @@ export default function CreateNewPanel({ hidden, session, onSessionChange, onMin
               {sessionFiles.map((f) => (
                 <li key={f.filename} className="flex items-center gap-2 px-3 py-2 text-sm">
                   <FileIcon className="w-4 h-4 text-text-secondary shrink-0" />
-                  <span className="flex-1 truncate font-mono text-xs">{f.filename}</span>
+                  <span className="flex-1 truncate font-mono text-xs" title={f.notice || ''}>
+                    {f.filename}
+                    {f.notice ? ' ⚠' : ''}
+                  </span>
                   {f.status === 'uploading' ? (
                     <button
                       type="button"

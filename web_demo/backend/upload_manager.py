@@ -59,8 +59,21 @@ _phase_a_executor = ThreadPoolExecutor(
 # so its cooperative cancel_check flag keeps working (that needs shared memory a subprocess
 # wouldn't have).
 
-REJECTED_SUBJECT_MESSAGE = "This demo is restricted to the held-out test subjects."
+# C5 Step 2: the subject allowlist of the defense demo is gone; a Project ID is a neutral label (db.SUBJECT_ID_RE).
+REJECTED_SUBJECT_MESSAGE = ("Project ID: 1-32 letters, digits, '_' or '-' (start with a letter or digit). "
+                            "Never type a patient's name.")
+EXISTING_SUBJECT_MESSAGE = "A study with this Project ID already exists. Choose another Project ID."
+REJECTED_SETTINGS_MESSAGE = "Unknown engine mode or mains frequency."
 REJECTED_FILE_MESSAGE = "File rejected — unsupported format or channel configuration."
+REJECTED_FILE_PREFIX = "File rejected — "
+CHUNK_BYTES = 1 << 20
+
+
+def _check_project_id(project_id: str) -> None:
+    if not db.SUBJECT_ID_RE.match(project_id or ""):
+        raise UploadManagerError(REJECTED_SUBJECT_MESSAGE, status_code=422)
+    if db.get_subject(project_id) is not None:
+        raise UploadManagerError(EXISTING_SUBJECT_MESSAGE, status_code=422)
 BLOCKED_MESSAGE = "Processing another subject. Please wait before creating a new one"
 
 
@@ -86,7 +99,8 @@ class FileEntry:
 
 
 class UploadSession:
-    def __init__(self, project_id: str, memo: str):
+    def __init__(self, project_id: str, memo: str, mode: str = "session", mains="auto", private: bool = False,
+                 interpolate: bool = False):
         # CC_STEP3_FIX3_PROMPT.md: Project ID/Memo stay editable in the frontend for the
         # whole draft — session_id is the stable, immutable key upload storage is keyed by
         # (see add_file), independent of whatever the user later retypes into Project ID.
@@ -104,17 +118,32 @@ class UploadSession:
         self.done = False
         self.error: Optional[str] = None
         self.alarm_budget: Optional[float] = None  # p_i of the frozen system (never shown in the UI)
+        # C5 Step 2 settings, fixed for the whole session (DESIGN_STEP2.md C2, C5, C7, C9)
+        self.mode = mode                  # "session" | "file"
+        self.mains = mains                # "auto" | 50.0 | 60.0
+        self.mains_resolved: Optional[float] = None if mains == "auto" else float(mains)
+        self.private = bool(private)
+        self.interpolate = bool(interpolate)
+        self.next_rec = 0                 # private sessions: neutral file names rec01.edf, rec02.edf, ...
+        self.file_events: Optional[dict] = None   # file engine: events computed in Phase B
+        self.file_meta: dict = {}
 
     def snapshot(self) -> dict:
         with self.lock:
             return {
                 "project_id": self.project_id,
                 "memo": self.memo,
+                "mode": self.mode,
+                "mains": self.mains,
+                "mains_resolved": self.mains_resolved,
+                "private": self.private,
+                "interpolate": self.interpolate,
                 "files": [
                     {
                         "filename": f.filename,
                         "status": f.status,
                         "error": f.error,
+                        "notice": (f.phase_a.notice if f.phase_a is not None else ""),
                     }
                     for f in self.files.values()
                 ],
@@ -139,14 +168,28 @@ def get_current() -> Optional[UploadSession]:
     return _current
 
 
-def start_session(project_id: str, memo: str) -> UploadSession:
+def _norm_mains(mains):
+    if mains in ("auto", None, ""):
+        return "auto"
+    try:
+        v = float(mains)
+    except (TypeError, ValueError):
+        raise UploadManagerError(REJECTED_SETTINGS_MESSAGE, status_code=422)
+    if v not in (50.0, 60.0):
+        raise UploadManagerError(REJECTED_SETTINGS_MESSAGE, status_code=422)
+    return v
+
+
+def start_session(project_id: str, memo: str, mode: str = "session", mains="auto", private: bool = False,
+                  interpolate: bool = False) -> UploadSession:
     global _current
     with _manager_lock:
         if _current is not None:
             raise UploadManagerError(BLOCKED_MESSAGE, status_code=409)
-        if project_id not in db.ALLOWED_SUBJECTS:
-            raise UploadManagerError(REJECTED_SUBJECT_MESSAGE, status_code=422)
-        _current = UploadSession(project_id, memo)
+        _check_project_id(project_id)
+        if mode not in db.ENGINE_MODES:
+            raise UploadManagerError(REJECTED_SETTINGS_MESSAGE, status_code=422)
+        _current = UploadSession(project_id, memo, mode, _norm_mains(mains), private, interpolate)
         return _current
 
 
@@ -174,7 +217,27 @@ def _draft_dir(session: UploadSession) -> Path:
     return UPLOAD_DIR / f"_draft_{session.session_id}"
 
 
+def neutral_name(session: UploadSession) -> str:
+    """Private sessions: the next neutral file name (the original name is never stored, DESIGN_STEP2.md C9)."""
+    with session.lock:
+        session.next_rec += 1
+        return f"rec{session.next_rec:02d}.edf"
+
+
+def anonymise_header(path: Path) -> None:
+    """Private sessions: overwrite the patient, recording, start-date and start-time fields of the app's own EDF copy
+    (bytes 8-184 of the fixed header); the signals are untouched. The original upload is not changed."""
+    with open(path, "r+b") as fh:
+        head = fh.read(256)
+        if len(head) < 256:
+            return
+        fh.seek(8)
+        fh.write(b"X".ljust(80) + b"Startdate X X X X".ljust(80) + b"01.01.85" + b"00.00.00")
+
+
 def add_file(session: UploadSession, filename: str, tmp_path: Path) -> None:
+    if session.private:
+        anonymise_header(tmp_path)
     dest_dir = _draft_dir(session)
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest_path = dest_dir / filename
@@ -192,23 +255,36 @@ def add_file(session: UploadSession, filename: str, tmp_path: Path) -> None:
 def _run_phase_a(session: UploadSession, entry: FileEntry) -> None:
     try:
         result = pd.process_file_phase_a(
-            str(entry.path), cancel_check=entry.cancel_flag.is_set, cache_dir=entry.path.parent
+            str(entry.path), cancel_check=entry.cancel_flag.is_set, cache_dir=entry.path.parent,
+            mains=session.mains, interpolate=session.interpolate, private=session.private,
+            mains_fallback=session.mains_resolved if session.mains == "auto" else None,
         )
     except pd.CancelledError:
         with session.lock:
             session.files.pop(entry.filename, None)
             entry.path.unlink(missing_ok=True)
         return
-    except pd.UnsupportedEdfError:
+    except pd.UnsupportedEdfError as exc:
         with session.lock:
             entry.status = "error"
-            entry.error = REJECTED_FILE_MESSAGE
+            entry.error = REJECTED_FILE_PREFIX + str(exc)
         return
     except Exception as exc:  # pragma: no cover - unexpected pipeline failure
         with session.lock:
             entry.status = "error"
-            entry.error = f"Unexpected error while reading this file: {exc}"
+            entry.error = ("Unexpected error while reading this file." if session.private
+                           else f"Unexpected error while reading this file: {exc}")
         return
+
+    # one mains frequency per session (the subject's statistics pool every file)
+    with session.lock:
+        if session.mains_resolved is None:
+            session.mains_resolved = result.notch_hz
+        elif session.mains_resolved != result.notch_hz:
+            entry.status = "error"
+            entry.error = (f"{REJECTED_FILE_PREFIX}this file's mains frequency ({result.notch_hz:.0f} Hz) differs "
+                           f"from the session's ({session.mains_resolved:.0f} Hz).")
+            return
 
     # Phase B and stage 2 read every array back from disk inside the worker process; keeping
     # the whole-file arrays in this server's memory for every uploaded file is not needed.
@@ -284,13 +360,20 @@ def _maybe_run_phase_b(session: UploadSession) -> None:
             for fn, f in session.files.items()
             if f.status == "uploaded"
         }
+        fsamp_paths = {
+            fn: str(f.phase_a.fsamp_path)
+            for fn, f in session.files.items()
+            if f.status == "uploaded"
+        }
+        mode = session.mode
     if not filtered_paths:
         with session.lock:
             session.phase_b_running = False
         return
 
     threading.Thread(
-        target=_run_phase_b, args=(session, gen, filtered_paths, flag_paths, moments_paths), daemon=True
+        target=_run_phase_b, args=(session, gen, filtered_paths, flag_paths, moments_paths, fsamp_paths, mode),
+        daemon=True,
     ).start()
 
 
@@ -319,16 +402,20 @@ def _run_worker(mode: str, payload: dict, out_suffix: str) -> Path:
 
 
 def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_paths: dict,
-                 moments_paths: dict) -> None:
+                 moments_paths: dict, fsamp_paths: Optional[dict] = None, mode: str = "session") -> None:
+    file_events = None
     try:
         out_path = _run_worker(
-            "phase_b",
-            {"filtered_paths": filtered_paths, "flag_paths": flag_paths, "moments_paths": moments_paths},
+            "phase_b_file" if mode == "file" else "phase_b",
+            {"filtered_paths": filtered_paths, "flag_paths": flag_paths, "moments_paths": moments_paths,
+             "fsamp_paths": fsamp_paths or {}},
             ".npz",
         )
         with np.load(out_path) as data:
-            scores = {fn: data[fn] for fn in data.files if not fn.startswith("dist__")}
+            scores = {fn: data[fn] for fn in data.files if not fn.startswith(("dist__", "__events__"))}
             dists = {fn[len("dist__"):]: data[fn] for fn in data.files if fn.startswith("dist__")}
+            if "__events__" in data.files:
+                file_events = json.loads(str(data["__events__"]))
         out_path.unlink(missing_ok=True)
     except Exception as exc:  # pragma: no cover - unexpected pipeline failure
         with session.lock:
@@ -346,6 +433,9 @@ def _run_phase_b(session: UploadSession, gen: int, filtered_paths: dict, flag_pa
             if fn in session.files:
                 session.files[fn].score = score
                 session.files[fn].dist = dists[fn]
+        if file_events is not None:
+            session.file_events = file_events["events"]
+            session.file_meta = file_events["meta"]
         session.phase_b_done = True
 
 
@@ -363,8 +453,7 @@ def start_process(session: UploadSession, project_id: str, memo: str) -> None:
             raise UploadManagerError("Already processing.", status_code=409)
         if not session.files or any(f.status != "uploaded" for f in session.files.values()):
             raise UploadManagerError("Not all files have finished uploading yet.", status_code=409)
-        if project_id not in db.ALLOWED_SUBJECTS:
-            raise UploadManagerError(REJECTED_SUBJECT_MESSAGE, status_code=422)
+        _check_project_id(project_id)
         session.project_id = project_id
         session.memo = memo
         session.processing = True
@@ -428,22 +517,39 @@ def _run_process(session: UploadSession, scores: dict, dists: dict, phase_a_by_f
             savez_payload[f"dist__{fn}"] = dists[fn]
         np.savez(score_npz_name, **savez_payload)
 
-        out_path = _run_worker("process_events", {"score_npz_path": score_npz_name}, ".json")
-        Path(score_npz_name).unlink(missing_ok=True)
-        result = json.loads(out_path.read_text())
-        out_path.unlink(missing_ok=True)
-
-        alarm_budget = result["alarm_budget"]
-        file_events = result["events"]  # {filename: [[onset_sec, offset_sec], ...]}
+        if session.mode == "file":
+            # file engine: events were computed per file in Phase B (engine_file.run_file)
+            Path(score_npz_name).unlink(missing_ok=True)
+            file_events = session.file_events or {}
+            tops = [m["top"] for m in session.file_meta.values() if not m["short"]]
+            alarm_budget = float(np.mean(tops)) if tops else 0.0
+            import engine_file as EF
+            engine = EF.describe()
+        else:
+            out_path = _run_worker("process_events", {"score_npz_path": score_npz_name}, ".json")
+            Path(score_npz_name).unlink(missing_ok=True)
+            result = json.loads(out_path.read_text())
+            out_path.unlink(missing_ok=True)
+            alarm_budget = result["alarm_budget"]
+            file_events = result["events"]  # {filename: [[onset_sec, offset_sec], ...]}
+            engine = SESSION_ENGINE
 
         files_payload = []
         events_payload = {}
         for fn, phase_a in phase_a_by_filename.items():
+            notice = phase_a.notice
+            if session.mode == "file" and session.file_meta.get(fn, {}).get("short"):
+                import engine_file as EF
+                notice = (notice + " " if notice else "") + (
+                    f"Shorter than {EF.settings()['min_minutes']} min of signal: the each-file engine flags nothing "
+                    f"in it.")
             files_payload.append(
                 {
                     "filename": fn,
-                    "start_time": phase_a.start_time.isoformat(),
+                    "start_time": (db.PRIVATE_EPOCH if session.private or phase_a.start_time is None
+                                   else phase_a.start_time.isoformat()),
                     "duration_seconds": phase_a.file_duration_seconds,
+                    "notice": notice,
                 }
             )
             events_payload[fn] = [
@@ -461,7 +567,9 @@ def _run_process(session: UploadSession, scores: dict, dists: dict, phase_a_by_f
         for fn, score in scores.items():
             np.save(subject_dir / f"{Path(fn).stem}.score.npy", score)
 
-        db.create_subject_with_files(session.project_id, session.memo, files_payload, events_payload)
+        db.create_subject_with_files(session.project_id, session.memo, files_payload, events_payload,
+                                     mode=session.mode, mains_hz=session.mains_resolved or 60.0,
+                                     private=session.private, engine=engine)
     except Exception as exc:  # pragma: no cover - unexpected pipeline/DB failure
         with session.lock:
             session.processing = False
@@ -474,9 +582,31 @@ def _run_process(session: UploadSession, scores: dict, dists: dict, phase_a_by_f
         session.alarm_budget = alarm_budget
 
 
+SESSION_ENGINE = ("whole session: V5 application chain (label-free statistics pooled over the study's files), "
+                  "GAE v2 seed 42, k 4.0677")
+
+
 def save_upload_to_tmp(data: bytes) -> Path:
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     fd, tmp_name = tempfile.mkstemp(suffix=".edf", dir=str(UPLOAD_DIR))
     with open(fd, "wb") as fh:
         fh.write(data)
     return Path(tmp_name)
+
+
+def save_upload_stream(fileobj) -> tuple[Path, int, str]:
+    """C5 Step 2 (DESIGN_STEP2.md C8): copy an upload to disk in 1-MB chunks (never the whole file in memory);
+    returns (path, size in bytes, sha256)."""
+    import hashlib
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(suffix=".edf", dir=str(UPLOAD_DIR))
+    h, size = hashlib.sha256(), 0
+    with open(fd, "wb") as out:
+        while True:
+            chunk = fileobj.read(CHUNK_BYTES)
+            if not chunk:
+                break
+            out.write(chunk)
+            h.update(chunk)
+            size += len(chunk)
+    return Path(tmp_name), size, h.hexdigest()

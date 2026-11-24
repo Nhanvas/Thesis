@@ -54,23 +54,28 @@ async function uploadRequest(path, options = {}) {
   return body
 }
 
-export const startUpload = (projectId, memo) =>
+// C5 Step 2: settings = { mode: 'session'|'file', mains: 'auto'|50|60, private: bool, interpolate: bool }
+export const startUpload = (projectId, memo, settings = {}) =>
   uploadRequest('/api/uploads/current', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ project_id: projectId, memo }),
+    body: JSON.stringify({ project_id: projectId, memo, ...settings }),
   })
 
 export const getUpload = () => uploadRequest('/api/uploads/current')
+
+// C5 Step 2: the action log as CSV (opens a download in the browser; cookies carry the login).
+export const AUDIT_CSV_URL = '/api/audit.csv'
 
 export const discardUpload = () => uploadRequest('/api/uploads/current', { method: 'DELETE' })
 
 export const acknowledgeUpload = () =>
   uploadRequest('/api/uploads/current/acknowledge', { method: 'POST' })
 
-export const addUploadFile = (file) => {
+// C5 Step 2: a private study never sends the original file name (it may hold the patient's name).
+export const addUploadFile = (file, isPrivate = false) => {
   const form = new FormData()
-  form.append('file', file, file.name)
+  form.append('file', file, isPrivate ? 'recording.edf' : file.name)
   return uploadRequest('/api/uploads/current/files', { method: 'POST', body: form })
 }
 
@@ -147,6 +152,21 @@ export async function exportSubjectTxt(subjectId) {
   const a = document.createElement('a')
   a.href = url
   a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
+// C5 Step 2 (DESIGN_STEP2.md C10): download the append-only action log as CSV.
+export async function downloadAuditCsv() {
+  const res = await fetch(AUDIT_CSV_URL, { credentials: 'include' })
+  if (!res.ok) throw new Error(`Request failed (${res.status})`)
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'szscan-action-log.csv'
   document.body.appendChild(a)
   a.click()
   a.remove()

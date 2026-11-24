@@ -11,7 +11,7 @@ import {
   CircleOutlineIcon,
   HalfCircleIcon,
 } from '../components/icons.jsx'
-import { acknowledgeUpload, deleteSubject, getUpload, listSubjects } from '../api.js'
+import { acknowledgeUpload, deleteSubject, downloadAuditCsv, getUpload, listSubjects } from '../api.js'
 
 const COLUMNS = ['ID', '| No. files', 'Start date', 'Duration', 'Alert', '| Status', 'Memo']
 const POLL_MS = 1500
@@ -314,6 +314,14 @@ export default function DatabaseScreen({ username, onLoggedOut, onOpen }) {
                 className="bg-brand text-white rounded-control px-4 py-2 text-sm font-medium"
               >
                 Create new
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadAuditCsv().catch(() => {})}
+                className="border border-border rounded-control px-4 py-2 text-sm bg-surface"
+                title="Download the action log (CSV)"
+              >
+                Action log
               </button>
               {banner && (
                 <span className="text-sm text-text flex items-center gap-1.5">{banner}</span>

@@ -151,53 +151,73 @@ class PhaseAResult:
     bandpass_path: Optional[Path] = None   # band-pass-only windows (EEG panel filter toggle)
     flag_path: Optional[Path] = None
     moments_path: Optional[Path] = None
+    # C5 Step 2 (DESIGN_STEP2.md C2, C4-C7): input description and the per-file statistics sample of the file engine
+    notch_hz: float = NOTCH_HZ
+    notice: str = ""
+    montage: str = "bipolar"
+    mains_ratios: tuple = (float("nan"), float("nan"))
+    fsamp_path: Optional[Path] = None      # every 10th window of the file, 3-s padded, filtered (m2l_core.sampled)
 
 
-def padded_window_moments(data: np.ndarray, n_windows: int) -> np.ndarray:
+def padded_window_moments(data: np.ndarray, n_windows: int, notch_hz: float = NOTCH_HZ) -> np.ndarray:
     """Per window: per-channel sum and sum of squares of x1_external.window_padded(data, i) --
     the window filtered with 3 s of padding on each side, exactly the signal x1_external.
     labelfree_stats samples. Stored for EVERY window because which windows are 'every 10th of
     the subject' depends on the files uploaded before this one (resolved in Phase B)."""
     out = np.empty((n_windows, data.shape[0], 2), dtype=np.float64)
     for i in range(n_windows):
-        w = X1.window_padded(data, i, NOTCH_HZ)
+        w = X1.window_padded(data, i, notch_hz)
         out[i, :, 0] = w.sum(axis=1)
         out[i, :, 1] = (w * w).sum(axis=1)
     return out
 
 
-def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[Path] = None) -> PhaseAResult:
+def notch_coefficients(notch_hz: float):
+    """iirnotch(notch, Q 30) at 256 Hz -- for 60 Hz exactly preprocessing._NOTCH_B / _NOTCH_A (asserted above);
+    for 50 Hz exactly x1_external.filters(50.0) (Siena and the hospital records in the thesis)."""
+    if notch_hz == NOTCH_HZ:
+        return preprocessing._NOTCH_B, preprocessing._NOTCH_A
+    return iirnotch(notch_hz, Q=30, fs=preprocessing.FS)
+
+
+def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[Path] = None,
+                         mains=NOTCH_HZ, interpolate: bool = False, private: bool = False,
+                         mains_fallback: Optional[float] = None) -> PhaseAResult:
     """Open, filter and window ONE file; signal-loss flags; per-window moments. No z-score, no
     graph, no model -- those need subject-wide statistics (Phase B). With `cache_dir`, every
-    array is also written to `{cache_dir}/{stem}.{filtered,raw,bandpass,flag,moments}.npy`."""
+    array is also written to `{cache_dir}/{stem}.{filtered,raw,bandpass,flag,moments,fsamp}.npy`.
+
+    C5 Step 2: the file is read by edf_input.load_any (bipolar CHB-MIT exactly as before; referential files -> the 18
+    derivations; any integer rate -> 256 Hz); `mains` = 50.0 / 60.0 or "auto" (edf_input's written rule);
+    `interpolate` = spherical-spline interpolation of bad electrodes (referential input only); `private` = no
+    header start time is kept (the stored start is pipeline_demo-independent, set by the caller)."""
+    import edf_input as EI
+
     def _check():
         if cancel_check is not None and cancel_check():
             raise CancelledError(edf_path)
 
     _check()
     try:
-        raw = preprocessing.open_edf(edf_path)
-    except Exception as exc:  # mne raises a variety of exceptions for non-EDF/corrupt input
-        raise UnsupportedEdfError(f"{edf_path}: could not be read as EDF ({exc})") from exc
-    if raw is None:
-        raise UnsupportedEdfError(f"{edf_path}: missing one or more of the 18 common channels "
-                                  f"({preprocessing.COMMON_CHANNELS}).")
-    if int(round(raw.info["sfreq"])) != preprocessing.FS:
-        raise UnsupportedEdfError(f"{edf_path}: sampling rate {raw.info['sfreq']} Hz, expected {preprocessing.FS}.")
-    n_windows = int(raw.n_times) // WIN_SAMPLES
+        data, meta = EI.load_any(edf_path, mains=mains, interpolate=interpolate, mains_fallback=mains_fallback)
+    except EI.InputError as exc:
+        raise UnsupportedEdfError(str(exc)) from exc
+    n_windows = int(data.shape[1]) // WIN_SAMPLES
     if n_windows == 0:
-        raise UnsupportedEdfError(f"{edf_path}: shorter than one 4 s window -- nothing to score.")
-    start_time = raw.info["meas_date"]
-    if start_time is None:
-        raise UnsupportedEdfError(f"{edf_path}: EDF header has no start time (meas_date).")
-    file_duration_seconds = float(raw.n_times) / float(raw.info["sfreq"])
+        raise UnsupportedEdfError("Shorter than one 4-s window; nothing to score.")
+    start_time = None if private else meta["meas_date"]
+    if start_time is None and not private:
+        raise UnsupportedEdfError("The EDF header has no start time; upload it as a private recording "
+                                  "(elapsed time is shown instead of clock time).")
+    file_duration_seconds = float(data.shape[1]) / float(preprocessing.FS)
+    notch_hz = float(meta["notch_hz"])
+    nb, na = notch_coefficients(notch_hz)
 
     _check()
-    data = raw.get_data().astype(np.float64)          # [18, n_samples], volts
     usable = n_windows * WIN_SAMPLES
     # Whole-file zero-phase filtering: band-pass then notch (= x1_external.filter_windows).
     bp = sosfiltfilt(preprocessing._BP_SOS, data, axis=1)
-    notched = filtfilt(preprocessing._NOTCH_B, preprocessing._NOTCH_A, bp, axis=1)
+    notched = filtfilt(nb, na, bp, axis=1)
 
     def _win(x):
         return np.ascontiguousarray(x[:, :usable].reshape(N_CH, n_windows, WIN_SAMPLES).transpose(1, 0, 2))
@@ -209,7 +229,12 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
     raw_windows = raw64.astype(np.float32)
     del raw64, bp, notched
     _check()
-    moments = padded_window_moments(data, n_windows)
+    moments = padded_window_moments(data, n_windows, notch_hz)
+    _check()
+    # file engine (m2l_core.sampled, line for line): every 10th window counted from the file's first, 3-s padded
+    samp_idx = np.flatnonzero((np.arange(n_windows) + 1) % STATS_SUBSAMPLE == 0)
+    fsamp = (np.concatenate([X1.window_padded(data, int(i), notch_hz) for i in samp_idx], axis=1)
+             if len(samp_idx) else np.empty((N_CH, 0)))
     _check()
 
     paths = {}
@@ -218,7 +243,7 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
         cache_dir.mkdir(parents=True, exist_ok=True)
         stem = Path(edf_path).stem
         for key, arr in (("filtered", filtered), ("raw", raw_windows), ("bandpass", bandpass_windows),
-                         ("flag", flag), ("moments", moments)):
+                         ("flag", flag), ("moments", moments), ("fsamp", fsamp)):
             p = cache_dir / f"{stem}.{key}.npy"
             np.save(p, arr)
             paths[key] = p
@@ -228,7 +253,9 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
         n_windows=n_windows, start_time=start_time, file_duration_seconds=file_duration_seconds,
         filtered_path=paths.get("filtered"), raw_path=paths.get("raw"),
         bandpass_path=paths.get("bandpass"), flag_path=paths.get("flag"),
-        moments_path=paths.get("moments"),
+        moments_path=paths.get("moments"), fsamp_path=paths.get("fsamp"),
+        notch_hz=notch_hz, notice=" ".join(meta["notices"]), montage=meta["montage"],
+        mains_ratios=tuple(meta["mains_ratios"]),
     )
 
 

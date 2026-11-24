@@ -8,15 +8,19 @@ for search — see SZSCAN_SPEC_v5.md §5.4), search, and subject deletion. Event
 AI events at review_status='Unseen' (SPEC §5.3: nothing has been reviewed yet).
 """
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent / "szscan.db"
 
-# SZSCAN_SPEC_v5.md §2 / CLAUDE.md — the fixed 8-subject held-out test allowlist, plus chb24
-# (added 2026-10-27 per author approval in V9-T1: format-compatible — 256 Hz, same 23-channel
-# bipolar naming as the other chb* subjects — and not part of the training/validation split).
-ALLOWED_SUBJECTS = {"chb03", "chb06", "chb13", "chb14", "chb15", "chb16", "chb17", "chb18", "chb24"}
+# C5 Step 2 (author 24/11/2026): the subject-id allowlist of the defense demo (8 test subjects + chb24) is removed --
+# SzScan accepts any EDF (every CHB-MIT case, Siena, hospital records). A subject id is a short neutral label: letters,
+# digits, '_' or '-', 1-32 characters, starting with a letter or digit (never a patient's name; the UI says so).
+import re
+
+SUBJECT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,31}$")
+ENGINE_MODES = ("session", "file")       # C5 Step 2: whole session (default) / each file on its own
+PRIVATE_EPOCH = "1970-01-01T00:00:00+00:00"   # start time stored for private sessions (elapsed time display)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS subjects (
@@ -57,7 +61,35 @@ CREATE TABLE IF NOT EXISTS attribution_status (
     status   TEXT NOT NULL CHECK (status IN ('Accept', 'Reject')),
     PRIMARY KEY (event_id, channel)
 );
+
+-- C5 Step 2: append-only action log (no foreign key: rows outlive the subjects they mention). Never holds a file's
+-- original name, a header field or a recording date of a private session (DESIGN_STEP2.md C9, C10).
+CREATE TABLE IF NOT EXISTS audit_log (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts_utc     TEXT NOT NULL,
+    ts_local   TEXT NOT NULL,
+    actor      TEXT NOT NULL DEFAULT '',
+    action     TEXT NOT NULL,
+    subject_id TEXT,
+    file_id    INTEGER,
+    event_id   INTEGER,
+    detail     TEXT NOT NULL DEFAULT ''
+);
+CREATE TRIGGER IF NOT EXISTS audit_log_no_update BEFORE UPDATE ON audit_log
+BEGIN SELECT RAISE(ABORT, 'audit_log is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS audit_log_no_delete BEFORE DELETE ON audit_log
+BEGIN SELECT RAISE(ABORT, 'audit_log is append-only'); END;
 """
+
+# Columns added by C5 Step 2 to databases created before it (ALTER TABLE ... ADD COLUMN, defaults = the defense-time
+# behaviour, so the existing subjects keep exactly their meaning: session engine, 60-Hz notch, not private).
+_MIGRATIONS = [
+    ("subjects", "mode", "TEXT NOT NULL DEFAULT 'session'"),
+    ("subjects", "mains_hz", "REAL NOT NULL DEFAULT 60.0"),
+    ("subjects", "private", "INTEGER NOT NULL DEFAULT 0"),
+    ("subjects", "engine", "TEXT NOT NULL DEFAULT ''"),
+    ("files", "notice", "TEXT NOT NULL DEFAULT ''"),
+]
 
 
 def get_connection() -> sqlite3.Connection:
@@ -70,8 +102,51 @@ def get_connection() -> sqlite3.Connection:
 def init_db() -> None:
     conn = get_connection()
     conn.executescript(SCHEMA)
+    for table, col, decl in _MIGRATIONS:
+        have = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+        if col not in have:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
     conn.commit()
     conn.close()
+
+
+# ── Action log (C5 Step 2) ──────────────────────────────────────────────────────────────
+
+def audit(action: str, actor: str = "", subject_id: str | None = None, file_id: int | None = None,
+          event_id: int | None = None, detail: str = "") -> None:
+    """One row per user action. `detail` is short text written by main.py (never a file's original name, never a
+    header field of an EDF, never a recording date)."""
+    now = datetime.now().astimezone()
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO audit_log (ts_utc, ts_local, actor, action, subject_id, file_id, event_id, detail) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (now.astimezone(timezone.utc).isoformat(timespec="milliseconds"),
+         now.isoformat(timespec="milliseconds"), actor or "", action, subject_id, file_id, event_id, detail or ""),
+    )
+    conn.commit()
+    conn.close()
+
+
+AUDIT_COLUMNS = ("id", "ts_utc", "ts_local", "actor", "action", "subject_id", "file_id", "event_id", "detail")
+
+
+def list_audit() -> list[dict]:
+    conn = get_connection()
+    rows = conn.execute(f"SELECT {', '.join(AUDIT_COLUMNS)} FROM audit_log ORDER BY id").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def audit_csv() -> str:
+    import csv
+    import io
+    buf = io.StringIO()
+    w = csv.writer(buf, lineterminator="\n")
+    w.writerow(AUDIT_COLUMNS)
+    for r in list_audit():
+        w.writerow([r[c] if r[c] is not None else "" for c in AUDIT_COLUMNS])
+    return buf.getvalue()
 
 
 def _format_duration(seconds: float) -> str:
@@ -124,6 +199,10 @@ def create_subject_with_files(
     memo: str,
     files: list[dict],
     events_by_filename: dict[str, list[dict]],
+    mode: str = "session",
+    mains_hz: float = 60.0,
+    private: bool = False,
+    engine: str = "",
 ) -> None:
     """Atomic per SZSCAN_SPEC_v5.md §5.1: the subject row and every child file row (and
     their AI events) appear together, or not at all — a subject mid-pipeline must never
@@ -134,14 +213,17 @@ def create_subject_with_files(
     """
     conn = get_connection()
     try:
+        if mode not in ENGINE_MODES:
+            raise ValueError(f"unknown engine mode {mode!r}")
         conn.execute(
-            "INSERT INTO subjects (id, memo) VALUES (?, ?)", (subject_id, memo)
+            "INSERT INTO subjects (id, memo, mode, mains_hz, private, engine) VALUES (?, ?, ?, ?, ?, ?)",
+            (subject_id, memo, mode, float(mains_hz), int(bool(private)), engine),
         )
         for f in files:
             cur = conn.execute(
-                "INSERT INTO files (subject_id, filename, start_time, duration_seconds, status) "
-                "VALUES (?, ?, ?, ?, 'View')",
-                (subject_id, f["filename"], f["start_time"], f["duration_seconds"]),
+                "INSERT INTO files (subject_id, filename, start_time, duration_seconds, status, notice) "
+                "VALUES (?, ?, ?, ?, 'View', ?)",
+                (subject_id, f["filename"], f["start_time"], f["duration_seconds"], f.get("notice", "")),
             )
             file_id = cur.lastrowid
             for ev in events_by_filename.get(f["filename"], []):
@@ -180,13 +262,14 @@ def _file_row(row: sqlite3.Row, alert: int, recording_n: int) -> dict:
         "duration": _format_duration(row["duration_seconds"]),
         "alert": alert,
         "status": _file_status_badge(row["status"]),
+        "notice": row["notice"] if "notice" in row.keys() else "",
     }
 
 
 def _subject_dict(conn: sqlite3.Connection, srow: sqlite3.Row, alert_by_file: dict[int, int]) -> dict:
     file_rows = conn.execute(
-        "SELECT id, filename, start_time, duration_seconds, status FROM files "
-        "WHERE subject_id = ? ORDER BY start_time",
+        "SELECT id, filename, start_time, duration_seconds, status, notice FROM files "
+        "WHERE subject_id = ? ORDER BY start_time, filename",
         (srow["id"],),
     ).fetchall()
     # file_rows is already sorted by start_time (meas_date) ascending, so its own
@@ -209,6 +292,10 @@ def _subject_dict(conn: sqlite3.Connection, srow: sqlite3.Row, alert_by_file: di
         "alert": subject_alert,
         "status": _subject_status([f["status"] for f in files]),
         "memo": srow["memo"],
+        "mode": srow["mode"],
+        "mains_hz": srow["mains_hz"],
+        "private": bool(srow["private"]),
+        "engine": srow["engine"],
         "files": files,
     }
 
@@ -219,7 +306,7 @@ def list_subjects() -> list[dict]:
     per-subject fetch needed to search inside collapsed rows)."""
     conn = get_connection()
     subject_rows = conn.execute(
-        "SELECT id, memo FROM subjects ORDER BY created_at"
+        "SELECT id, memo, mode, mains_hz, private, engine FROM subjects ORDER BY created_at"
     ).fetchall()
     alert_by_file = _alert_counts_by_file(conn)
     result = [_subject_dict(conn, srow, alert_by_file) for srow in subject_rows]
@@ -232,7 +319,8 @@ def get_subject(subject_id: str) -> dict | None:
     header alert count, Previous/Next, file dropdown, Progress x/N — all derived from the
     same file list/ordering as the Database screen's table (list_subjects above)."""
     conn = get_connection()
-    srow = conn.execute("SELECT id, memo FROM subjects WHERE id = ?", (subject_id,)).fetchone()
+    srow = conn.execute("SELECT id, memo, mode, mains_hz, private, engine FROM subjects WHERE id = ?",
+                        (subject_id,)).fetchone()
     if srow is None:
         conn.close()
         return None
@@ -249,7 +337,7 @@ def get_file(file_id: int) -> dict | None:
     need the whole subject payload."""
     conn = get_connection()
     row = conn.execute(
-        "SELECT id, subject_id, filename, start_time, duration_seconds, status "
+        "SELECT id, subject_id, filename, start_time, duration_seconds, status, notice "
         "FROM files WHERE id = ?",
         (file_id,),
     ).fetchone()
@@ -258,7 +346,7 @@ def get_file(file_id: int) -> dict | None:
         return None
     alert_by_file = _alert_counts_by_file(conn)
     siblings = conn.execute(
-        "SELECT id FROM files WHERE subject_id = ? ORDER BY start_time",
+        "SELECT id FROM files WHERE subject_id = ? ORDER BY start_time, filename",
         (row["subject_id"],),
     ).fetchall()
     conn.close()
@@ -267,6 +355,12 @@ def get_file(file_id: int) -> dict | None:
     file_dict["subject_id"] = row["subject_id"]
     file_dict["start_time"] = row["start_time"]
     file_dict["duration_seconds"] = row["duration_seconds"]
+    conn = get_connection()
+    srow = conn.execute("SELECT mode, mains_hz, private FROM subjects WHERE id = ?", (row["subject_id"],)).fetchone()
+    conn.close()
+    file_dict["mode"] = srow["mode"] if srow else "session"
+    file_dict["mains_hz"] = srow["mains_hz"] if srow else 60.0
+    file_dict["private"] = bool(srow["private"]) if srow else False
     return file_dict
 
 

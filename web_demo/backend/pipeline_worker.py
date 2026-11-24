@@ -45,6 +45,34 @@ def _run_phase_b(payload: dict, out_path: str) -> None:
     np.save(any_filtered_path.with_name(pd.PERNODE_BASELINE_FILENAME), res.baseline)
 
 
+def _run_phase_b_file(payload: dict, out_path: str) -> None:
+    """C5 Step 2, file engine (engine_file.py): each file scored on its own; scores, distances and the events of every
+    file in one .npz (events as a JSON string under the key "__events__"); panel arrays written as in _run_phase_b
+    (the panel baseline = median / MAD over every file's distances, display only)."""
+    import engine_file as EF
+    arrays, events, meta = {}, {}, {}
+    all_d = []
+    for fn, fp in payload["filtered_paths"].items():
+        r = EF.run_file(np.load(fp, mmap_mode="r"), np.load(payload["flag_paths"][fn]),
+                        np.load(payload["fsamp_paths"][fn]))
+        arrays[fn] = r["score"]
+        arrays[f"dist__{fn}"] = r["dist"]
+        events[fn] = [[a, b] for a, b in r["events"]]
+        meta[fn] = dict(q=r["q"], top=r["top"], short=r["short"])
+        stem = Path(fp).name.removesuffix(".filtered.npy")
+        np.save(Path(fp).with_name(f"{stem}.pernode.npy"), r["dist"].astype(np.float32))
+        d = r["dist"][np.isfinite(r["dist"]).all(axis=1)]
+        if len(d):
+            all_d.append(d)
+    any_fp = Path(next(iter(payload["filtered_paths"].values())))
+    if all_d:
+        np.save(any_fp.with_name(pd.PERNODE_BASELINE_FILENAME), pd.pernode_baseline(np.concatenate(all_d)))
+    else:
+        np.save(any_fp.with_name(pd.PERNODE_BASELINE_FILENAME), np.stack([np.zeros(pd.N_CH), np.ones(pd.N_CH)]))
+    arrays["__events__"] = np.array(json.dumps(dict(events=events, meta=meta)))
+    np.savez(out_path, **arrays)
+
+
 _FLAG_KEY_PREFIX = "flag__"
 _DIST_KEY_PREFIX = "dist__"
 
@@ -71,7 +99,7 @@ def _run_process_events(payload: dict, out_path: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["phase_b", "process_events"])
+    parser.add_argument("mode", choices=["phase_b", "phase_b_file", "process_events"])
     parser.add_argument("in_path", help="JSON file with this mode's input payload")
     parser.add_argument("out_path", help="Where to write the result (.npz for phase_b, .json for process_events)")
     args = parser.parse_args()
@@ -79,6 +107,8 @@ def main() -> None:
     payload = json.loads(Path(args.in_path).read_text())
     if args.mode == "phase_b":
         _run_phase_b(payload, args.out_path)
+    elif args.mode == "phase_b_file":
+        _run_phase_b_file(payload, args.out_path)
     else:
         _run_process_events(payload, args.out_path)
 

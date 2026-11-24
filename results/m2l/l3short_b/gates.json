@@ -1,0 +1,134 @@
+[
+ {
+  "gate": "G-sel",
+  "status": "PASS",
+  "selection": {
+   "arm": "B-MCD-F",
+   "S": "B",
+   "cov": "MCD",
+   "floor": "F",
+   "k": 9.914208892343954,
+   "candidates": [
+    "R-MCD-F",
+    "B-LW-F",
+    "B-MCD-F"
+   ],
+   "dev_f1": 0.13328746253670745,
+   "dev_sens": 0.8716605616605617,
+   "dev_fa": 45.40955319276832,
+   "rule": "among arms with F1 - P0 interval above 0 and sensitivity - P0 >= -0.03, highest F1 (3 decimals; ties -> F, LW, R); none -> P0 = R-LW-F",
+   "source_runs": [
+    "results\\m2l\\l2_rec",
+    "results\\m2l\\l2_rob"
+   ]
+  },
+  "sha16": "70539f67a1069202",
+  "summary": "chosen arm B-MCD-F (k 9.914208892343954) from results/m2l/l2/selection.json"
+ },
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 433,
+  "from_physionet": 1,
+  "failed_checks": [],
+  "cases_missing": [],
+  "summary": "433 EDF verified by sha256 against PhysioNet; checks ['committed data/summaries = PhysioNet summaries', 'CHB-MIT chb01-23: every EDF listed in its summary']"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 15,
+  "bad": [],
+  "pinned": 15,
+  "summary": "15 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-c",
+  "status": "PASS",
+  "max_abs_dev_3dec": 0.0,
+  "c": [
+   2.040617815449715,
+   1.6236797262940956,
+   1.4747473835208929,
+   1.4216248414393797,
+   1.7943079401237616,
+   1.593508281390045,
+   1.4854227075116804,
+   1.4702226130869862,
+   1.8180122196598778,
+   1.4666001035918539,
+   1.5718236446233411,
+   1.4881800227227333,
+   2.0581147877559505,
+   1.5989782588582246,
+   1.4953137324277093,
+   1.4183799729023836,
+   1.6675110716690975,
+   1.5457665760150259
+  ],
+  "summary": "c_ch recomputed from RB1c = the design table to 3 decimals (max deviation 0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed estimate: smoke rate x hours, LPT on workers; scoring = SCORE_FACTOR x build",
+  "elapsed_h": 0.153,
+  "build_h": 2.835,
+  "score_h": 0.227,
+  "extra_h": 0.0,
+  "workers": 4,
+  "rec_s_per_h": 60.27,
+  "hours_of_eeg": 677.25,
+  "projected_total_h": 3.22,
+  "summary": "projected total 3.22 h (limit 10.5 h)"
+ },
+ {
+  "gate": "G-worker[build]",
+  "status": "PASS",
+  "jobs": 428,
+  "differ": [],
+  "summary": "428 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-struct[seg]",
+  "status": "PASS",
+  "cases": 30,
+  "failed": [],
+  "summary": "30 patients: recordings, windows, labels, signal loss, file order = reference"
+ },
+ {
+  "gate": "G-worker[score_seg]",
+  "status": "PASS",
+  "jobs": 30,
+  "differ": [],
+  "summary": "30 jobs ran the parent's modules"
+ }
+]

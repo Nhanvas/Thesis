@@ -222,7 +222,7 @@ def main():
         t = time.time()
         RR.run(root / "runner.py", env_for(root, repo, run, M2L_TEST_SEGS=segs), [nbd / f"{nb}.ipynb"])
         g = gates(root / f"work_{run}", tag)
-        assert all(g.get(n) == "PASS" for n in ("G-sel", "G-raw", "G-data", "R1.0-dev", "G-struct[seg]",
+        assert all(g.get(n) == "PASS" for n in ("G-sel", "G-raw", "G-data", "R1.0-dev", "PROJ", "G-struct[seg]",
                                                 "G-worker[build]")), (nb, g)
         copy_out(root, run, repo, tag)
         print(f"P4 PASS {nb} ({time.time() - t:.0f} s)", flush=True)
@@ -237,7 +237,7 @@ def main():
     t = time.time()
     RR.run(root / "runner.py", env_for(root, repo, "ev"), [nbd / "M2L_L3_EVAL.ipynb"])
     g = gates(root / "work_ev", "l3eval")
-    assert all(g.get(n) == "PASS" for n in ("G-sel", "G-raw", "G-data", "R1.0-test", "GE", "G-struct[test]",
+    assert all(g.get(n) == "PASS" for n in ("G-sel", "G-raw", "G-data", "R1.0-test", "GE", "PROJ", "G-struct[test]",
                                             "G-struct[ext]", "G-worker[build]")), g
     copy_out(root, "ev", repo, "l3eval")
     o = RR.run(repo / "src" / "m2l_read.py", renv, ["--l3"])

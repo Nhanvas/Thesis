@@ -343,6 +343,68 @@ def rec_job(a):
         return dict(case=case, fi=fi, file=Path(path).name, error=traceback.format_exc()[-3000:])
 
 
+def _one_segment(data, kind, notch, seizures, S, cc, guard, covs, out_npz, buf):
+    """rec_job's per-recording body on an array already loaded (L3-short: one EDF read for all its segments)."""
+    n = data.shape[1] // WS
+    mu, sd = stats_of(sampled(data, notch, n), S, cc)
+    rec = features(data, notch, seizures, (mu, sd), buffer=False)
+    rec["is_buffer"] = buf
+    ok = ~rec["is_signal_loss"]
+    nvalid = int(ok.sum())
+    arrays = dict(n=np.int64(n), is_ictal=rec["is_ictal"], is_buffer=rec["is_buffer"],
+                  is_signal_loss=rec["is_signal_loss"], mu=mu, sd=sd)
+    short = nvalid < max(int(guard["min_valid"]), 17) or n < int(guard["min_n"])
+    timing = {}
+    if not short:
+        t1 = time.time()
+        idx, Z = latents(rec)
+        timing["gae_s"] = round(time.time() - t1, 1)
+        for cov in covs:
+            t1 = time.time()
+            D = {tag: distances(Z[tag], cov) for tag in TAGS}
+            timing[f"{cov}_s"] = round(time.time() - t1, 1)
+            ctx = onefile_ctx(n, ok, D)
+            for tag in TAGS:
+                x, smm = series(ctx, tag)
+                arrays[f"x_{cov}_{tag}"], arrays[f"smm_{cov}_{tag}"] = x, smm
+    Path(out_npz).parent.mkdir(parents=True, exist_ok=True)
+    np.savez(str(out_npz) + ".tmp.npz", **arrays)
+    Path(str(out_npz) + ".tmp.npz").replace(out_npz)
+    return dict(n=n, valid=nvalid, short=bool(short), hours=n * WIN / 3600, npz=str(out_npz), **timing)
+
+
+def rec_job_multi(a):
+    """L3-short (added 24/11, before any L3 output): ONE job per EDF for all its segments of every length, so that the
+    file is read once and one process serves many short segments (one process per segment would cost about 10 h of
+    start-up alone). Each segment is processed exactly as rec_job processes a recording.
+    a = (case, fi, path, kind, notch, seizures, S, cc, segs, guard, covs); segs = [(label, (a_w, b_w), out_npz)]."""
+    case, fi, path, kind, notch, seizures, S, cc, segs, guard, covs = a
+    t = time.time()
+    try:
+        R0._limit_threads()
+        data_full = X1.load_18(Path(path), kind)
+        if data_full is None:
+            return dict(case=case, fi=fi, file=Path(path).name, multi=[
+                dict(case=lab, fi=fi, file=Path(path).name, seg=list(sg), skipped=True, s=0.0, shas=code_shas())
+                for lab, sg, _ in segs], s=round(time.time() - t, 1), shas=code_shas())
+        n_full = data_full.shape[1] // WS
+        buf_full = P.build_buffer_mask(n_full * WIN, seizures).reshape(n_full, WIN).any(axis=1)
+        out, sh = [], code_shas()
+        for lab, sg, out_npz in segs:
+            t0 = time.time()
+            r = _one_segment(data_full[:, sg[0] * WS:sg[1] * WS], kind, notch, seg_seizures(seizures, *sg), S, cc,
+                             guard, covs, out_npz, buf_full[sg[0]:sg[1]])
+            out.append(dict(case=lab, fi=fi, file=Path(path).name, seg=list(sg), skipped=False,
+                            s=round(time.time() - t0, 1), shas=sh, **r))
+        return dict(case=case, fi=fi, file=Path(path).name, multi=out, s=round(time.time() - t, 1), shas=sh,
+                    hours=n_full * WIN / 3600,
+                    peak_rss_mb=round(__import__("resource").getrusage(0).ru_maxrss / 1024, 1))
+    except SystemExit as e:
+        return dict(case=case, fi=fi, file=Path(path).name, error=f"STOP: {e}")
+    except Exception:                    # noqa: BLE001
+        return dict(case=case, fi=fi, file=Path(path).name, error=traceback.format_exc()[-3000:])
+
+
 def load_recs(jobs_of_case):
     """the per-recording arrays of one patient in recording order -> (patient z, list of npz dicts)."""
     js = sorted([j for j in jobs_of_case if not j["skipped"]], key=lambda j: (j["fi"], (j.get("seg") or [0])[0]))

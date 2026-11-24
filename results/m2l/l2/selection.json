@@ -1,0 +1,20 @@
+{
+ "arm": "B-MCD-F",
+ "S": "B",
+ "cov": "MCD",
+ "floor": "F",
+ "k": 9.914208892343954,
+ "candidates": [
+  "R-MCD-F",
+  "B-LW-F",
+  "B-MCD-F"
+ ],
+ "dev_f1": 0.13328746253670745,
+ "dev_sens": 0.8716605616605617,
+ "dev_fa": 45.40955319276832,
+ "rule": "among arms with F1 - P0 interval above 0 and sensitivity - P0 >= -0.03, highest F1 (3 decimals; ties -> F, LW, R); none -> P0 = R-LW-F",
+ "source_runs": [
+  "results\\m2l\\l2_rec",
+  "results\\m2l\\l2_rob"
+ ]
+}

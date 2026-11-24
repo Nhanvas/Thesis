@@ -36,16 +36,16 @@ SPEC = {
                        what="the 15 development patients with the **robust** z-score scale (median, IQR / 1.349 × c_ch of "
                             "each recording): arms B-LW-F, B-LW-N, B-MCD-F, B-MCD-N (+ B-*-FX descriptive)"),
     "M2L_L3_SHORT_A": dict(env=dict(M2L_MODE="L3SHORT", M2L_SEGS="5,10", M2L_TAG="l3short_a"), tag="l3short_a",
-                           account="nhn2mm", inputs=[RAW, "v9-x3-fold1", "v9-x3-fold3"], runtime="≈ 4–5 h (computed)",
+                           account="nhn2mm", inputs=[RAW, "v9-x3-fold1", "v9-x3-fold3"], runtime="≈ 4.5–5 h (computed from L2's measured job times; PROJ stops above 10.5 h)",
                            what="development recordings cut into segments of **5 and 10 min**, the chosen arm "
                                 "(results/m2l/l2/selection.json)"),
     "M2L_L3_SHORT_B": dict(env=dict(M2L_MODE="L3SHORT", M2L_SEGS="20,30", M2L_TAG="l3short_b"), tag="l3short_b",
                            account="nhannguyen26", inputs=[RAW, "v9-x3-fold1", "v9-x3-fold3"],
-                           runtime="≈ 3–4 h (computed)",
+                           runtime="≈ 2.7–3 h (computed from L2's measured job times; PROJ stops above 10.5 h)",
                            what="development recordings cut into segments of **20 and 30 min**, the chosen arm"),
     "M2L_L3_EVAL": dict(env=dict(M2L_MODE="L3EVAL"), tag="l3eval", account="nhn2mm",
                         inputs=[RAW, "v9-x3-fold1", "v9-x3-fold3", "thesis-r2-external-features"],
-                        runtime="≈ 2–2.5 h (computed)",
+                        runtime="≈ 3–3.5 h (computed from L2's measured job times; PROJ stops above 10.5 h)",
                         what="**test, chb24 and Siena, scored once** with the chosen arm, its k and the minimum length "
                              "(results/m2l/l3short/minlen.json); V5 control in the same session"),
 }

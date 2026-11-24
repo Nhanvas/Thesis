@@ -32,6 +32,8 @@ log, TAGS, DEV, TEST, EXT = M.log, M.TAGS, M.DEV, M.TEST, M.EXT
 SMOKE_CASE, SMOKE_FILES = os.environ.get("M2L_TEST_SMOKE_CASE", "chb08"), 2
 REFUSE_H = 10.5
 SCORE_FACTOR = 0.08                       # scoring time / build time (computed estimate for PROJ; reported)
+LOAD_FACTOR = 1.45                        # L3 PROJ: build time measured in L2 / L2's projection (18,154 s / 12,488 s;
+                                          # 16,664 s / 11,434 s), i.e. 4 loaded workers against the 2-worker smoke
 TOLS = dict(stats_rel=1e-9, stats_lf_rel=1e-6, split_rel=1e-12)
 SEL = M.REPO / "results" / "m2l" / "l2" / "selection.json"
 MINLEN = M.REPO / "results" / "m2l" / "l3short" / "minlen.json"
@@ -242,6 +244,52 @@ def rec_specs(case, files, S, cc, guard, covs, segs=None):
     return specs
 
 
+def run_pool_multi(specs, workers, what):
+    """rec_job_multi jobs; the per-segment results are flattened (each keeps the job's module shas)."""
+    out = run_pool(M.rec_job_multi, specs, workers, what)
+    return out, [m for r in out for m in r["multi"]]
+
+
+def edf_windows(path):
+    import mne
+    raw = mne.io.read_raw_edf(str(path), preload=False, verbose=False)
+    return int(raw.n_times // (raw.info["sfreq"] * M.WIN)), float(raw.n_times / raw.info["sfreq"] / 3600)
+
+
+def multi_specs(case, files, S, cc, guard, covs, segs):
+    specs, hours = [], []
+    for fi, (p, sz, kind, notch) in enumerate(files):
+        n, h = edf_windows(p)
+        lst = []
+        for L in segs:
+            for si, (a_w, b_w) in enumerate(M.segment_cuts(n, sz, L)):
+                lst.append((f"{case}@{L}", (a_w, b_w), M.SCR / "seg" / str(L) / case / f"{fi:03d}_{si:03d}.npz"))
+        specs.append((case, fi, str(p), kind, notch, sz, S, cc, lst, guard, covs))
+        hours.append(h)
+    return specs, hours
+
+
+def pick_smoke(specs, hours):
+    """a 1-h recording that the record does not skip by design (else the longest such file: synthetic world)."""
+    skip = {f for fs in R0.SKIPPED_BY_DESIGN.values() for f in fs}
+    ok = [i for i, a in enumerate(specs) if Path(a[2]).name not in skip]
+    one = [i for i in ok if 0.9 < hours[i] < 1.1]
+    return one[0] if one else max(ok, key=lambda i: hours[i])
+
+
+def l3_smoke_proj(fn, spec, hours, workers, what):
+    """L3 PROJ: one job of the build measured here (one worker), rate x LOAD_FACTOR, LPT over the files."""
+    t = time.time()
+    r = run_pool(fn, [spec], 1, f"smoke {what}")[0]
+    h = r.get("hours") or 1e-9
+    rate = dict(rec_s_per_h=r["s"] / h * LOAD_FACTOR, smoke_file=r.get("file"), smoke_hours=round(h, 3),
+                smoke_s=r["s"], load_factor=LOAD_FACTOR)
+    R1._jdump(R1.out_dir() / "smoke.json", rate)
+    R1.phase("smoke", t)
+    projection(rate, hours, workers)
+    return r
+
+
 def struct_gate(jobs_by_case, ref_kind, label):
     """G-struct: per patient, the per-recording bookkeeping concatenated = the reference .npz (exact)."""
     rows = []
@@ -415,11 +463,17 @@ def main_l3short(notebook, repo_commit, workers=None):
     R1.r10(DEV, [], [], workers=workers, with_k=False)
     R1.phase("r10", t)
     files = {c: M.chb_files(c, earlier) for c in DEV}
-    specs = [s for c in DEV for s in rec_specs(c, files[c], S, cc, dict(min_valid=17, min_n=0), (cov,), segs)]
-    specs.sort(key=lambda a: -((a[8][1] - a[8][0]) if a[8] else 0))
+    specs, hours = [], []
+    for c in DEV:
+        sp_, h_ = multi_specs(c, files[c], S, cc, dict(min_valid=17, min_n=0), (cov,), segs)
+        specs += sp_
+        hours += h_
+    order = sorted(range(len(specs)), key=lambda i: -hours[i])
+    specs, hours = [specs[i] for i in order], [hours[i] for i in order]
+    l3_smoke_proj(M.rec_job_multi, specs[pick_smoke(specs, hours)], hours, workers, "seg")
     t = time.time()
-    jobs = run_pool(M.rec_job, specs, workers, "rec[seg]")
-    gate_worker(jobs, "build")
+    raw_jobs, jobs = run_pool_multi(specs, workers, "rec[seg]")
+    gate_worker(raw_jobs, "build")
     R1.phase("build", t)
     by = group(jobs)
     struct_gate(by, "earlier", "seg")
@@ -460,6 +514,10 @@ def main_l3eval(notebook, repo_commit, workers=None):
     files.update({c: M.ext_files(c, complete) for c in EXT})
     specs = [s for c in TEST + EXT for s in rec_specs(c, files[c], S, cc, guard, (cov,))]
     specs.sort(key=lambda a: -Path(a[2]).stat().st_size)
+    hours = [edf_windows(a[2])[1] for a in specs]
+    sm = dict(zip(range(12), specs[pick_smoke(specs, hours)]))
+    sm[9] = M.SCR / "smoke" / "rec.npz"
+    l3_smoke_proj(M.rec_job, tuple(sm[i] for i in range(12)), hours, workers, "eval")
     t = time.time()
     jobs = run_pool(M.rec_job, specs, workers, "rec")
     gate_worker(jobs, "build")

@@ -39,8 +39,8 @@ RULE_SENS = -0.03                     # DESIGN §6: sensitivity - P0 point estim
 ML_F1, ML_SENS, SEG = 0.02, 0.03, (5, 10, 20, 30)
 NEED_L2 = ["G-raw", "G-data", "G-stats1", "G-feat1", "R1.0-dev", "G-k", "G-chain", "G-split", "PROJ",
            "G-struct[dev]", "G-worker[build]"]
-NEED_SEG = ["G-sel", "G-raw", "G-data", "R1.0-dev", "G-struct[seg]", "G-worker[build]"]
-NEED_EVAL = ["G-sel", "G-raw", "G-data", "R1.0-test", "GE", "G-struct[test]", "G-struct[ext]", "G-worker[build]"]
+NEED_SEG = ["G-sel", "G-raw", "G-data", "R1.0-dev", "PROJ", "G-struct[seg]", "G-worker[build]"]
+NEED_EVAL = ["G-sel", "G-raw", "G-data", "R1.0-test", "GE", "PROJ", "G-struct[test]", "G-struct[ext]", "G-worker[build]"]
 
 
 def say(*a):

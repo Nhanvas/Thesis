@@ -1,0 +1,9 @@
+{
+ "S": "B",
+ "k": {
+  "LW": 3.3062675401150265,
+  "MCD": 9.914208892343954
+ },
+ "rule": "p3_levers.calibrate, seed 42, development patients, per-recording series concatenated per patient",
+ "k_record": 4.067744298524509
+}

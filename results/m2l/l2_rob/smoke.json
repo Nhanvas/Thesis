@@ -1,0 +1,25 @@
+{
+ "a_max_rel_to_scale": 0.0,
+ "b_reference": "results/eureka_d31f/9a/stats_lf/chb08_stats.json",
+ "b_sd_max_rel": 8.047850177042064e-08,
+ "b_mean_max_rel_to_sd": 9.917069726639597e-11,
+ "rec_s_per_h": 67.75,
+ "smoke_hours": 2.0,
+ "smoke_s": 118.1,
+ "timing": [
+  {
+   "file": "chb08_02.edf",
+   "s": 66.9,
+   "gae_s": 1.0,
+   "LW_s": 0.1,
+   "MCD_s": 55.8
+  },
+  {
+   "file": "chb08_03.edf",
+   "s": 68.6,
+   "gae_s": 1.0,
+   "LW_s": 0.1,
+   "MCD_s": 57.5
+  }
+ ]
+}

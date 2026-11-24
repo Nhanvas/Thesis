@@ -1,0 +1,11 @@
+{
+ "note": "computed estimate: smoke rate x hours, LPT on workers; scoring = SCORE_FACTOR x build",
+ "elapsed_h": 0.19,
+ "build_h": 3.176,
+ "score_h": 0.254,
+ "extra_h": 0.0,
+ "workers": 4,
+ "rec_s_per_h": 67.75,
+ "hours_of_eeg": 674.21,
+ "projected_total_h": 3.62
+}

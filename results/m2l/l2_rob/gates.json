@@ -1,0 +1,161 @@
+[
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 433,
+  "from_physionet": 1,
+  "failed_checks": [],
+  "cases_missing": [],
+  "summary": "433 EDF verified by sha256 against PhysioNet; checks ['committed data/summaries = PhysioNet summaries', 'CHB-MIT chb01-23: every EDF listed in its summary']"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 15,
+  "bad": [],
+  "pinned": 15,
+  "summary": "15 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-c",
+  "status": "PASS",
+  "max_abs_dev_3dec": 0.0,
+  "c": [
+   2.040617815449715,
+   1.6236797262940956,
+   1.4747473835208929,
+   1.4216248414393797,
+   1.7943079401237616,
+   1.593508281390045,
+   1.4854227075116804,
+   1.4702226130869862,
+   1.8180122196598778,
+   1.4666001035918539,
+   1.5718236446233411,
+   1.4881800227227333,
+   2.0581147877559505,
+   1.5989782588582246,
+   1.4953137324277093,
+   1.4183799729023836,
+   1.6675110716690975,
+   1.5457665760150259
+  ],
+  "summary": "c_ch recomputed from RB1c = the design table to 3 decimals (max deviation 0e+00)"
+ },
+ {
+  "gate": "G-stats1",
+  "status": "PASS",
+  "case": "chb08",
+  "a_max_rel_to_scale": 0.0,
+  "b_reference": "results/eureka_d31f/9a/stats_lf/chb08_stats.json",
+  "b_sd_max_rel": 8.047850177042064e-08,
+  "b_mean_max_rel_to_sd": 9.917069726639597e-11,
+  "summary": "chb08: per-recording statistics = independent loop (max 0.0e+00); pooled = label-free record statistics (SD 8.0e-08, mean 9.9e-11)"
+ },
+ {
+  "gate": "G-feat1",
+  "status": "PASS",
+  "case": "chb08",
+  "files": 2,
+  "exact_on_all_windows": true,
+  "f7_max_abs": 4.76837158203125e-07,
+  "bp5_max_abs": 2.384185791015625e-07,
+  "adj_frac_differing": 0.00040123456790123454,
+  "summary": "chb08 first 2 files, per-recording builder with the committed statistics = earlier .npz (r2_core.compare_features)"
+ },
+ {
+  "gate": "G-worker[smoke]",
+  "status": "PASS",
+  "jobs": 2,
+  "differ": [],
+  "summary": "2 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-k",
+  "status": "PASS",
+  "k": 4.067744298524509,
+  "k_record": 4.067744298524509,
+  "rel": 0.0,
+  "summary": "k 4.067744299 vs record 4.067744299 (relative 0.0e+00)"
+ },
+ {
+  "gate": "R1.0-dev",
+  "status": "PASS",
+  "rows": 720,
+  "error_pairs": 987,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "cases": [
+   "chb01",
+   "chb02",
+   "chb04",
+   "chb05",
+   "chb07",
+   "chb08",
+   "chb09",
+   "chb12",
+   "chb19",
+   "chb20",
+   "chb21",
+   "chb23",
+   "chb10",
+   "chb11",
+   "chb22"
+  ],
+  "summary": "p3c_freeze: 720 rows, 987 error pairs; 0 differ"
+ },
+ {
+  "gate": "G-chain",
+  "status": "PASS",
+  "rows": 180,
+  "rows_ref": 180,
+  "error_pairs": 247,
+  "mismatches": [],
+  "error_mismatches": [],
+  "summary": "m2l patient-unit path on V5's distances: 180 rows, 247 error pairs = p3c_freeze L2f; 0 differ"
+ },
+ {
+  "gate": "G-split",
+  "status": "PASS",
+  "patients": 15,
+  "differ": [],
+  "summary": "15 patients: one-file SzCORE counts summed = patient counts (V5 seed 42, cpd)"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed estimate: smoke rate x hours, LPT on workers; scoring = SCORE_FACTOR x build",
+  "elapsed_h": 0.19,
+  "build_h": 3.176,
+  "score_h": 0.254,
+  "extra_h": 0.0,
+  "workers": 4,
+  "rec_s_per_h": 67.75,
+  "hours_of_eeg": 674.21,
+  "projected_total_h": 3.62,
+  "summary": "projected total 3.62 h (limit 10.5 h)"
+ },
+ {
+  "gate": "G-worker[build]",
+  "status": "PASS",
+  "jobs": 428,
+  "differ": [],
+  "summary": "428 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-struct[dev]",
+  "status": "PASS",
+  "cases": 15,
+  "failed": [],
+  "summary": "15 patients: recordings, windows, labels, signal loss, file order = reference"
+ },
+ {
+  "gate": "G-worker[score_dev]",
+  "status": "PASS",
+  "jobs": 15,
+  "differ": [],
+  "summary": "15 jobs ran the parent's modules"
+ }
+]

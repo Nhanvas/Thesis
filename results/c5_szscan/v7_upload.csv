@@ -1,0 +1,11 @@
+case,what,expected,observed,as_expected
+U1,start a session with project id chb01 (the defense case),rejected: 422 'This demo is restricted to the held-out test subjects.',422 This demo is restricted to the held-out test subjects.,yes
+U2,"project id chb03, upload chb01_01.edf (no seizure)",accepted (Phase A ok): the app does not check that a file belongs to the subject,200; uploaded,yes
+U3,"same session, upload chb01_03.edf (with a seizure)",accepted (Phase A ok),200; uploaded,yes
+U4,Phase B of that session (two chb01 files under chb03),runs (GAE + distances); nothing written to the real database,phase_b_done=True error=None after 86 s,yes
+U5,upload a file named .txt,rejected: 422 'File rejected — unsupported format or channel configuration.',422 File rejected — unsupported format or channel configuration.,yes
+U6,"referential EDF, 19 electrodes named 'EEG Fp1-REF' …, 256 Hz",file error 'File rejected — unsupported format or channel configuration.',error: File rejected — unsupported format or channel configuration.,yes
+U7,bipolar EDF with the 18 names at 512 Hz,file error 'File rejected …',error: File rejected — unsupported format or channel configuration.,yes
+U9,garbage bytes named .edf,file error 'File rejected …',error: File rejected — unsupported format or channel configuration.,yes
+U8,"chb01_01.edf truncated to half its data, header unchanged",not specified in advance: observed behaviour reported,"uploaded; header says 3600 s, file holds 1800 s, app windows 450, app duration 1800 s",
+U10,memory: bytes held by the upload handler; tracemalloc peak of Phase A on chb01_01,measured,"upload handler holds the whole file in memory (main.py `await file.read()`): 42.4 MB for 1.00 h x 23 signals; Phase A traced peak 797 MB (797 MB per hour of EEG, 18 channels)",

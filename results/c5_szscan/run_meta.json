@@ -1,0 +1,20 @@
+{
+ "commit": "2a06a7772d22c8106cf7021a20e8dcf6e6ad36f0",
+ "dirty": "no",
+ "seconds": 4282.671257019043,
+ "hours": 279.3880555555556,
+ "subjects": [
+  "chb03",
+  "chb06",
+  "chb13",
+  "chb14",
+  "chb15",
+  "chb16",
+  "chb17",
+  "chb18"
+ ],
+ "python": "3.11.9",
+ "numpy": "2.4.4",
+ "smoke": false,
+ "peak_rss_mb": 473.6
+}

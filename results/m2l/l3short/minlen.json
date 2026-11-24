@@ -1,0 +1,9 @@
+{
+ "minutes": 30,
+ "windows": 450,
+ "qualifying": [],
+ "f1_full": 0.13328746253670745,
+ "sens_full": 0.8716605616605617,
+ "rule": "smallest L in [5, 10, 20, 30] with F1_L >= F1_full - 0.02 and Sens_L >= Sens_full - 0.03; none -> 30 min",
+ "arm": "B-MCD-F"
+}

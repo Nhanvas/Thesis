@@ -207,21 +207,28 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
         raise UnsupportedEdfError(str(exc)) from exc
     try:
         return _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private)
-    except BaseException as exc:
-        import traceback
-        traceback.clear_frames(exc.__traceback__)     # finished frames still hold the memory map (Windows delete)
-        raise
     finally:
-        del data
-        EI.drop_temp(meta.get("data_path"))           # the disk copy of a referential recording
+        EI.drop_temp(meta.get("data_path"), data)     # the disk copy of a referential recording
 
 
-def _out_array(cache_dir, stem, key, shape, dtype):
-    """C5 Step 2a: Phase A outputs are written straight to their .npy cache (memory map) when a cache dir is given."""
-    if cache_dir is None:
-        return np.empty(shape, dtype), None
-    p = Path(cache_dir) / f"{stem}.{key}.npy"
-    return np.lib.format.open_memmap(p, mode="w+", dtype=dtype, shape=shape), p
+_ASSEMBLE_WINDOWS = 512        # windows per block when the per-channel files are assembled (512 x 18 x 4 kB = 38 MB)
+
+
+def _assemble_npy(chan_path: Path, out_path: Path, n_windows: int) -> None:
+    """Channel-major float32 file [18, n_windows*1024] -> window-major .npy [n_windows, 18, 1024], block by block with
+    ordinary reads and writes (C5 Step 2a, second fix: no memory map). Values are copied, not changed."""
+    usable = n_windows * WIN_SAMPLES
+    header = {"descr": np.lib.format.dtype_to_descr(np.dtype(np.float32)), "fortran_order": False,
+              "shape": (n_windows, N_CH, WIN_SAMPLES)}
+    with open(chan_path, "rb") as src, open(out_path, "wb") as dst:
+        np.lib.format.write_array_header_1_0(dst, header)
+        for k in range(0, n_windows, _ASSEMBLE_WINDOWS):
+            nb = min(_ASSEMBLE_WINDOWS, n_windows - k)
+            buf = np.empty((nb, N_CH, WIN_SAMPLES), np.float32)
+            for c in range(N_CH):
+                src.seek((c * usable + k * WIN_SAMPLES) * 4)
+                buf[:, c, :] = np.fromfile(src, dtype=np.float32, count=nb * WIN_SAMPLES).reshape(nb, WIN_SAMPLES)
+            dst.write(buf.tobytes())
 
 
 def _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private) -> PhaseAResult:
@@ -245,22 +252,41 @@ def _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private) -> Pha
     # Whole-file zero-phase filtering: band-pass then notch (= x1_external.filter_windows), one derivation at a time
     # (C5 Step 2a: memory-light; row-wise sosfiltfilt / filtfilt equal the 2-D calls bit for bit, synthetic test E5)
     stem = Path(edf_path).stem
-    shape = (n_windows, N_CH, WIN_SAMPLES)
-    filtered, p_f = _out_array(cache_dir, stem, "filtered", shape, np.float32)
-    bandpass_windows, p_b = _out_array(cache_dir, stem, "bandpass", shape, np.float32)
-    raw_windows, p_r = _out_array(cache_dir, stem, "raw", shape, np.float32)
     flag = np.ones(n_windows, bool)
-    for c in range(N_CH):
-        x = np.asarray(data[c], dtype=np.float64)
-        bp = sosfiltfilt(preprocessing._BP_SOS, x)
-        nf = filtfilt(nb, na, bp)
-        filtered[:, c, :] = nf[:usable].reshape(n_windows, WIN_SAMPLES).astype(np.float32)
-        bandpass_windows[:, c, :] = bp[:usable].reshape(n_windows, WIN_SAMPLES).astype(np.float32)
-        rw = x[:usable].reshape(n_windows, WIN_SAMPLES)
-        raw_windows[:, c, :] = rw.astype(np.float32)
-        flag &= rw.std(axis=1) < SIGNAL_LOSS_STD_V
-        del x, bp, nf, rw
-        _check()
+    keys = ("filtered", "bandpass", "raw")
+    if cache_dir is None:                        # in memory (tests, short files)
+        outs = {k: np.empty((n_windows, N_CH, WIN_SAMPLES), np.float32) for k in keys}
+        chan = None
+    else:                                        # per-channel float32 files, assembled into the caches below
+        cache_dir = Path(cache_dir)
+        outs = None
+        chan = {k: cache_dir / f"_c5_{stem}.{k}.chan" for k in keys}
+        fhs = {k: open(chan[k], "wb") for k in keys}
+    try:
+        for c in range(N_CH):
+            x = np.asarray(data[c], dtype=np.float64)
+            bp = sosfiltfilt(preprocessing._BP_SOS, x)
+            nf = filtfilt(nb, na, bp)
+            rw = x[:usable].reshape(n_windows, WIN_SAMPLES)
+            flag &= rw.std(axis=1) < SIGNAL_LOSS_STD_V
+            for k, v in (("filtered", nf), ("bandpass", bp), ("raw", x)):
+                v32 = v[:usable].astype(np.float32)
+                if outs is not None:
+                    outs[k][:, c, :] = v32.reshape(n_windows, WIN_SAMPLES)
+                else:
+                    fhs[k].write(v32.tobytes())
+                del v32
+            del x, bp, nf, rw
+            _check()
+        if chan is not None:
+            for k in keys:
+                fhs[k].close()
+                _assemble_npy(chan[k], cache_dir / f"{stem}.{k}.npy", n_windows)
+    finally:
+        if chan is not None:
+            for k in keys:
+                fhs[k].close()
+                chan[k].unlink(missing_ok=True)
     moments = padded_window_moments(data, n_windows, notch_hz)
     _check()
     # file engine (m2l_core.sampled, line for line): every 10th window counted from the file's first, 3-s padded
@@ -271,12 +297,12 @@ def _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private) -> Pha
     _check()
 
     paths = {}
-    if cache_dir is not None:
-        cache_dir = Path(cache_dir)
-        for mm in (filtered, bandpass_windows, raw_windows):
-            mm.flush()
-        paths.update(filtered=p_f, bandpass=p_b, raw=p_r)
-        del bandpass_windows, raw_windows
+    if cache_dir is None:
+        filtered = outs["filtered"]
+    else:
+        for k in keys:
+            paths[k] = cache_dir / f"{stem}.{k}.npy"
+        filtered = np.load(paths["filtered"], mmap_mode="r")    # opened lazily, as Phase B reads it
         for key, arr in (("flag", flag), ("moments", moments), ("fsamp", fsamp)):
             p = cache_dir / f"{stem}.{key}.npy"
             np.save(p, arr)

@@ -11,11 +11,17 @@ c5_step2_gates.py -- chat C5, SzScan Step 2: gates on real data (results/c5_szsc
   G5  bad-electrode rule per Siena file (and per hospital record, private report): flagged electrodes, z and the
       amplitude ratio to the median electrode (a pure robust-z rule may flag a nearly normal electrode when all
       electrodes have almost the same amplitude -- seen on synthetic data; this column checks it on real data)
-  G6  memory: traced peak of edf_input.load_any and of Phase A per file (MB and MB per hour of EEG)
+  G6  memory: peak PROCESS memory (working set on Windows, resident set on Linux -- file pages included) during
+      edf_input.load_any and during Phase A per file (the gate number), the memory before the call and the growth
+      per hour of EEG (can read 0 when memory freed by the previous step is reused); the traced numpy heap is kept
+      as a further column. (Step 2a second fix: the first fix was judged on the
+      traced heap only, which does not see memory-mapped file pages; the laptop ran out of memory.)
 
 Memory-light by construction: one file (G3-G6) or one subject (G1) at a time, one worker, temporary caches deleted
 after each subject. --smoke runs only the longest Siena file and the shortest test subject first and prints the
-traced peaks; the smoke reports TOO HIGH when its traced peak exceeds --max-gb (default 2, the laptop budget).
+peaks; the smoke reports TOO HIGH when its process-memory peak exceeds --max-gb (default 2, the laptop budget).
+A watchdog stops the script at once (exit 3, message STOP) if the process memory exceeds --max-gb at any moment,
+so that the laptop is never pushed into low memory.
 Private hospital records (--private-dir): nothing about the files (name, header field, date, path) is printed or
 written; the report goes to Agent/inbox/C5_STEP2_PRIVATE.md only (never committed).
 Outputs (public): results/c5_szscan/step2/ (GATES.md, g1.csv, siena.csv, gates.json; smoke/ for --smoke).
@@ -29,7 +35,9 @@ import json
 import shutil
 import subprocess
 import sys
+import os
 import tempfile
+import threading
 import time
 import tracemalloc
 from pathlib import Path
@@ -58,16 +66,77 @@ def sha256(p):
     return h.hexdigest()
 
 
+def process_mb() -> float:
+    """Current process memory in MB: working set on Windows (psutil, else the Win32 API), resident set on Linux.
+    Memory-mapped file pages that are resident are included (they are physical memory the laptop must hold)."""
+    try:
+        import psutil
+        return psutil.Process().memory_info().rss / 1e6
+    except ImportError:
+        pass
+    if os.name == "nt":
+        import ctypes
+        from ctypes import wintypes
+
+        class PMC(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
+                        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
+                        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t)]
+        c = PMC()
+        c.cb = ctypes.sizeof(PMC)
+        k32 = ctypes.WinDLL("kernel32")
+        k32.GetCurrentProcess.restype = wintypes.HANDLE
+        ctypes.WinDLL("psapi").GetProcessMemoryInfo(k32.GetCurrentProcess(), ctypes.byref(c), c.cb)
+        return c.WorkingSetSize / 1e6
+    with open("/proc/self/statm") as fh:
+        return int(fh.read().split()[1]) * os.sysconf("SC_PAGE_SIZE") / 1e6
+
+
+class Watch:
+    """Samples the process memory every 0.1 s; records the peak; stops the script if it exceeds the limit."""
+    def __init__(self, limit_mb):
+        self.limit, self.peak, self._stop = limit_mb, 0.0, False
+        self.t = threading.Thread(target=self._run, daemon=True)
+        self.t.start()
+
+    def _run(self):
+        while not self._stop:
+            m = process_mb()
+            self.peak = max(self.peak, m)
+            if self.limit and m > self.limit:
+                print(f"STOP: process memory {m:.0f} MB > limit {self.limit:.0f} MB (watchdog); nothing written",
+                      flush=True)
+                os._exit(3)
+            time.sleep(0.1)
+
+    def reset(self):
+        self.peak = process_mb()
+
+    def close(self):
+        self._stop = True
+
+
+WATCH = None
+LAST = {}
+
+
 def traced(fn, *a, **k):
+    """-> (output, peak process memory MB during the call, seconds); LAST holds the memory before the call and the
+    traced numpy heap peak."""
     gc.collect()
+    base = process_mb()
+    WATCH.reset()
     tracemalloc.start()
     t0 = time.time()
     try:
         out = fn(*a, **k)
     finally:
-        _, peak = tracemalloc.get_traced_memory()
+        _, heap = tracemalloc.get_traced_memory()
         tracemalloc.stop()
-    return out, peak / 1e6, time.time() - t0
+    LAST.update(base_mb=base, heap_mb=heap / 1e6)
+    return out, max(WATCH.peak, process_mb()), time.time() - t0
 
 
 def rowwise_ref(p):
@@ -130,7 +199,8 @@ def g1(chb, subjects):
             diff += got != want
         hours = sum(out["n_windows"].values()) * 4 / 3600
         rows.append(dict(subject=s, files=len(files[s]), files_differ=diff, events=sum(len(v) for v in out["events"].values()),
-                         hours=round(hours, 2), seconds=round(secs, 1), traced_peak_mb=round(peak, 1)))
+                         hours=round(hours, 2), seconds=round(secs, 1), mem_peak_mb=round(peak, 1),
+                         mem_before_mb=round(LAST["base_mb"], 1), heap_peak_mb=round(LAST["heap_mb"], 1)))
         print(f"G1 {s}: {rows[-1]}", flush=True)
     return rows
 
@@ -154,30 +224,33 @@ def siena_one(p, sums):
         try:
             (d_app, meta), peak_load, s_load = traced(EI.load_any, p, mains="auto", workdir=tmp)
             r.update(suggested_hz=meta["notch_hz"])
+            load_heap = LAST["heap_mb"]
         except EI.InputError as e:
             r.update(suggested_hz="none", note=str(e)[:120])
             (d_app, meta), peak_load, s_load = traced(EI.load_any, p, mains=50.0, workdir=tmp)
+            load_heap = LAST["heap_mb"]
         r.update(montage=meta["montage"], fs_in=meta["fs_in"], r50=round(meta["mains_ratios"][0], 2),
                  r60=round(meta["mains_ratios"][1], 2), bad=" ".join(meta["bad"]), bad_ratio=bad_ratio(meta),
-                 max_z=round(max(t["z"] for t in meta["electrodes"]), 2), load_peak_mb=round(peak_load, 1),
-                 load_s=round(s_load, 1))
+                 max_z=round(max(t["z"] for t in meta["electrodes"]), 2), load_mem_mb=round(peak_load, 1),
+                 load_heap_mb=round(load_heap, 1), load_s=round(s_load, 1))
         hours = d_app.shape[1] / 256 / 3600
         r["g3_equal"] = g3_equal(p, d_app)
         if hours <= 1.5:                                 # load_18 itself = the row-wise reference (small files)
             d_x1 = X1.load_18(p, "siena")
             r["g3_load18_equal"] = bool(d_x1.shape == d_app.shape and np.array_equal(np.asarray(d_app), d_x1))
             del d_x1
+        EI.drop_temp(meta["data_path"], d_app)
         del d_app
-        if meta["data_path"] is not None:
-            Path(meta["data_path"]).unlink(missing_ok=True)
         gc.collect()
         res, peak_a, s_a = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+        base_a, heap_a = LAST["base_mb"], LAST["heap_mb"]
         del res                                          # closes the memory maps before the folder is removed
         gc.collect()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    r.update(hours=round(hours, 3), phase_a_peak_mb=round(peak_a, 1),
-             phase_a_mb_per_hour=round(peak_a / max(hours, 1e-9), 1), phase_a_s=round(s_a, 1))
+    r.update(hours=round(hours, 3), phase_a_mem_mb=round(peak_a, 1), phase_a_mem_before_mb=round(base_a, 1),
+             phase_a_growth_mb_per_hour=round((peak_a - base_a) / max(hours, 1e-9), 1),
+             phase_a_heap_mb=round(heap_a, 1), phase_a_s=round(s_a, 1))
     print(f"G3-G6 {p.parent.name}/{p.name}: {r}", flush=True)
     return r
 
@@ -188,7 +261,7 @@ def private_report(pdir):
                    key=lambda p: -p.stat().st_size)
     L = ["# C5 Step 2 -- hospital records (PRIVATE, laptop only; never commit)", "",
          "Records named by decreasing file size (clin01 = larger), as src/v9_clinical_run.py.", "",
-         "| record | hours | suggested mains | r50 | r60 | electrodes flagged (z) | load peak MB | Phase A peak MB |",
+         "| record | hours | suggested mains | r50 | r60 | electrodes flagged (z) | load memory peak MB | Phase A memory peak MB |",
          "|---|---|---|---|---|---|---|---|"]
     for i, p in enumerate(files):
         lab = f"clin{i + 1:02d}"
@@ -200,9 +273,8 @@ def private_report(pdir):
             (d, meta), peak_l, _ = traced(EI.load_any, p, mains=50.0, workdir=tmp)
             sug = "none"
         hours = d.shape[1] / 256 / 3600
+        EI.drop_temp(meta["data_path"], d)
         del d
-        if meta["data_path"] is not None:
-            Path(meta["data_path"]).unlink(missing_ok=True)
         gc.collect()
         amps = np.median([t["amp_uv"] for t in meta["electrodes"]])
         flagged = ", ".join(f"{t['electrode']} (z {t['z']:.1f}, x{t['amp_uv'] / amps:.2f})"
@@ -234,6 +306,14 @@ def main():
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--max-gb", type=float, default=2.0)
     a = ap.parse_args()
+    global WATCH
+    WATCH = Watch(a.max_gb * 1000)
+    try:
+        import psutil
+        print(f"available system memory at start: {psutil.virtual_memory().available / 1e6:.0f} MB; "
+              f"this process {process_mb():.0f} MB; limit {a.max_gb * 1000:.0f} MB", flush=True)
+    except ImportError:
+        print(f"this process {process_mb():.0f} MB; limit {a.max_gb * 1000:.0f} MB (psutil not installed)", flush=True)
     out = OUT / "smoke" if a.smoke else OUT
     out.mkdir(parents=True, exist_ok=True)
     sums = {}
@@ -250,8 +330,8 @@ def main():
         shortest = min(TEST, key=lambda s: sum((Path(a.chb) / s / f).stat().st_size for f in files[s]))
         g1rows = g1(a.chb, [shortest])
         srows = [siena_one(smoke_file, sums)]
-        peak = max([r["traced_peak_mb"] for r in g1rows] + [srows[0]["phase_a_peak_mb"], srows[0].get("load_peak_mb", 0)])
-        print(f"SMOKE: traced peak {peak:.0f} MB (G1 {shortest}, Siena {smoke_file.parent.name}/{smoke_file.name}); "
+        peak = max([r["mem_peak_mb"] for r in g1rows] + [srows[0]["phase_a_mem_mb"], srows[0]["load_mem_mb"]])
+        print(f"SMOKE: process memory peak {peak:.0f} MB (G1 {shortest}, Siena {smoke_file.parent.name}/{smoke_file.name}); "
               f"limit {a.max_gb * 1000:.0f} MB -> {'OK' if peak <= a.max_gb * 1000 else 'TOO HIGH'}")
     else:
         g1rows = g1(a.chb, TEST)
@@ -274,10 +354,10 @@ def main():
                 none=sum(r.get("suggested_hz") == "none" for r in srows)),
         G5=dict(files_flagged=sum(bool(r.get("bad")) for r in srows),
                 flagged=[f"{r['file']}: {r['bad']}" for r in srows if r.get("bad")]),
-        G6=dict(max_phase_a_peak_mb=max(r["phase_a_peak_mb"] for r in srows),
-                max_load_peak_mb=max(r["load_peak_mb"] for r in srows),
-                max_phase_a_mb_per_hour=max(r["phase_a_mb_per_hour"] for r in srows),
-                max_g1_peak_mb=max(r["traced_peak_mb"] for r in g1rows)),
+        G6=dict(max_phase_a_mem_mb=max(r["phase_a_mem_mb"] for r in srows),
+                max_load_mem_mb=max(r["load_mem_mb"] for r in srows),
+                max_phase_a_growth_mb_per_hour=max(r["phase_a_growth_mb_per_hour"] for r in srows),
+                max_g1_mem_mb=max(r["mem_peak_mb"] for r in g1rows)),
     )
     commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
     (out / "gates.json").write_text(json.dumps(dict(commit=commit, smoke=a.smoke, gates=gates), indent=1, default=str),
@@ -291,10 +371,9 @@ def main():
          f"none {gates['G4']['none']}",
          f"- **G5** bad-electrode rule on Siena: {gates['G5']['files_flagged']} files flagged "
          f"{gates['G5']['flagged'] or ''}",
-         f"- **G6** traced peak: load max {gates['G6']['max_load_peak_mb']:.0f} MB, "
-         f"Phase A max {gates['G6']['max_phase_a_peak_mb']:.0f} MB "
-         f"({gates['G6']['max_phase_a_mb_per_hour']:.0f} MB per hour of EEG); G1 per subject max "
-         f"{gates['G6']['max_g1_peak_mb']:.0f} MB", "",
+         f"- **G6** process memory peak (file pages included): load max {gates['G6']['max_load_mem_mb']:.0f} MB, "
+         f"Phase A max {gates['G6']['max_phase_a_mem_mb']:.0f} MB; G1 per subject max "
+         f"{gates['G6']['max_g1_mem_mb']:.0f} MB", "",
          "Per row: `g1.csv`, `siena.csv`. Hospital records: private report in Agent/inbox only."]
     (out / "GATES.md").write_text("\n".join(L) + "\n", encoding="utf-8")
     print(json.dumps({k: v.get("PASS") for k, v in gates.items() if "PASS" in v}))

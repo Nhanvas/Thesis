@@ -15,10 +15,11 @@ Each rule is shown to act on the case it is for and to leave the others alone; e
       mains mismatch inside a study, private study (person name in the file name and the header) -> the name,
       the header fields and the date appear nowhere (database bytes, cache names, EDF copy, API, action log,
       export, backend log); action log one row per action, append-only, CSV = table                          [G7, G8]
-  E10 memory-light reading (Step 2a fix): a 25-min 512-Hz referential file read in 600-s blocks through a disk
-      copy = x1_external.load_18 (exact); Phase A on it = the whole-file operations (filtered, band-pass, raw,
-      flags, moments; exact); no temporary file is left after Phase A or after a refused file; the interpolation
-      matrix = MNE's whole-recording interpolate_bads (rounding only); traced peak memory below load_18's       [C8]
+  E10 memory-light reading (Step 2a fix, second version without memory maps): a 25-min 512-Hz referential file
+      read derivation by derivation into a plain disk file = x1_external.load_18 (exact); Phase A on it = the
+      whole-file operations (filtered, band-pass, raw, flags, moments; exact); no temporary file is left after
+      Phase A or after a refused file; the interpolation matrix = MNE's whole-recording interpolate_bads (rounding
+      only); process-memory growth of Phase A (file pages included) below half of load_18's                    [C8]
 Run: PYTHONUTF8=1 python src/c5_step2_test.py   -> ALL PASS or the failing items (exit code 1).
 """
 import csv
@@ -224,11 +225,12 @@ def e10(root):
     wd.mkdir()
     d_app, meta = EI.load_any(pl, mains=50.0, workdir=wd)
     d_x1 = X1.load_18(pl, "siena")
-    check("E10 streamed referential (600-s blocks, disk copy) = x1_external.load_18 (exact)",
-          d_app.shape == d_x1.shape and np.array_equal(np.asarray(d_app), d_x1) and meta["data_path"] is not None,
-          f"{d_app.shape[1] / 256 / 60:.0f} min, disk copy {meta['data_path'] is not None}")
+    check("E10 referential read per derivation into a plain disk file = x1_external.load_18 (exact)",
+          d_app.shape == d_x1.shape and np.array_equal(np.asarray(d_app), d_x1) and meta["data_path"] is not None
+          and isinstance(d_app, EI.DiskRows),
+          f"{d_app.shape[1] / 256 / 60:.0f} min, disk file without memory map: {isinstance(d_app, EI.DiskRows)}")
+    EI.drop_temp(meta["data_path"], d_app)
     del d_app
-    Path(meta["data_path"]).unlink()
     cache = root / "pl"
     pa = pdm.process_file_phase_a(str(pl), None, cache, mains=50.0)
     sos, b, a = X1.filters(50.0)
@@ -273,19 +275,36 @@ def e10(root):
     check("E10 interpolation matrix = MNE whole-recording interpolate_bads (relative error < 1e-9)",
           "C3" in m_i["interpolated"] and m_i["interpolated"] == m_i["bad"] and err < 1e-9,
           f"relative max error {err:.1e}; interpolated {m_i['interpolated']}")
+    EI.drop_temp(m_i["data_path"], d_i)
     del d_i
-    Path(m_i["data_path"]).unlink()
-    # traced peak memory (numpy allocations; disk copies are not counted, which is the point)
-    tracemalloc.start()
-    X1.load_18(pl, "siena")
-    old_peak = tracemalloc.get_traced_memory()[1]
-    tracemalloc.stop()
-    tracemalloc.start()
-    pdm.process_file_phase_a(str(pl), None, root / "pl2", mains=50.0)
-    new_peak = tracemalloc.get_traced_memory()[1]
-    tracemalloc.stop()
-    check("E10 traced peak of the whole Phase A < traced peak of load_18 alone", new_peak < old_peak,
-          f"Phase A {new_peak / 2**20:.0f} MB vs load_18 {old_peak / 2**20:.0f} MB (25 min, 512 Hz)")
+    # process memory (resident / working set, memory-mapped file pages included -- the first fix was judged on the
+    # traced heap only, which does not see them)
+    import threading
+    import c5_step2_gates as G
+
+    def grow(fn, *a, **k):
+        import gc
+        gc.collect()
+        base, peak, stop = G.process_mb(), [0.0], [False]
+
+        def mon():
+            while not stop[0]:
+                peak[0] = max(peak[0], G.process_mb())
+                time.sleep(0.02)
+        th = threading.Thread(target=mon, daemon=True)
+        th.start()
+        try:
+            out = fn(*a, **k)
+        finally:
+            stop[0] = True
+            th.join()
+        return out, max(peak[0], G.process_mb()) - base
+    r2, g_pa = grow(pdm.process_file_phase_a, str(pl), None, root / "pl2", mains=50.0)   # first: nothing freed before
+    del r2
+    x1, g_x1 = grow(X1.load_18, pl, "siena")
+    del x1
+    check("E10 process-memory growth of the whole Phase A < half that of load_18 alone (file pages included)",
+          g_pa < 0.5 * g_x1, f"Phase A +{g_pa:.0f} MB vs load_18 +{g_x1:.0f} MB (25 min, 512 Hz)")
 
 
 def e7(root, chb_path):

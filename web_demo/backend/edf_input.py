@@ -196,25 +196,78 @@ def _resample(data: np.ndarray, fs: int) -> np.ndarray:
 BLOCK_S = 600            # seconds read per block (19 electrodes x 600 s x 512 Hz x 8 B = 47 MB)
 
 
-def _alloc(shape, workdir, name):
-    """RAM array, or a float64 .npy memory map in `workdir` (deleted by the caller) for long recordings."""
+class DiskRows:
+    """A [n_rows, n] float64 array kept in a plain binary file and read with ordinary file reads (C5 Step 2a, second
+    fix). No memory map: the first fix wrote the recording through np.memmap, whose pages stay in the process's
+    physical memory (measured: +1.5 GB file-backed for a 4-h 512-Hz file while the traced heap grew 122 MB), so the
+    laptop ran out of memory on the largest Siena file. Ordinary writes and reads go through the operating system's
+    file cache, which it can release. Supports the indexing the pipeline uses: data.shape, data[r] (one row),
+    data[:, a:b] (all rows, columns a..b) and np.asarray(data)."""
+    ndim = 2
+    dtype = np.dtype(np.float64)
+
+    def __init__(self, path, n_rows: int, n: int):
+        self.path, self.shape = Path(path), (int(n_rows), int(n))
+        self._fh = open(self.path, "w+b")
+        self._fh.truncate(self.shape[0] * self.shape[1] * 8)
+
+    def write(self, r: int, a: int, values) -> None:
+        v = np.ascontiguousarray(values, dtype=np.float64)
+        self._fh.seek((r * self.shape[1] + a) * 8)
+        self._fh.write(v.tobytes())
+
+    def _read(self, r: int, a: int, b: int) -> np.ndarray:
+        self._fh.seek((r * self.shape[1] + a) * 8)
+        out = np.fromfile(self._fh, dtype=np.float64, count=b - a)
+        if out.shape[0] != b - a:
+            raise IOError(f"short read from {self.path.name}")
+        return out
+
+    def __getitem__(self, key):
+        if isinstance(key, (int, np.integer)):
+            r = int(key) % self.shape[0]
+            return self._read(r, 0, self.shape[1])
+        if isinstance(key, tuple) and len(key) == 2 and key[0] == slice(None) and isinstance(key[1], slice):
+            a, b, st = key[1].indices(self.shape[1])
+            if st != 1:
+                raise IndexError("DiskRows: step slices are not supported")
+            b = max(a, b)
+            out = np.empty((self.shape[0], b - a))
+            for r in range(self.shape[0]):
+                out[r] = self._read(r, a, b)
+            return out
+        raise IndexError(f"DiskRows: unsupported index {key!r}")
+
+    def __len__(self):
+        return self.shape[0]
+
+    def __array__(self, dtype=None, copy=None):
+        out = np.stack([self[r] for r in range(self.shape[0])])
+        return out if dtype is None else out.astype(dtype)
+
+    def close(self) -> None:
+        if not self._fh.closed:
+            self._fh.close()
+
+
+def _new_rows(n_rows: int, n: int, workdir, name):
+    """RAM array, or a DiskRows file in `workdir` (deleted by the caller) for long recordings."""
     if workdir is None:
-        return np.empty(shape, np.float64), None
+        return np.empty((n_rows, n), np.float64), None
     import os
     import tempfile
-    fd, tmp = tempfile.mkstemp(prefix=f"_c5_{name}_", suffix=".npy", dir=str(workdir))
+    fd, tmp = tempfile.mkstemp(prefix=f"_c5_{name}_", suffix=".f64", dir=str(workdir))
     os.close(fd)
-    path = Path(tmp)
-    return np.lib.format.open_memmap(path, mode="w+", dtype=np.float64, shape=shape), path
+    return DiskRows(tmp, n_rows, n), Path(tmp)
 
 
-def drop_temp(path) -> None:
-    """Delete a temporary disk copy. On Windows a file still memory-mapped cannot be deleted; then it is left for the
-    caller's folder clean-up instead of hiding the error that is being raised (Step 2a fix)."""
+def drop_temp(path, arr=None) -> None:
+    """Close and delete a temporary disk copy (Windows cannot delete an open file; a failure is ignored so that it
+    never hides the error being raised, and the caller's folder clean-up removes the file)."""
+    if arr is not None and hasattr(arr, "close"):
+        arr.close()
     if path is None:
         return
-    import gc
-    gc.collect()
     try:
         Path(path).unlink(missing_ok=True)
     except OSError:
@@ -250,11 +303,12 @@ def load_bipolar(path):
 def load_referential(path, names: dict, interpolate: bool, workdir=None):
     """The 19 electrodes -> (bad-electrode table) -> optional interpolation -> 18 differences -> 256 Hz.
 
-    Memory-light (C5 Step 2a, measured: the whole-recording version peaked at 15.1 GB on an 11.7-h 512-Hz Siena file):
-    the electrodes are read in blocks of BLOCK_S seconds (MNE, not preloaded), the 18 differences are written at the
-    file's own rate into a float64 array (on disk in `workdir` when given), then resampled one derivation at a time.
-    Without interpolation the values equal x1_external.load_18 bit for bit (block reads, per-row resample_poly and
-    the differences are each exact; gate G3)."""
+    Memory-light (C5 Step 2a; measured: the whole-recording version peaked at 15.1 GB on an 11.7-h 512-Hz Siena file):
+    the bad-electrode table and any interpolation read the 19 electrodes in blocks of BLOCK_S seconds (MNE, not
+    preloaded); each derivation then reads its two electrodes over the whole file, takes the difference, resamples
+    it and writes it to the output (a DiskRows file in `workdir` when given, no memory map). Without interpolation
+    the values equal x1_external.load_18 bit for bit (per-channel reads, per-row resample_poly and the differences are
+    each exact; test E10, gate G3)."""
     import mne
     raw = mne.io.read_raw_edf(str(path), preload=False, verbose="ERROR")
     fs_f = float(raw.info["sfreq"])
@@ -273,30 +327,49 @@ def load_referential(path, names: dict, interpolate: bool, workdir=None):
         raise InputError(f"{len(bads)} electrodes look disconnected or flat ({', '.join(bads)}); "
                          f"more than {MAX_BAD} cannot be interpolated.")
     M = interpolation_matrix(names, bads) if (bads and interpolate) else None
-    bad_idx = [ELECTRODES.index(b) for b in bads]
-    pos = {e: i for i, e in enumerate(ELECTRODES)}
-    nat, nat_path = _alloc((len(BIPOLAR), n), workdir, "native")
     step = BLOCK_S * fs
-    for a in range(0, n, step):
-        b = min(n, a + step)
-        X = get(a, b)
-        if M is not None:
-            X[bad_idx] = M @ X
-        for r, (e1, e2) in enumerate(BIPOLAR):
-            nat[r, a:b] = X[pos[e1]] - X[pos[e2]]
-        del X
-    del raw
-    if fs == FS:
-        data, data_path = nat, nat_path
-    else:
-        g = math.gcd(fs, FS)
-        up, down = FS // g, fs // g
-        n_out = -(-n * up // down)
-        data, data_path = _alloc((len(BIPOLAR), n_out), workdir, "data")
-        for r in range(len(BIPOLAR)):
-            data[r] = resample_poly(np.asarray(nat[r]), up, down)
-        del nat
-        drop_temp(nat_path)
+    interp_rows, interp_path = None, None
+    try:
+        if M is not None:                        # interpolated electrodes, block by block (= the first fix, exact)
+            interp_rows, interp_path = _new_rows(len(bads), n, workdir, "interp")
+            for a in range(0, n, step):
+                b = min(n, a + step)
+                Y = M @ get(a, b)
+                for k in range(len(bads)):
+                    if isinstance(interp_rows, DiskRows):
+                        interp_rows.write(k, a, Y[k])
+                    else:
+                        interp_rows[k, a:b] = Y[k]
+                del Y
+        if fs == FS:
+            up = down = 1
+            n_out = n
+        else:
+            g = math.gcd(fs, FS)
+            up, down = FS // g, fs // g
+            n_out = -(-n * up // down)
+        data, data_path = _new_rows(len(BIPOLAR), n_out, workdir, "data")
+        try:
+            for r, (e1, e2) in enumerate(BIPOLAR):  # one derivation at a time: its two electrodes over the whole file
+                X = raw.get_data(picks=[names[e1], names[e2]])
+                for j, e in enumerate((e1, e2)):
+                    if M is not None and e in bads:
+                        X[j] = interp_rows[bads.index(e)]
+                d = X[0] - X[1]
+                del X
+                out = d if up == down else resample_poly(d, up, down)
+                del d
+                if isinstance(data, DiskRows):
+                    data.write(r, 0, out)
+                else:
+                    data[r] = out
+                del out
+        except BaseException:
+            drop_temp(data_path, data)
+            raise
+    finally:
+        drop_temp(interp_path, interp_rows)
+        del raw
     return data, meas_date, fs, table, (bads if interpolate else []), bads, data_path
 
 
@@ -333,12 +406,8 @@ def load_any(path, mains="auto", interpolate=False, mains_fallback=None, workdir
         raise InputError("The file could not be read as EDF.") from exc
     try:
         return _finish(data, meta, notices, fs, meas_date, mains, mains_fallback)
-    except BaseException as exc:
-        if meta["data_path"] is not None:            # no temporary disk copy is left behind on a refused file
-            import traceback
-            traceback.clear_frames(exc.__traceback__)  # the finished frames still hold the memory map
-            del data
-            drop_temp(meta["data_path"])
+    except BaseException:
+        drop_temp(meta["data_path"], data)             # no temporary disk copy is left behind on a refused file
         raise
 
 

@@ -5,7 +5,7 @@ m2l_make_notebooks.py -- Kaggle notebooks of milestone M2 stream L (chat F2-03; 
   M2L_L2_ROB      development, scale B (account nhannguyen26)
   M2L_L3_SHORT_A  development segments of 5 and 10 min, chosen arm (nhn2mm)
   M2L_L3_SHORT_B  development segments of 20 and 30 min, chosen arm (nhannguyen26)
-  M2L_L3_EVAL     test, chb24, Siena, chosen arm and minimum length (nhn2mm)
+  M2L_L3_EVAL     test, chb24, Siena, chosen arm and minimum length (nhn2mm); Version 2 (25/11) adds m2l_sched.py
 Each notebook clones github.com/Nhanvas/Thesis at --ref, asserts the sha256 of every module it runs, then calls
 src/m2l_run.py. Test mode (synthetic world, build container only): EUR_TEST_REPO / EUR_TEST_INPUT / EUR_TEST_WORK /
 EUR_TEST_SCRATCH.
@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTDIR = Path(os.environ.get("M2L_NB_OUTDIR", ROOT / "notebooks" / "m2l"))
-FILES = ["m2l_core.py", "m2l_run.py", "eur_abl.py", "r2_r1.py", "r2_core.py", "e16_recording_baseline.py",
+FILES = ["m2l_core.py", "m2l_run.py", "m2l_sched.py", "eur_abl.py", "r2_r1.py", "r2_core.py", "e16_recording_baseline.py",
          "e17b_latent_family.py", "p3c_freeze.py", "p3_levers.py", "p2_scalars.py", "e22_test_oneshot.py",
          "e23_test_look7.py", "x1_external.py", "p2_dump_seeds23.py", "e18_cpd_localizer.py", "e10_kernel_cpd.py",
          "dataprep/preprocessing.py", "continuous_eval.py", "c1b_build_trainset.py", "evaluation_protocol.py"]
@@ -45,7 +45,7 @@ SPEC = {
                            what="development recordings cut into segments of **20 and 30 min**, the chosen arm"),
     "M2L_L3_EVAL": dict(env=dict(M2L_MODE="L3EVAL"), tag="l3eval", account="nhn2mm",
                         inputs=[RAW, "v9-x3-fold1", "v9-x3-fold3", "thesis-r2-external-features"],
-                        runtime="≈ 3–3.5 h (computed from L2's measured job times; PROJ stops above 10.5 h)",
+                        runtime="≈ 4–5 h (computed: L2's measured job times, memory-aware admission; PROJ stops above 10.5 h)",
                         what="**test, chb24 and Siena, scored once** with the chosen arm, its k and the minimum length "
                              "(results/m2l/l3short/minlen.json); V5 control in the same session"),
 }

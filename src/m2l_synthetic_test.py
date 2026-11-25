@@ -21,6 +21,13 @@ Checks
   NEG3 M2L_TEST_CHAIN_SHIFT (k x 1.05 inside G-chain) -> STOP at G-chain
   NEG4 is_buffer flipped in an earlier .npz (not scored, R1.0 passes) -> STOP at G-struct[dev]
   NEG5 selection.json removed -> STOP at G-sel (L3-short)       NEG6 an edited module -> STOP before the run
+  (25/11, m2l_sched, after M2L_L3_EVAL Version 1 timed out)
+  U3  m2l_sched units: the memory model's numbers, an estimate above the budget -> STOP, the admission simulation
+  P5  L3-eval with a memory budget that admits ONE job at a time (M2L_TEST_BUDGET_MB): G-sched PASS, no two recorded
+      jobs overlap, every job reports its own peak; G-sched-equal: every per-recording array = the earlier Pool path
+  NEG7 a worker killed from outside (SIGKILL, as the OOM killer) -> STOP naming the recording, never a silent wait
+  NEG8 a stalled job -> STOP at G-watchdog          NEG9 a budget below one recording's estimate -> STOP at PROJ
+  (each L3-eval run of P5 / NEG7-9 under a wall-clock limit: a hang fails the test)
   python src/m2l_synthetic_test.py [--root DIR] [--skip-neg]
 """
 import argparse
@@ -46,6 +53,7 @@ D.EXT_SIENA = {"PN00": [("PN00-1.edf", 7, (100, 114)), ("PN00-2.edf", 6, (60, 10
                "PN01": [("PN01-1.edf", 7, (120, 133))]}
 D.CHB24 = [("chb24_01.edf", 6, [(90, 104)], None), ("chb24_02.edf", 6, [], None)]
 WORKERS = "2"
+ONE_JOB_MB = "2000"                      # one synthetic job is estimated at ~1.27 GB, two do not fit (P5)
 
 
 def env_for(root, repo, tag, **kw):
@@ -60,6 +68,45 @@ def notebooks(root, repo):
                        text=True)
     assert p.returncode == 0, p.stderr[-2000:]
     return root / "notebooks"
+
+
+def run_t(script, env, args=(), expect_fail=None, timeout=1800):
+    """RR.run with a wall-clock limit (a silent hang must fail the test, not stall it)."""
+    t = time.time()
+    try:
+        p = subprocess.run([sys.executable, str(script), *map(str, args)], env=dict(os.environ, **env),
+                           capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise SystemExit(f"FAILED: {script} {args} did not finish within {timeout} s (hang)")
+    tail = p.stdout[-3000:] + "\n" + p.stderr[-4000:]
+    if expect_fail is None and p.returncode != 0:
+        print(tail)
+        raise SystemExit(f"FAILED: {script} {args}")
+    if expect_fail is not None and (p.returncode == 0 or expect_fail not in tail):
+        print(tail)
+        raise SystemExit(f"expected a STOP containing {expect_fail!r}: {script} {args}")
+    return tail, time.time() - t
+
+
+def unit_sched(repo):
+    sys.path.insert(0, str(repo / "src"))
+    import m2l_sched as SC
+    assert abs(SC.estimate_mb(13.49, 512) - (950 + 13.49 * 810) * 1.25) < 1e-6
+    assert abs(SC.estimate_mb(4.0, 256) - (950 + 4.0 * 640) * 1.25) < 1e-6
+    assert SC.mb_per_h(1024) == 1620.0 and SC.mb_per_h(200) == 640.0
+    try:
+        SC.run(SC.rec_job, [("c", 0, "/x/PN01-1.edf")], [5000.0], [1.0], 2, 4000.0, "u3")
+        raise AssertionError("no STOP")
+    except SystemExit as e:
+        assert "above the budget" in str(e), e
+    # Version 1's four largest Siena recordings + 20 one-hour CHB files, budget 20.4 GB, 4 workers
+    big = [SC.estimate_mb(h, 512) for h in (13.49, 12.95, 11.67, 11.27)]
+    est = big + [SC.estimate_mb(1.0, 256)] * 20
+    dur = [h * 120 for h in (13.49, 12.95, 11.67, 11.27)] + [120.0] * 20
+    mk1, c1 = SC.simulate(est, dur, 4, 20400.0)
+    mk0, c0 = SC.simulate(est, dur, 4, 1e9)
+    assert c0 == 4 and mk1 >= mk0 and sum(big) > 20400.0
+    print(f"U3 PASS: memory model, over-budget STOP, admission simulation (makespan {mk0:.0f} -> {mk1:.0f} s under 20.4 GB)")
 
 
 def gates(work, tag):
@@ -190,6 +237,7 @@ def main():
     print(RR.run(root / "record_gen.py", genv).strip().splitlines()[-1])
     print(f"world ready ({time.time() - t0:.0f} s)", flush=True)
     unit_tests(repo)
+    unit_sched(repo)
     nbd = notebooks(root, repo)
 
     # ---- P1: L2 notebooks
@@ -235,10 +283,17 @@ def main():
 
     # ---- P4: L3-eval, P2, P3
     t = time.time()
-    RR.run(root / "runner.py", env_for(root, repo, "ev"), [nbd / "M2L_L3_EVAL.ipynb"])
+    run_t(root / "runner.py", env_for(root, repo, "ev", M2L_TEST_BUDGET_MB=ONE_JOB_MB, M2L_TEST_COMPARE_POOL="1"),
+          [nbd / "M2L_L3_EVAL.ipynb"])
     g = gates(root / "work_ev", "l3eval")
     assert all(g.get(n) == "PASS" for n in ("G-sel", "G-raw", "G-data", "R1.0-test", "GE", "PROJ", "G-struct[test]",
-                                            "G-struct[ext]", "G-worker[build]")), g
+                                            "G-struct[ext]", "G-worker[build]", "G-sched[build]", "G-sched-equal",
+                                            "G-worker[score_eval]")), g
+    J = pd.read_csv(root / "work_ev" / "m2l" / "l3eval" / "jobs.csv").sort_values("t0")
+    assert (J.t0.values[1:] >= J.t1.values[:-1] - 1e-6).all(), "two jobs overlapped under a one-job budget"
+    assert (J.vmhwm_mb > 0).all() and J.est_mb.notna().all()
+    print(f"P5 PASS: one-job budget respected ({len(J)} jobs, none overlap), peaks measured "
+          f"({J.vmhwm_mb.min():.0f}-{J.vmhwm_mb.max():.0f} MB), scheduled = Pool arrays")
     copy_out(root, "ev", repo, "l3eval")
     o = RR.run(repo / "src" / "m2l_read.py", renv, ["--l3"])
     assert (repo / "results" / "m2l" / "l3" / "T_L3.md").exists()
@@ -313,6 +368,18 @@ def negatives(root, repo, nbd):
             fh.write("# edited\n")
         RR.run(root / "runner.py", env_for(root, cp, "neg6"), [nbd / "M2L_L2_REC.ipynb"], expect_fail="modules differ")
         print("NEG6 PASS: an edited module stops the notebook before it starts")
+    # NEG7-9: m2l_sched (25/11)
+    tail, dt = run_t(root / "runner.py", env_for(root, repo, "neg7", M2L_TEST_KILL="PN01-1.edf"),
+                     [nbd / "M2L_L3_EVAL.ipynb"], expect_fail="a worker died", timeout=1800)
+    assert "PN01-1.edf" in tail
+    print(f"NEG7 PASS: a worker killed from outside stops the run, naming PN01-1.edf ({dt:.0f} s, no hang)")
+    tail, dt = run_t(root / "runner.py", env_for(root, repo, "neg8", M2L_TEST_HANG="PN00-2.edf", M2L_TEST_WATCHDOG_S="90"),
+                     [nbd / "M2L_L3_EVAL.ipynb"], expect_fail="G-watchdog FAIL", timeout=1800)
+    assert "PN00-2.edf" in tail, tail[-1500:]
+    print(f"NEG8 PASS: a stalled job stops at G-watchdog ({dt:.0f} s)")
+    run_t(root / "runner.py", env_for(root, repo, "neg9", M2L_TEST_BUDGET_MB="500"), [nbd / "M2L_L3_EVAL.ipynb"],
+          expect_fail="PROJ FAIL", timeout=1800)
+    print("NEG9 PASS: a budget below one recording's estimate stops at PROJ")
 
 
 if __name__ == "__main__":

@@ -9,7 +9,9 @@ author 23/11/2026 14:19). Written before any output. Three modes (environment M2
   L3SHORT  development segments of M2L_SEGS minutes (tags l3short_a / l3short_b): the chosen arm of
            results/m2l/l2/selection.json (G-sel), its k, the length guard off (MCD needs > 16 valid windows).
   L3EVAL   test, chb24, Siena (tag l3eval): the chosen arm with its k and the minimum length of
-           results/m2l/l3short/minlen.json (G-sel); V5 control R1.0-test + GE.
+           results/m2l/l3short/minlen.json (G-sel); V5 control R1.0-test + GE. Build and scoring through m2l_sched
+           (25/11, after Version 1 timed out: memory-aware admission, STOP on a dead worker or a stalled job,
+           PROJ with the memory model, G-sched); the L2 / L3-short paths are unchanged.
 Outputs WORK/m2l/<tag>/ (small files only; no EEG, no .npz): run_meta.json, gates.json, inventory/, data_sha256.csv,
 r10/, smoke.json, chain/, k.json, per_subject.csv, errors.csv, per_file.csv, stats_per_recording.csv, struct.csv,
 jobs.csv, projection.json, SUMMARY.md. The reading is src/m2l_read.py (committed before the outputs).
@@ -290,6 +292,62 @@ def l3_smoke_proj(fn, spec, hours, workers, what):
     return r
 
 
+def l3eval_smoke_proj(spec, specs, hours, sfreqs, workers):
+    """L3-eval PROJ (25/11, after Version 1): the smoke job's rate x LOAD_FACTOR as before, plus the memory model of
+    m2l_sched; the projection simulates the memory-aware admission; STOP if one recording's estimate exceeds the
+    budget or the projected total exceeds REFUSE_H."""
+    import m2l_sched as SC
+    t = time.time()
+    r = run_pool(M.rec_job, [spec], 1, "smoke eval")[0]
+    h = r.get("hours") or 1e-9
+    rate = dict(rec_s_per_h=r["s"] / h * LOAD_FACTOR, smoke_file=r.get("file"), smoke_hours=round(h, 3),
+                smoke_s=r["s"], load_factor=LOAD_FACTOR)
+    R1._jdump(R1.out_dir() / "smoke.json", rate)
+    R1.phase("smoke", t)
+    budget, bsrc = SC.memory_budget_mb()
+    est = [SC.estimate_mb(hh, fs) for hh, fs in zip(hours, sfreqs)]
+    dur = [hh * rate["rec_s_per_h"] for hh in hours]
+    over = [(Path(a[2]).name, round(e)) for a, e in zip(specs, est) if e > budget]
+    make_s, conc = SC.simulate(est, dur, workers, budget)
+    proj = dict(note="computed estimate: smoke rate x hours; memory model of m2l_sched (measured slopes x SAFETY); "
+                     "makespan = simulation of the memory-aware admission; scoring = SCORE_FACTOR x build",
+                elapsed_h=round(R1.hours(), 3), build_h=round(make_s / 3600, 3), score_h=round(SCORE_FACTOR * make_s / 3600, 3),
+                workers=workers, rec_s_per_h=round(rate["rec_s_per_h"], 2), hours_of_eeg=round(float(sum(hours)), 2),
+                budget_mb=round(budget), budget_source=bsrc, jobs=len(specs), max_estimate_mb=round(max(est)),
+                largest=Path(specs[int(np.argmax(est))][2]).name, simulated_max_concurrency=conc,
+                over_budget=over[:10], model=dict(base_mb=SC.BASE_MB, mb_per_h=SC.MB_PER_H, safety=SC.SAFETY,
+                                                  uncal=SC.UNCAL, budget_frac=SC.BUDGET_FRAC))
+    proj["projected_total_h"] = round(proj["elapsed_h"] + make_s / 3600 * (1 + SCORE_FACTOR), 2)
+    R1._jdump(R1.out_dir() / "projection.json", proj)
+    ok = not over and proj["projected_total_h"] <= REFUSE_H
+    R1.gate(dict(gate="PROJ", status="PASS" if ok else "FAIL", **proj,
+                 summary=f"projected total {proj['projected_total_h']} h (limit {REFUSE_H} h); largest estimate "
+                         f"{proj['max_estimate_mb']} MB ({proj['largest']}) within the budget {budget:.0f} MB"
+                         if ok else (f"{len(over)} recordings exceed the memory budget {budget:.0f} MB: {over[:3]}"
+                                     if over else f"projected total {proj['projected_total_h']} h > {REFUSE_H} h")))
+    return est, dur, budget
+
+
+def sched_equal(specs, jobs, workers):
+    """synthetic test only (M2L_TEST_COMPARE_POOL): the same specs through the earlier Pool path into another scratch
+    folder; every array of every per-recording file must be identical (scheduling changes when, not what)."""
+    alt = [tuple(a[:9]) + (Path(str(a[9]).replace(str(M.SCR), str(M.SCR) + "_pool")),) + tuple(a[10:]) for a in specs]
+    ref = run_pool(M.rec_job, alt, workers, "rec[pool, test]")
+    mine = {(j["case"], j["fi"]): j for j in jobs}
+    bad = []
+    for r in ref:
+        j = mine[(r["case"], r["fi"])]
+        if r["skipped"] or j["skipped"]:
+            if r["skipped"] != j["skipped"]:
+                bad.append((r["case"], r["fi"], "skipped"))
+            continue
+        a, b = np.load(r["npz"]), np.load(j["npz"])
+        if sorted(a.files) != sorted(b.files) or any(not np.array_equal(a[k], b[k], equal_nan=True) for k in a.files):
+            bad.append((r["case"], r["fi"]))
+    R1.gate(dict(gate="G-sched-equal", status="PASS" if not bad and len(ref) == len(jobs) else "FAIL", jobs=len(ref),
+                 differ=bad[:10], summary=f"{len(ref)} recordings: scheduled build = Pool build, every array identical"))
+
+
 def struct_gate(jobs_by_case, ref_kind, label):
     """G-struct: per patient, the per-recording bookkeeping concatenated = the reference .npz (exact)."""
     rows = []
@@ -514,19 +572,34 @@ def main_l3eval(notebook, repo_commit, workers=None):
     files.update({c: M.ext_files(c, complete) for c in EXT})
     specs = [s for c in TEST + EXT for s in rec_specs(c, files[c], S, cc, guard, (cov,))]
     specs.sort(key=lambda a: -Path(a[2]).stat().st_size)
-    hours = [edf_windows(a[2])[1] for a in specs]
+    import m2l_sched as SC                                  # 25/11: memory-aware build (Version 1 diagnosis)
+    hdr = [SC.edf_header(a[2]) for a in specs]
+    hours, sfreqs = [h for h, _ in hdr], [fs for _, fs in hdr]
     sm = dict(zip(range(12), specs[pick_smoke(specs, hours)]))
     sm[9] = M.SCR / "smoke" / "rec.npz"
-    l3_smoke_proj(M.rec_job, tuple(sm[i] for i in range(12)), hours, workers, "eval")
+    est, dur, _ = l3eval_smoke_proj(tuple(sm[i] for i in range(12)), specs, hours, sfreqs, workers)
     t = time.time()
-    jobs = run_pool(M.rec_job, specs, workers, "rec")
+    budget, bsrc = SC.memory_budget_mb()
+    log(f"build: memory budget {budget:.0f} MB ({bsrc}); {len(specs)} recordings, largest estimate {max(est):.0f} MB")
+    jobs = SC.run(SC.rec_job, specs, est, dur, workers, budget, "rec")
     gate_worker(jobs, "build")
+    SC.gate_sched(jobs, budget, "build")
     R1.phase("build", t)
+    if M.TEST_MODE and os.environ.get("M2L_TEST_COMPARE_POOL"):
+        sched_equal(specs, jobs, workers)
     by = group(jobs)
     struct_gate({c: by[c] for c in TEST}, "earlier", "test")
     struct_gate({c: by[c] for c in EXT}, "ext", "ext")
     set_of = {c: "test" for c in TEST} | {"chb24": "chb24"} | {c: "siena" for c in EXT if c != "chb24"}
-    res = score_all(by, set_of, S, {cov: float(sel["k"])}, (fl, "FX"), (cov,), workers, "eval")
+    t = time.time()
+    sspecs = [(c, set_of[c], S, {cov: float(sel["k"])}, js, (fl, "FX"), (cov,)) for c, js in by.items()]
+    sspecs.sort(key=lambda a: -sum(j.get("n", 0) for j in a[4] if not j["skipped"]))
+    sest = [SC.BASE_MB * SC.SAFETY + 0.05 * sum(j.get("n", 0) for j in a[4] if not j["skipped"]) for a in sspecs]
+    sbudget, _ = SC.memory_budget_mb()
+    res = SC.run(SC.score_job, sspecs, [min(e, sbudget) for e in sest], [600.0] * len(sspecs), workers, sbudget,
+                 "score[eval]")
+    gate_worker(res, "score_eval")
+    R1.phase("score", t)
     write_outputs(jobs, res)
     R1.finish_meta(dict(selection=sel, minlen=ml))
     (R1.out_dir() / "SUMMARY.md").write_text(

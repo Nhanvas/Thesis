@@ -1,0 +1,30 @@
+{
+ "commit": "04ea436846d12e476d6f8adb6deb76df84daf2c2",
+ "smoke": true,
+ "gates": {
+  "G1": {
+   "PASS": true,
+   "subjects": 1,
+   "files_differ": 0
+  },
+  "G3": {
+   "PASS": true,
+   "files": 1,
+   "sha_bad": []
+  },
+  "G4": {
+   "suggested_50": 1,
+   "suggested_60": 0,
+   "none": 0
+  },
+  "G5": {
+   "files_flagged": 0,
+   "flagged": []
+  },
+  "G6": {
+   "max_phase_a_peak_mb": 15148.6,
+   "max_phase_a_mb_per_hour": 1298.6,
+   "max_g1_peak_mb": 809.5
+  }
+ }
+}

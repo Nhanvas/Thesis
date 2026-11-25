@@ -4,14 +4,18 @@ c5_step2_gates.py -- chat C5, SzScan Step 2: gates on real data (results/c5_szsc
 
   G1  session engine after Step 2 on the 8 test subjects (headless, the app's own functions, mains 60 Hz)
       = the committed application-tier export web_demo/report_handback/tier2_v4/ (every AI event, every file)
-  G3  every Siena file through edf_input.load_any = x1_external.load_18 (exact); sha256 = PhysioNet
+  G3  every Siena file through edf_input.load_any = x1_external.load_18's operations (exact); sha256 = PhysioNet.
+      Memory-light reference (Step 2a fix): load_18's operations one derivation at a time (the two electrodes over
+      the whole file -> difference -> resample_poly); on files <= 1.5 h load_18 itself is also run and must equal it
   G4  mains suggestion per Siena file (and per hospital record, private report): suggested Hz and the two ratios
-  G5  bad-electrode rule per Siena file (and per hospital record, private report): flagged electrodes and z
+  G5  bad-electrode rule per Siena file (and per hospital record, private report): flagged electrodes, z and the
+      amplitude ratio to the median electrode (a pure robust-z rule may flag a nearly normal electrode when all
+      electrodes have almost the same amplitude -- seen on synthetic data; this column checks it on real data)
   G6  memory: traced peak of edf_input.load_any and of Phase A per file (MB and MB per hour of EEG)
 
 Memory-light by construction: one file (G3-G6) or one subject (G1) at a time, one worker, temporary caches deleted
 after each subject. --smoke runs only the longest Siena file and the shortest test subject first and prints the
-traced peaks; the full run refuses to start when the smoke peak exceeds --max-gb (default 3).
+traced peaks; the smoke reports TOO HIGH when its traced peak exceeds --max-gb (default 2, the laptop budget).
 Private hospital records (--private-dir): nothing about the files (name, header field, date, path) is printed or
 written; the report goes to Agent/inbox/C5_STEP2_PRIVATE.md only (never committed).
 Outputs (public): results/c5_szscan/step2/ (GATES.md, g1.csv, siena.csv, gates.json; smoke/ for --smoke).
@@ -66,6 +70,33 @@ def traced(fn, *a, **k):
     return out, peak / 1e6, time.time() - t0
 
 
+def rowwise_ref(p):
+    """x1_external.load_18 (Siena branch) one derivation at a time: same picks, same differences, same resample_poly
+    (per-row resample_poly = the 2-D call bit for bit, synthetic test E10)."""
+    import math
+    import mne
+    from scipy.signal import resample_poly
+    raw = mne.io.read_raw_edf(str(p), preload=False, verbose=False)
+    names = {}
+    for ch in raw.ch_names:
+        n = ch.upper().replace("EEG", "").strip().replace(" ", "")
+        names[X1.SIENA_MAP.get(n, n)] = ch
+    fs = int(round(raw.info["sfreq"]))
+    g = math.gcd(fs, 256)
+    for a, b in X1.BIPOLAR:
+        X = raw.get_data(picks=[names[a], names[b]])          # float64 already; load_18's astype is a copy
+        d = X[0] - X[1]
+        del X
+        yield d if fs == 256 else resample_poly(d, 256 // g, fs // g)
+
+
+def g3_equal(p, d_app):
+    ok = True
+    for r, ref in enumerate(rowwise_ref(p)):
+        ok &= bool(ref.shape[0] == d_app.shape[1] and np.array_equal(np.asarray(d_app[r]), ref))
+    return ok
+
+
 def tier2_events():
     ev, files = {}, {}
     for s in TEST:
@@ -88,6 +119,8 @@ def g1(chb, subjects):
         tmp = Path(tempfile.mkdtemp(prefix=f"c5g1_{s}_"))
         try:
             out, peak, secs = traced(pdm.process_subject_headless, [str(p) for p in edfs], cache_dir=tmp, max_workers=1)
+            out = dict(events=out["events"], n_windows=out["n_windows"])   # drop arrays / memory maps
+            gc.collect()
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
         diff = 0
@@ -106,29 +139,41 @@ def siena_files(root):
     return sorted(Path(root).rglob("PN*.edf"))
 
 
+def bad_ratio(meta):
+    amps = np.array([t["amp_uv"] for t in meta["electrodes"]])
+    med = float(np.median(amps))
+    return " ".join(f"{t['electrode']}:{t['amp_uv'] / med:.2f}" for t in meta["electrodes"] if t["bad"])
+
+
 def siena_one(p, sums):
     r = dict(subject=p.parent.name, file=p.name, size_mb=round(p.stat().st_size / 1e6, 1))
     want = sums.get(f"{p.parent.name}/{p.name}")
     r["sha_ok"] = (sha256(p) == want) if want else "not listed"
-    try:
-        (d_app, meta), peak_load, s_load = traced(EI.load_any, p, mains="auto")
-        r.update(montage=meta["montage"], fs_in=meta["fs_in"], suggested_hz=meta["notch_hz"],
-                 r50=round(meta["mains_ratios"][0], 2), r60=round(meta["mains_ratios"][1], 2),
-                 bad=" ".join(meta["bad"]), max_z=round(max(t["z"] for t in meta["electrodes"]), 2),
-                 load_peak_mb=round(peak_load, 1))
-    except EI.InputError as e:
-        r.update(suggested_hz="none", note=str(e)[:120])
-        (d_app, meta), _, _ = traced(EI.load_any, p, mains=50.0)
-        r.update(montage=meta["montage"], fs_in=meta["fs_in"], bad=" ".join(meta["bad"]),
-                 max_z=round(max(t["z"] for t in meta["electrodes"]), 2))
-    d_x1 = X1.load_18(p, "siena")
-    r["g3_equal"] = bool(d_x1 is not None and d_app.shape == d_x1.shape and np.array_equal(d_app, d_x1))
-    hours = d_app.shape[1] / 256 / 3600
-    del d_app, d_x1
-    gc.collect()
     tmp = Path(tempfile.mkdtemp(prefix="c5g6_"))
     try:
-        _, peak_a, s_a = traced(pdm.process_file_phase_a, str(p), None, tmp, mains=50.0)
+        try:
+            (d_app, meta), peak_load, s_load = traced(EI.load_any, p, mains="auto", workdir=tmp)
+            r.update(suggested_hz=meta["notch_hz"])
+        except EI.InputError as e:
+            r.update(suggested_hz="none", note=str(e)[:120])
+            (d_app, meta), peak_load, s_load = traced(EI.load_any, p, mains=50.0, workdir=tmp)
+        r.update(montage=meta["montage"], fs_in=meta["fs_in"], r50=round(meta["mains_ratios"][0], 2),
+                 r60=round(meta["mains_ratios"][1], 2), bad=" ".join(meta["bad"]), bad_ratio=bad_ratio(meta),
+                 max_z=round(max(t["z"] for t in meta["electrodes"]), 2), load_peak_mb=round(peak_load, 1),
+                 load_s=round(s_load, 1))
+        hours = d_app.shape[1] / 256 / 3600
+        r["g3_equal"] = g3_equal(p, d_app)
+        if hours <= 1.5:                                 # load_18 itself = the row-wise reference (small files)
+            d_x1 = X1.load_18(p, "siena")
+            r["g3_load18_equal"] = bool(d_x1.shape == d_app.shape and np.array_equal(np.asarray(d_app), d_x1))
+            del d_x1
+        del d_app
+        if meta["data_path"] is not None:
+            Path(meta["data_path"]).unlink(missing_ok=True)
+        gc.collect()
+        res, peak_a, s_a = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+        del res                                          # closes the memory maps before the folder is removed
+        gc.collect()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     r.update(hours=round(hours, 3), phase_a_peak_mb=round(peak_a, 1),
@@ -147,19 +192,25 @@ def private_report(pdir):
          "|---|---|---|---|---|---|---|---|"]
     for i, p in enumerate(files):
         lab = f"clin{i + 1:02d}"
+        tmp = Path(tempfile.mkdtemp(prefix="c5priv_"))
         try:
-            (d, meta), peak_l, _ = traced(EI.load_any, p, mains="auto")
+            (d, meta), peak_l, _ = traced(EI.load_any, p, mains="auto", workdir=tmp)
             sug = f"{meta['notch_hz']:.0f} Hz"
         except EI.InputError:
-            (d, meta), peak_l, _ = traced(EI.load_any, p, mains=50.0)
+            (d, meta), peak_l, _ = traced(EI.load_any, p, mains=50.0, workdir=tmp)
             sug = "none"
         hours = d.shape[1] / 256 / 3600
         del d
+        if meta["data_path"] is not None:
+            Path(meta["data_path"]).unlink(missing_ok=True)
         gc.collect()
-        flagged = ", ".join(f"{t['electrode']} ({t['z']:.1f})" for t in meta["electrodes"] if t["bad"]) or "none"
-        tmp = Path(tempfile.mkdtemp(prefix="c5priv_"))
+        amps = np.median([t["amp_uv"] for t in meta["electrodes"]])
+        flagged = ", ".join(f"{t['electrode']} (z {t['z']:.1f}, x{t['amp_uv'] / amps:.2f})"
+                            for t in meta["electrodes"] if t["bad"]) or "none"
         try:
-            _, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp, mains=50.0)
+            res, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+            del res
+            gc.collect()
         except Exception as e:      # noqa: BLE001  (message only, never a path)
             peak_a = float("nan")
             flagged += f"; Phase A error {type(e).__name__}"
@@ -181,7 +232,7 @@ def main():
     ap.add_argument("--siena", required=True)
     ap.add_argument("--private-dir", default=None)
     ap.add_argument("--smoke", action="store_true")
-    ap.add_argument("--max-gb", type=float, default=3.0)
+    ap.add_argument("--max-gb", type=float, default=2.0)
     a = ap.parse_args()
     out = OUT / "smoke" if a.smoke else OUT
     out.mkdir(parents=True, exist_ok=True)
@@ -214,7 +265,9 @@ def main():
     gates = dict(
         G1=dict(PASS=all(r["files_differ"] == 0 for r in g1rows), subjects=len(g1rows),
                 files_differ=sum(r["files_differ"] for r in g1rows)),
-        G3=dict(PASS=all(r["g3_equal"] is True for r in srows), files=len(srows),
+        G3=dict(PASS=all(r["g3_equal"] is True for r in srows)
+                and all(r.get("g3_load18_equal", True) is True for r in srows), files=len(srows),
+                load18_checked=sum("g3_load18_equal" in r for r in srows),
                 sha_bad=[r["file"] for r in srows if r["sha_ok"] is False]),
         G4=dict(suggested_50=sum(r.get("suggested_hz") == 50.0 for r in srows),
                 suggested_60=sum(r.get("suggested_hz") == 60.0 for r in srows),
@@ -222,6 +275,7 @@ def main():
         G5=dict(files_flagged=sum(bool(r.get("bad")) for r in srows),
                 flagged=[f"{r['file']}: {r['bad']}" for r in srows if r.get("bad")]),
         G6=dict(max_phase_a_peak_mb=max(r["phase_a_peak_mb"] for r in srows),
+                max_load_peak_mb=max(r["load_peak_mb"] for r in srows),
                 max_phase_a_mb_per_hour=max(r["phase_a_mb_per_hour"] for r in srows),
                 max_g1_peak_mb=max(r["traced_peak_mb"] for r in g1rows)),
     )
@@ -232,12 +286,13 @@ def main():
          f"- **G1** session engine = committed application-tier events: {'PASS' if gates['G1']['PASS'] else 'FAIL'} "
          f"({gates['G1']['subjects']} subjects, {gates['G1']['files_differ']} files differ)",
          f"- **G3** Siena through edf_input = x1_external.load_18: {'PASS' if gates['G3']['PASS'] else 'FAIL'} "
-         f"({gates['G3']['files']} files; sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
+         f"({gates['G3']['files']} files, load_18 itself on {gates['G3']['load18_checked']} files <= 1.5 h; sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
          f"- **G4** mains suggestion on Siena: 50 Hz {gates['G4']['suggested_50']}, 60 Hz {gates['G4']['suggested_60']}, "
          f"none {gates['G4']['none']}",
          f"- **G5** bad-electrode rule on Siena: {gates['G5']['files_flagged']} files flagged "
          f"{gates['G5']['flagged'] or ''}",
-         f"- **G6** traced peak: Phase A max {gates['G6']['max_phase_a_peak_mb']:.0f} MB "
+         f"- **G6** traced peak: load max {gates['G6']['max_load_peak_mb']:.0f} MB, "
+         f"Phase A max {gates['G6']['max_phase_a_peak_mb']:.0f} MB "
          f"({gates['G6']['max_phase_a_mb_per_hour']:.0f} MB per hour of EEG); G1 per subject max "
          f"{gates['G6']['max_g1_peak_mb']:.0f} MB", "",
          "Per row: `g1.csv`, `siena.csv`. Hospital records: private report in Agent/inbox only."]

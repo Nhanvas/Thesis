@@ -128,21 +128,26 @@ def _sampled_windows(n_windows: int) -> np.ndarray:
     return np.flatnonzero((np.arange(n_windows) + 1) % SUB == 0)
 
 
-def bad_electrode_table(X: np.ndarray, fs: int) -> list[dict]:
-    """X [19, n] volts at fs (ELECTRODES order) -> per electrode amp (V), robust z, bad flag (rule above)."""
+def bad_electrode_table(X, fs: int, n: int | None = None) -> list[dict]:
+    """X = [19, n] volts at fs (ELECTRODES order) or a callable (start, stop) -> [19, stop-start] that reads them
+    from the file (memory-light); -> per electrode amp (V), robust z, bad flag (rule above)."""
+    get = X if callable(X) else (lambda a, b: X[:, a:b])
+    n = X.shape[1] if n is None else n
     win, pad = int(4 * fs), int(3 * fs)
-    nw = X.shape[1] // win
+    nw = n // win
     idx = _sampled_windows(nw)
     if len(idx) == 0:
         raise InputError("Recording too short (fewer than 10 windows of 4 s).")
     sos = butter(4, [0.5, 60.0], btype="bandpass", fs=fs, output="sos")
-    parts = []
-    for i in idx:
-        a, b = max(0, i * win - pad), min(X.shape[1], (i + 1) * win + pad)
-        f = sosfiltfilt(sos, X[:, a:b], axis=1)
-        parts.append(f[:, i * win - a:i * win - a + win])
-    S = np.concatenate(parts, axis=1)
-    q75, q25 = np.percentile(S, [75, 25], axis=1)
+    S = None                                     # = np.concatenate of the windows, filled in place (memory-light)
+    for k, i in enumerate(idx):
+        a, b = max(0, i * win - pad), min(n, (i + 1) * win + pad)
+        f = sosfiltfilt(sos, get(a, b), axis=1)
+        if S is None:
+            S = np.empty((f.shape[0], len(idx) * win))
+        S[:, k * win:(k + 1) * win] = f[:, i * win - a:i * win - a + win]
+    q = np.array([np.percentile(row, [75, 25]) for row in S])     # per electrode = the 2-D call (synthetic test)
+    q75, q25 = q[:, 0], q[:, 1]
     amp = (q75 - q25) / 1.349
     med = np.median(amp)
     mad = 1.4826 * np.median(np.abs(amp - med))
@@ -157,16 +162,20 @@ def mains_ratios(data18: np.ndarray) -> tuple[float, float]:
     if len(idx) == 0:
         return float("nan"), float("nan")
     f = np.fft.rfftfreq(WIN, 1 / FS)                         # 0.25-Hz bins
-    seg = np.stack([data18[:, i * WIN:(i + 1) * WIN] for i in idx])          # [w, 18, 1024]
-    seg = seg - seg.mean(axis=2, keepdims=True)
-    pw = np.abs(np.fft.rfft(seg * np.hanning(WIN), axis=2)) ** 2
+    hann = np.hanning(WIN)
 
-    def ratio(c, lo_flank, hi_flank):
+    def ratio(pw, c, lo_flank, hi_flank):
         band = pw[:, :, (f >= c - 0.5) & (f <= c + 0.5)].mean(axis=2)
         fl = pw[:, :, ((f >= lo_flank[0]) & (f <= lo_flank[1])) | ((f >= hi_flank[0]) & (f <= hi_flank[1]))]
-        r = band / np.maximum(np.median(fl, axis=2), 1e-300)
-        return float(np.median(r))
-    return ratio(50.0, (45, 49), (51, 55)), ratio(60.0, (55, 59), (61, 65))
+        return band / np.maximum(np.median(fl, axis=2), 1e-300)
+    r50, r60 = [], []
+    for k in range(0, len(idx), 200):                        # 200 windows at a time (memory-light)
+        seg = np.stack([np.asarray(data18[:, i * WIN:(i + 1) * WIN]) for i in idx[k:k + 200]])   # [w, 18, 1024]
+        seg = seg - seg.mean(axis=2, keepdims=True)
+        pw = np.abs(np.fft.rfft(seg * hann, axis=2)) ** 2
+        r50.append(ratio(pw, 50.0, (45, 49), (51, 55)))
+        r60.append(ratio(pw, 60.0, (55, 59), (61, 65)))
+    return float(np.median(np.concatenate(r50))), float(np.median(np.concatenate(r60)))
 
 
 def suggest_mains(data18: np.ndarray) -> tuple[float | None, float, float]:
@@ -184,6 +193,48 @@ def _resample(data: np.ndarray, fs: int) -> np.ndarray:
     return resample_poly(data, FS // g, fs // g, axis=1)
 
 
+BLOCK_S = 600            # seconds read per block (19 electrodes x 600 s x 512 Hz x 8 B = 47 MB)
+
+
+def _alloc(shape, workdir, name):
+    """RAM array, or a float64 .npy memory map in `workdir` (deleted by the caller) for long recordings."""
+    if workdir is None:
+        return np.empty(shape, np.float64), None
+    import os
+    import tempfile
+    fd, tmp = tempfile.mkstemp(prefix=f"_c5_{name}_", suffix=".npy", dir=str(workdir))
+    os.close(fd)
+    path = Path(tmp)
+    return np.lib.format.open_memmap(path, mode="w+", dtype=np.float64, shape=shape), path
+
+
+def drop_temp(path) -> None:
+    """Delete a temporary disk copy. On Windows a file still memory-mapped cannot be deleted; then it is left for the
+    caller's folder clean-up instead of hiding the error that is being raised (Step 2a fix)."""
+    if path is None:
+        return
+    import gc
+    gc.collect()
+    try:
+        Path(path).unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def interpolation_matrix(names: dict, bads: list) -> np.ndarray:
+    """MNE's spherical-spline interpolation (interpolate_bads, mode 'accurate', standard 10-20 positions) as a linear
+    map [n_bad, 19]: obtained by interpolating the 19 unit vectors, so applying it block by block equals MNE's
+    whole-recording interpolation up to floating-point rounding (synthetic test)."""
+    import mne
+    info = mne.create_info(list(ELECTRODES), sfreq=float(FS), ch_types="eeg")
+    raw = mne.io.RawArray(np.eye(len(ELECTRODES)), info, verbose="ERROR")
+    raw.set_montage(mne.channels.make_standard_montage("standard_1020"), on_missing="ignore", match_case=False)
+    raw.info["bads"] = list(bads)
+    raw.interpolate_bads(reset_bads=True, mode="accurate", verbose="ERROR")
+    out = raw.get_data()
+    return out[[ELECTRODES.index(b) for b in bads]]
+
+
 def load_bipolar(path):
     """CHB-MIT path, unchanged: preprocessing.open_edf -> get_data (volts)."""
     raw = P.open_edf(str(path))
@@ -192,12 +243,18 @@ def load_bipolar(path):
     fs = int(round(raw.info["sfreq"]))
     if abs(raw.info["sfreq"] - fs) > 1e-6:
         raise InputError(f"Sampling rate {raw.info['sfreq']} Hz is not an integer rate.")
-    data = raw.get_data().astype(np.float64)
+    data = np.asarray(raw.get_data(), dtype=np.float64)     # get_data is float64; no second copy (Step 2a fix)
     return _resample(data, fs), raw.info["meas_date"], fs
 
 
-def load_referential(path, names: dict, interpolate: bool):
-    """The 19 electrodes -> (bad-electrode table) -> optional interpolation -> 18 differences -> 256 Hz."""
+def load_referential(path, names: dict, interpolate: bool, workdir=None):
+    """The 19 electrodes -> (bad-electrode table) -> optional interpolation -> 18 differences -> 256 Hz.
+
+    Memory-light (C5 Step 2a, measured: the whole-recording version peaked at 15.1 GB on an 11.7-h 512-Hz Siena file):
+    the electrodes are read in blocks of BLOCK_S seconds (MNE, not preloaded), the 18 differences are written at the
+    file's own rate into a float64 array (on disk in `workdir` when given), then resampled one derivation at a time.
+    Without interpolation the values equal x1_external.load_18 bit for bit (block reads, per-row resample_poly and
+    the differences are each exact; gate G3)."""
     import mne
     raw = mne.io.read_raw_edf(str(path), preload=False, verbose="ERROR")
     fs_f = float(raw.info["sfreq"])
@@ -205,29 +262,45 @@ def load_referential(path, names: dict, interpolate: bool):
     if abs(fs_f - fs) > 1e-6:
         raise InputError(f"Sampling rate {fs_f} Hz is not an integer rate.")
     meas_date = raw.info["meas_date"]
-    raw.pick([names[e] for e in ELECTRODES])
-    raw.load_data(verbose="ERROR")
-    raw.rename_channels({names[e]: e for e in ELECTRODES if names[e] != e})
-    X = raw.get_data(picks=ELECTRODES).astype(np.float64)
-    table = bad_electrode_table(X, fs)
+    picks = [names[e] for e in ELECTRODES]
+    n = int(raw.n_times)
+
+    def get(a, b):
+        return raw.get_data(picks=picks, start=a, stop=b)
+    table = bad_electrode_table(get, fs, n)
     bads = [t["electrode"] for t in table if t["bad"]]
     if len(bads) > MAX_BAD:
         raise InputError(f"{len(bads)} electrodes look disconnected or flat ({', '.join(bads)}); "
                          f"more than {MAX_BAD} cannot be interpolated.")
-    if bads and interpolate:
-        montage = mne.channels.make_standard_montage("standard_1020")
-        raw.set_montage(montage, on_missing="ignore", match_case=False)
-        raw.info["bads"] = list(bads)
-        raw.interpolate_bads(reset_bads=True, mode="accurate", verbose="ERROR")
-        X = raw.get_data(picks=ELECTRODES).astype(np.float64)
-    del raw
+    M = interpolation_matrix(names, bads) if (bads and interpolate) else None
+    bad_idx = [ELECTRODES.index(b) for b in bads]
     pos = {e: i for i, e in enumerate(ELECTRODES)}
-    data = np.stack([X[pos[a]] - X[pos[b]] for a, b in BIPOLAR])
-    del X
-    return _resample(data, fs), meas_date, fs, table, (bads if interpolate else []), bads
+    nat, nat_path = _alloc((len(BIPOLAR), n), workdir, "native")
+    step = BLOCK_S * fs
+    for a in range(0, n, step):
+        b = min(n, a + step)
+        X = get(a, b)
+        if M is not None:
+            X[bad_idx] = M @ X
+        for r, (e1, e2) in enumerate(BIPOLAR):
+            nat[r, a:b] = X[pos[e1]] - X[pos[e2]]
+        del X
+    del raw
+    if fs == FS:
+        data, data_path = nat, nat_path
+    else:
+        g = math.gcd(fs, FS)
+        up, down = FS // g, fs // g
+        n_out = -(-n * up // down)
+        data, data_path = _alloc((len(BIPOLAR), n_out), workdir, "data")
+        for r in range(len(BIPOLAR)):
+            data[r] = resample_poly(np.asarray(nat[r]), up, down)
+        del nat
+        drop_temp(nat_path)
+    return data, meas_date, fs, table, (bads if interpolate else []), bads, data_path
 
 
-def load_any(path, mains="auto", interpolate=False, mains_fallback=None) -> tuple[np.ndarray, dict]:
+def load_any(path, mains="auto", interpolate=False, mains_fallback=None, workdir=None) -> tuple[np.ndarray, dict]:
     """-> (data [18, n] volts at 256 Hz, meta). meta: montage, fs_in, meas_date, notch_hz, mains_ratios, notices,
     bad (electrodes flagged), interpolated. Raises InputError with a user-facing message.
     mains_fallback (auto only): the study's mains frequency already decided by an earlier file, used when this
@@ -241,13 +314,13 @@ def load_any(path, mains="auto", interpolate=False, mains_fallback=None) -> tupl
     tn = truncation_notice(h)
     if tn:
         notices.append(tn)
-    meta = dict(montage=montage, bad=[], interpolated=[], electrodes=None)
+    meta = dict(montage=montage, bad=[], interpolated=[], electrodes=None, data_path=None)
     try:
         if montage == "bipolar":
             data, meas_date, fs = load_bipolar(path)
         else:
-            data, meas_date, fs, table, interp, bads = load_referential(path, names, interpolate)
-            meta.update(electrodes=table, bad=bads, interpolated=interp)
+            data, meas_date, fs, table, interp, bads, data_path = load_referential(path, names, interpolate, workdir)
+            meta.update(electrodes=table, bad=bads, interpolated=interp, data_path=data_path)
             if bads and interp:
                 notices.append(f"Electrode(s) {', '.join(bads)} looked disconnected or flat and were interpolated "
                                f"from their neighbours.")
@@ -258,6 +331,18 @@ def load_any(path, mains="auto", interpolate=False, mains_fallback=None) -> tupl
         raise
     except Exception as exc:      # mne raises many kinds of errors on unreadable files
         raise InputError("The file could not be read as EDF.") from exc
+    try:
+        return _finish(data, meta, notices, fs, meas_date, mains, mains_fallback)
+    except BaseException as exc:
+        if meta["data_path"] is not None:            # no temporary disk copy is left behind on a refused file
+            import traceback
+            traceback.clear_frames(exc.__traceback__)  # the finished frames still hold the memory map
+            del data
+            drop_temp(meta["data_path"])
+        raise
+
+
+def _finish(data, meta, notices, fs, meas_date, mains, mains_fallback):
     if data.shape[1] < WIN:
         raise InputError("Shorter than one 4-s window; nothing to score.")
     if mains == "auto":

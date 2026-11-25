@@ -15,6 +15,10 @@ Each rule is shown to act on the case it is for and to leave the others alone; e
       mains mismatch inside a study, private study (person name in the file name and the header) -> the name,
       the header fields and the date appear nowhere (database bytes, cache names, EDF copy, API, action log,
       export, backend log); action log one row per action, append-only, CSV = table                          [G7, G8]
+  E10 memory-light reading (Step 2a fix): a 25-min 512-Hz referential file read in 600-s blocks through a disk
+      copy = x1_external.load_18 (exact); Phase A on it = the whole-file operations (filtered, band-pass, raw,
+      flags, moments; exact); no temporary file is left after Phase A or after a refused file; the interpolation
+      matrix = MNE's whole-recording interpolate_bads (rounding only); traced peak memory below load_18's       [C8]
 Run: PYTHONUTF8=1 python src/c5_step2_test.py   -> ALL PASS or the failing items (exit code 1).
 """
 import csv
@@ -198,6 +202,8 @@ def main():
         pa = pdm.process_file_phase_a(str(ps), None, root / "ps", mains=60.0)
         rs = EF.run_file(np.load(pa.filtered_path, mmap_mode="r"), np.load(pa.flag_path), np.load(pa.fsamp_path))
         check("E6 20-min file: no event (minimum 30 min)", rs["short"] and rs["events"] == [])
+        # ── E10 memory-light reading
+        e10(root)
         # ── E7 the whole app, temporary state
         e7(root, pb)
     finally:
@@ -205,6 +211,81 @@ def main():
     bad = [r for r in RESULTS if not r[1]]
     print(f"\n{'ALL PASS' if not bad else f'{len(bad)} FAIL'} ({len(RESULTS)} checks)")
     return 0 if not bad else 1
+
+
+def e10(root):
+    import tracemalloc
+    import mne
+    from scipy.signal import filtfilt, sosfiltfilt, resample_poly
+    labels = [f"EEG {e.capitalize()}" for e in REF19] + ["EKG EKG"]
+    pl = root / "longref.edf"
+    write_edf(pl, labels, 512, eeg(20, 1500, 512, 21, 50))
+    wd = root / "wd"
+    wd.mkdir()
+    d_app, meta = EI.load_any(pl, mains=50.0, workdir=wd)
+    d_x1 = X1.load_18(pl, "siena")
+    check("E10 streamed referential (600-s blocks, disk copy) = x1_external.load_18 (exact)",
+          d_app.shape == d_x1.shape and np.array_equal(np.asarray(d_app), d_x1) and meta["data_path"] is not None,
+          f"{d_app.shape[1] / 256 / 60:.0f} min, disk copy {meta['data_path'] is not None}")
+    del d_app
+    Path(meta["data_path"]).unlink()
+    cache = root / "pl"
+    pa = pdm.process_file_phase_a(str(pl), None, cache, mains=50.0)
+    sos, b, a = X1.filters(50.0)
+    n = d_x1.shape[1] // 1024
+    bp = sosfiltfilt(sos, d_x1, axis=1)
+    nf = filtfilt(b, a, bp, axis=1)
+    win = lambda x: np.ascontiguousarray(x[:, :n * 1024].reshape(18, n, 1024).transpose(1, 0, 2))
+    raw64 = win(d_x1)
+    ok = (np.array_equal(np.load(pa.filtered_path), win(nf).astype(np.float32))
+          and np.array_equal(np.load(pa.bandpass_path), win(bp).astype(np.float32))
+          and np.array_equal(np.load(pa.raw_path), raw64.astype(np.float32))
+          and np.array_equal(np.load(pa.flag_path), pdm.compute_signal_loss_flags(raw64))
+          and np.array_equal(np.load(pa.moments_path), pdm.padded_window_moments(d_x1, n, 50.0)))
+    check("E10 Phase A per derivation = whole-file operations (filtered, band-pass, raw, flags, moments; exact)", ok)
+    left = sorted(q.name for q in cache.glob("_c5_*")) + sorted(q.name for q in wd.glob("_c5_*"))
+    check("E10 no temporary file left after Phase A", not left, str(left))
+    pq = root / "longref_noline.edf"
+    write_edf(pq, labels, 512, eeg(20, 700, 512, 22, None))
+    try:
+        EI.load_any(pq, mains="auto", workdir=wd); refused = False
+    except EI.InputError:
+        refused = True
+    left = sorted(q.name for q in wd.glob("_c5_*"))
+    check("E10 refused file (no mains line): no temporary file left", refused and not left, str(left))
+    # interpolation: block-wise matrix vs MNE on the whole recording
+    xi = eeg(20, 700, 512, 23, 50)
+    xi[REF19.index("C3")] *= 12
+    pi = root / "interp.edf"
+    write_edf(pi, labels, 512, xi, phys=(-32000.0, 32000.0))
+    d_i, m_i = EI.load_any(pi, mains=50.0, interpolate=True, workdir=wd)
+    _, names = EI.classify(labels)
+    r = mne.io.read_raw_edf(str(pi), preload=True, verbose="ERROR")
+    r.pick([names[e] for e in EI.ELECTRODES])
+    r.rename_channels({names[e]: e for e in EI.ELECTRODES})
+    r.set_montage(mne.channels.make_standard_montage("standard_1020"), on_missing="ignore", match_case=False)
+    r.info["bads"] = list(m_i["bad"])          # whatever the rule flagged (C3 x12 must be among them)
+    r.interpolate_bads(reset_bads=True, mode="accurate", verbose="ERROR")
+    X = r.get_data(picks=list(EI.ELECTRODES))
+    pos = {e: i for i, e in enumerate(EI.ELECTRODES)}
+    ref = resample_poly(np.stack([X[pos[a]] - X[pos[b]] for a, b in EI.BIPOLAR]), 1, 2, axis=1)
+    err = float(np.max(np.abs(np.asarray(d_i) - ref)) / np.max(np.abs(ref)))
+    check("E10 interpolation matrix = MNE whole-recording interpolate_bads (relative error < 1e-9)",
+          "C3" in m_i["interpolated"] and m_i["interpolated"] == m_i["bad"] and err < 1e-9,
+          f"relative max error {err:.1e}; interpolated {m_i['interpolated']}")
+    del d_i
+    Path(m_i["data_path"]).unlink()
+    # traced peak memory (numpy allocations; disk copies are not counted, which is the point)
+    tracemalloc.start()
+    X1.load_18(pl, "siena")
+    old_peak = tracemalloc.get_traced_memory()[1]
+    tracemalloc.stop()
+    tracemalloc.start()
+    pdm.process_file_phase_a(str(pl), None, root / "pl2", mains=50.0)
+    new_peak = tracemalloc.get_traced_memory()[1]
+    tracemalloc.stop()
+    check("E10 traced peak of the whole Phase A < traced peak of load_18 alone", new_peak < old_peak,
+          f"Phase A {new_peak / 2**20:.0f} MB vs load_18 {old_peak / 2**20:.0f} MB (25 min, 512 Hz)")
 
 
 def e7(root, chb_path):

@@ -198,10 +198,37 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
             raise CancelledError(edf_path)
 
     _check()
+    if cache_dir is not None:
+        Path(cache_dir).mkdir(parents=True, exist_ok=True)
     try:
-        data, meta = EI.load_any(edf_path, mains=mains, interpolate=interpolate, mains_fallback=mains_fallback)
+        data, meta = EI.load_any(edf_path, mains=mains, interpolate=interpolate, mains_fallback=mains_fallback,
+                                 workdir=cache_dir)
     except EI.InputError as exc:
         raise UnsupportedEdfError(str(exc)) from exc
+    try:
+        return _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private)
+    except BaseException as exc:
+        import traceback
+        traceback.clear_frames(exc.__traceback__)     # finished frames still hold the memory map (Windows delete)
+        raise
+    finally:
+        del data
+        EI.drop_temp(meta.get("data_path"))           # the disk copy of a referential recording
+
+
+def _out_array(cache_dir, stem, key, shape, dtype):
+    """C5 Step 2a: Phase A outputs are written straight to their .npy cache (memory map) when a cache dir is given."""
+    if cache_dir is None:
+        return np.empty(shape, dtype), None
+    p = Path(cache_dir) / f"{stem}.{key}.npy"
+    return np.lib.format.open_memmap(p, mode="w+", dtype=dtype, shape=shape), p
+
+
+def _phase_a_rest(edf_path, data, meta, cancel_check, cache_dir, private) -> PhaseAResult:
+    def _check():
+        if cancel_check is not None and cancel_check():
+            raise CancelledError(edf_path)
+
     n_windows = int(data.shape[1]) // WIN_SAMPLES
     if n_windows == 0:
         raise UnsupportedEdfError("Shorter than one 4-s window; nothing to score.")
@@ -215,35 +242,42 @@ def process_file_phase_a(edf_path: str, cancel_check=None, cache_dir: Optional[P
 
     _check()
     usable = n_windows * WIN_SAMPLES
-    # Whole-file zero-phase filtering: band-pass then notch (= x1_external.filter_windows).
-    bp = sosfiltfilt(preprocessing._BP_SOS, data, axis=1)
-    notched = filtfilt(nb, na, bp, axis=1)
-
-    def _win(x):
-        return np.ascontiguousarray(x[:, :usable].reshape(N_CH, n_windows, WIN_SAMPLES).transpose(1, 0, 2))
-
-    filtered = _win(notched).astype(np.float32)
-    bandpass_windows = _win(bp).astype(np.float32)
-    raw64 = _win(data)
-    flag = compute_signal_loss_flags(raw64)
-    raw_windows = raw64.astype(np.float32)
-    del raw64, bp, notched
-    _check()
+    # Whole-file zero-phase filtering: band-pass then notch (= x1_external.filter_windows), one derivation at a time
+    # (C5 Step 2a: memory-light; row-wise sosfiltfilt / filtfilt equal the 2-D calls bit for bit, synthetic test E5)
+    stem = Path(edf_path).stem
+    shape = (n_windows, N_CH, WIN_SAMPLES)
+    filtered, p_f = _out_array(cache_dir, stem, "filtered", shape, np.float32)
+    bandpass_windows, p_b = _out_array(cache_dir, stem, "bandpass", shape, np.float32)
+    raw_windows, p_r = _out_array(cache_dir, stem, "raw", shape, np.float32)
+    flag = np.ones(n_windows, bool)
+    for c in range(N_CH):
+        x = np.asarray(data[c], dtype=np.float64)
+        bp = sosfiltfilt(preprocessing._BP_SOS, x)
+        nf = filtfilt(nb, na, bp)
+        filtered[:, c, :] = nf[:usable].reshape(n_windows, WIN_SAMPLES).astype(np.float32)
+        bandpass_windows[:, c, :] = bp[:usable].reshape(n_windows, WIN_SAMPLES).astype(np.float32)
+        rw = x[:usable].reshape(n_windows, WIN_SAMPLES)
+        raw_windows[:, c, :] = rw.astype(np.float32)
+        flag &= rw.std(axis=1) < SIGNAL_LOSS_STD_V
+        del x, bp, nf, rw
+        _check()
     moments = padded_window_moments(data, n_windows, notch_hz)
     _check()
     # file engine (m2l_core.sampled, line for line): every 10th window counted from the file's first, 3-s padded
     samp_idx = np.flatnonzero((np.arange(n_windows) + 1) % STATS_SUBSAMPLE == 0)
-    fsamp = (np.concatenate([X1.window_padded(data, int(i), notch_hz) for i in samp_idx], axis=1)
-             if len(samp_idx) else np.empty((N_CH, 0)))
+    fsamp = np.empty((N_CH, len(samp_idx) * WIN_SAMPLES))   # = np.concatenate of the windows, filled in place
+    for k, i in enumerate(samp_idx):
+        fsamp[:, k * WIN_SAMPLES:(k + 1) * WIN_SAMPLES] = X1.window_padded(data, int(i), notch_hz)
     _check()
 
     paths = {}
     if cache_dir is not None:
         cache_dir = Path(cache_dir)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        stem = Path(edf_path).stem
-        for key, arr in (("filtered", filtered), ("raw", raw_windows), ("bandpass", bandpass_windows),
-                         ("flag", flag), ("moments", moments), ("fsamp", fsamp)):
+        for mm in (filtered, bandpass_windows, raw_windows):
+            mm.flush()
+        paths.update(filtered=p_f, bandpass=p_b, raw=p_r)
+        del bandpass_windows, raw_windows
+        for key, arr in (("flag", flag), ("moments", moments), ("fsamp", fsamp)):
             p = cache_dir / f"{stem}.{key}.npy"
             np.save(p, arr)
             paths[key] = p

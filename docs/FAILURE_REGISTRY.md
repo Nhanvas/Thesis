@@ -74,7 +74,8 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
 | FM-22 | label use | The z-score statistics excluded annotated seizure windows | measured | L2, L3 |
 | FM-23 | label use | The per-patient budget of the final system was chosen after looks at the test set | measured | L2, L3 |
 | FM-24 | evaluation | CHB-MIT has no untouched confirmatory set left | open | X1, T1 |
-| FM-25 | deployment | The review application (SzScan) scores lower than V5 on the same patients; the cause is not recorded | open | L1 |
+| FM-25 | deployment | The review application (SzScan) scores lower than V5 on the same patients; the cause is recorded (L1) | measured | — |
+| FM-31 | deployment | Run on one recording at a time, the budget floor puts events in every recording: about twice V5's false alarms on CHB-MIT | measured | F2-06, X1 |
 | FM-26 | reproducibility | Kaggle machine types train with different arithmetic under the same library versions | measured | X1 |
 | FM-27 | reproducibility | ASR output is not bit-reproducible across computers in about one file in six | measured | N2 |
 | FM-28 | reproducibility | Rebuilding features from the raw EDF moves numbers at the third decimal | measured | L3, X1 |
@@ -181,6 +182,10 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   been measured.
 - *Status.* measured (the statistic's behaviour); its effect on detection is a hypothesis. *M2.* L2 (record vs robust
   statistic, chosen on development by a rule written before).
+- *L2 (24/11, F2-03).* In the per-recording protocol the rule written before the run chose the robust scale (MAD × the
+  per-channel factor of RB1c) with an MCD covariance (arm B-MCD-F; development 0.872 / F1 0.133 / 45.4 FP/day against
+  the record scale with MCD, R-MCD-F, 0.849 / 0.126 / 46.6; B − R not bootstrapped separately, descriptive) (`results/m2l/l2/T_L2.md` @ `7d4054d`).
+  Whether a robust statistic changes detection inside V5's patient-level chain is still not measured.
 
 **FM-07 — What the flagged non-seizure events are is unknown.**
 - *Observation.* False alarms are high-amplitude windows (FM-05), but whether they are artifacts, physiological
@@ -338,6 +343,11 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
 - *Still open.* The minimum recording length for a reliable per-recording reference has not been measured. This
   matters for an application that receives one EDF at a time.
 - *Status.* measured (dependence); minimum length open. *M2.* L2 (minimum length as an option chosen on development).
+- *L3-short (24/11, F2-03).* Development recordings cut into 5 / 10 / 20 / 30-min segments, arm B-MCD-F: no length met
+  the rule written before (F1 within 0.02 and sensitivity within 0.03 of whole recordings: 0.872 / F1 0.133), so the
+  minimum length is 30 min by the rule; F1 0.027 / 0.048 / 0.075 / 0.087 and 288 / 145 / 94 / 77 FP/day — at 5 min about
+  one false alarm per segment (`results/m2l/l3short/T_L3SHORT.md` @ `2a06a77`). *L3 (25/11).* With whole recordings (none of test or Siena under 30 min) the
+  per-recording reference finds as many test seizures as V5 (see FM-31) (`results/m2l/l3/T_L3.md` (reader `src/m2l_read.py --l3` on `results/m2l/l3eval/` @ `8d21a0b`)).
 
 **FM-20 — Siena differs from test through the false-alarm rate and the seizure mix.**
 - *Observation.* Siena 0.633 ± 0.079 at 41.0 FP/day (`docs/PERF_PHASE_RECORD.md` @ `67ab0ba`). A fixed 0.5 % budget
@@ -356,6 +366,9 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   −0.032 [−0.055, −0.009]. Of the test change, −0.008 [−0.018, +0.000] is the numerical rebuild difference
   (`results/eureka_d31f/9a/aggregate/T9A.md` @ `0071a14`).
 - *Status.* measured; disclosed. *M2.* L2, L3 (fully label-free protocol).
+- *L3 (25/11, F2-03; test descriptive).* The fully label-free per-recording protocol (B-MCD-F): test 0.562 ± 0.019 against
+  L0 (label-free, patient-level) 0.536, difference +0.027 [−0.039, +0.089]; against V5 −0.005 [−0.064, +0.047]
+  (`results/m2l/l3/T_L3.md` (reader `src/m2l_read.py --l3` on `results/m2l/l3eval/` @ `8d21a0b`)).
 
 **FM-23 — The per-patient budget of the final system was chosen after looks at the test set.**
 - *Observation.* The final system is "look #7 (TEST-INFORMED, record 9.2)" (`results/e23_test_look7/SUMMARY.md`
@@ -364,6 +377,10 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
   - Final system: 0.567 ± 0.019 at 28.7.
   - Final − held-out: +0.070 [0.000, 0.201] (`docs/PROJECT_INSTRUCTIONS.md` @ `937b6b5`).
 - *Status.* measured; disclosed. *M2.* L2 (budget rule chosen on development only), L3.
+- *L3 (25/11, F2-03).* Every choice of the per-recording protocol (arm, k 9.914209, minimum length 30 min) was made on
+  the 15 development patients before test, chb24 and Siena were scored once. Test: sensitivity −0.005 [−0.064, +0.047],
+  F1 −0.073 [−0.117, −0.039], FP/day +23.3 [+16.1, +30.7] against V5; Siena (external) −0.105 [−0.281, +0.036],
+  F1 +0.019 [−0.065, +0.110], FP/day −9.4 [−20.0, +1.8] (`results/m2l/l3/T_L3.md` (reader `src/m2l_read.py --l3` on `results/m2l/l3eval/` @ `8d21a0b`)). Test stays descriptive (FM-24).
 
 **FM-24 — CHB-MIT has no untouched confirmatory set left.**
 - *Observation.* The 8 test patients entered several decisions (FM-23) and every ablation was also scored on them
@@ -374,11 +391,29 @@ reader-study protocol, F5b offset rule. "Parked" refers to §14.22.
 **FM-25 — The review application scores lower than V5 on the same patients; the cause is not recorded.**
 - *Observation.* The application run on the 8 test patients gives subject-mean sensitivity 0.528, precision 0.108 and
   26.92 FP/day (`results/application_eval_v4/SUMMARY.md` @ `9f64036`), against V5's 0.567 at 28.7.
-- *Still open.* (a) File vs patient as the scoring unit. (b) Statistics or reference computed differently. (c) Seed
-  and budget. L1 records which.
-- *Status.* open. *M2.* L1.
+- *Measured (L1, 23/11, F2-03; read only, no run; `results/m2l/L1_SZSCAN_TODAY.md` @ `92140c6`).* The application's unit is the patient, and its reference,
+  budget rule and k are V5's. The gap is the label-free z-score statistics (seed 42: 0.577 → 0.534, three seizures in
+  chb03, chb06, chb16; −0.012 of it is the rebuild difference, FM-28), partly offset by the seed (seed 42 alone 0.577
+  against the 4-seed 0.567); one more seizure in chb15 separates the application (0.528) from EUR_9A's label-free run
+  (0.534) — *hypothesis:* a numerical difference between the two implementations of the same statistics rule; check
+  (not run): the application's headless path on chb15 with EUR_9A's committed statistics.
+- *Status.* measured (cause recorded; the chb15 remainder a hypothesis). *M2.* —
 
 ### Reproducibility across machines
+
+**FM-31 — Run on one recording at a time, the budget floor puts events in every recording.**
+- *Observation (L2, 24/11, F2-03).* On development every per-recording arm with V5's floor (clip(q, 0.5 %, 2 %) per
+  recording) or a fixed 0.5 % per recording gives events in every recording (share without an event 0.000) and
+  41–56 FP/day; without the floor 34–65 % of the recordings have no event, at 13–29 FP/day and 0.53–0.68 sensitivity (`results/m2l/l2/T_L2.md` @ `7d4054d`).
+- *Measured (L3, 25/11; scored once, test descriptive; `results/m2l/l3/T_L3.md` (reader `src/m2l_read.py --l3` on `results/m2l/l3eval/` @ `8d21a0b`)).* Test: B-MCD-F 0.562 at 52.0 FP/day against V5's 0.567 at
+  28.7; at a fixed 0.5 % per recording 48.1. Computed after the reading from `results/m2l/l3eval/per_file.csv`
+  (descriptive): the floor is active (q < 0.5 %) in 77 % of test recording × seed rows, which hold 80 % of the false
+  alarms; every seizure-free test recording (75 % of the recordings, mostly 1 h) has at least one false alarm. Siena
+  (recordings 3.4 h on average, floor active in 83 % of rows): 31.2 FP/day against V5's 40.6. chb24: 52.8 against 27.8.
+- *Still open.* How to allocate the budget when only one recording is available (e.g. a floor in events per hour
+  rather than a share per recording, or a patient-level mode when several recordings are loaded together — SzScan's
+  session mode); not tested. On the short TUH files of the SzCORE open benchmark the floor would act on every file.
+- *Status.* measured (descriptive mechanism). *M2.* F2-06 (candidate), X1.
 
 **FM-26 — Kaggle machine types train with different arithmetic under the same library versions.**
 - *Measured.* One machine type failed the reproduction gate (G-pc7rep DIFF; slower CPU, 7.87–8.12 ms per step against
@@ -479,6 +514,11 @@ Track F chat; "hold" means it waits; "reject" means it is closed with its reason
   (preprint). No peer-reviewed seizure-detection study of per-recording label-free calibration was found.
 - *Smallest experiment.* L2 (design written before, options chosen on the 15 development patients), then L3 scored
   once on test, chb24 and Siena.
+- *Result (L2 → L3, 23–25/11, F2-03).* On test the label-free per-recording protocol B-MCD-F matches V5's sensitivity
+  (0.562 against 0.567, −0.005 [−0.064, +0.047]) at about twice the false alarms (+23.3 [+16.1, +30.7] FP/day; FM-31);
+  on Siena (external) sensitivity 0.540 against 0.645 (−0.105 [−0.281, +0.036]) at fewer false alarms (31.2 against
+  40.6) and equal F1 (`results/m2l/l3/T_L3.md` (reader `src/m2l_read.py --l3` on `results/m2l/l3eval/` @ `8d21a0b`)). The hypothesis holds for sensitivity on test, not for false alarms; the alternative
+  (losses add up) is not supported on test.
 - *Decision.* ______
 
 **RQ-04 — Does the development-to-test gap persist on data nobody in this project has seen?**
@@ -602,3 +642,5 @@ Track F chat; "hold" means it waits; "reject" means it is closed with its reason
 | date | chat | change |
 |---|---|---|
 | 23/11/2026 | F2-01 | file created: 29 failure rows (FM-01 … FM-30, FM-21 unused), 11 research questions; no run, no new number |
+| 23/11/2026 | F2-02 | V1 results added to FM-01, FM-02, FM-04, RQ-07 |
+| 25/11/2026 | F2-03 | L1–L3 added to FM-06, FM-19, FM-22, FM-23, FM-25 (now measured), RQ-03; new FM-31 (per-recording budget floor) |

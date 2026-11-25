@@ -1,0 +1,32 @@
+{
+ "file": "PN00-4.edf",
+ "platform": "Windows-10-10.0.19045-SP0",
+ "mne": "1.12.1",
+ "numpy": "2.4.4",
+ "signals_in_header": 35,
+ "signals_read_by_mne": 35,
+ "fs": 512,
+ "hours": 0.584,
+ "block_s": 600,
+ "predicted_if_H1": {
+  "whole_mb": 318.6,
+  "blocks_mb": 103.2,
+  "rows_only_mb": 17.2
+ },
+ "whole": {
+  "commit_growth_mb": 342.9,
+  "resident_growth_mb": 54.6,
+  "commit_before_mb": 622.9,
+  "resident_before_mb": 142.9,
+  "seconds": 0.87
+ },
+ "blocks": {
+  "commit_growth_mb": 130.8,
+  "resident_growth_mb": 34.7,
+  "commit_before_mb": 641.9,
+  "resident_before_mb": 161.0,
+  "seconds": 0.2
+ },
+ "equal_bit_for_bit": true,
+ "reading": "H1 supported: the whole-file read commits about the all-signal buffer"
+}

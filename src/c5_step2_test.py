@@ -20,6 +20,11 @@ Each rule is shown to act on the case it is for and to leave the others alone; e
       whole-file operations (filtered, band-pass, raw, flags, moments; exact); no temporary file is left after
       Phase A or after a refused file; the interpolation matrix = MNE's whole-recording interpolate_bads (rounding
       only); process-memory growth of Phase A (file pages included) below half of load_18's                    [C8]
+  E11 C5b memory fix (25/11): MNE commits a read buffer for EVERY signal of the file over the samples requested.
+      A 1-h 512-Hz referential file with 49 signals and a 2-h 256-Hz bipolar file with 28 signals: load_any with a
+      work folder = x1_external.load_18 / open_edf + get_data() on the whole file (exact); its COMMITTED memory growth
+      (private bytes on Windows, VmData on Linux -- resident memory does not see untouched pages) stays below the
+      memory model of c5_step2_gates.predict_mb, while the old whole-file read of two electrodes exceeds it      [C8, G6]
 Run: PYTHONUTF8=1 python src/c5_step2_test.py   -> ALL PASS or the failing items (exit code 1).
 """
 import csv
@@ -205,6 +210,7 @@ def main():
         check("E6 20-min file: no event (minimum 30 min)", rs["short"] and rs["events"] == [])
         # ── E10 memory-light reading
         e10(root)
+        e11(root)
         # ── E7 the whole app, temporary state
         e7(root, pb)
     finally:
@@ -305,6 +311,63 @@ def e10(root):
     del x1
     check("E10 process-memory growth of the whole Phase A < half that of load_18 alone (file pages included)",
           g_pa < 0.5 * g_x1, f"Phase A +{g_pa:.0f} MB vs load_18 +{g_x1:.0f} MB (25 min, 512 Hz)")
+
+
+def e11(root):
+    import gc
+    import threading
+    import mne
+    import c5_diag_mne_commit as DG
+    import c5_step2_gates as G
+
+    def commit_growth(fn, *a, **k):
+        gc.collect()
+        base, peak, stop = DG.memory_mb()["commit"], [0.0], [False]
+
+        def mon():
+            while not stop[0]:
+                peak[0] = max(peak[0], DG.memory_mb()["commit"])
+                time.sleep(0.005)
+        th = threading.Thread(target=mon, daemon=True)
+        th.start()
+        try:
+            out = fn(*a, **k)
+        finally:
+            stop[0] = True
+            th.join()
+        return out, max(peak[0], DG.memory_mb()["commit"]) - base
+
+    wd = root / "w11"
+    wd.mkdir()
+    # referential, 49 signals, 1 h at 512 Hz
+    labels = [f"EEG {e.capitalize()}" for e in REF19] + [f"POL X{i}" for i in range(30)]
+    pr = root / "ref49.edf"
+    write_edf(pr, labels, 512, eeg(49, 3600, 512, 61, 50))
+    pred, n_sig, *_ = G.predict_mb(pr)
+    (d, meta), g_new = commit_growth(EI.load_any, pr, mains=50.0, workdir=wd)
+    eq = np.array_equal(np.asarray(d), X1.load_18(pr, "siena"))
+    EI.drop_temp(meta["data_path"], d)
+    del d
+    raw = mne.io.read_raw_edf(str(pr), preload=False, verbose="ERROR")
+    _, g_old = commit_growth(raw.get_data, picks=[raw.ch_names[0], raw.ch_names[10]])
+    del raw
+    check("E11 referential 49 signals: block reader = x1_external.load_18 (exact)", eq)
+    check("E11 referential 49 signals: committed growth below the memory model, old whole-file read above it",
+          g_new <= pred < g_old, f"load_any +{g_new:.0f} MB, model {pred:.0f} MB, old 2-electrode read +{g_old:.0f} MB")
+    # bipolar, 28 signals, 2 h at 256 Hz (output above RAM_ROWS_MB -> DiskRows)
+    pb = root / "chbl_01.edf"
+    write_edf(pb, CHB23 + [f"X{i}" for i in range(5)], 256, eeg(28, 7200, 256, 62, 60))
+    pred, *_ = G.predict_mb(pb)
+    (d, meta), g_new = commit_growth(EI.load_any, pb, mains=60.0, workdir=wd)
+    ref = P.open_edf(str(pb)).get_data()
+    eq = isinstance(d, EI.DiskRows) and np.array_equal(np.asarray(d), ref)
+    EI.drop_temp(meta["data_path"], d)
+    del d, ref
+    check("E11 bipolar 28 signals: block reader into a disk file = open_edf + get_data() (exact)", eq)
+    check("E11 bipolar 28 signals: committed growth below the memory model", g_new <= pred,
+          f"load_any +{g_new:.0f} MB, model {pred:.0f} MB")
+    left = sorted(q.name for q in wd.glob("_c5_*"))
+    check("E11 no temporary file left", not left, str(left))
 
 
 def e7(root, chb_path):

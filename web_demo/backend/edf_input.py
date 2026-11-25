@@ -1,6 +1,7 @@
 """edf_input.py — C5 Step 2 (results/c5_szscan/DESIGN_STEP2.md C4–C7): any EDF in, the 18 thesis derivations out.
 
-  bipolar input      (CHB-MIT: the 18 derivation labels present)  -> preprocessing.open_edf, exactly as before Step 2;
+  bipolar input      (CHB-MIT: the 18 derivation labels present)  -> preprocessing.open_edf, read in blocks (C5b) =
+                     get_data() on the whole file bit for bit;
                      a rate other than 256 Hz is resampled with scipy's resample_poly (as for every other input)
   referential input  (Siena, hospital: the 19 electrodes of the 10-20 system present, names normalised as
                      x1_external.load_18: upper case, 'EEG' and spaces removed, T3/T4/T5/T6 -> T7/T8/P7/P8; a second
@@ -288,27 +289,78 @@ def interpolation_matrix(names: dict, bads: list) -> np.ndarray:
     return out[[ELECTRODES.index(b) for b in bads]]
 
 
-def load_bipolar(path):
-    """CHB-MIT path, unchanged: preprocessing.open_edf -> get_data (volts)."""
+RAM_ROWS_MB = 256        # an [18, n] output up to this size stays in RAM (CHB-MIT 1-h files); larger -> DiskRows
+
+
+def _read_blocks(raw, picks, a0, b0, step):
+    """raw.get_data(picks, start, stop) block by block (C5b, 25/11). MNE 1.12.1 allocates its read buffer for EVERY
+    signal of the file over the samples requested, whatever the picks (mne/io/edf/edf.py, _read_segment_file:
+    np.zeros((len(orig_sel), n))); a whole-file read of two electrodes of PN14-3 (49 signals, 11.7 h) therefore
+    committed 8.4 GB. Measured on the laptop (results/c5_szscan/step2/diag_mne_commit.json): whole-file read of
+    PN00-4 +343 MB private, blocks of 600 s +131 MB, values equal bit for bit (each sample is converted on its own)."""
+    for a in range(a0, b0, step):
+        b = min(b0, a + step)
+        yield a, b, raw.get_data(picks=picks, start=a, stop=b)
+
+
+def load_bipolar(path, workdir=None):
+    """CHB-MIT path: preprocessing.open_edf, then the 18 channels read in blocks of BLOCK_S seconds (= get_data() on
+    the whole file, bit for bit; C5b memory fix). Output in RAM up to RAM_ROWS_MB, else a DiskRows file in `workdir`.
+    -> (data, meas_date, fs, data_path)."""
     raw = P.open_edf(str(path))
     if raw is None:
         raise InputError("One or more of the 18 derivations is missing.")
     fs = int(round(raw.info["sfreq"]))
     if abs(raw.info["sfreq"] - fs) > 1e-6:
         raise InputError(f"Sampling rate {raw.info['sfreq']} Hz is not an integer rate.")
-    data = np.asarray(raw.get_data(), dtype=np.float64)     # get_data is float64; no second copy (Step 2a fix)
-    return _resample(data, fs), raw.info["meas_date"], fs
+    n = int(raw.n_times)
+    nr = len(raw.ch_names)
+    step = BLOCK_S * fs
+
+    def rows(n_cols, name):
+        if workdir is None or nr * n_cols * 8 / 1e6 <= RAM_ROWS_MB:
+            return np.empty((nr, n_cols), np.float64), None
+        return _new_rows(nr, n_cols, workdir, name)
+    src, src_path = rows(n, "bip")
+    try:
+        for a, b, Y in _read_blocks(raw, None, 0, n, step):
+            if isinstance(src, DiskRows):
+                for r in range(nr):
+                    src.write(r, a, Y[r])
+            else:
+                src[:, a:b] = Y
+            del Y
+        if fs == FS:
+            return src, raw.info["meas_date"], fs, src_path
+        g = math.gcd(fs, FS)                    # another rate: per-row resample_poly (= the 2-D call, test E10)
+        out, out_path = rows(-(-n * (FS // g) // (fs // g)), "bip256")
+        try:
+            for r in range(nr):
+                y = resample_poly(np.asarray(src[r]), FS // g, fs // g)
+                if isinstance(out, DiskRows):
+                    out.write(r, 0, y)
+                else:
+                    out[r] = y
+        except BaseException:
+            drop_temp(out_path, out)
+            raise
+        drop_temp(src_path, src)
+        return out, raw.info["meas_date"], fs, out_path
+    except BaseException:
+        drop_temp(src_path, src)
+        raise
 
 
 def load_referential(path, names: dict, interpolate: bool, workdir=None):
     """The 19 electrodes -> (bad-electrode table) -> optional interpolation -> 18 differences -> 256 Hz.
 
-    Memory-light (C5 Step 2a; measured: the whole-recording version peaked at 15.1 GB on an 11.7-h 512-Hz Siena file):
-    the bad-electrode table and any interpolation read the 19 electrodes in blocks of BLOCK_S seconds (MNE, not
-    preloaded); each derivation then reads its two electrodes over the whole file, takes the difference, resamples
-    it and writes it to the output (a DiskRows file in `workdir` when given, no memory map). Without interpolation
-    the values equal x1_external.load_18 bit for bit (per-channel reads, per-row resample_poly and the differences are
-    each exact; test E10, gate G3)."""
+    Memory-light (C5 Step 2a; measured: the whole-recording version peaked at 15.1 GB on an 11.7-h 512-Hz Siena file;
+    C5b fix 25/11: reading two electrodes over the whole file still committed MNE's all-signal buffer, 9.9 GB private
+    on the laptop): the bad-electrode table reads its sampled windows; then ONE pass reads the 19 electrodes in blocks
+    of BLOCK_S seconds into a row file (any interpolation applied per block); each derivation is the difference of
+    two rows, resampled and written to the output (a DiskRows file in `workdir` when given, no memory map). Without
+    interpolation the values equal x1_external.load_18 bit for bit (block reads, the differences and per-row
+    resample_poly are each exact; tests E10, E11, gate G3)."""
     import mne
     raw = mne.io.read_raw_edf(str(path), preload=False, verbose="ERROR")
     fs_f = float(raw.info["sfreq"])
@@ -328,19 +380,24 @@ def load_referential(path, names: dict, interpolate: bool, workdir=None):
                          f"more than {MAX_BAD} cannot be interpolated.")
     M = interpolation_matrix(names, bads) if (bads and interpolate) else None
     step = BLOCK_S * fs
-    interp_rows, interp_path = None, None
+    bad_idx = [ELECTRODES.index(e) for e in bads] if M is not None else []
+    # C5b memory fix: ONE pass over the file -- the 19 electrodes in blocks of BLOCK_S seconds (MNE's read buffer then
+    # holds every signal of the file for one block only, see _read_blocks), bad electrodes replaced by their
+    # interpolation computed on the same block (= the first fix, exact), each electrode written to a row file
+    elec, elec_path = _new_rows(len(ELECTRODES), n, workdir, "elec")
     try:
-        if M is not None:                        # interpolated electrodes, block by block (= the first fix, exact)
-            interp_rows, interp_path = _new_rows(len(bads), n, workdir, "interp")
-            for a in range(0, n, step):
-                b = min(n, a + step)
-                Y = M @ get(a, b)
-                for k in range(len(bads)):
-                    if isinstance(interp_rows, DiskRows):
-                        interp_rows.write(k, a, Y[k])
-                    else:
-                        interp_rows[k, a:b] = Y[k]
-                del Y
+        for a, b, Y in _read_blocks(raw, picks, 0, n, step):
+            if M is not None:
+                Yi = M @ Y
+                for k, i in enumerate(bad_idx):
+                    Y[i] = Yi[k]
+                del Yi
+            if isinstance(elec, DiskRows):
+                for r in range(len(ELECTRODES)):
+                    elec.write(r, a, Y[r])
+            else:
+                elec[:, a:b] = Y
+            del Y
         if fs == FS:
             up = down = 1
             n_out = n
@@ -350,13 +407,9 @@ def load_referential(path, names: dict, interpolate: bool, workdir=None):
             n_out = -(-n * up // down)
         data, data_path = _new_rows(len(BIPOLAR), n_out, workdir, "data")
         try:
-            for r, (e1, e2) in enumerate(BIPOLAR):  # one derivation at a time: its two electrodes over the whole file
-                X = raw.get_data(picks=[names[e1], names[e2]])
-                for j, e in enumerate((e1, e2)):
-                    if M is not None and e in bads:
-                        X[j] = interp_rows[bads.index(e)]
-                d = X[0] - X[1]
-                del X
+            pos = {e: i for i, e in enumerate(ELECTRODES)}
+            for r, (e1, e2) in enumerate(BIPOLAR):  # one derivation at a time from the electrode rows
+                d = np.asarray(elec[pos[e1]]) - np.asarray(elec[pos[e2]])
                 out = d if up == down else resample_poly(d, up, down)
                 del d
                 if isinstance(data, DiskRows):
@@ -368,7 +421,7 @@ def load_referential(path, names: dict, interpolate: bool, workdir=None):
             drop_temp(data_path, data)
             raise
     finally:
-        drop_temp(interp_path, interp_rows)
+        drop_temp(elec_path, elec)
         del raw
     return data, meas_date, fs, table, (bads if interpolate else []), bads, data_path
 
@@ -390,7 +443,8 @@ def load_any(path, mains="auto", interpolate=False, mains_fallback=None, workdir
     meta = dict(montage=montage, bad=[], interpolated=[], electrodes=None, data_path=None)
     try:
         if montage == "bipolar":
-            data, meas_date, fs = load_bipolar(path)
+            data, meas_date, fs, data_path = load_bipolar(path, workdir)
+            meta.update(data_path=data_path)
         else:
             data, meas_date, fs, table, interp, bads, data_path = load_referential(path, names, interpolate, workdir)
             meta.update(electrodes=table, bad=bads, interpolated=interp, data_path=data_path)

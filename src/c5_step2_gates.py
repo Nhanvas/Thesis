@@ -18,6 +18,10 @@ c5_step2_gates.py -- chat C5, SzScan Step 2: gates on real data (results/c5_szsc
       as a further column. (Step 2a second fix: the first fix was judged on the
       traced heap only, which does not see memory-mapped file pages; the laptop ran out of memory.)
 
+C5b (25/11): the readers read in blocks (MNE's all-signal buffer, diag_mne_commit.json); before each file (G1: the
+largest file of each subject) the memory model predict_mb is checked against the limit and the script STOPs before
+reading (exit 4) instead of being killed by the watchdog; load_18 itself runs on a Siena file when its predicted
+commit fits.
 Memory-light by construction: one file (G3-G6) or one subject (G1) at a time, one worker, temporary caches deleted
 after each subject. --smoke runs only the longest Siena file and the shortest test subject first and prints the
 peaks; the smoke reports TOO HIGH when its private-memory peak exceeds --max-gb (default 2, the laptop budget).
@@ -163,7 +167,10 @@ def traced(fn, *a, **k):
 
 def rowwise_ref(p):
     """x1_external.load_18 (Siena branch) one derivation at a time: same picks, same differences, same resample_poly
-    (per-row resample_poly = the 2-D call bit for bit, synthetic test E10)."""
+    (per-row resample_poly = the 2-D call bit for bit, synthetic test E10). C5b: the two electrodes are read in blocks
+    of edf_input.BLOCK_S seconds (MNE commits a buffer for every signal of the file over the samples requested;
+    block reads equal the whole-file read bit for bit, results/c5_szscan/step2/diag_mne_commit.json). Independent of
+    the app's reader (which reads the 19 electrodes once into a row file)."""
     import math
     import mne
     from scipy.signal import resample_poly
@@ -174,11 +181,49 @@ def rowwise_ref(p):
         names[X1.SIENA_MAP.get(n, n)] = ch
     fs = int(round(raw.info["sfreq"]))
     g = math.gcd(fs, 256)
+    n, step = int(raw.n_times), EI.BLOCK_S * fs
     for a, b in X1.BIPOLAR:
-        X = raw.get_data(picks=[names[a], names[b]])          # float64 already; load_18's astype is a copy
-        d = X[0] - X[1]
-        del X
+        d = np.empty(n)
+        for s0 in range(0, n, step):
+            s1 = min(n, s0 + step)
+            X = raw.get_data(picks=[names[a], names[b]], start=s0, stop=s1)
+            d[s0:s1] = X[0] - X[1]
+            del X
         yield d if fs == 256 else resample_poly(d, 256 // g, fs // g)
+
+
+def predict_mb(p):
+    """Memory model of one file (C5b, written before the run; instructions §4): from the EDF header, the largest of
+    (0) the bad-electrode table: the 19 electrodes over every 10th window, plus one padded read (10 s of every signal),
+    (1) one read block: MNE's all-signal buffer + the 19 electrodes three times (block, MNE's output, the row
+        written) + MNE's 10-MB record chunk and its copies (20 MB),
+    (2) one derivation at the input rate: two electrode rows and their difference, plus the 256-Hz output,
+    (3) Phase A per channel at 256 Hz: x, band-pass, notch (float64) and three float32 copies, plus the window view.
+    Synthetic check (test E11, 49 signals, 1 h, 512 Hz): measured committed growth 224 MB.
+    Returns (predicted growth MB, signals, input samples, output samples, fs)."""
+    h = EI.header(p)
+    fs = max(int(round(k / h["rec_dur"])) for k in h["nsamp"])
+    n_in = h["n_rec_file"] * max(h["nsamp"])
+    n_out = n_in * 256 // fs
+    block = EI.BLOCK_S * fs
+    n_sig = len(h["labels"])
+    m0 = 19 * (n_in // 10) * 8 + n_sig * 10 * fs * 8
+    m1 = (n_sig + 3 * 19) * block * 8 + 20e6
+    m2 = 3 * n_in * 8 + n_out * 8
+    m3 = 3 * n_out * 8 + 3 * n_out * 4 + n_out * 8
+    return max(m0, m1, m2, m3) / 1e6, n_sig, n_in, n_out, fs
+
+
+def admit(p, what):
+    """STOP before reading when the private memory now + the predicted growth exceeds the limit (no file attribute of
+    a private record is printed: `what` is a neutral label)."""
+    pred, *_ = predict_mb(p)
+    now = memory_mb()[1]
+    if WATCH.limit and now + pred > WATCH.limit:
+        print(f"STOP before reading {what}: private memory {now:.0f} MB + predicted {pred:.0f} MB > limit "
+              f"{WATCH.limit:.0f} MB; nothing written", flush=True)
+        sys.exit(4)
+    return pred
 
 
 def g3_equal(p, d_app):
@@ -207,6 +252,7 @@ def g1(chb, subjects):
     rows = []
     for s in subjects:
         edfs = [Path(chb) / s / f for f in sorted(files[s])]
+        admit(max(edfs, key=lambda q: q.stat().st_size), s)
         tmp = Path(tempfile.mkdtemp(prefix=f"c5g1_{s}_"))
         try:
             out, peak, secs = traced(pdm.process_subject_headless, [str(p) for p in edfs], cache_dir=tmp, max_workers=1)
@@ -242,6 +288,7 @@ def siena_one(p, sums):
     r = dict(subject=p.parent.name, file=p.name, size_mb=round(p.stat().st_size / 1e6, 1))
     want = sums.get(f"{p.parent.name}/{p.name}")
     r["sha_ok"] = (sha256(p) == want) if want else "not listed"
+    r["predicted_mb"] = round(admit(p, f"{p.parent.name}/{p.name}"), 1)
     tmp = Path(tempfile.mkdtemp(prefix="c5g6_"))
     try:
         try:
@@ -259,10 +306,14 @@ def siena_one(p, sums):
                  load_resident_mb=round(load_rss, 1), load_heap_mb=round(load_heap, 1), load_s=round(s_load, 1))
         hours = d_app.shape[1] / 256 / 3600
         r["g3_equal"] = g3_equal(p, d_app)
-        if hours <= 1.5:                                 # load_18 itself = the row-wise reference (small files)
+        _, n_sig, n_in, n_out, _ = predict_mb(p)        # load_18 itself = the row-wise reference, when it fits
+        need = ((n_sig + 19) * n_in + 18 * n_out) * 8 / 1e6
+        if memory_mb()[1] + need < WATCH.limit - 200:
             d_x1 = X1.load_18(p, "siena")
             r["g3_load18_equal"] = bool(d_x1.shape == d_app.shape and np.array_equal(np.asarray(d_app), d_x1))
             del d_x1
+        else:
+            r["g3_load18_skipped_mb"] = round(need)
         EI.drop_temp(meta["data_path"], d_app)
         del d_app
         gc.collect()
@@ -290,6 +341,7 @@ def private_report(pdir):
          "|---|---|---|---|---|---|---|---|"]
     for i, p in enumerate(files):
         lab = f"clin{i + 1:02d}"
+        admit(p, lab)
         tmp = Path(tempfile.mkdtemp(prefix="c5priv_"))
         try:
             (d, meta), peak_l, _ = traced(EI.load_any, p, mains="auto", workdir=tmp)
@@ -375,6 +427,7 @@ def main():
         G3=dict(PASS=all(r["g3_equal"] is True for r in srows)
                 and all(r.get("g3_load18_equal", True) is True for r in srows), files=len(srows),
                 load18_checked=sum("g3_load18_equal" in r for r in srows),
+                load18_skipped=sum("g3_load18_skipped_mb" in r for r in srows),
                 sha_bad=[r["file"] for r in srows if r["sha_ok"] is False]),
         G4=dict(suggested_50=sum(r.get("suggested_hz") == 50.0 for r in srows),
                 suggested_60=sum(r.get("suggested_hz") == 60.0 for r in srows),
@@ -384,7 +437,8 @@ def main():
         G6=dict(max_phase_a_mem_mb=max(r["phase_a_mem_mb"] for r in srows),
                 max_load_mem_mb=max(r["load_mem_mb"] for r in srows),
                 max_phase_a_growth_mb_per_hour=max(r["phase_a_growth_mb_per_hour"] for r in srows),
-                max_g1_mem_mb=max(r["mem_peak_mb"] for r in g1rows)),
+                max_g1_mem_mb=max(r["mem_peak_mb"] for r in g1rows),
+                max_predicted_mb=max(r["predicted_mb"] for r in srows)),
     )
     commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
     (out / "gates.json").write_text(json.dumps(dict(commit=commit, smoke=a.smoke, gates=gates), indent=1, default=str),
@@ -393,7 +447,7 @@ def main():
          f"- **G1** session engine = committed application-tier events: {'PASS' if gates['G1']['PASS'] else 'FAIL'} "
          f"({gates['G1']['subjects']} subjects, {gates['G1']['files_differ']} files differ)",
          f"- **G3** Siena through edf_input = x1_external.load_18: {'PASS' if gates['G3']['PASS'] else 'FAIL'} "
-         f"({gates['G3']['files']} files, load_18 itself on {gates['G3']['load18_checked']} files <= 1.5 h; sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
+         f"({gates['G3']['files']} files, load_18 itself on {gates['G3']['load18_checked']} files, skipped on {gates['G3']['load18_skipped']} (predicted above the limit); sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
          f"- **G4** mains suggestion on Siena: 50 Hz {gates['G4']['suggested_50']}, 60 Hz {gates['G4']['suggested_60']}, "
          f"none {gates['G4']['none']}",
          f"- **G5** bad-electrode rule on Siena: {gates['G5']['files_flagged']} files flagged "

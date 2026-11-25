@@ -1,2 +1,2 @@
-file,subject,bad,fs_in,g3_equal,hours,load_peak_mb,max_z,montage,phase_a_mb_per_hour,phase_a_peak_mb,phase_a_s,r50,r60,sha_ok,size_mb,suggested_hz
-PN14-3.edf,PN14,,512,True,11.665,15148.6,1.06,referential,1298.6,15148.6,140.4,8.49,1.23,True,2107.2,50.0
+file,subject,bad,bad_ratio,fs_in,g3_equal,g3_load18_skipped_mb,hours,load_heap_mb,load_mem_mb,load_resident_mb,load_s,max_z,montage,phase_a_growth_mb_per_hour,phase_a_heap_mb,phase_a_mem_before_mb,phase_a_mem_mb,phase_a_resident_mb,phase_a_s,predicted_mb,r50,r60,sha_ok,size_mb,suggested_hz
+PN14-3.edf,PN14,,,512,True,13245,11.665,516.4,1620.1,1078.8,309.8,1.06,referential,44.5,516.4,1102.3,1621.2,1083.3,463.8,602.0,8.49,1.23,True,2107.2,50.0

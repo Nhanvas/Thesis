@@ -1,0 +1,16 @@
+case,files_equal,n,n_ref,is_ictal_equal,is_signal_loss_equal,file_idx_equal,status
+PN00,True,2918,2918,True,True,True,PASS
+PN01,True,12139,12139,True,True,True,PASS
+PN03,True,21804,21804,True,True,True,PASS
+PN05,True,5431,5431,True,True,True,PASS
+PN06,True,10864,10864,True,True,True,PASS
+PN07,True,7862,7862,True,True,True,PASS
+PN09,True,6162,6162,True,True,True,PASS
+PN10,True,16852,16852,True,True,True,PASS
+PN11,True,2169,2169,True,True,True,PASS
+PN12,True,5488,5488,True,True,True,PASS
+PN13,True,7797,7797,True,True,True,PASS
+PN14,True,18416,18416,True,True,True,PASS
+PN16,True,4391,4391,True,True,True,PASS
+PN17,True,4612,4612,True,True,True,PASS
+chb24,True,19166,19166,True,True,True,PASS

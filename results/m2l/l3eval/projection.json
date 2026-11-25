@@ -1,0 +1,31 @@
+{
+ "note": "computed estimate: smoke rate x hours; memory model of m2l_sched (measured slopes x SAFETY); makespan = simulation of the memory-aware admission; scoring = SCORE_FACTOR x build",
+ "elapsed_h": 0.163,
+ "build_h": 3.079,
+ "score_h": 0.246,
+ "workers": 4,
+ "rec_s_per_h": 94.49,
+ "hours_of_eeg": 441.7,
+ "budget_mb": 25811,
+ "budget_source": {
+  "source": "MemAvailable",
+  "mem_available_mb": 30366,
+  "mem_total_mb": 32099
+ },
+ "jobs": 294,
+ "max_estimate_mb": 14844,
+ "largest": "PN01-1.edf",
+ "simulated_max_concurrency": 4,
+ "over_budget": [],
+ "model": {
+  "base_mb": 950.0,
+  "mb_per_h": {
+   "256": 640.0,
+   "512": 810.0
+  },
+  "safety": 1.25,
+  "uncal": 1.5,
+  "budget_frac": 0.85
+ },
+ "projected_total_h": 3.49
+}

@@ -1,0 +1,237 @@
+[
+ {
+  "gate": "G-sel",
+  "status": "PASS",
+  "selection": {
+   "arm": "B-MCD-F",
+   "S": "B",
+   "cov": "MCD",
+   "floor": "F",
+   "k": 9.914208892343954,
+   "candidates": [
+    "R-MCD-F",
+    "B-LW-F",
+    "B-MCD-F"
+   ],
+   "dev_f1": 0.13328746253670745,
+   "dev_sens": 0.8716605616605617,
+   "dev_fa": 45.40955319276832,
+   "rule": "among arms with F1 - P0 interval above 0 and sensitivity - P0 >= -0.03, highest F1 (3 decimals; ties -> F, LW, R); none -> P0 = R-LW-F",
+   "source_runs": [
+    "results\\m2l\\l2_rec",
+    "results\\m2l\\l2_rob"
+   ]
+  },
+  "minlen": {
+   "minutes": 30,
+   "windows": 450,
+   "qualifying": [],
+   "f1_full": 0.13328746253670745,
+   "sens_full": 0.8716605616605617,
+   "rule": "smallest L in [5, 10, 20, 30] with F1_L >= F1_full - 0.02 and Sens_L >= Sens_full - 0.03; none -> 30 min",
+   "arm": "B-MCD-F"
+  },
+  "sha16": [
+   "70539f67a1069202",
+   "1c6468b1d04f713f"
+  ],
+  "summary": "arm B-MCD-F (k 9.914208892343954), minimum length 30 min"
+ },
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 294,
+  "from_physionet": 0,
+  "failed_checks": [],
+  "cases_missing": [],
+  "summary": "294 EDF verified by sha256 against PhysioNet; checks ['committed data/summaries = PhysioNet summaries', 'CHB-MIT chb01-23: every EDF listed in its summary']"
+ },
+ {
+  "gate": "G-data",
+  "status": "PASS",
+  "files": 23,
+  "bad": [],
+  "pinned": 23,
+  "summary": "23 files hashed, 0 differ"
+ },
+ {
+  "gate": "G-c",
+  "status": "PASS",
+  "max_abs_dev_3dec": 0.0,
+  "c": [
+   2.040617815449715,
+   1.6236797262940956,
+   1.4747473835208929,
+   1.4216248414393797,
+   1.7943079401237616,
+   1.593508281390045,
+   1.4854227075116804,
+   1.4702226130869862,
+   1.8180122196598778,
+   1.4666001035918539,
+   1.5718236446233411,
+   1.4881800227227333,
+   2.0581147877559505,
+   1.5989782588582246,
+   1.4953137324277093,
+   1.4183799729023836,
+   1.6675110716690975,
+   1.5457665760150259
+  ],
+  "summary": "c_ch recomputed from RB1c = the design table to 3 decimals (max deviation 0e+00)"
+ },
+ {
+  "gate": "R1.0-test",
+  "status": "PASS",
+  "rows_e23": 128,
+  "error_pairs": 296,
+  "rows_look6": 64,
+  "mismatches": [],
+  "n_mismatch": 0,
+  "error_mismatches": [],
+  "n_error_mismatch": 0,
+  "look6_mismatches": [],
+  "run_budget_vs_record": [],
+  "cases": [
+   "chb03",
+   "chb06",
+   "chb13",
+   "chb14",
+   "chb15",
+   "chb16",
+   "chb17",
+   "chb18"
+  ],
+  "summary": "e23 128 rows + 296 error pairs, look #6 64 rows, run_budget consistency 0 differ; 0 differ from the record"
+ },
+ {
+  "gate": "GE",
+  "status": "PASS",
+  "rows": 240,
+  "exact_rows": 148,
+  "max_abs_dtp": 1,
+  "max_abs_dfp": 2,
+  "missing": 0,
+  "over_tolerance": [],
+  "n_ref_or_hours_differ": 0,
+  "errors_descriptive": {
+   "det_on": {
+    "median_abs": 24.0,
+    "median_abs_ref": 24.0
+   },
+   "det_off": {
+    "median_abs": 16.0,
+    "median_abs_ref": 16.0
+   },
+   "cpd_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "cpd_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_on": {
+    "median_abs": 12.0,
+    "median_abs_ref": 12.0
+   },
+   "hyb_off": {
+    "median_abs": 12.0,
+    "median_abs_ref": 8.0
+   },
+   "pairs": 348,
+   "pairs_ref": 343
+  },
+  "cases": [
+   "chb24",
+   "PN00",
+   "PN01",
+   "PN03",
+   "PN05",
+   "PN06",
+   "PN07",
+   "PN09",
+   "PN10",
+   "PN11",
+   "PN12",
+   "PN13",
+   "PN14",
+   "PN16",
+   "PN17"
+  ],
+  "summary": "240 rows, 148 exact, max |dtp| 1, max |dfp| 2 (tolerance 1 / 2)"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed estimate: smoke rate x hours; memory model of m2l_sched (measured slopes x SAFETY); makespan = simulation of the memory-aware admission; scoring = SCORE_FACTOR x build",
+  "elapsed_h": 0.163,
+  "build_h": 3.079,
+  "score_h": 0.246,
+  "workers": 4,
+  "rec_s_per_h": 94.49,
+  "hours_of_eeg": 441.7,
+  "budget_mb": 25811,
+  "budget_source": {
+   "source": "MemAvailable",
+   "mem_available_mb": 30366,
+   "mem_total_mb": 32099
+  },
+  "jobs": 294,
+  "max_estimate_mb": 14844,
+  "largest": "PN01-1.edf",
+  "simulated_max_concurrency": 4,
+  "over_budget": [],
+  "model": {
+   "base_mb": 950.0,
+   "mb_per_h": {
+    "256": 640.0,
+    "512": 810.0
+   },
+   "safety": 1.25,
+   "uncal": 1.5,
+   "budget_frac": 0.85
+  },
+  "projected_total_h": 3.49,
+  "summary": "projected total 3.49 h (limit 10.5 h); largest estimate 14844 MB (PN01-1.edf) within the budget 25811 MB"
+ },
+ {
+  "gate": "G-worker[build]",
+  "status": "PASS",
+  "jobs": 294,
+  "differ": [],
+  "summary": "294 jobs ran the parent's modules"
+ },
+ {
+  "gate": "G-sched[build]",
+  "status": "PASS",
+  "jobs": 294,
+  "budget_mb": 25811,
+  "peak_estimate_in_flight_mb": 25805,
+  "missing_peak": 0,
+  "max_measured_over_estimate": 0.77,
+  "max_measured_mb": 11427,
+  "summary": "294 jobs; estimates in flight <= 25805 of 25811 MB; measured peak <= 11427 MB (max measured / estimate 0.77)"
+ },
+ {
+  "gate": "G-struct[test]",
+  "status": "PASS",
+  "cases": 8,
+  "failed": [],
+  "summary": "8 patients: recordings, windows, labels, signal loss, file order = reference"
+ },
+ {
+  "gate": "G-struct[ext]",
+  "status": "PASS",
+  "cases": 15,
+  "failed": [],
+  "summary": "15 patients: recordings, windows, labels, signal loss, file order = reference"
+ },
+ {
+  "gate": "G-worker[score_eval]",
+  "status": "PASS",
+  "jobs": 23,
+  "differ": [],
+  "summary": "23 jobs ran the parent's modules"
+ }
+]

@@ -1,0 +1,9 @@
+case,files_equal,n,n_ref,is_ictal_equal,is_buffer_equal,is_signal_loss_equal,file_idx_equal,status
+chb03,True,34201,34201,True,True,True,True,PASS
+chb06,True,60060,60060,True,True,True,True,PASS
+chb13,True,29700,29700,True,True,True,True,PASS
+chb14,True,23400,23400,True,True,True,True,PASS
+chb15,True,36008,36008,True,True,True,True,PASS
+chb16,True,17100,17100,True,True,True,True,PASS
+chb17,True,18906,18906,True,True,True,True,PASS
+chb18,True,32070,32070,True,True,True,True,PASS

@@ -399,8 +399,8 @@ def private_report(pdir):
          "Records named by decreasing file size (clin01 = larger), as src/v9_clinical_run.py. Opened through "
          "edf_input.open_raw (C5c fix 4).", "",
          "| record | hours | 19 electrodes at the top rate | suggested mains | r50 | r60 | electrodes flagged (z, ratio to the median) "
-         "| predicted MB | open MB | load memory peak MB | Phase A memory peak MB |",
-         "|---|---|---|---|---|---|---|---|---|---|---|"])
+         "| predicted MB | open MB | load memory peak MB | Phase A memory peak MB | Phase A growth MB |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|"])
     try:
         for i, p in enumerate(files):
             lab = f"clin{i + 1:02d}"
@@ -424,25 +424,56 @@ def private_report(pdir):
                                     for t in meta["electrodes"] if t["bad"]) or "none"
                 try:
                     res, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+                    grow_a = peak_a - LAST["base_mb"]
                     del res
                     gc.collect()
                 except Exception as e:      # noqa: BLE001  (message only, never a path)
-                    peak_a = float("nan")
+                    peak_a = grow_a = float("nan")
                     flagged += f"; Phase A error {type(e).__name__}"
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
             r50, r60 = meta["mains_ratios"]
             L = [f"| {lab} | {hours:.2f} | {top} | {sug} | {r50:.1f} | {r60:.1f} | {flagged} | {pred:.0f} | {o_mb:.0f} "
-                 f"| {peak_l:.0f} | {peak_a:.0f} |"]
+                 f"| {peak_l:.0f} | {peak_a:.0f} | {grow_a:.0f} |"]
             trunc = [n for n in meta["notices"] if "declares" in n]
             if trunc:
-                L.append(f"|  | notice: {trunc[0]} | | | | | | | | | |")
+                L.append(f"|  | notice: {trunc[0]} | | | | | | | | | | |")
             put(L)
             print(f"private {lab}: done (open {o_mb:.0f} MB, load {peak_l:.0f} MB, Phase A {peak_a:.0f} MB private)",
                   flush=True)
     finally:
         fh.close()
     print("private report: Agent/inbox/C5_STEP2_PRIVATE.md", flush=True)
+
+
+def filemode_one(p, rows_dir):
+    """C5c Step 2b: memory and time of the file engine (SzScan 1.0) on one recording -- Phase A, then
+    engine_file.run_file on its caches as the app's phase_b_file worker does; private memory peaks (watchdog)."""
+    import engine_file as EF
+    h = EI.header(p)
+    r = dict(subject=p.parent.name, file=p.name, hours=round(h["n_rec_file"] * h["rec_dur"] / 3600, 3),
+             predicted_mb=round(admit(p, f"{p.parent.name}/{p.name}"), 1))
+    tmp = Path(tempfile.mkdtemp(prefix="c5fm_"))
+    try:
+        t0 = time.perf_counter()
+        pa, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+        r.update(phase_a_s=round(time.perf_counter() - t0, 1), phase_a_mem_before_mb=round(LAST["base_mb"], 1),
+                 phase_a_mem_mb=round(peak_a, 1))
+        t1 = time.perf_counter()
+        res, peak_f, _ = traced(EF.run_file, np.load(pa.filtered_path, mmap_mode="r"), np.load(pa.flag_path),
+                                np.load(pa.fsamp_path))
+        r.update(engine_s=round(time.perf_counter() - t1, 1), engine_mem_before_mb=round(LAST["base_mb"], 1),
+                 engine_mem_mb=round(peak_f, 1), engine_growth_mb=round(peak_f - LAST["base_mb"], 1),
+                 events=len(res["events"]), short=bool(res["short"]))
+        del res, pa
+        gc.collect()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    log = RowLog(rows_dir, "filemode")
+    log.add(r)
+    log.close()
+    print(f"FILE MODE {r['subject']}/{r['file']} ({r['hours']} h): {r}", flush=True)
+    return r
 
 
 def write_outputs(out, g1rows, srows, smoke, commit=None, note=""):
@@ -495,18 +526,18 @@ def main():
     ap.add_argument("--chb")
     ap.add_argument("--siena")
     ap.add_argument("--private-dir", default=None)
-    ap.add_argument("--parts", default=None, help="comma-separated: g1, siena, hospital")
+    ap.add_argument("--parts", default=None, help="comma-separated: g1, siena, hospital, filemode")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--max-gb", type=float, default=2.0)
     a = ap.parse_args()
     parts = set((a.parts or ("g1,siena" + (",hospital" if a.private_dir else ""))).split(","))
-    if parts - {"g1", "siena", "hospital"}:
-        raise SystemExit(f"STOP: unknown part(s) {sorted(parts - {'g1', 'siena', 'hospital'})}")
+    if parts - {"g1", "siena", "hospital", "filemode"}:
+        raise SystemExit(f"STOP: unknown part(s) {sorted(parts - {'g1', 'siena', 'hospital', 'filemode'})}")
     if a.smoke:
         parts = {"g1", "siena"}
-    for need, arg in (("g1", a.chb), ("siena", a.siena), ("hospital", a.private_dir)):
+    for need, arg in (("g1", a.chb), ("siena", a.siena), ("filemode", a.siena), ("hospital", a.private_dir)):
         if need in parts and not arg:
-            raise SystemExit(f"STOP: part {need} needs {'--chb' if need == 'g1' else '--siena' if need == 'siena' else '--private-dir'}")
+            raise SystemExit(f"STOP: part {need} needs {'--chb' if need == 'g1' else '--private-dir' if need == 'hospital' else '--siena'}")
     global WATCH
     WATCH = Watch(a.max_gb * 1000)
     try:
@@ -520,6 +551,12 @@ def main():
     out = OUT / "smoke" if a.smoke else OUT
     out.mkdir(parents=True, exist_ok=True)
     g1rows, srows = [], []
+    if "filemode" in parts:
+        sf_all = siena_files(a.siena)
+        if not sf_all:
+            raise SystemExit(f"STOP: no PN*.edf under {a.siena}")
+        longest = max(sf_all, key=lambda q: (lambda h: h["n_rec_file"] * h["rec_dur"])(EI.header(q)))
+        filemode_one(longest, out / "rows")
     if "siena" in parts:
         sums = {}
         for line in SIENA_SUMS.read_text().splitlines():

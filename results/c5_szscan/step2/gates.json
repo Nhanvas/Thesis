@@ -1,0 +1,43 @@
+{
+ "commit": "17b86fc",
+ "smoke": false,
+ "gates": {
+  "G1": {
+   "PASS": true,
+   "subjects": 8,
+   "files_differ": 0
+  },
+  "G3": {
+   "PASS": true,
+   "files": 41,
+   "load18_checked": 6,
+   "load18_skipped": 35,
+   "sha_bad": []
+  },
+  "G4": {
+   "suggested_50": 19,
+   "suggested_60": 0,
+   "none": 22
+  },
+  "G5": {
+   "files_flagged": 8,
+   "flagged": [
+    "PN03-1.edf: FZ O2 P8",
+    "PN05-3.edf: P3 P4 PZ",
+    "PN05-4.edf: FZ",
+    "PN06-4.edf: PZ",
+    "PN06-5.edf: PZ",
+    "PN07-1.edf: F7 F8",
+    "PN10-1.edf: PZ",
+    "PN13-2.edf: CZ"
+   ]
+  },
+  "G6": {
+   "max_phase_a_mem_mb": 1691.5,
+   "max_load_mem_mb": 1690.9,
+   "max_phase_a_growth_mb_per_hour": 307.9,
+   "max_g1_mem_mb": 1596.3,
+   "max_predicted_mb": 696.1
+  }
+ }
+}

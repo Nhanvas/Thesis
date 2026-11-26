@@ -375,6 +375,51 @@ def private_report(pdir):
     (INBOX / "C5_STEP2_PRIVATE.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
+def write_outputs(out, g1rows, srows, smoke, commit=None, note=""):
+    """g1.csv, siena.csv, gates.json, GATES.md from the per-row results (also used by c5_gates_from_log.py)."""
+    for name, rows in (("g1.csv", g1rows), ("siena.csv", srows)):
+        keys = sorted({k for r in rows for k in r}, key=lambda k: (k not in ("subject", "file"), k))
+        with open(out / name, "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=keys); w.writeheader(); w.writerows(rows)
+    gates = dict(
+        G1=dict(PASS=all(r["files_differ"] == 0 for r in g1rows), subjects=len(g1rows),
+                files_differ=sum(r["files_differ"] for r in g1rows)),
+        G3=dict(PASS=all(r["g3_equal"] is True for r in srows)
+                and all(r.get("g3_load18_equal", True) is True for r in srows), files=len(srows),
+                load18_checked=sum("g3_load18_equal" in r for r in srows),
+                load18_skipped=sum("g3_load18_skipped_mb" in r for r in srows),
+                sha_bad=[r["file"] for r in srows if r["sha_ok"] is False]),
+        G4=dict(suggested_50=sum(r.get("suggested_hz") == 50.0 for r in srows),
+                suggested_60=sum(r.get("suggested_hz") == 60.0 for r in srows),
+                none=sum(r.get("suggested_hz") == "none" for r in srows)),
+        G5=dict(files_flagged=sum(bool(r.get("bad")) for r in srows),
+                flagged=[f"{r['file']}: {r['bad']}" for r in srows if r.get("bad")]),
+        G6=dict(max_phase_a_mem_mb=max(r["phase_a_mem_mb"] for r in srows),
+                max_load_mem_mb=max(r["load_mem_mb"] for r in srows),
+                max_phase_a_growth_mb_per_hour=max(r["phase_a_growth_mb_per_hour"] for r in srows),
+                max_g1_mem_mb=max(r["mem_peak_mb"] for r in g1rows),
+                max_predicted_mb=max(r["predicted_mb"] for r in srows)),
+    )
+    commit = commit or subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
+    (out / "gates.json").write_text(json.dumps(dict(commit=commit, smoke=smoke, gates=gates), indent=1, default=str),
+                                    encoding="utf-8")
+    L = [f"# SzScan Step 2 gates{' — SMOKE' if smoke else ''}", "", f"Commit `{commit}`." + (f" {note}" if note else ""), "",
+         f"- **G1** session engine = committed application-tier events: {'PASS' if gates['G1']['PASS'] else 'FAIL'} "
+         f"({gates['G1']['subjects']} subjects, {gates['G1']['files_differ']} files differ)",
+         f"- **G3** Siena through edf_input = x1_external.load_18: {'PASS' if gates['G3']['PASS'] else 'FAIL'} "
+         f"({gates['G3']['files']} files, load_18 itself on {gates['G3']['load18_checked']} files, skipped on {gates['G3']['load18_skipped']} (predicted above the limit); sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
+         f"- **G4** mains suggestion on Siena: 50 Hz {gates['G4']['suggested_50']}, 60 Hz {gates['G4']['suggested_60']}, "
+         f"none {gates['G4']['none']}",
+         f"- **G5** bad-electrode rule on Siena: {gates['G5']['files_flagged']} files flagged "
+         f"{gates['G5']['flagged'] or ''}",
+         f"- **G6** private memory peak (resident peaks, file pages included, in the CSVs): load max {gates['G6']['max_load_mem_mb']:.0f} MB, "
+         f"Phase A max {gates['G6']['max_phase_a_mem_mb']:.0f} MB; G1 per subject max "
+         f"{gates['G6']['max_g1_mem_mb']:.0f} MB", "",
+         "Per row: `g1.csv`, `siena.csv`. Hospital records: private report in Agent/inbox only."]
+    (out / "GATES.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    return gates
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--chb", required=True)
@@ -417,46 +462,7 @@ def main():
         srows = [siena_one(p, sums) for p in sf]
         if a.private_dir:
             private_report(a.private_dir)
-    for name, rows in (("g1.csv", g1rows), ("siena.csv", srows)):
-        keys = sorted({k for r in rows for k in r}, key=lambda k: (k not in ("subject", "file"), k))
-        with open(out / name, "w", newline="", encoding="utf-8") as fh:
-            w = csv.DictWriter(fh, fieldnames=keys); w.writeheader(); w.writerows(rows)
-    gates = dict(
-        G1=dict(PASS=all(r["files_differ"] == 0 for r in g1rows), subjects=len(g1rows),
-                files_differ=sum(r["files_differ"] for r in g1rows)),
-        G3=dict(PASS=all(r["g3_equal"] is True for r in srows)
-                and all(r.get("g3_load18_equal", True) is True for r in srows), files=len(srows),
-                load18_checked=sum("g3_load18_equal" in r for r in srows),
-                load18_skipped=sum("g3_load18_skipped_mb" in r for r in srows),
-                sha_bad=[r["file"] for r in srows if r["sha_ok"] is False]),
-        G4=dict(suggested_50=sum(r.get("suggested_hz") == 50.0 for r in srows),
-                suggested_60=sum(r.get("suggested_hz") == 60.0 for r in srows),
-                none=sum(r.get("suggested_hz") == "none" for r in srows)),
-        G5=dict(files_flagged=sum(bool(r.get("bad")) for r in srows),
-                flagged=[f"{r['file']}: {r['bad']}" for r in srows if r.get("bad")]),
-        G6=dict(max_phase_a_mem_mb=max(r["phase_a_mem_mb"] for r in srows),
-                max_load_mem_mb=max(r["load_mem_mb"] for r in srows),
-                max_phase_a_growth_mb_per_hour=max(r["phase_a_growth_mb_per_hour"] for r in srows),
-                max_g1_mem_mb=max(r["mem_peak_mb"] for r in g1rows),
-                max_predicted_mb=max(r["predicted_mb"] for r in srows)),
-    )
-    commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(ROOT)).stdout.strip()
-    (out / "gates.json").write_text(json.dumps(dict(commit=commit, smoke=a.smoke, gates=gates), indent=1, default=str),
-                                    encoding="utf-8")
-    L = [f"# SzScan Step 2 gates{' — SMOKE' if a.smoke else ''}", "", f"Commit `{commit}`.", "",
-         f"- **G1** session engine = committed application-tier events: {'PASS' if gates['G1']['PASS'] else 'FAIL'} "
-         f"({gates['G1']['subjects']} subjects, {gates['G1']['files_differ']} files differ)",
-         f"- **G3** Siena through edf_input = x1_external.load_18: {'PASS' if gates['G3']['PASS'] else 'FAIL'} "
-         f"({gates['G3']['files']} files, load_18 itself on {gates['G3']['load18_checked']} files, skipped on {gates['G3']['load18_skipped']} (predicted above the limit); sha256 not matching PhysioNet: {gates['G3']['sha_bad'] or 'none'})",
-         f"- **G4** mains suggestion on Siena: 50 Hz {gates['G4']['suggested_50']}, 60 Hz {gates['G4']['suggested_60']}, "
-         f"none {gates['G4']['none']}",
-         f"- **G5** bad-electrode rule on Siena: {gates['G5']['files_flagged']} files flagged "
-         f"{gates['G5']['flagged'] or ''}",
-         f"- **G6** private memory peak (resident peaks, file pages included, in the CSVs): load max {gates['G6']['max_load_mem_mb']:.0f} MB, "
-         f"Phase A max {gates['G6']['max_phase_a_mem_mb']:.0f} MB; G1 per subject max "
-         f"{gates['G6']['max_g1_mem_mb']:.0f} MB", "",
-         "Per row: `g1.csv`, `siena.csv`. Hospital records: private report in Agent/inbox only."]
-    (out / "GATES.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    gates = write_outputs(out, g1rows, srows, a.smoke)
     print(json.dumps({k: v.get("PASS") for k, v in gates.items() if "PASS" in v}))
 
 

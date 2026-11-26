@@ -1,5 +1,5 @@
 {
- "commit": "98a2e31be87df77ed202ecefe2cb8cc330e678d9",
+ "commit": "20c5172b3585504bdb88e82b4c8a3c1a1eff5e09",
  "smoke": true,
  "gates": {
   "G1": {
@@ -24,10 +24,10 @@
    "flagged": []
   },
   "G6": {
-   "max_phase_a_mem_mb": 1621.2,
-   "max_load_mem_mb": 1620.1,
-   "max_phase_a_growth_mb_per_hour": 44.5,
-   "max_g1_mem_mb": 1206.5,
+   "max_phase_a_mem_mb": 1623.5,
+   "max_load_mem_mb": 1622.1,
+   "max_phase_a_growth_mb_per_hour": 44.4,
+   "max_g1_mem_mb": 1207.6,
    "max_predicted_mb": 602.0
   }
  }

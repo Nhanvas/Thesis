@@ -1,2 +1,2 @@
 subject,events,files,files_differ,heap_peak_mb,hours,mem_before_mb,mem_peak_mb,resident_peak_mb,seconds
-chb16,16,19,0,246.6,19.0,937.1,1206.5,1949.0,1220.2
+chb16,16,19,0,246.6,19.0,937.7,1207.6,1949.6,1190.4

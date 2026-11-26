@@ -26,10 +26,18 @@ Written rules (DESIGN_STEP2.md §3, fixed before any run):
 The EDF header is read here by a small reader written from the specification (Kemp et al. 1992,
 DOI 10.1016/0013-4694(92)90009-7) — only the signal labels, rates and record counts are used; the patient, recording
 and date fields are never returned.
+
+Every EDF is opened through open_raw / no_edf_annotations (C5c fix 4, 26/11): MNE 1.12.1 reads an EDF+ annotation
+signal over the whole file while opening it, with a buffer for every signal of the file over the whole length
+(RawEDF.__init__; 10 GB predicted for the larger hospital record, src/c5_diag_edfplus.py), and exclude= does not stop it.
+SzScan never reads annotations, so the annotation signal's index list is emptied right after MNE has read the header:
+the channel selection, the rates and every per-channel operation stay MNE's own, so the data are unchanged (test E12).
 """
 from __future__ import annotations
 
+import contextlib
 import math
+import threading
 from pathlib import Path
 
 import numpy as np
@@ -52,6 +60,51 @@ MAINS_MIN_RATIO = 3.0
 
 class InputError(ValueError):
     """User-facing refusal; the message is shown as the file's error toast."""
+
+
+# ════════════════════════════════════════════════════════════════════ opening an EDF (C5c fix 4)
+MNE_PINNED = "1.12.1"                       # requirements.txt; the helper relies on this version's internals
+SKIPS_EDF_ANNOTATIONS = True                # read by c5_step2_gates.predict_mb: opening reads the header only
+_OPEN_LOCK = threading.Lock()
+
+
+@contextlib.contextmanager
+def no_edf_annotations():
+    """Inside this block mne.io.read_raw_edf does not read the EDF+ annotation signal ('EDF Annotations').
+
+    MNE 1.12.1: _get_info -> _read_edf_header computes tal_idx (the annotation signals) and excludes them from the
+    channel selection `sel`; RawEDF.__init__ then reads tal_idx over the whole file (lines 226-236) and every later
+    _read_segment_file reads them again (read_sel = sel[idx] + tal_idx). Emptying tal_idx in the edf_info that
+    _get_info returns leaves `sel`, max_samp, sfreq and the per-channel calibration untouched (all computed before),
+    so the signal values are MNE's own; only the annotation reads disappear and raw.annotations stays empty.
+    A lock serialises the opens (the app opens files from worker threads); the original function is always restored."""
+    import mne
+    import mne.io.edf.edf as _E
+    if mne.__version__ != MNE_PINNED:
+        raise RuntimeError(f"edf_input.no_edf_annotations relies on MNE {MNE_PINNED}; installed {mne.__version__}. "
+                           f"Re-check mne/io/edf/edf.py (RawEDF.__init__, _get_info, _read_segment_file) and test E12.")
+    orig = _E._get_info
+
+    def _get_info_no_tal(*a, **k):
+        out = orig(*a, **k)
+        edf_info = out[1]
+        if "tal_idx" not in edf_info:
+            raise RuntimeError("MNE's edf_info has no 'tal_idx'; the annotation bypass does not apply.")
+        edf_info["tal_idx"] = np.empty(0, int)
+        return out
+    with _OPEN_LOCK:
+        _E._get_info = _get_info_no_tal
+        try:
+            yield
+        finally:
+            _E._get_info = orig
+
+
+def open_raw(path):
+    """mne.io.read_raw_edf(path, preload=False) without reading the annotation signal (no_edf_annotations)."""
+    import mne
+    with no_edf_annotations():
+        return mne.io.read_raw_edf(str(path), preload=False, verbose="ERROR")
 
 
 # ════════════════════════════════════════════════════════════════════ header (specification reader)
@@ -307,7 +360,8 @@ def load_bipolar(path, workdir=None):
     """CHB-MIT path: preprocessing.open_edf, then the 18 channels read in blocks of BLOCK_S seconds (= get_data() on
     the whole file, bit for bit; C5b memory fix). Output in RAM up to RAM_ROWS_MB, else a DiskRows file in `workdir`.
     -> (data, meas_date, fs, data_path)."""
-    raw = P.open_edf(str(path))
+    with no_edf_annotations():                  # fix 4: an EDF+ bipolar file opens without its annotation signal
+        raw = P.open_edf(str(path))
     if raw is None:
         raise InputError("One or more of the 18 derivations is missing.")
     fs = int(round(raw.info["sfreq"]))
@@ -361,8 +415,7 @@ def load_referential(path, names: dict, interpolate: bool, workdir=None):
     two rows, resampled and written to the output (a DiskRows file in `workdir` when given, no memory map). Without
     interpolation the values equal x1_external.load_18 bit for bit (block reads, the differences and per-row
     resample_poly are each exact; tests E10, E11, gate G3)."""
-    import mne
-    raw = mne.io.read_raw_edf(str(path), preload=False, verbose="ERROR")
+    raw = open_raw(path)                         # fix 4: no annotation-signal read at open
     fs_f = float(raw.info["sfreq"])
     fs = int(round(fs_f))
     if abs(fs_f - fs) > 1e-6:

@@ -31,7 +31,15 @@ commands when the system reports memory pressure, whatever this script uses (smo
 Private hospital records (--private-dir): nothing about the files (name, header field, date, path) is printed or
 written; the report goes to Agent/inbox/C5_STEP2_PRIVATE.md only (never committed).
 Outputs (public): results/c5_szscan/step2/ (GATES.md, g1.csv, siena.csv, gates.json; smoke/ for --smoke).
+
+C5c (26/11, fix 4): every EDF is opened by edf_input.open_raw (no EDF+ annotation-signal read at open); predict_mb
+adds the open-time read (0 through edf_input); each file's private-memory growth while opening is measured (column
+open_mem_mb, hospital: private report). Each row is written as it finishes (C5b's full run lost its outputs when it
+stopped): rows/<part>.jsonl in the output folder, and the private report line by line; the CSVs, gates.json and
+GATES.md are written only when G1 and Siena both ran (they are never overwritten by a partial run). --parts chooses
+what runs: g1, siena, hospital (comma-separated; default g1,siena plus hospital when --private-dir is given).
 Run: PYTHONUTF8=1 python src/c5_step2_gates.py --chb F:/Study/Thesis/Dataset/CHB-MIT --siena F:/Study/Thesis/Dataset/siena [--private-dir F:/Study/Thesis/Dataset/Clinical] [--smoke]
+Hospital part only: PYTHONUTF8=1 python src/c5_step2_gates.py --parts hospital --private-dir F:/Study/Thesis/Dataset/Clinical
 """
 import argparse
 import csv
@@ -200,6 +208,9 @@ def predict_mb(p):
     (2) one derivation at the input rate: two electrode rows and their difference, plus the 256-Hz output,
     (3) Phase A per channel at 256 Hz: x, band-pass, notch (float64) and three float32 copies, plus the window view.
     Synthetic check (test E11, 49 signals, 1 h, 512 Hz): measured committed growth 224 MB.
+    (4) C5c: opening the file. MNE reads an EDF+ annotation signal over the whole file at open with a buffer for every
+        other signal (c5_diag_edfplus.py); edf_input.open_raw skips that read (SKIPS_EDF_ANNOTATIONS), so the term is 0
+        through edf_input and (other signals) x samples x 8 B otherwise (test E12 measures both).
     Returns (predicted growth MB, signals, input samples, output samples, fs)."""
     h = EI.header(p)
     fs = max(int(round(k / h["rec_dur"])) for k in h["nsamp"])
@@ -211,7 +222,32 @@ def predict_mb(p):
     m1 = (n_sig + 3 * 19) * block * 8 + 20e6
     m2 = 3 * n_in * 8 + n_out * 8
     m3 = 3 * n_out * 8 + 3 * n_out * 4 + n_out * 8
-    return max(m0, m1, m2, m3) / 1e6, n_sig, n_in, n_out, fs
+    n_tal = sum(lab.strip().upper() in ("EDF ANNOTATIONS", "BDF ANNOTATIONS") for lab in h["labels"])
+    m4 = 0 if (EI.SKIPS_EDF_ANNOTATIONS or not n_tal) else (n_sig - n_tal) * n_in * 8
+    return max(m0, m1, m2, m3, m4) / 1e6, n_sig, n_in, n_out, fs
+
+
+def open_mb(p):
+    """Private-memory growth (MB) while edf_input.open_raw opens the file (fix 4 check; peak sampled by the watchdog)."""
+    raw, peak, _ = traced(EI.open_raw, p)
+    del raw
+    gc.collect()
+    return max(0.0, peak - LAST["base_mb"])
+
+
+class RowLog:
+    """One JSON line per finished row, flushed at once (a stopped run keeps every row it finished)."""
+    def __init__(self, folder, part):
+        folder.mkdir(parents=True, exist_ok=True)
+        self.fh = open(folder / f"{part}.jsonl", "w", encoding="utf-8")
+
+    def add(self, row):
+        self.fh.write(json.dumps(row, default=str) + "\n")
+        self.fh.flush()
+        os.fsync(self.fh.fileno())
+
+    def close(self):
+        self.fh.close()
 
 
 def admit(p, what):
@@ -247,7 +283,7 @@ def tier2_events():
     return ev, files
 
 
-def g1(chb, subjects):
+def g1(chb, subjects, log=None):
     ev, files = tier2_events()
     rows = []
     for s in subjects:
@@ -270,6 +306,8 @@ def g1(chb, subjects):
                          hours=round(hours, 2), seconds=round(secs, 1), mem_peak_mb=round(peak, 1),
                          mem_before_mb=round(LAST["base_mb"], 1), resident_peak_mb=round(LAST["rss_peak_mb"], 1),
                          heap_peak_mb=round(LAST["heap_mb"], 1)))
+        if log:
+            log.add(rows[-1])
         print(f"G1 {s}: {rows[-1]}", flush=True)
     return rows
 
@@ -289,6 +327,7 @@ def siena_one(p, sums):
     want = sums.get(f"{p.parent.name}/{p.name}")
     r["sha_ok"] = (sha256(p) == want) if want else "not listed"
     r["predicted_mb"] = round(admit(p, f"{p.parent.name}/{p.name}"), 1)
+    r["open_mem_mb"] = round(open_mb(p), 1)
     tmp = Path(tempfile.mkdtemp(prefix="c5g6_"))
     try:
         try:
@@ -331,48 +370,79 @@ def siena_one(p, sums):
     return r
 
 
+def _electrodes_at_top_rate(p):
+    """True when the 19 electrodes are sampled at the file's highest rate (otherwise MNE resamples them per read and
+    block reads would not equal a whole-file read); None when the montage is not referential."""
+    h = EI.header(p)
+    montage, names = EI.classify(h["labels"])
+    if montage != "referential":
+        return None
+    other = [k for lab, k in zip(h["labels"], h["nsamp"]) if lab.strip().upper() not in ("EDF ANNOTATIONS", "BDF ANNOTATIONS")]
+    top = max(other)
+    return all(h["nsamp"][h["labels"].index(names[e])] == top for e in EI.ELECTRODES)
+
+
 def private_report(pdir):
-    """Hospital records: counts only, no file attribute printed or written except durations and electrode names."""
+    """Hospital records: counts only, no file attribute printed or written except durations and electrode names.
+    The report is written line by line as each record finishes (C5c)."""
     files = sorted((p for p in Path(pdir).iterdir() if p.is_file() and p.suffix.lower() == ".edf"),
                    key=lambda p: -p.stat().st_size)
-    L = ["# C5 Step 2 -- hospital records (PRIVATE, laptop only; never commit)", "",
-         "Records named by decreasing file size (clin01 = larger), as src/v9_clinical_run.py.", "",
-         "| record | hours | suggested mains | r50 | r60 | electrodes flagged (z) | load memory peak MB | Phase A memory peak MB |",
-         "|---|---|---|---|---|---|---|---|"]
-    for i, p in enumerate(files):
-        lab = f"clin{i + 1:02d}"
-        admit(p, lab)
-        tmp = Path(tempfile.mkdtemp(prefix="c5priv_"))
-        try:
-            (d, meta), peak_l, _ = traced(EI.load_any, p, mains="auto", workdir=tmp)
-            sug = f"{meta['notch_hz']:.0f} Hz"
-        except EI.InputError:
-            (d, meta), peak_l, _ = traced(EI.load_any, p, mains=50.0, workdir=tmp)
-            sug = "none"
-        hours = d.shape[1] / 256 / 3600
-        EI.drop_temp(meta["data_path"], d)
-        del d
-        gc.collect()
-        amps = np.median([t["amp_uv"] for t in meta["electrodes"]])
-        flagged = ", ".join(f"{t['electrode']} (z {t['z']:.1f}, x{t['amp_uv'] / amps:.2f})"
-                            for t in meta["electrodes"] if t["bad"]) or "none"
-        try:
-            res, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
-            del res
-            gc.collect()
-        except Exception as e:      # noqa: BLE001  (message only, never a path)
-            peak_a = float("nan")
-            flagged += f"; Phase A error {type(e).__name__}"
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
-        r50, r60 = meta["mains_ratios"]
-        L.append(f"| {lab} | {hours:.2f} | {sug} | {r50:.1f} | {r60:.1f} | {flagged} | {peak_l:.0f} | {peak_a:.0f} |")
-        trunc = [n for n in meta["notices"] if "declares" in n]
-        if trunc:
-            L.append(f"|  | notice: {trunc[0]} | | | | | | |")
-        print(f"private {lab}: done", flush=True)
     INBOX.mkdir(parents=True, exist_ok=True)
-    (INBOX / "C5_STEP2_PRIVATE.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    rep_path = INBOX / "C5_STEP2_PRIVATE.md"
+    fh = open(rep_path, "w", encoding="utf-8")
+
+    def put(lines):
+        fh.write("\n".join(lines) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
+    put(["# C5 Step 2 -- hospital records (PRIVATE, laptop only; never commit)", "",
+         "Records named by decreasing file size (clin01 = larger), as src/v9_clinical_run.py. Opened through "
+         "edf_input.open_raw (C5c fix 4).", "",
+         "| record | hours | 19 electrodes at the top rate | suggested mains | r50 | r60 | electrodes flagged (z, ratio to the median) "
+         "| predicted MB | open MB | load memory peak MB | Phase A memory peak MB |",
+         "|---|---|---|---|---|---|---|---|---|---|---|"])
+    try:
+        for i, p in enumerate(files):
+            lab = f"clin{i + 1:02d}"
+            pred = admit(p, lab)
+            top = _electrodes_at_top_rate(p)
+            o_mb = open_mb(p)
+            tmp = Path(tempfile.mkdtemp(prefix="c5priv_"))
+            try:
+                try:
+                    (d, meta), peak_l, _ = traced(EI.load_any, p, mains="auto", workdir=tmp)
+                    sug = f"{meta['notch_hz']:.0f} Hz"
+                except EI.InputError:
+                    (d, meta), peak_l, _ = traced(EI.load_any, p, mains=50.0, workdir=tmp)
+                    sug = "none"
+                hours = d.shape[1] / 256 / 3600
+                EI.drop_temp(meta["data_path"], d)
+                del d
+                gc.collect()
+                amps = np.median([t["amp_uv"] for t in meta["electrodes"]])
+                flagged = ", ".join(f"{t['electrode']} (z {t['z']:.1f}, x{t['amp_uv'] / amps:.2f})"
+                                    for t in meta["electrodes"] if t["bad"]) or "none"
+                try:
+                    res, peak_a, _ = traced(pdm.process_file_phase_a, str(p), None, tmp / "pa", mains=50.0)
+                    del res
+                    gc.collect()
+                except Exception as e:      # noqa: BLE001  (message only, never a path)
+                    peak_a = float("nan")
+                    flagged += f"; Phase A error {type(e).__name__}"
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+            r50, r60 = meta["mains_ratios"]
+            L = [f"| {lab} | {hours:.2f} | {top} | {sug} | {r50:.1f} | {r60:.1f} | {flagged} | {pred:.0f} | {o_mb:.0f} "
+                 f"| {peak_l:.0f} | {peak_a:.0f} |"]
+            trunc = [n for n in meta["notices"] if "declares" in n]
+            if trunc:
+                L.append(f"|  | notice: {trunc[0]} | | | | | | | | | |")
+            put(L)
+            print(f"private {lab}: done (open {o_mb:.0f} MB, load {peak_l:.0f} MB, Phase A {peak_a:.0f} MB private)",
+                  flush=True)
+    finally:
+        fh.close()
+    print("private report: Agent/inbox/C5_STEP2_PRIVATE.md", flush=True)
 
 
 def write_outputs(out, g1rows, srows, smoke, commit=None, note=""):
@@ -422,48 +492,70 @@ def write_outputs(out, g1rows, srows, smoke, commit=None, note=""):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--chb", required=True)
-    ap.add_argument("--siena", required=True)
+    ap.add_argument("--chb")
+    ap.add_argument("--siena")
     ap.add_argument("--private-dir", default=None)
+    ap.add_argument("--parts", default=None, help="comma-separated: g1, siena, hospital")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--max-gb", type=float, default=2.0)
     a = ap.parse_args()
+    parts = set((a.parts or ("g1,siena" + (",hospital" if a.private_dir else ""))).split(","))
+    if parts - {"g1", "siena", "hospital"}:
+        raise SystemExit(f"STOP: unknown part(s) {sorted(parts - {'g1', 'siena', 'hospital'})}")
+    if a.smoke:
+        parts = {"g1", "siena"}
+    for need, arg in (("g1", a.chb), ("siena", a.siena), ("hospital", a.private_dir)):
+        if need in parts and not arg:
+            raise SystemExit(f"STOP: part {need} needs {'--chb' if need == 'g1' else '--siena' if need == 'siena' else '--private-dir'}")
     global WATCH
     WATCH = Watch(a.max_gb * 1000)
     try:
         import psutil
         print(f"available system memory at start: {psutil.virtual_memory().available / 1e6:.0f} MB; "
               f"this process {memory_mb()[0]:.0f} MB resident, {memory_mb()[1]:.0f} MB private; "
-              f"private limit {a.max_gb * 1000:.0f} MB", flush=True)
+              f"private limit {a.max_gb * 1000:.0f} MB; parts {sorted(parts)}", flush=True)
     except ImportError:
         print(f"this process {memory_mb()[0]:.0f} MB resident, {memory_mb()[1]:.0f} MB private; "
-              f"private limit {a.max_gb * 1000:.0f} MB (psutil not installed)", flush=True)
+              f"private limit {a.max_gb * 1000:.0f} MB (psutil not installed); parts {sorted(parts)}", flush=True)
     out = OUT / "smoke" if a.smoke else OUT
     out.mkdir(parents=True, exist_ok=True)
-    sums = {}
-    for line in SIENA_SUMS.read_text().splitlines():
-        parts = line.split()
-        if len(parts) == 2:
-            sums[parts[1].lstrip("*").removeprefix("./")] = parts[0].lower()
-    sf = siena_files(a.siena)
-    if not sf:
-        raise SystemExit(f"STOP: no PN*.edf under {a.siena}")
-    smoke_file = max(sf, key=lambda p: p.stat().st_size)
+    g1rows, srows = [], []
+    if "siena" in parts:
+        sums = {}
+        for line in SIENA_SUMS.read_text().splitlines():
+            q = line.split()
+            if len(q) == 2:
+                sums[q[1].lstrip("*").removeprefix("./")] = q[0].lower()
+        sf = siena_files(a.siena)
+        if not sf:
+            raise SystemExit(f"STOP: no PN*.edf under {a.siena}")
     if a.smoke:
         ev, files = tier2_events()
         shortest = min(TEST, key=lambda s: sum((Path(a.chb) / s / f).stat().st_size for f in files[s]))
-        g1rows = g1(a.chb, [shortest])
+        smoke_file = max(sf, key=lambda p: p.stat().st_size)
+        g1rows = g1(a.chb, [shortest], RowLog(out / "rows", "g1"))
+        log = RowLog(out / "rows", "siena")
         srows = [siena_one(smoke_file, sums)]
+        log.add(srows[0])
         peak = max([r["mem_peak_mb"] for r in g1rows] + [srows[0]["phase_a_mem_mb"], srows[0]["load_mem_mb"]])
         print(f"SMOKE: private memory peak {peak:.0f} MB (G1 {shortest}, Siena {smoke_file.parent.name}/{smoke_file.name}); "
               f"limit {a.max_gb * 1000:.0f} MB -> {'OK' if peak <= a.max_gb * 1000 else 'TOO HIGH'}")
     else:
-        g1rows = g1(a.chb, TEST)
-        srows = [siena_one(p, sums) for p in sf]
-        if a.private_dir:
+        if "g1" in parts:
+            g1rows = g1(a.chb, TEST, RowLog(out / "rows", "g1"))
+        if "siena" in parts:
+            log = RowLog(out / "rows", "siena")
+            for p in sf:
+                srows.append(siena_one(p, sums))
+                log.add(srows[-1])
+        if "hospital" in parts:
             private_report(a.private_dir)
-    gates = write_outputs(out, g1rows, srows, a.smoke)
-    print(json.dumps({k: v.get("PASS") for k, v in gates.items() if "PASS" in v}))
+    if g1rows and srows:
+        gates = write_outputs(out, g1rows, srows, a.smoke)
+        print(json.dumps({k: v.get("PASS") for k, v in gates.items() if "PASS" in v}))
+    else:
+        print(f"partial run ({sorted(parts)}): public CSVs / GATES.md not rewritten"
+              + (f"; rows in {out / 'rows'}" if (g1rows or srows) else ""))
 
 
 if __name__ == "__main__":

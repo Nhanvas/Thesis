@@ -25,6 +25,13 @@ Each rule is shown to act on the case it is for and to leave the others alone; e
       work folder = x1_external.load_18 / open_edf + get_data() on the whole file (exact); its COMMITTED memory growth
       (private bytes on Windows, VmData on Linux -- resident memory does not see untouched pages) stays below the
       memory model of c5_step2_gates.predict_mb, while the old whole-file read of two electrodes exceeds it      [C8, G6]
+  E12 C5c fix 4 (26/11): MNE reads an EDF+ annotation signal over the whole file at open with a buffer for every
+      signal. EDF+ files with an annotation signal (referential: 19 electrodes + 30 other signals, some at a lower
+      rate, 1 h at 512 Hz; bipolar: CHB-like, 20 min at 256 Hz) and a plain EDF: edf_input.open_raw gives the same
+      channels, rates, n_times and selection as MNE's own open and every signal equal bit for bit (600-s blocks);
+      no annotation read (committed growth at open < 20 MB, MNE's own open above 300 MB); load_any = x1_external.load_18
+      / open_edf + get_data() (exact) with committed growth below predict_mb; MNE's function restored after the open
+      and after an error; another MNE version refused                                                          [C8, G6]
 Run: PYTHONUTF8=1 python src/c5_step2_test.py   -> ALL PASS or the failing items (exit code 1).
 """
 import csv
@@ -211,6 +218,7 @@ def main():
         # ── E10 memory-light reading
         e10(root)
         e11(root)
+        e12(root)
         # ── E7 the whole app, temporary state
         e7(root, pb)
     finally:
@@ -368,6 +376,148 @@ def e11(root):
           f"load_any +{g_new:.0f} MB, model {pred:.0f} MB")
     left = sorted(q.name for q in wd.glob("_c5_*"))
     check("E11 no temporary file left", not left, str(left))
+
+
+def write_edfplus(path, labels, nsamp, datas_uv, annot=True, phys=(-6400.0, 6400.0)):
+    """EDF (Kemp et al. 1992) or EDF+C (Kemp & Olivan 2003, DOI 10.1016/S1388-2457(03)00123-8) with 1-s records,
+    per-signal rates, and a time-keeping annotation signal (one TAL per record, plus a text annotation in record 5)."""
+    ns = len(labels)
+    n_rec = min(len(d) // k for d, k in zip(datas_uv, nsamp))
+    labs, ns_l = list(labels), list(nsamp)
+    if annot:
+        labs.append("EDF Annotations"); ns_l.append(30)
+    nt = len(labs)
+
+    def f(x, w):
+        t = str(x)[:w]
+        return t + " " * (w - len(t))
+    h = f("0", 8) + f("X X X X", 80) + f("Startdate 01-JAN-2001 X X X", 80) + f("01.01.01", 8) + f("12.00.00", 8)
+    h += f(256 + 256 * nt, 8) + f("EDF+C" if annot else "", 44) + f(n_rec, 8) + f(1, 8) + f(nt, 4)
+    for key, w in [("label", 16), ("tr", 80), ("dim", 8), ("pmin", 8), ("pmax", 8), ("dmin", 8), ("dmax", 8),
+                   ("pre", 80), ("ns", 8), ("res", 32)]:
+        for i in range(nt):
+            tal = i >= ns
+            h += f(dict(label=labs[i], tr="", dim="" if tal else "uV", pmin=-1 if tal else phys[0],
+                        pmax=1 if tal else phys[1], dmin=-32768, dmax=32767, pre="", ns=ns_l[i], res="")[key], w)
+    gain = (phys[1] - phys[0]) / 65535
+    digs = [np.clip(np.round((np.asarray(d[:n_rec * k], float) - phys[0]) / gain - 32768), -32768, 32767)
+            .astype("<i2").reshape(n_rec, k) for d, k in zip(datas_uv, nsamp)]
+    with open(path, "wb") as fh:
+        fh.write(h.encode("latin-1"))
+        for r in range(n_rec):
+            fh.write(b"".join(dg[r].tobytes() for dg in digs))
+            if annot:
+                tal = f"+{r}\x14\x14\x00".encode("ascii")
+                if r == 5:
+                    tal += "+5\x151\x14spike\x14\x00".encode("ascii")
+                fh.write(tal.ljust(60, b"\x00"))
+
+
+def e12(root):
+    import gc
+    import threading
+    import mne
+    import mne.io.edf.edf as _E
+    import c5_diag_mne_commit as DG
+    import c5_step2_gates as G
+
+    def commit_growth(fn, *a, **k):
+        gc.collect()
+        base, peak, stop = DG.memory_mb()["commit"], [0.0], [False]
+
+        def mon():
+            while not stop[0]:
+                peak[0] = max(peak[0], DG.memory_mb()["commit"])
+                time.sleep(0.005)
+        th = threading.Thread(target=mon, daemon=True)
+        th.start()
+        try:
+            out = fn(*a, **k)
+        finally:
+            stop[0] = True
+            th.join()
+        return out, max(peak[0], DG.memory_mb()["commit"]) - base
+
+    def same_open(r0, r1):
+        e0, e1 = r0._raw_extras[0], r1._raw_extras[0]
+        return (r0.ch_names == r1.ch_names and r0.n_times == r1.n_times and r0.info["sfreq"] == r1.info["sfreq"]
+                and np.array_equal(e0["sel"], e1["sel"]) and e0["max_samp"] == e1["max_samp"])
+
+    def same_data(r0, r1, step):
+        for a in range(0, r0.n_times, step):
+            b = min(r0.n_times, a + step)
+            if not np.array_equal(r0.get_data(start=a, stop=b), r1.get_data(start=a, stop=b)):
+                return False
+        return True
+    orig = _E._get_info
+    wd = root / "w12"
+    wd.mkdir()
+    # referential EDF+: 19 electrodes at 512 Hz, 20 other signals at 512 Hz, 10 at 256 Hz, + annotation signal; 1 h
+    labels = [f"EEG {e.capitalize()}" for e in REF19] + [f"POL X{i}" for i in range(30)]
+    nsamp = [512] * 39 + [256] * 10
+    x = eeg(39, 3600, 512, 71, 50)
+    datas = list(x) + list(eeg(10, 3600, 256, 72))
+    pr = root / "ref_plus.edf"
+    write_edfplus(pr, labels, nsamp, datas)
+    del x, datas
+    raw0, g_old = commit_growth(mne.io.read_raw_edf, str(pr), preload=False, verbose="ERROR")
+    raw1, g_new = commit_growth(EI.open_raw, pr)
+    check("E12 referential EDF+: MNE's own open reads the annotations (premise)", len(raw0.annotations) == 1,
+          f"{len(raw0.annotations)} annotation(s)")
+    check("E12 open_raw: same channels, rate, n_times, selection, max_samp as MNE's own open", same_open(raw0, raw1),
+          f"{len(raw1.ch_names)} channels, {raw1.info['sfreq']} Hz")
+    check("E12 open_raw: every signal equal bit for bit (600-s blocks, lower-rate signals included)",
+          same_data(raw0, raw1, 600 * 512))
+    check("E12 open_raw: no annotation read (raw.annotations empty)", len(raw1.annotations) == 0)
+    check("E12 committed growth at open: open_raw < 20 MB, MNE's own open > 300 MB", g_new < 20 < 300 < g_old,
+          f"open_raw +{g_new:.0f} MB, MNE +{g_old:.0f} MB")
+    check("E12 MNE's _get_info restored after the open", _E._get_info is orig)
+    del raw0, raw1
+    pred, *_ = G.predict_mb(pr)
+    (d, meta), g_load = commit_growth(EI.load_any, pr, mains=50.0, workdir=wd)
+    eq = np.array_equal(np.asarray(d), X1.load_18(pr, "siena"))
+    EI.drop_temp(meta["data_path"], d)
+    del d
+    check("E12 referential EDF+: load_any = x1_external.load_18 (exact)", eq)
+    check("E12 referential EDF+: committed growth of load_any below predict_mb", g_load <= pred,
+          f"+{g_load:.0f} MB, model {pred:.0f} MB")
+    # bipolar EDF+ (CHB-like), 20 min at 256 Hz
+    pb = root / "chbplus_01.edf"
+    write_edfplus(pb, CHB23, [256] * 23, list(eeg(23, 1200, 256, 73, 60)))
+    d, meta = EI.load_any(pb, mains=60.0)
+    ref = P.open_edf(str(pb)).get_data()
+    check("E12 bipolar EDF+: load_any = open_edf + get_data() (exact)", np.array_equal(np.asarray(d), ref))
+    with EI.no_edf_annotations():
+        rb = P.open_edf(str(pb))
+    check("E12 bipolar EDF+: open_edf inside no_edf_annotations reads no annotation", len(rb.annotations) == 0)
+    del d, ref, rb
+    # plain EDF (no annotation signal): identical to MNE's own open
+    pp = root / "plain.edf"
+    write_edfplus(pp, labels[:25], [512] * 25, list(eeg(25, 600, 512, 74, 50)), annot=False)
+    r0 = mne.io.read_raw_edf(str(pp), preload=False, verbose="ERROR")
+    r1 = EI.open_raw(pp)
+    check("E12 plain EDF: open_raw = MNE's own open (selection, rates, data exact)",
+          same_open(r0, r1) and same_data(r0, r1, 600 * 512) and len(r0.annotations) == len(r1.annotations) == 0)
+    # restore after an error, refuse another version
+    try:
+        with EI.no_edf_annotations():
+            raise KeyError("x")
+    except KeyError:
+        pass
+    check("E12 MNE's _get_info restored after an error inside the block", _E._get_info is orig)
+    real = mne.__version__
+    try:
+        mne.__version__ = "9.9.9"
+        try:
+            EI.open_raw(pp)
+            refused = False
+        except RuntimeError:
+            refused = True
+    finally:
+        mne.__version__ = real
+    check("E12 another MNE version refused", refused and _E._get_info is orig)
+    left = sorted(q.name for q in wd.glob("_c5_*"))
+    check("E12 no temporary file left", not left, str(left))
 
 
 def e7(root, chb_path):

@@ -12,6 +12,8 @@ c5_step2b_test.py -- chat C5c, Step 2b: synthetic and replay tests of the new of
   B4 Siena annotation path: a Seizures-list file in the standard format -> the planted seizure; an event on it = 1 TP,
      an event elsewhere = 1 FP.
   B5 an event running past its file's end is split onto the next file (application-tier rule) and counted once.
+  B7 a CHB-MIT summary that lists only the seizure files (as chb24's): the unlisted files count as seizure-free
+     (x1_external's convention, used by L3), their number is reported, the seizure of a listed file is found.
   B4c Siena clock (C5c, after the laptop's Windows failure, 26/11): every branch of SzCORE's Siena parser (standard,
      day shift, the PN12-type entry, PN01, PN00-3, PN10-7.8.9) gives the same seizures through siena_clock as through
      the original on this machine; with time.mktime refusing dates before 1970 (Windows) the original fails and
@@ -211,12 +213,35 @@ def b4c(root):
           fails and win == expected and X1._parseTimeStamp.__name__ == "_parseTimeStamp")
 
 
+def b7(root):
+    d = root / "chb7" / "chb97"
+    d.mkdir(parents=True)
+    (d / "chb97-summary.txt").write_text(
+        "Data Sampling Rate: 256 Hz\n\nFile Name: chb97_03.edf\nNumber of Seizures in File: 1\n"
+        "Seizure 1 Start Time: 100 seconds\nSeizure 1 End Time: 160 seconds\n\n")
+    up = root / "up7"
+    db = TmpDB(root / "c.db", up)
+    db.subject("chb97")
+    f3 = db.file("chb97", "chb97_03.edf", 3600.0, 900)
+    f1 = db.file("chb97", "chb97_01.edf", 3600.0, 900)
+    db.event(f3, 98.0, 150.0)
+    db.event(f1, 500.0, 560.0)
+    db.close()
+    SA.main(["--chb", str(root / "chb7"), "--db", str(root / "c.db"), "--uploads", str(up), "--out", str(root / "o7")])
+    r = pd.read_csv(root / "o7" / "per_subject.csv").iloc[0]
+    md = (root / "o7" / "SUMMARY.md").read_text(encoding="utf-8")
+    check("B7 summary listing only seizure files: unlisted file seizure-free, counted, seizure found",
+          (r["seizures"], r["detected"], r["false_alarms"], r["files_not_in_annotation"]) == (1, 1, 1, 1)
+          and "1 such file(s)" in md, f"{r.to_dict()}")
+
+
 def main():
     root = Path(tempfile.mkdtemp(prefix="c5s2b_"))
     try:
         b1_b3(root)
         b4c(root)
         b4_b5(root)
+        b7(root)
         try:
             import c5_verify2_test as VT
             VT.run(root, check)

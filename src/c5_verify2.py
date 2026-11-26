@@ -289,11 +289,13 @@ def check_file(f, subj, roots, sums, summ, ev_db, ev_ref, ws, min_s):
                 x -= volts(hdr, idx[e2], paths[idx[e2]])
             if up_ != down_:
                 x = resample_poly(x, up_, down_)
+            # the app filters the WHOLE derivation, then keeps the complete 4-s windows (pipeline_demo._phase_a_rest);
+            # filtering after the cut changes the last samples through the backward pass (C5c: G9 smoke on PN01-1)
+            fi = V1.indep_filter(x, notch)[:usable]
             x = x[:usable]
             app = np.asarray(raw_mm[:, c, :], np.float64).reshape(-1)
             d = float(np.max(np.abs(app - x))) * 1e6 if len(x) == usable else float("inf")
             del app
-            fi = V1.indep_filter(x, notch)
             appf = np.asarray(flt_mm[:, c, :], np.float64).reshape(-1)
             df = float(np.max(np.abs(appf - fi))) * 1e6
             del appf

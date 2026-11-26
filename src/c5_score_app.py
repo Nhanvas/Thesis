@@ -132,10 +132,11 @@ def siena_clock(X1):
 def score_subject(sid, base, sfiles, events, uploads, ann):
     """Counts of one subject (all its files) -> dict, plus the per-file rows."""
     fids = {f["id"]: f for f in sfiles}
-    missing = [f["filename"] for f in sfiles if f["filename"] not in ann]
-    if missing:
-        raise SystemExit(f"STOP: {sid}: file(s) absent from the annotation: {missing[:5]} -- their seizures would "
-                         "vanish and their events count as false alarms")
+    # A recording the subject's annotation does not list has no seizure -- the convention of x1_external.chb_subject
+    # (`sz.get(f, [])`), used by F2-03's L3 run: chb24's summary lists only its seizure files (C5c 27/11). Counted
+    # per subject; gate S1 checks the per-file seizure counts against L3 for every file L3 scored.
+    unlisted = [f["filename"] for f in sfiles if f["filename"] not in ann]
+    ann = {**ann, **{fn: [] for fn in unlisted}}
     frows = []
     for f in sfiles:
         score_p = uploads / sid / f"{Path(f['filename']).stem}.score.npy"
@@ -160,7 +161,7 @@ def score_subject(sid, base, sfiles, events, uploads, ann):
         tp += sc["tp"]; fp += sc["fp"]; n_ref += sc["n_ref"]; dur += fr["duration_s"]; sz_s += s_s
         per_file[fr["file_name"]] = sc["n_ref"]
     row = dict(subject=sid, base=base, group=group_of(base), files=len(frows), hours=round(dur / 3600, 4),
-               ai_events=len(ev), events_crossing_files=bstats[sid]["n_crossed"])
+               ai_events=len(ev), events_crossing_files=bstats[sid]["n_crossed"], files_not_in_annotation=len(unlisted))
     row.update(EA._score_from_counts(tp, fp, n_ref, dur, sz_s))
     row["_n_ref_by_file"] = per_file
     return row
@@ -235,7 +236,8 @@ def write(out, rows, gates, n_private, smoke):
                  f"{int(d['detected'].sum())} | {d.loc[d['seizures'] > 0, 'sensitivity'].mean():.3f} | "
                  f"{f1.mean():.3f} | {fpd.mean():.1f} |")
     L += ["", "Sensitivity mean over subjects with at least one seizure; F1 'undefined' (no detection, no seizure) "
-          "left out of the mean.", "", "| subject | group | mode | files | hours | seizures | detected | false alarms "
+          "left out of the mean. A file the subject's annotation does not list counts as seizure-free (x1_external's "
+          f"convention, as F2-03's L3): {int(df['files_not_in_annotation'].sum())} such file(s).", "", "| subject | group | mode | files | hours | seizures | detected | false alarms "
           "| sensitivity | precision | F1 | FP/day | events crossing a file end |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
         L.append(f"| {r['subject']} | {r['group']} | {r['mode']} | {r['files']} | {r['hours']:.2f} | {r['seizures']} "

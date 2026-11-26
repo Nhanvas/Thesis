@@ -1,8 +1,9 @@
 """
 c5_verify2_test.py -- test B6 of src/c5_step2b_test.py (chat C5c): gate G9 (src/c5_verify2.py) on synthetic studies
 created by the application's own ingest (batch_ingest.ingest) in a temporary database and upload folder:
-  chb98  bipolar CHB-like, 256 Hz, 60-Hz study, session engine, two 20-min files
-  PN98   referential Siena-like ("EEG Fp1" ...), 512 Hz, 50-Hz study, file engine, one 35-min and one 10-min file
+  chb98  bipolar CHB-like, 256 Hz, 60-Hz study, session engine, files of 20 min and 20 min 2 s (a partial last window:
+         G9 smoke on PN01-1 found V3 / V5 failing on such files -- the verifier filtered after the cut, C5c 27/11)
+  PN98   referential Siena-like ("EEG Fp1" ...), 512 Hz, 50-Hz study, file engine, one 35-min 3-s and one 10-min file
   clin01 referential hospital-like EDF+ ("EEG T3-REF" ..., 30 other signals, annotation signal), 256 Hz, 50-Hz study,
          private, C3 x12 and interpolated
 Expected: V1, V2, V3, V4 (no node -> formatter not run), V5 PASS on the public files; file mode: no event in the 10-min
@@ -41,9 +42,9 @@ def run(root, check):
         for d in (chb, sie, hosp):
             d.mkdir(parents=True)
         T.write_edf(chb / "chb98_01.edf", T.CHB23, 256, T.eeg(23, 1200, 256, 61, 60), starttime="10.00.00")
-        T.write_edf(chb / "chb98_02.edf", T.CHB23, 256, T.eeg(23, 1200, 256, 62, 60), starttime="10.20.00")
+        T.write_edf(chb / "chb98_02.edf", T.CHB23, 256, T.eeg(23, 1202, 256, 62, 60), starttime="10.20.00")
         sl = [f"EEG {e.capitalize()}" for e in T.REF19] + ["EKG", "SPO2"]
-        x = T.eeg(21, 35 * 60, 512, 63, 50)
+        x = T.eeg(21, 35 * 60 + 3, 512, 63, 50)
         x[:19, 900 * 512:960 * 512] *= 5
         T.write_edfplus(sie / "PN98-1.edf", sl, [512] * 21, list(x), annot=False)
         T.write_edfplus(sie / "PN98-2.edf", sl, [512] * 21, list(T.eeg(21, 600, 512, 64, 50)), annot=False)

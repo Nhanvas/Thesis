@@ -1,0 +1,13 @@
+{
+ "S0": {
+  "PASS": true,
+  "differ": [],
+  "reference": "results\\application_eval_v4\\per_subject.csv"
+ },
+ "S1": {
+  "PASS": true,
+  "files_compared": 316,
+  "differ": [],
+  "reference": "results\\m2l\\l3eval\\per_file.csv"
+ }
+}

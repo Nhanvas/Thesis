@@ -1,0 +1,14 @@
+{
+ "commit": "76665ce67d2ff4206983b46f74cdb422ed7c88b6",
+ "dirty": "no",
+ "seconds": 302.1871328353882,
+ "hours": 13.488055555555556,
+ "subjects": [
+  "PN01"
+ ],
+ "smoke": true,
+ "peak_mb_max": 1881.894912,
+ "private_note": "not checked in this run",
+ "smoke_seconds_per_hour": 20.7,
+ "full_run_projection_h": 3.41
+}

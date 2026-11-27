@@ -1,0 +1,41 @@
+{
+ "V1": {
+  "pass_files": 1,
+  "files": 1,
+  "PASS": true
+ },
+ "V2": {
+  "pass_files": 1,
+  "files": 1,
+  "PASS": true
+ },
+ "V3": {
+  "pass_files": 1,
+  "files": 1,
+  "PASS": true
+ },
+ "V4_core": {
+  "pass_files": 1,
+  "files": 1,
+  "PASS": true
+ },
+ "V5_data": {
+  "pass_files": 1,
+  "files": 1,
+  "PASS": true
+ },
+ "V4": {
+  "PASS": true,
+  "ui_cases": 3,
+  "node_run": true
+ },
+ "V5": {
+  "PASS": true
+ },
+ "V6": {
+  "match": 0,
+  "differ": 0,
+  "no_reference": 1,
+  "PASS": null
+ }
+}

@@ -1,0 +1,10 @@
+db,case,files_physionet,files_on_kaggle,files_kaggle_sha_equal,files_from_physionet,files_skipped_by_design,seizures_listed,seizures_in_used_files,hours,hours_used_windows,files_listed_in_summary,summary_entries,earlier_files,earlier_hours_used_windows
+chbmit,chb03,38,38,38,0,0,7,7,38.0017,38.0011,38,38,38,38.0011
+chbmit,chb06,18,18,18,0,0,10,10,66.735,66.7333,18,18,18,66.7333
+chbmit,chb13,33,33,33,0,0,12,12,33.0,33.0,33,33,33,33.0
+chbmit,chb14,26,26,26,0,0,8,8,26.0,26.0,26,26,26,26.0
+chbmit,chb15,40,40,40,0,0,20,20,40.01,40.0089,40,40,40,40.0089
+chbmit,chb16,19,19,19,0,0,10,10,19.0,19.0,19,19,19,19.0
+chbmit,chb17,21,21,21,0,0,3,3,21.0067,21.0067,21,21,21,21.0067
+chbmit,chb18,36,36,36,0,0,6,6,35.6347,35.6333,36,36,36,35.6333
+chbmit,chb24,22,22,22,0,0,16,16,21.2964,21.2956,12,12,22,21.2956

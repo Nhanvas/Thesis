@@ -1,0 +1,69 @@
+[
+ {
+  "gate": "G-raw",
+  "status": "PASS",
+  "files": 41,
+  "from_physionet": 0,
+  "failed_checks": [],
+  "cases_missing": [],
+  "summary": "41 EDF verified by sha256 against PhysioNet; checks []"
+ },
+ {
+  "gate": "G-files",
+  "status": "PASS",
+  "recordings": 41,
+  "l3_recordings": 41,
+  "summary": "41 recordings = L3's 41 recordings of the set"
+ },
+ {
+  "gate": "G2-smoke",
+  "status": "PASS",
+  "file": "PN12-3.edf",
+  "differ": [],
+  "seconds": 15.7,
+  "peak_mb": 978.3,
+  "summary": "PN12/PN12-3.edf = L3"
+ },
+ {
+  "gate": "PROJ",
+  "status": "PASS",
+  "note": "computed estimate: smoke rate x hours, LPT on workers; scoring = SCORE_FACTOR x build",
+  "elapsed_h": 0.026,
+  "build_h": 0.407,
+  "score_h": 0.033,
+  "extra_h": 0.0,
+  "workers": 4,
+  "rec_s_per_h": 41.22,
+  "hours_of_eeg": 141.02,
+  "projected_total_h": 0.47,
+  "summary": "projected total 0.47 h (limit 10.5 h)"
+ },
+ {
+  "gate": "G-worker[g2]",
+  "status": "PASS",
+  "jobs": 41,
+  "differ": [],
+  "summary": "41 jobs ran the parent's modules (m2l and the application)"
+ },
+ {
+  "gate": "G-sched[g2]",
+  "status": "PASS",
+  "jobs": 41,
+  "budget_mb": 25707,
+  "peak_estimate_in_flight_mb": 9821,
+  "missing_peak": 0,
+  "max_measured_over_estimate": 0.715,
+  "max_measured_mb": 1827,
+  "summary": "41 jobs; estimates in flight <= 9821 of 25707 MB; measured peak <= 1827 MB (max measured / estimate 0.71)"
+ },
+ {
+  "gate": "G2[siena]",
+  "status": "PASS",
+  "recordings": 41,
+  "l3_recordings": 41,
+  "missing": [],
+  "extra": [],
+  "differ": [],
+  "summary": "41 / 41 recordings equal to L3; missing 0, extra 0"
+ }
+]

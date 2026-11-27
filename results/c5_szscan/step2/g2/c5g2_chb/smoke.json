@@ -1,0 +1,7 @@
+{
+ "rec_s_per_h": 39.295,
+ "smoke_file": "chb03_01.edf",
+ "smoke_hours": 1.0,
+ "smoke_s": 27.1,
+ "load_factor": 1.45
+}
